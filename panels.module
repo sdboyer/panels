@@ -182,7 +182,7 @@ function panels_list_page() {
     $items[] = $item;
   }
   $header = array(
-    t('panels title'),
+    t('Panel title'),
     t('URL'),
     t('Operations'),
   );
@@ -191,7 +191,7 @@ function panels_list_page() {
 }
 
 /*
- * Provide a form to confirm deletion of a view.
+ * Provide a form to confirm deletion of a panel page.
  */
 function panels_delete_page($did = '') {
   $panels = panels_load_panels($did);
@@ -210,7 +210,7 @@ function panels_delete_page($did = '') {
 }
 
 /*
- * Handle the submit button to delete a view.
+ * Handle the submit button to delete a panel page.
  */
 function panels_delete_confirm_submit($formid, $form) {
   if ($form['confirm']) {
