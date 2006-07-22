@@ -310,7 +310,7 @@ function panels_edit_form($panels) {
       panels_form_builder($form['add'][$id]);
 
       if ($conf = $function('add', $form_values['add'][$id])) {
-        $add->conf = $conf;
+        $add->configuration = $conf;
         $add->type = $id;
         $form['add']['area']['#parents'] = array('area');
         panels_form_builder($form['add']['area']);
@@ -406,11 +406,8 @@ function panels_edit_form($panels) {
       else {
         $position = 0;
       }
-      $area_record = new stdClass();
-      $area_record->type = $add->type;
-      $area_record->configuration = $add->conf;
 
-      $panels->content[$area][$position] = $area_record;
+      $panels->content[$area][$position] = $add;
       $order[] = $position;
       $form['content'][$area]['order']['#value'] = serialize($order);
     }

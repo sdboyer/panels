@@ -68,7 +68,6 @@ function panels_admin_node($op, &$arg, $arg2 = NULL) {
       $conf = &$arg;
       $form['nid'] = array(
         '#type' => 'hidden',
-
         '#default_value' => $conf['nid'],
       );
       $form['teaser'] = array(

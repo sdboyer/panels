@@ -1,4 +1,5 @@
 <?php
+// $Id$
 /**
  * implementation of hook_panels_layouts
  */
