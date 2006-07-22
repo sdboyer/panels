@@ -1,0 +1,13 @@
+Simply activate the module. The tables you need will be installed.
+
+Then, go to administer >> panels
+
+Select 'add'.
+
+Choose a layout; a simple one is best if you're just exploring.
+
+Choose a URL for your new panel page. 'panel/test' is good if you're just exploring.
+
+Add some content to each of the areas.
+
+Click save, then click on the URL in the list to see what your new page looks like.
