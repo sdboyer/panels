@@ -1,0 +1,16 @@
+.panel-3col-33 { 
+  /* border: 1px solid red; */ 
+  overflow: hidden; 
+}
+.panel-3col-33 .panel-col-first { 
+  float: left; 
+  width: 33%; 
+}
+.panel-3col-33 .panel-col { 
+  float: left; 
+  width: 34%; 
+}
+.panel-3col-33 .panel-col-last { 
+  float: left; 
+  width: 33%; 
+}

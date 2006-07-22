@@ -1,0 +1,14 @@
+TODO:
+
+? content type: phptemplate
+
+content templates:
+  1 x 2 x 1
+  3 col -- even
+access control to pages
+access control to content types
+
+dashboard node extension
+
+write help
+document plugin API

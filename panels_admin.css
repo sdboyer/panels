@@ -1,0 +1,14 @@
+.layout-link {
+  float: left; 
+  padding: 1em;
+  width: 125px;
+}
+
+.layout-link img {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.layout-icon {
+  float: right;
+}

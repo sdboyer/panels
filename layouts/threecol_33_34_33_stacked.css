@@ -1,0 +1,21 @@
+.panel-3col-33-stacked { 
+  /* border: 1px solid red; */ 
+  overflow: hidden; 
+}
+.panel-3col-33-stacked .panel-col-top,
+.panel-3col-33-stacked .panel-col-bottom { 
+  width: 100%; 
+  clear: both;
+}
+.panel-3col-33-stacked .panel-col-first { 
+  float: left; 
+  width: 33%; 
+}
+.panel-3col-33-stacked .panel-col { 
+  float: left; 
+  width: 34%; 
+}
+.panel-3col-33-stacked .panel-col-last { 
+  float: left; 
+  width: 33%; 
+}

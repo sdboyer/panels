@@ -1,0 +1,799 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_help()
+ */
+function panels_help($section = '') {
+  switch ($section) {
+    case 'admin/modules#description':
+      return t('The panels module allows the creation of pages with flexible layouts.');
+    case 'admin/panels':
+    case 'admin/panels/list':
+      return t('<p>You may peruse a list of your current panels layouts and edit them, or click add to create a new page.</p>');
+    case 'admin/panels/add':
+      return t('<p>Choose a layout for your new page from the list below.</p>');
+  }
+}
+
+/**
+ * Implementation of hook_perm()
+ */
+function panels_perm() {
+  return array('create panelss');
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function panels_menu($may_cache) {
+  if ($may_cache) {
+    $access = user_access('create panelss');
+    $items[] = array(
+      'path' => 'admin/panels',
+      'title' => t('panels'),
+      'access' => $access,    
+      'callback' => 'panels_list_page',
+    );
+    $items[] = array(
+      'path' => 'admin/panels/list',
+      'title' => t('list'),
+      'access' => $access,    
+      'callback' => 'panels_list_page',
+      'weight' => -10,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+    $items[] = array(
+      'path' => 'admin/panels/add',
+      'title' => t('add'),
+      'access' => $access,    
+      'callback' => 'panels_add_page',
+      'type' => MENU_LOCAL_TASK,
+    );
+    $items[] = array(
+      'path' => 'admin/panels/add/layout',
+      'title' => t('add'),
+      'access' => $access,    
+      'callback' => 'panels_add_layout_page',
+      'type' => MENU_LOCAL_TASK,
+    );
+    $items[] = array(
+      'path' => 'admin/panels/edit',
+      'title' => t('edit panels'),
+      'access' => $access,    
+      'callback' => 'panels_edit_page',
+      'type' => MENU_CALLBACK,
+    );
+    $items[] = array(
+      'path' => 'admin/panels/delete',
+      'title' => t('delete panels'),
+      'access' => $access,    
+      'callback' => 'panels_delete_page',
+      'type' => MENU_CALLBACK,
+    );
+
+    $items[] = array(
+      'path' => 'panels/node/autocomplete',
+      'title' => t('autocomplete node'),
+      'callback' => 'panels_node_autocomplete',
+      'access' => user_access('access content'),
+      'type' => MENU_CALLBACK
+    );
+
+    // load panelss from database
+    $result = db_query("SELECT * FROM {panels_info}");
+    // FIXME: Fow now we're making these all callbacks, but we
+    // should steal code from Views so they can be normal, tabs,
+    // etc
+    while ($panels = db_fetch_object($result)) {
+      $items[] = array(
+        'path' => $panels->path,
+        'title' => $panels->title,
+        'access' => panels_access(unserialize($panels->access)),
+        'callback' => 'panels_panels_page',
+        'callback arguments' => array($panels->did),
+        'type' => MENU_CALLBACK
+      );
+    }
+  }
+  return $items;
+}
+
+/**
+ * Determine whether or not the current user has access to this
+ * panels.
+ */
+function panels_access($access) {
+  // for now
+  return TRUE;
+}
+
+/**
+ * panels path helper function
+ */
+function panels_get_file_path($module, $file, $base_path = true) {
+  if ($base_path) {
+    $output = base_path();
+  }
+  return $output . drupal_get_path('module', $module) . '/' . $file;
+}
+
+// ---------------------------------------------------------------------------
+// panels custom image button
+
+/**
+ * Custom form element to do our nice images.
+ */
+function panels_elements() {
+  $type['panels_imagebutton'] = array('#input' => TRUE, '#button_type' => 'submit',);
+  return $type;
+}
+
+/**
+ * Theme our image button.
+ */
+function theme_panels_imagebutton($element) {
+  return '<input type="image" class="form-'. $element['#button_type'] .'" name="'. $element['#name'] .'" value="'. check_plain($element['#default_value']) .'" '. drupal_attributes($element['#attributes']) . ' src="' . $element['#image'] . '" alt="' . $element['#title'] . '" title="' . $element['#title'] . "\" />\n";
+}
+
+function panels_imagebutton_value() {
+  // null function guarantees default_value doesn't get moved to #value.
+}
+
+/**
+ * Add a single button to a form.
+ */
+function panels_add_button($image, $name, $text) {
+  $module_path = base_path() . drupal_get_path('module', 'panels');
+
+  return array(
+    '#type' => 'panels_imagebutton',
+    '#image' => $module_path . '/images/' . $image,
+    '#title' => $text,
+    '#default_value' => $name,
+  );
+}
+
+/**
+ * Set a button to a blank image -- used for placeholders when buttons are
+ * not relevant but just removing it would be visually unappealing.
+ */
+function panels_set_blank(&$form) {
+  $form['#type'] = 'markup';
+  $form['#value'] = theme('image', drupal_get_path('module', 'panels') . '/images/blank.gif');
+}
+
+// ---------------------------------------------------------------------------
+// panels administrative pages
+
+/**
+ * Provide a list of panelss, with links to edit or delete them.
+ */
+function panels_list_page() {
+  $result = db_query("SELECT * FROM {panels_info} ORDER BY title");
+  while ($panels = db_fetch_object($result)) {
+    $item = array();
+    $item[] = check_plain($panels->title);
+    $item[] = l($panels->path, $panels->path);
+    $item[] = implode(' | ', array(
+      l('edit', "admin/panels/edit/$panels->did"),
+      l('delete', "admin/panels/delete/$panels->did"),
+    ));
+    $items[] = $item;
+  }
+  $header = array(
+    t('panels title'),
+    t('URL'),
+    t('Operations'),
+  );
+  $output = theme('table', $header, $items);
+  return $output;
+}
+
+/*
+ * Provide a form to confirm deletion of a view.
+ */
+function panels_delete_page($did = '') {
+  $panels = panels_load_panels($did);
+
+  if (!$panels) {
+    return 'admin/panels';
+  }
+
+  $form['did'] = array('#type' => 'value', '#value' => $panels->did);
+  return confirm_form('panels_delete_confirm', $form,
+    t('Are you sure you want to delete %title?', array('%title' => $panels->title)),
+    $_GET['destination'] ? $_GET['destination'] : 'admin/panels',
+    t('This action cannot be undone.'),
+    t('Delete'), t('Cancel')
+  );
+}
+
+/*
+ * Handle the submit button to delete a view.
+ */
+function panels_delete_confirm_submit($formid, $form) {
+  if ($form['confirm']) {
+    panels_delete_panels((object) $form);
+    drupal_goto('admin/panels');
+  }
+}
+
+/**
+ * Handle the add panels page
+ */
+function panels_add_page($layout = NULL) {
+  $layouts = panels_get_layouts();
+  theme_add_style(drupal_get_path('module', 'panels') . '/panels_admin.css');
+  if (!$layout) {
+    foreach ($layouts as $id => $layout) {
+      if (!$default_id) {
+        // grab the first one for our default.
+        $default_id = $id;
+      }
+      $file = panels_get_file_path($layout['module'], $layout['icon'], false);
+      $output .= theme('panels_add_image', $layout[title], $id, l(theme('image', $file), $_GET['q'] . '/' . $id, NULL, NULL, NULL, NULL, TRUE));
+    }
+    return $output;
+  }
+
+  if (!$layouts[$layout]) {
+    return drupal_not_found();
+  }
+
+  $panels->layout = $layout;
+  return panels_edit_form($panels);
+}
+
+function theme_panels_add_image($title, $id, $image) {
+  $output .= '<div class="layout-link">';
+  $output .= $image;
+  $output .= '<div>' . l($title, $_GET['q'] . '/' . $id) . '</div>';
+  $output .= '</div>';
+  return $output;
+}
+// ---------------------------------------------------------------------------
+// panels administrative pages
+
+function panels_edit_page($did = NULL) {
+  if (!$did || !($panels = panels_load_panels($did))) {
+    return drupal_not_found();
+  }
+  return panels_edit_form($panels);
+}
+
+/**
+ * shortcut to ease the syntax of the various form builder tricks we use.
+ */
+function panels_form_builder(&$form, $form_id = 'panels_edit_form') {
+  $form = form_builder($form_id, $form);
+}
+
+/**
+ * Edit an already loaded panels.
+ */
+function panels_edit_form($panels) {
+  theme_add_style(drupal_get_path('module', 'panels') . '/panels_admin.css');
+  $layouts = panels_get_layouts();
+  $layout = $layouts[$panels->layout];
+
+  $content_types = panels_get_content_types();
+
+  // Process all our add button stuff first so we can add stuff to the
+  // form semi dynamically.
+
+  $form['add'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add content'),
+    '#collapsible' => false,
+    '#description' => t('Select an area to add content to, then select a type of content and click the appropriate button. The content will be added.'),
+  );
+
+  $default_radio = array_shift(array_keys($layout['content areas']));
+  $form['add']['area'] = array(
+    '#type' => 'radios',
+    '#title' => t('Area'),
+    '#options' => $layout['content areas'],
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+    '#default_value' => $default_radio,
+  );
+  foreach ($content_types as $id => $type) {
+    $function = $type['admin'];
+    if (function_exists($function)) {
+      global $form_values;
+      $form['add'][$id] = $function('add button', $dummy); 
+      
+      // $dummy needed for cause you can't have default args on a reference.
+      $form['add'][$id]['#parents'] = array('add', $id);
+      $form['add'][$id]['#tree'] = true;
+      panels_form_builder($form['add'][$id]);
+
+      if ($conf = $function('add', $form_values['add'][$id])) {
+        $add->conf = $conf;
+        $add->type = $id;
+        $form['add']['area']['#parents'] = array('area');
+        panels_form_builder($form['add']['area']);
+        $add->area = $form_values['area'];
+      }
+    }
+  }
+
+  $form['layout'] = array(
+    '#type' => 'value',
+    '#value' => $panels->layout
+  );
+
+  $form['did'] = array(
+    '#type' => 'value',
+    '#value' => $panels->did,
+  );
+
+  $form['info'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('General information'),
+    '#collapsible' => false,
+  );
+
+  $file = panels_get_file_path($layout['module'], $layout['icon'], false);
+  $icon .= theme('image', $file);
+  $form['info']['layout-icon'] = array(
+    '#value' => '<div class="layout-icon">' . $icon . '</div>',
+  );
+
+  $form['info']['layout-display'] = array(
+    '#value' => '<strong>Layout</strong>: ' . $layout['title'],
+  );
+
+  $form['info']['title'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $panels->title,
+    '#title' => t('Page title'),
+    '#description' => t('The page title for this panels layout'),
+  );
+
+  $form['info']['css_id'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $panels->css_id,
+    '#title' => t('CSS ID'),
+    '#description' => t('The CSS ID to apply to this page'),
+  );
+
+  $form['info']['path'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $panels->path,
+    '#title' => t('Path'),
+    '#description' => t('The URL path to give this page, i.e, path/to/page'),
+    '#required' => TRUE,
+  );
+
+  $form['content'] = array(
+    '#tree' => true,
+  );
+  
+  // Go through our content areas and display what we have.
+  foreach ($layout['content areas'] as $area => $title) {
+    $list = array();
+    $form['content'][$area] = array(
+      '#tree' => true,
+    );
+
+    // Construct the order, feeding it the default order for what
+    // we know about. When we pull it back out, it may well be
+    // different due to past submits.
+    $order = array();
+    if (is_array($panels->content[$area])) {
+	    $order = array_keys($panels->content[$area]);
+    }
+  	$form['content'][$area]['order'] = array(
+      '#type' => 'hidden',
+      '#default_value' => serialize($order),
+      '#parents' => array('content', $area, 'order'),
+    );
+
+    // If an add button has added an item to the area, put it in and update
+    // the $order.
+    panels_form_builder($form['content'][$area]['order']);
+    $order = unserialize($form['content'][$area]['order']['#value']);
+    if ($add->area == $area) {
+      // say THIS 5 times real fast
+      if ($panels->content[$area]) {
+        $position = max(max(array_keys($order)), max(array_keys($panels->content[$area]))) + 1;
+      }
+      else if ($order) {
+        $position = max(array_keys($order)) + 1;
+      }
+      else {
+        $position = 0;
+      }
+      $area_record = new stdClass();
+      $area_record->type = $add->type;
+      $area_record->configuration = $add->conf;
+
+      $panels->content[$area][$position] = $area_record;
+      $order[] = $position;
+      $form['content'][$area]['order']['#value'] = serialize($order);
+    }
+
+    // Go through each item in the area and render it.
+    $count = count($order);
+    foreach ($order as $position => $id) {
+      // place buttons to re-order content. 
+      $form['content'][$area][$id]['buttons'] = array(
+        '#parents' => array('content', $area, $id, 'buttons'),
+        '#tree' => TRUE
+      );
+      panels_add_buttons($form['content'][$area][$id]['buttons'], $count, $position);
+
+      // figure out if one of those buttons was pressed
+      panels_form_builder($form['content'][$area][$id]['buttons']);
+      $deleted = false;
+      foreach ($GLOBALS['form_values']['content'][$area][$id]['buttons'] as $button => $value) {
+        if ($value) {
+          $function = 'panels_move_' . $button;
+          $function($order, $position);
+          $form['content'][$area]['order']['#value'] = serialize($order);
+          if ($button == 'delete')
+          $deleted = true;
+        }
+      }
+      // If a content item was deleted, it still has buttons. Get rid of them.
+      // It had buttons because we needed to give it buttons to see if its
+      // buttons were clicked.
+      if ($deleted) {
+        unset($form['content'][$area][$id]['buttons']);
+      }
+      else {
+        // we finally get to add the conent item's content to the form.
+        $area_record = $panels->content[$area][$id];
+        $form['content'][$area][$id]['type'] = array(
+          '#type' => 'hidden',
+          '#default_value' => $area_record->type,
+          '#parents' => array('content', $area, $id, 'type'),
+        );
+        // retrieve what was already there -- so we can retain edits and
+        // content items that were added.
+        panels_form_builder($form['content'][$area][$id]['type']);
+        $type = $form['content'][$area][$id]['type']['#value'];
+        $function = $content_types[$type]['admin'];
+        if (function_exists($function)) {
+          $array = array(
+            '#tree' => true,
+            '#parents' => array('content', $area, $id, 'configuration'),
+          );
+          $form['content'][$area][$id]['configuration'] = array_merge($array, $function('edit', $area_record->configuration, array('content', $area, $id, 'configuration')));
+          panels_form_builder($form['content'][$area][$id]['configuration']);
+        }        
+      }
+    }
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );  
+
+  return drupal_get_form('panels_edit_form', $form);
+}
+
+/**
+ * Display the form to edit a panels.
+ */
+function theme_panels_edit_form($form) {
+  $layouts = panels_get_layouts();
+  $layout = $layouts[$form['layout']['#value']];
+
+  $content_types = panels_get_content_types();
+
+  $output .= form_render($form['info']);
+  foreach ($layout['content areas'] as $area => $title) {
+    $order = unserialize($form['content'][$area]['order']['#value']);
+    if (!$order) {
+      $area_content = t('This area has no content.');
+    }
+    else {
+      $area_content = '';
+      $count = count($order);
+      foreach ($order as $position => $id) {
+        if ($count > 1) {
+          if ($position == 0 ) {
+            panels_set_blank($form['content'][$area][$id]['buttons']['up']);
+          }
+          else if ($position == ($count - 1)) {
+            panels_set_blank($form['content'][$area][$id]['buttons']['down']);
+          }
+        }
+        $type = $form['content'][$area][$id]['type']['#value'];
+        $function = $content_types[$type]['admin'];
+        if (function_exists($function)) {
+          // figure out the actual values; using the global because we need it
+          // to be in the same format it'll be in 'submit'.
+          global $form_values;
+          $conf_form = $form_values['content'][$area][$id]['configuration'];
+          $conf = $function('save', $conf_form);
+          $fieldset = array(
+            '#title' => t('Configure'), 
+            '#children' => form_render($form['content'][$area][$id]['configuration']), 
+            '#collapsible' => true, 
+            '#collapsed' => true
+          );
+          $buttons = form_render($form['content'][$area][$id]['buttons']);
+          $area_content .= $buttons . '&nbsp;' . $function('list', $conf) . 
+            theme('fieldset', $fieldset)  /* . '<br />' */;
+        }
+      }
+    }
+    $content[$area] = theme('fieldset', array('#title' => check_plain($title), '#value' => $area_content));
+  }
+
+  $output .= panels_get_layout($layout, $content);
+
+  $output .= form_render($form);
+  return $output;
+}
+
+function panels_edit_form_validate($form_id, $form_values, $form) {
+  $content_types = panels_get_content_types();
+  foreach ($form_values['content'] as $area => $content) {
+    foreach ($content as $id => $item) {
+      if (is_numeric($id)) {
+        $function = $content_types[$item['type']]['admin'];
+        if (function_exists($function)) {
+          $function('validate', $item['configuration'], $form['content'][$area][$id]['configuration']);
+        }
+      }
+    }
+  }
+}
+
+function panels_edit_form_submit($form_id, $form_values) {
+  $panels = (object) $form_values;
+  // be sure we get the order right.
+  foreach ($form_values['content'] as $area => $content) {
+    $array = array();
+    $order = unserialize($content['order']);
+    if (is_array($order)) {
+      foreach($order as $id) {
+        $array[] = $content[$id];
+      }
+    }
+    $panels->content[$area] = $array;
+  }
+  panels_save_panels($panels);
+  drupal_set_message(t('The panels has been saved.'));
+  return 'admin/panels';
+}
+
+/**
+ * add the buttons to a content item
+ */
+function panels_add_buttons(&$form, $count, $position) {
+  $form['delete'] = panels_add_button('user-trash.png', 'delete', t('Delete this item'));
+  // Leaving these in but commented out as I'm not convinced we don't want them.
+//  if ($count > 2) {
+//    $form['top'] = panels_add_button('go-top.png', 'top', t('Move item to top'));
+//  }
+  if ($count > 1) {
+    $form['up'] = panels_add_button('go-up.png', 'up', t('Move item up'));
+    $form['down'] = panels_add_button('go-down.png', 'down', t('Move item down'));
+  }
+//  if ($count > 2) {
+//    $form['bottom'] = panels_add_button('go-bottom.png', 'bottom', t('Move item to bottom'));
+//  }
+//  if ($count > 1) {
+//    $form['spacer'] = panels_add_blank();
+//  }
+  return $form;
+}
+
+/**
+ * move an item in an array to the top
+ */
+function panels_move_top(&$array, &$position) {
+  $value = $array[$position];
+  unset($array[$position]);
+  array_unshift($array, $value);
+  // reindex the array now
+  $array = array_values($array);
+}
+
+/**
+ * move an item in an array to the bottom
+ */
+function panels_move_bottom(&$array, &$position) {
+  $value = $array[$position];
+  unset($array[$position]);
+  $array[] = $value;
+  // reindex the array now
+  $array = array_values($array);
+}
+
+/**
+ * move an item in an array up one position
+ */
+function panels_move_up(&$array, &$position) {
+  $value = $array[$position];
+  $array[$position] = $array[$position - 1];
+  $array[$position - 1] = $value;
+}
+
+/**
+ * move an item in an array up one position
+ */
+function panels_move_down(&$array, &$position) {
+  $value = $array[$position];
+  $array[$position] = $array[$position + 1];
+  $array[$position + 1] = $value;
+}
+
+/**
+ * Remove an item from an array
+ */
+function panels_move_delete(&$array, &$position) {
+  unset($array[$position]);
+  // reindex the array now
+  $array = array_values($array);
+}
+
+// ---------------------------------------------------------------------------
+// panels database functions
+
+function panels_load_panels($did) {
+  $panels = db_fetch_object(db_query("SELECT * FROM {panels_info} WHERE did = %d", $did));
+  if (!$panels) {
+    return NULL;
+  }
+  $result = db_query("SELECT * FROM {panels_area} WHERE did = %d ORDER BY area, position", $did);
+  while ($area = db_fetch_object($result)) {
+    $area->configuration = unserialize($area->configuration);
+    $panels->content[$area->area][] = $area;
+  }
+  return $panels;
+}
+
+function panels_save_panels($panels) {
+  if ($panels->did) {
+    db_query("UPDATE {panels_info} SET title = '%s', access = '%s', path = '%s', css_id = '%s', layout = '%s' WHERE did = %d", $panels->title, $panels->access, $panels->path, $panels->css_id, $panels->layout, $panels->did);
+    db_query("DELETE FROM {panels_area} WHERE did = %d", $panels->did);
+  }
+  else {
+    $panels->did = db_next_id("{panels_info_id}");
+    db_query("INSERT INTO {panels_info} (did, title, access, path, css_id, layout) VALUES (%d, '%s', '%s', '%s', '%s', '%s')", $panels->did, $panels->title, $panels->access, $panels->path, $panels->css_id, $panels->layout);
+  }
+  foreach ($panels->content as $area => $info) {
+    foreach ($info as $position => $block) {
+      if (is_numeric($position)) { // don't save some random form stuff that may've been here.
+        $block = (object) $block;
+        db_query("INSERT INTO {panels_area} (did, area, type, configuration, position) VALUES(%d, '%s', '%s', '%s', %d)", $panels->did, $area, $block->type, serialize($block->configuration), $position);
+      }
+    }
+  }
+  cache_clear_all('menu:', TRUE);
+}
+
+function panels_delete_panels($panels) {
+  db_query("DELETE FROM {panels_info} WHERE did = %d", $panels->did);
+  db_query("DELETE FROM {panels_area} WHERE did = %d", $panels->did);
+  cache_clear_all('menu:', TRUE);
+}
+// ---------------------------------------------------------------------------
+// panels page
+
+function panels_panels_page($did) {
+  $panels = panels_load_panels($did);
+  if (!$panels) {
+    return drupal_not_found();
+  }
+
+  $layouts = panels_get_layouts();
+  $layout = $layouts[$panels->layout];
+
+  if (!$layout) {
+    watchdog('panels', t('Unable to find requested layout %s', array('%s' => check_plain($panels->layout))));
+    return drupal_not_found();
+  }
+
+  $content_types = panels_get_content_types();
+
+  foreach ($panels->content as $location => $list) {
+    foreach ($list as $area) {
+      $function = $content_types[$area->type]['callback'];
+      if (function_exists($function)) {
+        $content[$area->area] .= $function($area->configuration);
+      }
+    }
+  }
+  $output = panels_get_layout($layout, $content);
+  return $output;
+}
+
+function panels_get_layout($layout, $content) {
+  $output = theme($layout['theme'], check_plain($layout['css_id']), $content);
+
+  if ($output) {
+    if (file_exists(path_to_theme() . '/' . $layout['css'])) {
+      theme_add_style(path_to_theme() . '/' . $layout['css']);
+    }
+    else {
+      theme_add_style(drupal_get_path('module', $layout['module']) . '/' . $layout['css']);
+    }
+  }
+  return $output;
+}
+
+/**
+ * For external use: Given a layout ID and a $content array, return the
+ * finished layout.
+ */
+function panels_print_layout($id, $content) {
+  $layouts = panels_get_layouts();
+  $layout = $layouts[$id];
+  if (!$layout) {
+    return;
+  }
+  
+  return panels_get_layout($layout, $content);
+}
+
+// ---------------------------------------------------------------------------
+// panels data loading
+
+function panels_load_includes($directory, $callback) {
+  // Load all our module 'on behalfs'.
+  $path = drupal_get_path('module', 'panels') . '/' . $directory;
+  $files = system_listing('.inc$', $path, 'name', 0);
+
+  foreach($files as $file) {
+    require_once($file->filename);
+  }
+  $output = module_invoke_all($callback);
+  foreach ($files as $file) {
+    $function = 'panels_' . $file->name . '_' . $callback;
+    if (function_exists($function)) {
+      $result = $function();
+      if (isset($result) && is_array($result)) {
+        $output = array_merge($output, $result);
+      }
+    }
+  }
+  return $output;
+}
+
+function panels_get_layouts() {
+  static $layout = NULL;
+  if (!$layout) {
+    $layouts = panels_load_includes('layouts', 'panels_layouts');
+  }
+  return $layouts;
+}
+
+function panels_get_content_types() {
+  static $layout = NULL;
+  if (!$layout) {
+    $layouts = panels_load_includes('content_types', 'panels_content_types');
+  }
+  return $layouts;
+}
+
+/**
+ * Helper function for autocompletion of node titles.
+ * This is mostly stolen from clipper.
+ */
+function panels_node_autocomplete($string) {
+  if ($string != '') { // if there are node_types passed, we'll use those in a MySQL IN query.
+    $result = db_query_range(db_rewrite_sql('SELECT n.title, u.name FROM {node} n INNER JOIN {users} u ON u.uid = n.uid WHERE LOWER(title) LIKE LOWER("%%%s%%")'), $string, 0, 10);
+    $prefix = count($array) ? implode(', ', $array) .', ' : '';
+
+    $matches = array();
+    while ($node = db_fetch_object($result)) {
+      $n = $node->title;
+      // Commas and quotes in terms are special cases, so encode 'em.
+      if (preg_match('/,/', $node->title) || preg_match('/"/', $node->title)) {
+        $n = '"'. preg_replace('/"/', '""', $node->title) .'"';
+      }
+      $matches[$prefix . $n] = '<span class="autocomplete_title">'. check_plain($node->title) .'</span> <span class="autocomplete_user">('. t('by %user', array('%user' => check_plain($node->name))) .')</span>';
+    }
+    print drupal_to_js($matches);
+    exit();
+  }
+}

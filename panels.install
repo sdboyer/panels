@@ -1,0 +1,38 @@
+<?php
+// $Id$
+
+/**
+ * Install the panels tables
+ */
+function panels_install() {
+  switch ($GLOBALS['dbtype']) {
+    case 'pgsql':
+    case 'mysql':
+    case 'mysqli':
+    default:
+      db_query(<<<EOT
+        create table {panels_info} (
+          did int(10) not null default 0 primary key,
+          title varchar(128),
+          access varchar(128),
+          path varchar(128),
+          css_id varchar(128),
+          layout varchar(32)
+        )
+EOT
+      );
+      db_query(<<<EOT
+        create table {panels_area} (
+          did int(10) not null default 0,
+          area varchar(32),
+          type varchar(32),
+          configuration longtext,
+          position int(5),
+          key (did)
+        );
+EOT
+  );
+
+  }
+}
+

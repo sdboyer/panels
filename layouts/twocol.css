@@ -1,0 +1,12 @@
+.panel-2col { 
+  /* border: 1px solid red; */ 
+  overflow: hidden; 
+}
+.panel-2col .panel-col-first { 
+  float: left; 
+  width: 50%; 
+}
+.panel-2col .panel-col-last { 
+  float: left; 
+  width: 50%; 
+}
