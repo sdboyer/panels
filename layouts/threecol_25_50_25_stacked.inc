@@ -30,21 +30,21 @@ function theme_panels_threecol_25_50_25_stacked($id, $content) {
   $output = <<<EOT
 <div class="panel-3col-stacked" $idstr>
   <div class="panel-col-top">
-    $content[top]
+    <div>$content[top]</div>
   </div>
   <div class="panel-col-first">
-    $content[left]
+    <div>$content[left]</div>
   </div>
 
   <div class="panel-col">
-    $content[middle]
+    <div>$content[middle]</div>
   </div>
 
   <div class="panel-col-last">
-    $content[right]
+    <div>$content[right]</div>
   </div>
   <div class="panel-col-bottom">
-    $content[bottom]
+    <div>$content[bottom]</div>
   </div>
 </div>
 EOT;

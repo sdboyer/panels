@@ -29,11 +29,11 @@ function theme_panels_twocol($id, $content) {
   $output = <<<EOT
 <div class="panel-2col" $idstr>
   <div class="panel-col-first">
-    $content[left]
+    <div>$content[left]</div>
   </div>
 
   <div class="panel-col-last">
-    $content[right]
+    <div>$content[right]</div>
   </div>
 </div>
 <br clear="both" />

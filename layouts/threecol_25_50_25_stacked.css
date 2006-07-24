@@ -4,6 +4,9 @@
   /* border: 1px solid red; */ 
   overflow: hidden; 
 }
+.panel-3col-stacked div div { 
+  margin: .5em;
+}
 .panel-3col-stacked .panel-col-top,
 .panel-3col-stacked .panel-col-bottom { 
   width: 100%; 

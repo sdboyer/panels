@@ -2,6 +2,9 @@
   /* border: 1px solid red; */ 
   overflow: hidden; 
 }
+.panel-3col div div { 
+  margin: .5em;
+}
 .panel-3col .panel-col-first { 
   float: left; 
   width: 25%; 
