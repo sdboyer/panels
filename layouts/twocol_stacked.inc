@@ -7,7 +7,6 @@
 function panels_twocol_stacked_panels_layouts() {
   $items['twocol_stacked'] = array(
     'module' => 'panels',
-    'path' => 'layouts',
     'title' => t('Two column stacked'),
     'icon' => 'layouts/twocol_stacked.png',
     'theme' => 'panels_twocol_stacked',

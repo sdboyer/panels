@@ -10,3 +10,9 @@ file without breaking it.
 Perhaps most importantly, unlike the dashboard module it requires no fiddling 
 with PHP code to include the things you want; the interface lets you add blocks, 
 nodes and custom content just by selecting and clicking. 
+
+If you want to override the CSS of a panel, the easiest way is to just copy
+the CSS into your theme directory and tweak; panels will look there before
+including the CSS from the module, and if it exists, will not include the
+module's CSS. If you want to just change a tiny bit but keep the basic
+structure, just add your changes to your style.css instead.

@@ -1,0 +1,125 @@
+The API for expanding the panels module comes in two pieces. First there is the 
+layout API, which adds to the list of layouts you need. Second is the content
+types API, which lets modules supply content to the panels. Natively, panels
+module supports the content types of 'block', which just renders the output
+of a block, 'node' which simply renders a node_view, 'custom' which allows the
+user to enter custom content with filtering, and finally 'views' because I
+wrote them both.
+
+Where to put your code:
+=======================
+
+With both types, there are two ways to implement a new type. First, you can
+implement the hook in your module and provide the necessary data. Or you
+can create a .inc file in the right format, and drop it into the proper
+directory in the panels module. Both are very similar, and only requires
+a minor naming adjustment.
+
+When using the .inc file, in place of 'hook' in the various hooks, use
+panels_FILENAME. 
+
+Creating a new Layout Type:
+===========================
+
+A layout consists of 4 things:
+
+1) A bit of HTML in a theme function. I use heredoc notation to make it
+   extra easy to convert these to .tpl.inc files in case they are to
+   be overridden in php template.
+2) A bit of CSS to describe how the layout should be, well, laid out.
+3) An icon that is 50x75 which gives the user a visual indication of
+   what the layout looks like.
+4) An implementation of hook_panels_layouts() to tell panels the necessary 
+   information.
+
+hook_panels_layouts returns an array with the following information:
+
+'module' => The module name providing this. This is necessary because it
+            uses drupal_get_path('module', $module) to get the proper
+            path for included CSS.
+'title'  => The title of the layout presented to the user. Use t().
+'icon'   => The filename of the icon to use when listing avialable layouts.
+'theme'  => The theme function that contains the HTML, without the theme_ 
+            part.
+'css'    => The CSS file.
+'content areas' => an array in the form of 'name' => t('Title') of content
+                   areas supported by the layout. For example, the simple
+                   2 column layout uses array('left' => t('Left side'), 
+                   'right' => t('Right side')); -- the name is the internal
+                   identifier. Your theme function will see it as 
+                   $content['name'] (so twocol gets $content['left'] and
+                   $content['right']).
+
+
+Creating a new Content Type:
+============================
+
+Content types require 1 hook and two callbacks. The hook defines what content 
+types are available, the first callback displays the content in a dashboard, 
+and the other callback does all of the administrative functions.
+
+hook_panels_content_types returns an array with the following information:
+'callback'  => The function to display the content.
+'admin'     => The function to administer the content.
+
+The callback function receives one argument: The $configuration array, as
+defined by the administrative callback.
+
+The administrative callback recieves 3 arguments:
+
+$op     -- the operation to perform. See below.
+&$arg1  -- The first argument should be a reference and its meaning varies 
+           based on the op.
+$arg2   -- The second argument is optional, not a reference, and should 
+           default to NULL.
+
+Administrative operations:
+
+'list':     $arg1 is the configuration array.
+    This op is called when panels lists what content is in a content
+    area. It generally returns something similar to this:
+    return '<strong>Views</strong>: ' . $view->name . ' (' . $view->description . ')';
+
+'add button': arguments not used here.
+    This op is called to display the 'add content type' button; it can also
+    display additional information (such as the list of blocks or the
+    autocomplete to select a node).
+
+    The actual button should look something like this:
+        $form['submit'] = array(
+          '#type' => 'button',
+          '#value' => t('Add view'),
+        );
+
+    And it's a good idea to do this, but it's not required:
+
+        $form['#prefix'] = '<div class="container-inline">';
+        $form['#suffix'] = '</div>';
+
+'add': $arg1 == the $configuration array
+    This op is called to see if your add button has been clicked. It *must*
+    start off by checking to see if this is true:
+
+        if ($_POST['op'] != t('Add view')) {
+          return;
+        }
+
+    If it is true, it should process that information and return a $configuration
+    array populated from whatever other form items were presented in 'add button'
+    and whatever defaults make sense.
+
+'edit': $arg1 == the $configuration array
+    This op is called to provide an edit form for a content type. It *must*
+    ensure *all* information from the conf array is available, even if it
+    is just hidden; panels has no way to remember this data between form
+    clicks, so any data not put here will be lost. No buttons need to be
+    added to the form.
+
+'validate': $arg1 == $form_values, $arg2 == $form
+    Called to validate the 'edit' form above.
+
+'save': $arg1 == $form_values
+    Called to convert a $form_values back into a $configuration array. All
+    of the default types just send $form_values back as $configuration,
+    but if you need to do some kind of transformation, this is where it
+    happens.

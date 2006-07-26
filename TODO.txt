@@ -1,14 +1,12 @@
 TODO:
 
-? content type: phptemplate
+This is a brief list of the things that may still need to be done. No guarantee
+of them ever getting done.
 
-content templates:
-  1 x 2 x 1
-  3 col -- even
+content type: phptemplate
+
 access control to pages
 access control to content types
 
 dashboard node extension
 
-write help
-document plugin API

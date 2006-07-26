@@ -6,7 +6,6 @@
 function panels_twocol_panels_layouts() {
   $items['twocol'] = array(
     'module' => 'panels',
-    'path' => 'layouts',
     'title' => t('Two column'),
     'icon' => 'layouts/twocol.png',
     'theme' => 'panels_twocol',

@@ -7,7 +7,6 @@
 function panels_threecol_25_50_25_stacked_panels_layouts() {
   $items['threecol_25_50_25_stacked'] = array(
     'module' => 'panels',
-    'path' => 'layouts',
     'title' => t('Three column 25/50/25 stacked'),
     'icon' => 'layouts/threecol_25_50_25_stacked.png',
     'theme' => 'panels_threecol_25_50_25_stacked',
