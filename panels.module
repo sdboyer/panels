@@ -20,7 +20,7 @@ function panels_help($section = '') {
  * Implementation of hook_perm()
  */
 function panels_perm() {
-  return array('create panelss');
+  return array('create panels');
 }
 
 /**
@@ -28,7 +28,7 @@ function panels_perm() {
  */
 function panels_menu($may_cache) {
   if ($may_cache) {
-    $access = user_access('create panelss');
+    $access = user_access('create panels');
     $items[] = array(
       'path' => 'admin/panels',
       'title' => t('panels'),
@@ -80,7 +80,7 @@ function panels_menu($may_cache) {
       'type' => MENU_CALLBACK
     );
 
-    // load panelss from database
+    // load panels from database
     $result = db_query("SELECT * FROM {panels_info}");
     // FIXME: Fow now we're making these all callbacks, but we
     // should steal code from Views so they can be normal, tabs,
@@ -167,7 +167,7 @@ function panels_set_blank(&$form) {
 // panels administrative pages
 
 /**
- * Provide a list of panelss, with links to edit or delete them.
+ * Provide a list of panels, with links to edit or delete them.
  */
 function panels_list_page() {
   $result = db_query("SELECT * FROM {panels_info} ORDER BY title");
