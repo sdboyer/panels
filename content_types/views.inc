@@ -19,7 +19,20 @@ if (module_exist('views')) {
   function panels_content_views($conf) {
     $view = views_get_view($conf['view']);
     if ($view) {
-      $args = $conf['args'] ? explode('/', $conf['args']) : array();
+      $arguments = explode('/', $_GET['q']);
+      $args = $conf['args'];
+      
+      foreach ($arguments as $id => $arg) {
+        $args = str_replace("%$id", $arg, $args);
+      }
+
+      $args = preg_replace('/\%\d/', '', $args);
+      $args = $args ? explode('/', $args) : array();
+
+      if ($conf['url']) {
+        $view->url = $conf['url'];
+      }
+
       $output = views_build_view($conf['type'], $view, $args, intval($conf['pager_id']), intval($conf['nodes_per_page']));
     }
     return $output;
@@ -107,6 +120,22 @@ if (module_exist('views')) {
           '#title' => t('Posts to Display'),
           '#size' => 4,
           '#description' => t('Select the number of posts to display, or 0 to display all results.'),
+        );
+
+        $form['args'] = array(
+          '#type' => 'textfield',
+          '#default_value' => $conf['args'],
+          '#title' => t('View arguments'),
+          '#size' => 12,
+          '#description' => t('Arguments to send to the view as if they were part of the URL in the form of arg1/arg2/arg3. You can use %0, %1, %2, etc, to use arguments from the actual URL. For example, if your panel URL is foo/bar, and someone hits foo/bar/5 use %2 to get the 5.'),
+        );
+
+        $form['url'] = array(
+          '#type' => 'textfield',
+          '#default_value' => $conf['url'],
+          '#title' => t('Override URL'),
+          '#size' => 12,
+          '#description' => t('If this is set, override the View URL; this can sometimes be useful to set to the panel URL'),
         );
 
         return $form;
