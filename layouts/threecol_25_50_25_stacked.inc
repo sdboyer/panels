@@ -46,6 +46,7 @@ function theme_panels_threecol_25_50_25_stacked($id, $content) {
     <div>$content[bottom]</div>
   </div>
 </div>
+<br class="panel-clearer" />
 EOT;
   return $output;
 }

@@ -35,7 +35,7 @@ function theme_panels_twocol($id, $content) {
     <div>$content[right]</div>
   </div>
 </div>
-<br clear="both" />
+<br class="panel-clearer" />
 EOT;
   return $output;
 }

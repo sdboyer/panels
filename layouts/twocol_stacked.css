@@ -22,3 +22,6 @@
   float: left; 
   width: 50%; 
 }
+.panel-clearer {
+  clear: both;
+}

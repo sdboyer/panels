@@ -42,7 +42,7 @@ function theme_panels_twocol_stacked($id, $content) {
     <div>$content[bottom]</div>
   </div>
 </div>
-<br clear="both" />
+<br class="panel-clearer" />
 EOT;
   return $output;
 }

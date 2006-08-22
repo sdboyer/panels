@@ -19,3 +19,6 @@
   float: left; 
   width: 33%; 
 }
+.panel-clearer {
+  clear: both;
+}

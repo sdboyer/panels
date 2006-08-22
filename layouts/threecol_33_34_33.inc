@@ -39,6 +39,7 @@ function theme_panels_threecol_33_34_33($id, $content) {
     <div>$content[right]</div>
   </div>
 </div>
+<br class="panel-clearer" />
 EOT;
   return $output;
 }
