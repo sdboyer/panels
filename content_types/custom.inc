@@ -16,7 +16,7 @@ function panels_custom_panels_content_types() {
  */
 function panels_content_custom($conf) {
   $title = filter_xss_admin($conf['title']);
-  $body = check_markup($conf['body'], FALSE, $conf['format'], false);
+  $body = check_markup($conf['body'], $conf['format'], FALSE);
   return theme('panels_content_custom', $title, $body);
 }
 
