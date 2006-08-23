@@ -684,7 +684,8 @@ function panels_panels_page($did) {
 
   $layouts = panels_get_layouts();
   $layout = $layouts[$panels->layout];
-
+  $layout['css_id'] = $panels->css_id;
+  
   if (!$layout) {
     watchdog('panels', t('Unable to find requested layout %s', array('%s' => check_plain($panels->layout))));
     return drupal_not_found();
