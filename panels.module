@@ -742,7 +742,7 @@ function panels_load_includes($directory, $callback) {
   $files = system_listing('.inc$', $path, 'name', 0);
 
   foreach($files as $file) {
-    require_once($file->filename);
+    require_once('./' . $file->filename);
   }
   $output = module_invoke_all($callback);
   foreach ($files as $file) {
