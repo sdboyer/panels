@@ -16,3 +16,7 @@ the CSS into your theme directory and tweak; panels will look there before
 including the CSS from the module, and if it exists, will not include the
 module's CSS. If you want to just change a tiny bit but keep the basic
 structure, just add your changes to your style.css instead.
+
+If you're having problems with IE and your panels falling below your sidebars,
+try setting the width of the main panel area (example, .panel-2col-stacked) to
+98%.
