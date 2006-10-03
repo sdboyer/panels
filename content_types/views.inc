@@ -1,6 +1,6 @@
 <?php
 // Only valid if views module loaded.
-if (module_exist('views')) {
+if (module_exists('views')) {
   /**
    * Callback function to supply a list of content types.
    */

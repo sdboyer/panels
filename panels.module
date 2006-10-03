@@ -6,12 +6,10 @@
  */
 function panels_help($section = '') {
   switch ($section) {
-    case 'admin/modules#description':
-      return t('The panels module allows the creation of pages with flexible layouts.');
-    case 'admin/panels':
-    case 'admin/panels/list':
+    case 'admin/build/panels':
+    case 'admin/build/panels/list':
       return t('<p>You may peruse a list of your current panels layouts and edit them, or click add to create a new page.</p>');
-    case 'admin/panels/add':
+    case 'admin/build/panels/add':
       return t('<p>Choose a layout for your new page from the list below.</p>');
   }
 }
@@ -30,13 +28,14 @@ function panels_menu($may_cache) {
   if ($may_cache) {
     $access = user_access('create panels');
     $items[] = array(
-      'path' => 'admin/panels',
+      'path' => 'admin/build/panels',
       'title' => t('panels'),
       'access' => $access,    
       'callback' => 'panels_list_page',
+      'description' => t('Create pages on your site that are 2 or 3 columns'),
     );
     $items[] = array(
-      'path' => 'admin/panels/list',
+      'path' => 'admin/build/panels/list',
       'title' => t('list'),
       'access' => $access,    
       'callback' => 'panels_list_page',
@@ -44,28 +43,28 @@ function panels_menu($may_cache) {
       'type' => MENU_DEFAULT_LOCAL_TASK,
     );
     $items[] = array(
-      'path' => 'admin/panels/add',
+      'path' => 'admin/build/panels/add',
       'title' => t('add'),
       'access' => $access,    
       'callback' => 'panels_add_page',
       'type' => MENU_LOCAL_TASK,
     );
     $items[] = array(
-      'path' => 'admin/panels/add/layout',
+      'path' => 'admin/build/panels/add/layout',
       'title' => t('add'),
       'access' => $access,    
       'callback' => 'panels_add_layout_page',
       'type' => MENU_LOCAL_TASK,
     );
     $items[] = array(
-      'path' => 'admin/panels/edit',
+      'path' => 'admin/build/panels/edit',
       'title' => t('edit panels'),
       'access' => $access,    
       'callback' => 'panels_edit_page',
       'type' => MENU_CALLBACK,
     );
     $items[] = array(
-      'path' => 'admin/panels/delete',
+      'path' => 'admin/build/panels/delete',
       'title' => t('delete panels'),
       'access' => $access,    
       'callback' => 'panels_delete_page',
@@ -176,8 +175,8 @@ function panels_list_page() {
     $item[] = check_plain($panels->title);
     $item[] = l($panels->path, $panels->path);
     $item[] = implode(' | ', array(
-      l('edit', "admin/panels/edit/$panels->did"),
-      l('delete', "admin/panels/delete/$panels->did"),
+      l('edit', "admin/build/panels/edit/$panels->did"),
+      l('delete', "admin/build/panels/delete/$panels->did"),
     ));
     $items[] = $item;
   }
@@ -197,13 +196,13 @@ function panels_delete_page($did = '') {
   $panels = panels_load_panels($did);
 
   if (!$panels) {
-    return 'admin/panels';
+    return 'admin/build/panels';
   }
 
   $form['did'] = array('#type' => 'value', '#value' => $panels->did);
   return confirm_form('panels_delete_confirm', $form,
     t('Are you sure you want to delete %title?', array('%title' => $panels->title)),
-    $_GET['destination'] ? $_GET['destination'] : 'admin/panels',
+    $_GET['destination'] ? $_GET['destination'] : 'admin/build/panels',
     t('This action cannot be undone.'),
     t('Delete'), t('Cancel')
   );
@@ -215,7 +214,7 @@ function panels_delete_page($did = '') {
 function panels_delete_confirm_submit($formid, $form) {
   if ($form['confirm']) {
     panels_delete_panels((object) $form);
-    drupal_goto('admin/panels');
+    drupal_goto('admin/build/panels');
   }
 }
 
@@ -224,7 +223,7 @@ function panels_delete_confirm_submit($formid, $form) {
  */
 function panels_add_page($layout = NULL) {
   $layouts = panels_get_layouts();
-  theme_add_style(drupal_get_path('module', 'panels') . '/panels_admin.css');
+  drupal_add_css(drupal_get_path('module', 'panels') . '/panels_admin.css');
   if (!$layout) {
     foreach ($layouts as $id => $layout) {
       if (!$default_id) {
@@ -242,7 +241,7 @@ function panels_add_page($layout = NULL) {
   }
 
   $panels->layout = $layout;
-  return panels_edit_form($panels);
+  return drupal_get_form('panels_edit_form', $panels);
 }
 
 function theme_panels_add_image($title, $id, $image) {
@@ -259,13 +258,14 @@ function panels_edit_page($did = NULL) {
   if (!$did || !($panels = panels_load_panels($did))) {
     return drupal_not_found();
   }
-  return panels_edit_form($panels);
+  return drupal_get_form('panels_edit_form', $panels);
 }
 
 /**
  * shortcut to ease the syntax of the various form builder tricks we use.
  */
 function panels_form_builder(&$form, $form_id = 'panels_edit_form') {
+  $form['#post'] = $_POST;
   $form = form_builder($form_id, $form);
 }
 
@@ -273,7 +273,7 @@ function panels_form_builder(&$form, $form_id = 'panels_edit_form') {
  * Edit an already loaded panels.
  */
 function panels_edit_form($panels) {
-  theme_add_style(drupal_get_path('module', 'panels') . '/panels_admin.css');
+  drupal_add_css(drupal_get_path('module', 'panels') . '/panels_admin.css');
   $layouts = panels_get_layouts();
   $layout = $layouts[$panels->layout];
 
@@ -470,7 +470,7 @@ function panels_edit_form($panels) {
     '#value' => t('Save'),
   );  
 
-  return drupal_get_form('panels_edit_form', $form);
+  return $form;
 }
 
 /**
@@ -482,7 +482,7 @@ function theme_panels_edit_form($form) {
 
   $content_types = panels_get_content_types();
 
-  $output .= form_render($form['info']);
+  $output .= drupal_render($form['info']);
   foreach ($layout['content areas'] as $area => $title) {
     $order = unserialize($form['content'][$area]['order']['#value']);
     if (!$order) {
@@ -510,11 +510,11 @@ function theme_panels_edit_form($form) {
           $conf = $function('save', $conf_form);
           $fieldset = array(
             '#title' => t('Configure'), 
-            '#children' => form_render($form['content'][$area][$id]['configuration']), 
+            '#children' => drupal_render($form['content'][$area][$id]['configuration']), 
             '#collapsible' => true, 
             '#collapsed' => true
           );
-          $buttons = form_render($form['content'][$area][$id]['buttons']);
+          $buttons = drupal_render($form['content'][$area][$id]['buttons']);
           $area_content .= $buttons . '&nbsp;' . $function('list', $conf) . 
             theme('fieldset', $fieldset)  /* . '<br />' */;
         }
@@ -525,7 +525,7 @@ function theme_panels_edit_form($form) {
 
   $output .= panels_get_layout($layout, $content);
 
-  $output .= form_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 
@@ -558,7 +558,7 @@ function panels_edit_form_submit($form_id, $form_values) {
   }
   panels_save_panels($panels);
   drupal_set_message(t('The panels has been saved.'));
-  return 'admin/panels';
+  return 'admin/build/panels';
 }
 
 /**
@@ -665,7 +665,7 @@ function panels_save_panels($panels) {
       }
     }
   }
-  cache_clear_all('menu:', TRUE);
+  cache_clear_all('menu:', 'cache_menu');
 }
 
 function panels_delete_panels($panels) {
@@ -710,10 +710,10 @@ function panels_get_layout($layout, $content) {
 
   if ($output) {
     if (file_exists(path_to_theme() . '/' . $layout['css'])) {
-      theme_add_style(path_to_theme() . '/' . $layout['css']);
+      drupal_add_css(path_to_theme() . '/' . $layout['css']);
     }
     else {
-      theme_add_style(drupal_get_path('module', $layout['module']) . '/' . $layout['css']);
+      drupal_add_css(drupal_get_path('module', $layout['module']) . '/' . $layout['css']);
     }
   }
   return $output;
