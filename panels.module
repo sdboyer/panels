@@ -29,14 +29,14 @@ function panels_menu($may_cache) {
     $access = user_access('create panels');
     $items[] = array(
       'path' => 'admin/build/panels',
-      'title' => t('panels'),
+      'title' => t('Panels'),
       'access' => $access,    
       'callback' => 'panels_list_page',
       'description' => t('Create pages on your site that are 2 or 3 columns'),
     );
     $items[] = array(
       'path' => 'admin/build/panels/list',
-      'title' => t('list'),
+      'title' => t('List'),
       'access' => $access,    
       'callback' => 'panels_list_page',
       'weight' => -10,
@@ -44,28 +44,28 @@ function panels_menu($may_cache) {
     );
     $items[] = array(
       'path' => 'admin/build/panels/add',
-      'title' => t('add'),
+      'title' => t('Add'),
       'access' => $access,    
       'callback' => 'panels_add_page',
       'type' => MENU_LOCAL_TASK,
     );
     $items[] = array(
       'path' => 'admin/build/panels/add/layout',
-      'title' => t('add'),
+      'title' => t('Add'),
       'access' => $access,    
       'callback' => 'panels_add_layout_page',
       'type' => MENU_LOCAL_TASK,
     );
     $items[] = array(
       'path' => 'admin/build/panels/edit',
-      'title' => t('edit panels'),
+      'title' => t('Edit panels'),
       'access' => $access,    
       'callback' => 'panels_edit_page',
       'type' => MENU_CALLBACK,
     );
     $items[] = array(
       'path' => 'admin/build/panels/delete',
-      'title' => t('delete panels'),
+      'title' => t('Delete panels'),
       'access' => $access,    
       'callback' => 'panels_delete_page',
       'type' => MENU_CALLBACK,
@@ -73,7 +73,7 @@ function panels_menu($may_cache) {
 
     $items[] = array(
       'path' => 'panels/node/autocomplete',
-      'title' => t('autocomplete node'),
+      'title' => t('Autocomplete node'),
       'callback' => 'panels_node_autocomplete',
       'access' => user_access('access content'),
       'type' => MENU_CALLBACK
@@ -739,7 +739,7 @@ function panels_print_layout($id, $content) {
 function panels_load_includes($directory, $callback) {
   // Load all our module 'on behalfs'.
   $path = drupal_get_path('module', 'panels') . '/' . $directory;
-  $files = system_listing('.inc$', $path, 'name', 0);
+  $files = drupal_system_listing('.inc$', $path, 'name', 0);
 
   foreach($files as $file) {
     require_once('./' . $file->filename);
