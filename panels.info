@@ -1,0 +1,5 @@
+; $Id$
+name = Panels
+description = The panels module allows the creation of pages with flexible layouts.
+version = 1.1
+
