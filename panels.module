@@ -67,7 +67,8 @@ function panels_menu($may_cache) {
       'path' => 'admin/build/panels/delete',
       'title' => t('Delete panels'),
       'access' => $access,    
-      'callback' => 'panels_delete_page',
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('panels_delete_confirm'),
       'type' => MENU_CALLBACK,
     );
 
@@ -192,15 +193,15 @@ function panels_list_page() {
 /*
  * Provide a form to confirm deletion of a panel page.
  */
-function panels_delete_page($did = '') {
+function panels_delete_confirm($did = '') {
   $panels = panels_load_panels($did);
 
   if (!$panels) {
-    return 'admin/build/panels';
+    drupal_goto('admin/build/panels');
   }
 
   $form['did'] = array('#type' => 'value', '#value' => $panels->did);
-  return confirm_form('panels_delete_confirm', $form,
+  return confirm_form( $form,
     t('Are you sure you want to delete %title?', array('%title' => $panels->title)),
     $_GET['destination'] ? $_GET['destination'] : 'admin/build/panels',
     t('This action cannot be undone.'),
@@ -665,13 +666,13 @@ function panels_save_panels($panels) {
       }
     }
   }
-  cache_clear_all('menu:', 'cache_menu');
+  menu_rebuild();
 }
 
 function panels_delete_panels($panels) {
   db_query("DELETE FROM {panels_info} WHERE did = %d", $panels->did);
   db_query("DELETE FROM {panels_area} WHERE did = %d", $panels->did);
-  cache_clear_all('menu:', TRUE);
+  menu_rebuild();
 }
 // ---------------------------------------------------------------------------
 // panels page
