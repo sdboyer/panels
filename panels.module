@@ -176,8 +176,8 @@ function panels_list_page() {
     $item[] = check_plain($panels->title);
     $item[] = l($panels->path, $panels->path);
     $item[] = implode(' | ', array(
-      l('edit', "admin/build/panels/edit/$panels->did"),
-      l('delete', "admin/build/panels/delete/$panels->did"),
+      l(t('Edit'), "admin/build/panels/edit/$panels->did"),
+      l(t('Delete'), "admin/build/panels/delete/$panels->did"),
     ));
     $items[] = $item;
   }
