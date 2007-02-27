@@ -1,259 +1,280 @@
-# LANGUAGE translation of Drupal (panels.module)
-# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Hebrew translation of Drupal (panels.module)
+# Hebrew translation of drupal-panels
 # Generated from file: panels.module,v 1.10 2006/10/31 23:49:58 merlinofchaos
 #
-#, fuzzy
+# Haggai Eran <haggai.eran@gmail.com>, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: panels\n"
 "POT-Creation-Date: 2007-02-27 05:53-0500\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
-"Last-Translator: NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"Last-Translator: Amnon Levav http://www.levavie.com\n"
+"Language-Team: Hebrew <he@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: panels.module:11
 msgid "<p>You may peruse a list of your current panels layouts and edit them, or click add to create a new page.</p>"
-msgstr ""
+msgstr "<p>עריכת הסידור של פנלים קיימים, או הוספת פנלים חדשים</p>"
 
 #: panels.module:13
 msgid "<p>Choose a layout for your new page from the list below.</p>"
-msgstr ""
+msgstr "<p>בחרו סידור לפנל החדש מהרשימה הבאה."
 
 #: panels.module:32
 msgid "Panels"
-msgstr ""
+msgstr "פנלים"
 
 #: panels.module:35
 msgid "Create pages on your site that are 2 or 3 columns"
-msgstr ""
+msgstr "יוצר עמודים באתר שיש בהם שניים או שלושה טורים"
 
 #: panels.module:39
 msgid "List"
-msgstr ""
+msgstr "רשימה"
 
 #: panels.module:47;54
 msgid "Add"
-msgstr ""
+msgstr "הוסף"
 
 #: panels.module:61
 msgid "Edit panels"
-msgstr ""
+msgstr "עריכת פנל"
 
 #: panels.module:68
 msgid "Delete panels"
-msgstr ""
+msgstr "מחק פנל"
 
 #: panels.module:77
 msgid "Autocomplete node"
-msgstr ""
+msgstr "השלמה אוטומטית של פריט תוכן"
 
 #: panels.module:179
 msgid "Edit"
-msgstr ""
+msgstr "עריכה"
 
 #: panels.module:180;208
 msgid "Delete"
-msgstr ""
+msgstr "מחיקה"
 
 #: panels.module:185
 msgid "Panel title"
-msgstr ""
+msgstr "כותרת הפנל"
 
 #: panels.module:186
 msgid "URL"
-msgstr ""
+msgstr "כתובת URL"
 
 #: panels.module:187
 msgid "Operations"
-msgstr ""
+msgstr "פעולות"
 
 #: panels.module:205
 msgid "Are you sure you want to delete %title?"
-msgstr ""
+msgstr "האמנם ברצונך למחוק את %title?"
 
 #: panels.module:207
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "לא ניתן לבטל פעולה זו"
 
 #: panels.module:208
 msgid "Cancel"
-msgstr ""
+msgstr "ביטול"
 
 #: panels.module:288
 msgid "Add content"
-msgstr ""
+msgstr "הוספת תוכן"
 
 #: panels.module:290
 msgid "Select an area to add content to, then select a type of content and click the appropriate button. The content will be added."
-msgstr ""
+msgstr "ראשית יש לבחור את האיזור שבו התוכן ימוקם. אחר כך בחרו סוג תוכן ולחצו על הכפתור המתאים"
 
 #: panels.module:296
 msgid "Area"
-msgstr ""
+msgstr "אזור"
 
 #: panels.module:335
 msgid "General information"
-msgstr ""
+msgstr "מידע כללי"
 
 #: panels.module:352
 msgid "Page title"
-msgstr ""
+msgstr "כותרת עמוד"
 
 #: panels.module:353
 msgid "The page title for this panels layout"
-msgstr ""
+msgstr "כותרת העמוד עבור סידור פנלים זה"
 
 #: panels.module:359
 msgid "CSS ID"
-msgstr ""
+msgstr "מזהה CSS"
 
 #: panels.module:360
 msgid "The CSS ID to apply to this page"
-msgstr ""
+msgstr "מזהה ה-CSS שיוצמד לעמוד זה"
 
 #: panels.module:366
 msgid "Path"
-msgstr ""
+msgstr "מיקום"
 
 #: panels.module:367
 msgid "The URL path to give this page, i.e, path/to/page"
-msgstr ""
+msgstr "כתובת ה-URL של העמוד שבו יוצג הפנל, לדוגמה: path/to/page"
 
 #: panels.module:471
 msgid "Save"
-msgstr ""
+msgstr "שמור"
 
 #: panels.module:490
 msgid "This area has no content."
-msgstr ""
+msgstr "באיזור זה אין תוכן."
 
 #: panels.module:513
 msgid "Configure"
-msgstr ""
+msgstr "הגדרות"
 
 #: panels.module:561
 msgid "The panels has been saved."
-msgstr ""
+msgstr "הפנל נשמר"
 
 #: panels.module:569
 msgid "Delete this item"
-msgstr ""
+msgstr "מחיקת פריט זה"
 
 #: panels.module:575
 msgid "Move item up"
-msgstr ""
+msgstr "הזזת הפריט למעלה"
 
 #: panels.module:576
 msgid "Move item down"
-msgstr ""
+msgstr "הזזת הפריט למטה"
 
 #: panels.module:691
 msgid "Unable to find requested layout %s"
-msgstr ""
+msgstr "לא ניתן למצוא את הסידור המבוקש %s"
 
 #: panels.module:793
 msgid "by %user"
-msgstr ""
+msgstr "על ידי %user"
 
 #: panels.module:691;0
 msgid "panels"
-msgstr ""
+msgstr "פנלים"
 
 #: panels.module:21
 msgid "create panels"
-msgstr ""
+msgstr "יצירת פנלים"
+
+#: panels.module/layouts
+msgid "Bottom"
+msgstr "למטה"
+
+#: panels.module/layouts
+msgid "Top"
+msgstr "למעלה"
+
+#: panels.module/layouts
+msgid "Left side"
+msgstr "צד שמאל"
+
+#: panels.module/layouts
+msgid "Right side"
+msgstr "צד ימין"
+
+#: panels.module/layouts
+msgid "Middle column"
+msgstr "טור אמצעי"
 
 #: panels/content-types/block.inc:58 panels/content-types/views.inc:107
 msgid "Block"
-msgstr ""
+msgstr "תיבה"
 
 #: panels/content-types/block.inc:62;69
 msgid "Add block"
-msgstr ""
+msgstr "הוסף תיבה"
 
 #: panels/content-types/block.inc:90
 msgid "Override title"
-msgstr ""
+msgstr "שינוי כותרת"
 
 #: panels/content-types/block.inc:91
 msgid "If checked, the block title will be overridden with the override title text."
-msgstr ""
+msgstr "סימון אפשרות זו יציג את כותרת התיבה שרשמנו בפנל במקום כותרת התיבה הרגילה."
 
 #: panels/content-types/block.inc:96
 msgid "Override title text"
-msgstr ""
+msgstr "כותרת מותאמת אישית"
 
 #: panels/content-types/custom.inc:43
 msgid "Enter an optional title for custom content you define"
-msgstr ""
+msgstr "כאן ניתן לרשום כותרת אופציונלית לתוכן המותאם שהוגדר"
 
 #: panels/content-types/custom.inc:50;57
 msgid "Add custom"
-msgstr ""
+msgstr "הוסף תיבה מותאמת אישית"
 
 #: panels/content-types/custom.inc:66;67
 msgid "Title"
-msgstr ""
+msgstr "כותרת"
 
 #: panels/content-types/custom.inc:71
 msgid "Body"
-msgstr ""
+msgstr "תוכן"
 
 #: panels/content-types/node.inc:34
 msgid "Enter the title or NID of a post"
-msgstr ""
+msgstr "הכנס את הכותרת או את המספר של פריט התוכן"
 
 #: panels/content-types/node.inc:42;49
 msgid "Add post"
-msgstr ""
+msgstr "הוסף פריט"
 
 #: panels/content-types/node.inc:60
 msgid "Unable to find \"%s\""
-msgstr ""
+msgstr "לא ניתן למצוא \"%s\""
 
 #: panels/content-types/node.inc:74
 msgid "Teaser"
-msgstr ""
+msgstr "תמצית"
 
 #: panels/content-types/node.inc:77
 msgid "Check here to show only the node teaser"
-msgstr ""
+msgstr "הצג רק את התמצית של פריט התוכן"
 
 #: panels/content-types/node.inc:82
 msgid "Display links"
-msgstr ""
+msgstr "הצג קישורים"
 
 #: panels/content-types/node.inc:83
 msgid "Check here to display the links with the post."
-msgstr ""
+msgstr "סימון כאן יציג את הקישורים בתוך פריט התוכן."
 
 #: panels/content-types/views.inc:70
 msgid "Choose a view from the views module"
-msgstr ""
+msgstr "בחירת View כפי שהוגדר ברכיב ה-Views"
 
 #: panels/content-types/views.inc:74;81
 msgid "Add view"
-msgstr ""
+msgstr "הוסף View"
 
 #: panels/content-types/views.inc:105
 msgid "View type"
-msgstr ""
+msgstr "סוג View"
 
 #: panels/content-types/views.inc:106
 msgid "Select which type of the view to display."
-msgstr ""
+msgstr "בחרו את ה-view שיוצג"
 
 #: panels/content-types/views.inc:107
 msgid "Page"
-msgstr ""
+msgstr "עמוד"
 
 #: panels/content-types/views.inc:107
 msgid "Embedded"
-msgstr ""
+msgstr "מוטמע"
 
 #: panels/content-types/views.inc:112
 msgid "Pager ID"
@@ -265,15 +286,15 @@ msgstr ""
 
 #: panels/content-types/views.inc:120
 msgid "Posts to Display"
-msgstr ""
+msgstr "פריטי תוכן שיוצגו"
 
 #: panels/content-types/views.inc:122
 msgid "Select the number of posts to display, or 0 to display all results."
-msgstr ""
+msgstr "מספר הפרסומים שיוצגו, או 0 להצגת כל התוצאות"
 
 #: panels/content-types/views.inc:128
 msgid "View arguments"
-msgstr ""
+msgstr "ארגומנטים של ה-View"
 
 #: panels/content-types/views.inc:130
 msgid "Arguments to send to the view as if they were part of the URL in the form of arg1/arg2/arg3. You can use %0, %1, %2, etc, to use arguments from the actual URL. For example, if your panel URL is foo/bar, and someone hits foo/bar/5 use %2 to get the 5."
@@ -281,9 +302,9 @@ msgstr ""
 
 #: panels/content-types/views.inc:136
 msgid "Override URL"
-msgstr ""
+msgstr "כתובת URL"
 
 #: panels/content-types/views.inc:138
 msgid "If this is set, override the View URL; this can sometimes be useful to set to the panel URL"
-msgstr ""
+msgstr "עקיפת כתובת ה-URL הרגילה של ה-VIEW. לעיתים זה שימושי לשים כאן את כתובת ה-URL של הפנל."
 
