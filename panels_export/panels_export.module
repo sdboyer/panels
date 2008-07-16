@@ -1,0 +1,143 @@
+<?php
+// $Id$
+
+
+/**
+ * @file panels_export.module
+ *
+ * Provides functionality to export multiple items at once to make it easy to
+ * dump a set of panels into code.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function panels_export_menu($may_cache) {
+  if ($may_cache) {
+    $items = array();
+    $items[] = array(
+      'path' => 'admin/panels/export',
+      'title' => t('Export panels'),
+      'access' => user_access('use panels exporter'),
+      'callback' => 'panels_export_export',
+      'description' => t('Export panels in bulk.'),
+    );
+    $items[] = array(
+      'path' => 'admin/panels/export/results',
+      'access' => user_access('use panels exporter'),
+      'callback' => 'panels_export_export',
+      'type' => MENU_CALLBACK,
+    );
+    return $items;
+  }
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function panels_export_perm() {
+  return array('use panels exporter');
+}
+
+/**
+ * Page callback to export panels in bulk.
+ */
+function panels_export_export() {
+  $exportables = array();
+  foreach (module_implements('panels_exportables') as $module) {
+    $function = $module . '_panels_exportables';
+    $exportables[$module] = $function('list');
+  }
+  if ($exportables) {
+    $form_id = 'panels_export_export_form';
+    $form    = drupal_retrieve_form($form_id, $exportables);
+    $output  = drupal_process_form($form_id, $form);
+    if (!$output) {
+      $output = drupal_render_form($form_id, $form);
+    }
+    return $output;
+  }
+  else {
+    return t('There are no panels to be exported at this time.');
+  }
+}
+
+/**
+ * Form to choose a group of panels to export.
+ */
+function panels_export_export_form($exportables) {
+  foreach ($exportables as $module => $panels) {
+    $form['modules']['#tree'] = TRUE;
+    $form['modules'][$module] = array(
+      '#type' => 'checkboxes',
+      '#options' => $panels,
+      '#default_value' => array(),
+    );
+  }
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Module name'),
+    '#description' => t('Enter the module name to export code to.'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Export'),
+  );
+
+  $form['#action'] = url('admin/panels/export/results');
+  $form['#redirect'] = FALSE;
+  $form['#exportables'] = $exportables;
+  return $form;
+}
+
+function theme_panels_export_export_form($form) {
+  $files = module_rebuild_cache();
+  $exportables = $form['#exportables'];
+  $output = '';
+
+  foreach ($exportables as $module => $panels) {
+    $header = array(theme('table_select_header_cell'), $files[$module]->info['name']);
+    $rows = array();
+    foreach ($panels as $name => $panel) {
+      $title = $form['modules'][$module][$name]['#title'];
+      unset($form['modules'][$module][$name]['#title']);
+      $rows[] = array(drupal_render($form['modules'][$module][$name]), $title);
+    }
+    $output .= '<div class="export-container">';
+    $output .= theme('table', $header, $rows);
+    $output .= "</div>\n";
+  }
+  drupal_add_css(panels_get_path('panels_export/panels_export.css'));
+  $output .= drupal_render($form);
+  return $output;
+}
+
+function panels_export_export_form_submit($form_id, $form_values) {
+  $code = '';
+  if (empty($form_values['name'])) {
+    $form_values['name'] = 'foo';
+  }
+
+  foreach ($form_values['modules'] as $module => $panels) {
+    $panels = array_filter($panels);
+    if ($panels) {
+      $code .= module_invoke($module, 'panels_exportables', 'export', $panels, $form_values['name']) . "\n\n";
+    }
+  }
+
+  $lines = substr_count($code, "\n");
+  $element = array(
+    '#type' => 'textarea',
+    '#id' => 'export-textarea',
+    '#name' => 'export-textarea',
+    '#attributes' => array(),
+    '#rows' => min($lines, 150),
+    '#value' => $code,
+    '#parents' => array(),
+  );
+
+  return theme('textarea', $element);
+}
+

@@ -1,0 +1,6 @@
+; $Id$
+name = "Panels simple cache"
+description = "Adds the simple cache as an option when configuring panel panes."
+package = "Panels"
+dependencies[] = panels
+core = 6.x

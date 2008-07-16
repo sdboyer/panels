@@ -1,0 +1,126 @@
+<?php
+// $Id$
+
+/**
+ * Install the panels tables
+ */
+function panels_page_schema() {
+  return panels_schema_1();
+}
+
+/**
+ * Schema version 1 for Panels in D6.
+ */
+function panels_page_schema_1() {
+  $schema = array();
+
+  $schema['panels_page'] = array(
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',,
+      ),
+      'did' => array(
+        'type' => 'int',,
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => '128',,
+      ),
+      'access' => array(
+        'type' => 'varchar',
+        'length' => '128',,
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => '128',,
+      ),
+      'css_id' => array(
+        'type' => 'varchar',
+        'length' => '128',,
+      ),
+      'css' => array(
+        'type' => 'text',
+        'size' => 'big',,
+      ),
+      'arguments' => array(
+        'type' => 'text',
+        'size' => 'big',,
+      ),
+      'displays' => array(
+        'type' => 'text',
+        'size' => 'big',,
+      ),
+      'contexts' => array(
+        'type' => 'text',
+        'size' => 'big',,
+      ),
+      'relationships' => array(
+        'type' => 'text',
+        'size' => 'big',,
+      ),
+      'no_blocks' => array(
+        'type' => 'int',
+        'size' => 'small',,
+        'default' => 0,
+      ),
+      'menu' => array(
+        'type' => 'int',
+        'size' => 'small',,
+        'default' => 0,
+      ),
+      'menu_tab' => array(
+        'type' => 'int',
+        'size' => 'small',,
+      ),
+      'menu_tab_weight' => array(
+        'type' => 'int',
+        'size' => 'small',,
+      ),
+      'menu_title' => array(
+        'type' => 'varchar',
+        'length' => '255',,
+      ),
+      'menu_tab_default' => array(
+        'type' => 'int',
+        'size' => 'small',,
+      ),
+      'menu_tab_default_parent_type' => array(
+        'type' => 'varchar',
+        'length' => '10',,
+      ),
+      'menu_parent_title' => array(
+        'type' => 'varchar',
+        'length' => '255',,
+      ),
+      'menu_parent_tab_weight' => array(
+        'type' => 'int',
+        'size' => 'small',,
+      )
+    ),
+    'primary key' => array('pid'),
+    'unique keys' => array(
+      'name' => array('name'),
+    ),
+    'indexes' => array(
+      'path_idx' => array('path'),
+    ),
+  );
+
+  return $schema;
+}
+
+
+function panels_page_install() {
+  db_query("UPDATE {system} SET weight = 10 WHERE name = 'panels_page'");
+  drupal_install_schema('panels_page');
+}
+
+function panels_page_uninstall() {
+  drupal_uninstall_schema('panels_page');
+}
+

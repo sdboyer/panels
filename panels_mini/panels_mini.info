@@ -1,0 +1,5 @@
+; $Id$
+name = Mini panels
+description = Create mini panels that can be used as blocks.
+package = "Panels"
+dependencies = panels

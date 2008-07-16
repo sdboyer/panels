@@ -1,0 +1,6 @@
+; $Id$
+name = Legacy node panes
+description = "Allows embedding specific nodes into panes without using contexts. This module provides backwards compatibility for older Panels API implementations; you should only enable it if your Panels editor is mysteriously without node-related data."
+package = "Panels"
+dependencies = panels
+

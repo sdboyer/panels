@@ -1,0 +1,362 @@
+/* $Id$ */
+
+#panels-dnd-main {
+  margin: 0.5em 0;
+}
+
+div.panels-display {
+  border: 1px dashed #3D9CD7;
+  padding: 0 0 .5em 0;
+  background: #D4EBF9;
+}
+
+div.panels-display h2.label {
+/*  background: transparent; */
+  color: #3D9CD7;
+  text-align: center;
+  font-size: 13pt;
+  margin: 0 0 .5em 0;
+  padding-right: 16px;
+  vertical-align: middle;
+}
+
+div.panels-display .pane-add {
+  float: left;
+  margin: 2px;
+  background: #999;
+  border: 1px solid #fff;
+}
+
+div.panels-display .pane-add-link {
+  display: block;
+  width: 16px;
+  height: 16px;
+  float: left;
+  margin: 2px;
+  padding: 0;
+  border: 1px solid #fff; 
+}
+
+div.panels-display .pane-add-link * {
+  padding: 0;
+  margin: 0;
+}
+
+.panel-pane {
+  padding: 0em;
+  background: #ffffff;
+  border-top: 1px solid #78BAE3;
+  border-right: 1px solid #2B6D96;
+  border-bottom: 1px solid #2B6D96;
+  border-left: 1px solid #78BAE3;
+}
+
+#panels-dnd-main .panel-pane,
+#panels-dnd-main .helperclass {
+  margin: .5em;
+}
+
+#panels-edit-display-form .inline-icon-help {
+  vertical-align: middle;
+  margin: 2px 1px;
+}
+
+.panel-pane.hidden-pane {
+  background: #ccc;
+}
+
+.panel-pane .content {
+  margin: .5em 0 .5em 0;
+  padding: 0 .25em 0 .25em;
+  display: none; /* initially hidden */
+}
+
+.panel-pane .grabber {
+  width: 100%;
+  height: 20px;
+  cursor: move;
+  margin: 0 0 0.5em 0;
+  color: #fff;
+  background-color: #3D9CD7;
+  overflow: hidden;
+}
+
+.panel-pane.hidden-pane .grabber {
+  background-color: #888;
+}
+
+.changed div.grabber {
+  background-color: #FFFFDD !important;
+  border-bottom: 1px solid #3D9CD7 !important;
+  color: black !important;
+}
+
+.changed.hidden-pane div.grabber {
+  background-color: #B4B488 !important;
+  border-bottom: 1px solid #3D9CD7 !important;
+}
+
+.changed div.grabber span.star {
+  font-weight: bold;
+  color: #E09010;
+}
+
+.panel-pane .grabber:hover {
+  color: #fff;
+  background-color: #2F78A5;
+}
+
+.panel-pane.hidden-pane .grabber:hover {
+  background-color: #666;
+}
+
+.panel-pane .grabber:active {
+  color: #fff;
+  background-color: red;
+}
+
+.panel-pane .grabber .text {
+  margin-left: 3px;
+  font-size: 90%;
+}
+
+.panel-pane .buttons {
+  float: right;
+  padding: 0;
+  margin: 0;
+}
+
+.panel-pane .buttons input {
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+
+.panel-pane .buttons a img {
+  margin: 2px 1px;
+}
+
+.panel-pane .toggle {
+  float: left;
+  width: 21px;
+  height: 21px;
+  cursor: pointer;
+  background-position: 7px 7px;
+  background-repeat: no-repeat;
+  background-image: url(../images/portlet-expanded.png);
+}
+
+.panel-pane .title {
+  font-size:125%;
+  cursor: pointer;
+}
+
+.panel-pane .panel-pane-collapsible {
+  margin: 0;
+  padding: 0;
+}
+
+.panel-pane .toggle-collapsed {
+  background-image: url(../images/portlet-collapsed.png);
+}
+
+/* CSS to guide a user to a place to drop */
+.helperclass {
+  border: 1px dashed #f00;
+}
+
+.hoverclass {
+  border: 1px solid red !important;
+}
+
+/* CSS for an area if something can be dropped in it */
+.panels-modal-content {
+  background: #fff;
+  color: #000;
+  padding: 0;
+  margin: 2px;
+  border: 1px solid #000;
+  width: 600px;
+} 
+
+.panels-modal-content .modal-title {
+  font-size: 120%;
+  font-weight: bold;
+  color: white;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.panels-modal-content .modal-header {
+  background-color: #2385c2;
+  padding: 0 .25em 0 1em;
+}
+
+.panels-modal-content .modal-header a {
+  color: white;
+  float: right;
+}
+
+.panels-modal-content .modal-content {
+  padding: 0 1em;
+  overflow: auto;
+  width: 575px;
+  height: 400px;
+}
+
+.panels-modal-content .modal-form {
+}
+
+.panels-modal-content .form-checkboxes .form-item {
+  float: left;
+  width: 24%;
+}
+
+.panels-hidden,
+.panels-js-only {
+  display: none;
+}
+
+a.close {
+  color: white;
+}
+
+a.close:hover {
+  text-decoration: none;
+}
+
+a.close img {
+  position: relative;
+  top: 1px;
+}
+
+.panels-section-title {
+  clear: left;
+  border-bottom: 1px solid #ddf;
+  margin-bottom: .5em;
+  text-align: left;
+}
+
+.panels-section-decorator {
+}
+
+.panels-section-column {
+  width: 31.5%;
+  float: left;
+  margin-right: 1.25%;
+  margin-bottom: 1.5em;
+}
+
+.panels-section {
+  margin-bottom: 1em;
+}
+
+.panels-section .content-type-button {
+  font-size: 8pt;
+  line-height: 1em;
+  overflow: hidden;
+  text-align: left;
+}
+
+.content-type-button img {
+  border: 2px solid white;
+  float: left;
+}
+
+.content-type-button img:hover {
+  border: 2px solid blue;
+}
+
+.content-type-button div {
+  width: 85%;
+  top: -5px;
+  left: 2px;
+  float: left;
+  padding-left: 3px;
+  padding-top: 5px;
+}
+
+.panels-modal-content .modal-content .panels-throbber-wrapper {
+  width: 575px;
+  height: 400px;
+  text-align: center;
+}
+
+.panels-modal-content .modal-content .panels-throbber-wrapper img {
+  margin-top: 160px;
+}
+
+/** modal forms CSS **/
+.panels-modal-content .form-item label {
+  width: 8em;
+  float: left;
+}
+
+.panels-modal-content .form-item label.option {
+  width: auto;
+  float: none;
+}
+
+.panels-modal-content .form-item .description {
+  clear: left;
+}
+
+.panels-modal-content .form-item .description .tips {
+  margin-left: 2em;
+}
+
+.panels-modal-content .no-float .form-item * {
+  float: none;
+}
+
+.panels-modal-content .modal-form .no-float label  {
+  width: auto;
+}
+
+.panels-modal-content .modal-form fieldset,
+.panels-modal-content .modal-form .form-checkboxes {
+  clear: left;
+}
+
+#edit-configuration-nid {
+  clear: left;
+}
+
+.option-text-aligner .form-item {
+  float: left;
+  padding: .25em 1em .25em 0;
+  margin: 0;
+}
+
+.option-text-aligner {
+  clear: both;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.panels-style-settings,
+.panels-style-settings-box,
+#panels-style-setting {
+  float: left;
+}
+
+.panels-style-settings-box .form-item {
+  margin: 0 1em 0 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * Debugging CSS
+ *
+.panels-dnd {
+  border: 1px dashed #f00;
+}
+.panel-col {
+  border: 1px dashed #00f;
+}
+.panel-portlet {
+  border: 1px dashed #0f0;
+}
+ /**
+  * End of debugging CSS
+  */

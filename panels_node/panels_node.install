@@ -1,0 +1,60 @@
+<?php
+// $Id$
+
+
+/**
+ * Install the panels node tables.
+ */
+function panels_node_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'pgsql':
+      db_query(<<<EOT
+        CREATE TABLE {panels_node} (
+          nid integer NOT NULL DEFAULT 0,
+          css_id varchar(255),
+          did integer,
+          PRIMARY KEY (nid)
+        );
+EOT
+      );
+      break;
+
+    case 'mysql':
+    case 'mysqli':
+      db_query(<<<EOT
+        CREATE TABLE {panels_node} (
+          nid int(10) NOT NULL DEFAULT 0 PRIMARY KEY,
+          css_id varchar(255),
+          did int(10)
+        );
+EOT
+      );
+      break;
+  }
+}
+
+/**
+ * Uninstall the panels node tables.
+ */
+function panels_node_uninstall() {
+  // TODO: Delete all actual nodes that are panels_nodes.
+  db_query("DELETE FROM {node} WHERE type = 'panel'");
+  switch ($GLOBALS['db_type']) {
+    case 'pgsql':
+      db_query("DROP TABLE {panels_node}");
+      break;
+
+    case 'mysql':
+    case 'mysqli':
+      db_query("DROP TABLE IF EXISTS {panels_node}");
+      break;
+  }
+}
+
+function panels_node_update_5000() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 11 WHERE name = 'panels_node'");
+  menu_rebuild();
+  return $ret;
+}
+
