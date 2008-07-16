@@ -22,84 +22,84 @@ function panels_page_schema_1() {
       ),
       'name' => array(
         'type' => 'varchar',
-        'length' => '255',,
+        'length' => '255',
       ),
       'did' => array(
-        'type' => 'int',,
+        'type' => 'int',
       ),
       'title' => array(
         'type' => 'varchar',
-        'length' => '128',,
+        'length' => '128',
       ),
       'access' => array(
         'type' => 'varchar',
-        'length' => '128',,
+        'length' => '128',
       ),
       'path' => array(
         'type' => 'varchar',
-        'length' => '128',,
+        'length' => '128',
       ),
       'css_id' => array(
         'type' => 'varchar',
-        'length' => '128',,
+        'length' => '128',
       ),
       'css' => array(
         'type' => 'text',
-        'size' => 'big',,
+        'size' => 'big',
       ),
       'arguments' => array(
         'type' => 'text',
-        'size' => 'big',,
+        'size' => 'big',
       ),
       'displays' => array(
         'type' => 'text',
-        'size' => 'big',,
+        'size' => 'big',
       ),
       'contexts' => array(
         'type' => 'text',
-        'size' => 'big',,
+        'size' => 'big',
       ),
       'relationships' => array(
         'type' => 'text',
-        'size' => 'big',,
+        'size' => 'big',
       ),
       'no_blocks' => array(
         'type' => 'int',
-        'size' => 'small',,
+        'size' => 'small',
         'default' => 0,
       ),
       'menu' => array(
         'type' => 'int',
-        'size' => 'small',,
+        'size' => 'small',
         'default' => 0,
       ),
       'menu_tab' => array(
         'type' => 'int',
-        'size' => 'small',,
+        'size' => 'small',
       ),
       'menu_tab_weight' => array(
         'type' => 'int',
-        'size' => 'small',,
+        'size' => 'small',
       ),
       'menu_title' => array(
         'type' => 'varchar',
-        'length' => '255',,
+        'length' => '255',
       ),
       'menu_tab_default' => array(
         'type' => 'int',
-        'size' => 'small',,
+        'size' => 'small',
       ),
       'menu_tab_default_parent_type' => array(
         'type' => 'varchar',
-        'length' => '10',,
+        'length' => '10',
       ),
       'menu_parent_title' => array(
         'type' => 'varchar',
-        'length' => '255',,
+        'length' => '255',
       ),
       'menu_parent_tab_weight' => array(
         'type' => 'int',
-        'size' => 'small',,
+        'size' => 'small',
       )
     ),
     'primary key' => array('pid'),
