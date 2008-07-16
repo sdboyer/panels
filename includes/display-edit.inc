@@ -193,6 +193,7 @@ function theme_panels_edit_display_form($form) {
    }
 
   $output .= drupal_render($form);
+  panels_load_include('display-render');
   $output .= theme('panels_dnd', panels_render_layout($layout, $content, '', $display->layout_settings));
   $output .= $save_buttons;
    return $output;

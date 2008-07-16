@@ -35,7 +35,7 @@ function panels_theme() {
   );*/
   $theme['panels_pane'] = array(
     'arguments' => array('content', 'pane', 'display'),
-    'file' => 'includes/render.inc',
+    'file' => 'includes/display-render.inc',
   );
   $theme['panels_common_content_list'] = array(
     'arguments' => array('display'),
