@@ -110,7 +110,55 @@ function panels_page_schema_1() {
       'path_idx' => array('path'),
     ),
   );
-
+  
+  $schema['panels_page_menu_router'] = array(
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'did' => array(
+        'type' => 'int',
+      ),
+      'number_parts' => array(
+        'type' => 'int',
+        'size' => 'small',
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+    ),
+    'primary key' => array('pid'),
+    'unique keys' => array(
+      'did' => array('did'),
+    ),
+    'indexes' => array(
+      'number_parts_idx' => array('number_parts'),
+    ),
+  );
+  $schema['panels_page_menu_link'] = array(
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'did' => array(
+        'type' => 'int',
+      ),
+      'number_parts' => array(
+        'type' => 'int',
+        'size' => 'small',
+      )
+    ),
+    'primary key' => array('pid'),
+    'unique keys' => array(
+      'did' => array('did'),
+    ),
+    'indexes' => array(
+      'number_parts_idx' => array('number_parts'),
+    ),
+  );
   return $schema;
 }
 

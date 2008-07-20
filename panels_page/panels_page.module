@@ -12,6 +12,44 @@
  */
 
 /**
+ * Bitvalues used to determine the status of the panels_page override at a given
+ * path. @see panels_page_check_router_status() for details on how these are
+ * implemented.
+ *
+ * Indicates that the menu router for a particular path exists. If this bitval
+ * is set but none of the others are, it indicates that that router is 'owned'
+ * by another module and has not been overridden by Panels.
+ */
+define('PANELS_ROUTER_EXISTS', 1);
+/**
+ * Indicates that the active router in the {menu_router} table is set and is
+ * owned by Panels.
+ */
+define('PANELS_IS_PANELS_ROUTER', PANELS_MENU_ITEM_EXISTS << 1);
+/**
+ * Panels display objects with this bitval set are an owner, although possibly
+ * not the sole owner, of the router item at the provided path.
+ */
+define('PANELS_PID_IS_OWNER', PANELS_MENU_ITEM_EXISTS << 2);
+// TODO change to path-centric paradigm
+/**
+ * Panels display objects with this bitval set are the sole owner of the router
+ * item at the provided path.
+ */
+define('PANELS_IS_SOLE_PANELS_OWNER', PANELS_MENU_ITEM_EXISTS << 3);
+// TODO change to path-centric paradigm
+/**
+ * Indicates that there is at least one 'fallback' router that Panels has stored
+ * for this router item.
+ */
+define('PANELS_HAS_FALLBACK_ROUTER', PANELS_MENU_ITEM_EXISTS << 4);
+/**
+ * Indicates that the path is owned by a panels page admin editing router. This
+ * should basically be a big "hands-off" sign.
+ */
+define('PANELS_IS_ADMIN_ROUTER', PANELS_MENU_ITEM_EXISTS << 5);
+
+/**
  * Implementation of hook_help().
  */
 function panels_page_help($section = '') {
@@ -41,437 +79,81 @@ function panels_page_perm() {
 
 /**
  * Implementation of hook_menu().
+ *
+ * Delegates to an .inc file to reduce code load overhead.
  */
-function panels_page_menu($may_cache) {
-  $items = array();
-  $panels = panels_page_load_all();
-  if ($may_cache) {
-    $access = user_access('create panel-pages');
-    $items[] = array(
-      'path' => 'admin/panels/panel-page',
-      'title' => t('Panel pages'),
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_list_page'),
-      'description' => t('Create and administer panel-pages (complex layout pages with URLs).'),
-    );
-    $items[] = array(
-      'path' => 'admin/panels/panel-page/list',
-      'title' => t('List'),
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_list_page'),
-      'weight' => -10,
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-    );
-    $items[] = array(
-      'path' => 'admin/panels/panel-page/add',
-      'title' => t('Add'),
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_add_page'),
-      'type' => MENU_LOCAL_TASK,
-    );
-    $items[] = array(
-      'path' => 'admin/panels/panel-page/import',
-      'title' => t('Import'),
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_import_page'),
-      'type' => MENU_LOCAL_TASK,
-    );
-    $items[] = array(
-      'path' => 'admin/panels/panel-page/settings',
-      'title' => t('Settings'),
-      'access' => $access,
-      'callback' => 'panels_page_settings',
-      'weight' => 5,
-      'type' => MENU_LOCAL_TASK,
-    );
-    $items[] = array(
-      'path' => 'admin/panels/panel-page/disable',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_disable_page'),
-      'weight' => -1,
-      'type' => MENU_CALLBACK,
-    );
-    $items[] = array(
-      'path' => 'admin/panels/panel-page/enable',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_enable_page'),
-      'weight' => -1,
-      'type' => MENU_CALLBACK,
-    );
+function panels_page_menu() {
+  require_once panels_load_include('panels_page.menu', 'panels_page/');
+  return panels_page_construct_menu('menu');
+}
 
-    // Ajax responder
-    $items[] = array(
-      'path' => 'panels/argument/ajax/add',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_ajax_argument_add'),
-      'type' => MENU_CALLBACK,
-    );
-    $items[] = array(
-      'path' => 'panels/argument/ajax/edit',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_ajax_argument_edit'),
-      'type' => MENU_CALLBACK,
-    );
+/**
+ * Implementation of hook_menu_alter().
+ *
+ * Delegates to an .inc file to reduce code load overhead.
+ */
+function panels_page_menu_alter() {
+  require_once panels_load_include('panels_page.menu', 'panels_page/');
+  return panels_page_construct_menu('menu_alter');
+}
 
-    // Ajax responder
-    $items[] = array(
-      'path' => 'panels/relationship/ajax/add',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_ajax_relationship_add'),
-      'type' => MENU_CALLBACK,
-    );
-    $items[] = array(
-      'path' => 'panels/relationship/ajax/edit',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_ajax_relationship_edit'),
-      'type' => MENU_CALLBACK,
-    );
-
-    // Ajax responder
-    $items[] = array(
-      'path' => 'panels/context/ajax/add',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_ajax_context_add'),
-      'type' => MENU_CALLBACK,
-    );
-    $items[] = array(
-      'path' => 'panels/context/ajax/edit',
-      'access' => $access,
-      'callback' => 'panels_page_passthru',
-      'callback arguments' => array('panels_page_ajax_context_edit'),
-      'type' => MENU_CALLBACK,
-    );
-
-    // Get all panels and, if enabled, create menu items.
-    foreach ($panels as $panel_page) {
-      if (empty($panel_page->disabled)) {
-        // Only create menu items based on the path if it's not a variable path.
-        if (strpos($panel_page->path, '%') === FALSE) {
-          _panels_page_create_menu_item($items, $panel_page, $panel_page->path, array($panel_page->name, FALSE));
-          // DEBUG: Above is now creating only the basic menu item, not the admin items.
+/**
+ * Determines the relationship between a particular panel page, identified by
+ * $pid, and the router item for $path.
+ * @param string $path
+ */
+function panels_page_check_router_status($path, $pid) {
+  $status = 0;
+  // TODO put in a preg_replace() that strips out loader function names from the
+  // path if they're provided. Essentially, beef up the str_replace() below.
+  // Find out if we're overriding a router on this path. (below is the manual query, saved just in case)
+  // db_fetch_object(db_query("SELECT * FROM {menu_router} WHERE path LIKE (''%s'%%') AND path NOT LIKE (''%s'%%/%%')", $panel_page->path));
+  $router = menu_get_item(str_replace('%', '1', $panel_page->path));
+  if (!empty($router)) {
+    $status += PANELS_MENU_ITEM_EXISTS;
+    // TODO crude method for determining if a router is being implemented by
+    // panels.
+    if (array_search('panels_page_render_load', $router['load_functions'])) {
+      $status += PANELS_IS_PANELS_ROUTER;
+      $panels_routers = panels_page_get_routers_by_path($path);
+      foreach ($panels_routers as $key => $panels_router) {
+        if (empty($panels_router['pid'])) {
+          $status = $status | PANELS_HAS_FALLBACK_ROUTER;
+          unset($panels_routers[$key]);
+          continue;
         }
-        panels_page_admin_menu_items($items, 'admin/panels/panel-page/' . $panel_page->name, $panel_page);
+        if ($pid == $panels_router['pid']) {
+          $status = $status | PANELS_PID_IS_OWNER;
+        }
+      }
+      if (count($panels_routers) == 1 && $status & PANELS_PID_IS_OWNER) {
+        $status += PANELS_IS_SOLE_PANELS_OWNER;
       }
     }
-  }
-  else {
-    // Look for panels with variable arguments.
-    // Build an array of $urls because 'real' URLs will take precedence over
-    // argument filled URLs
-    $urls = array();
-    foreach ($panels as $panel_page) {
-      $url[$panel_page->path] = TRUE;
-    }
-
-    $plugins_loaded = FALSE;
-    foreach ($panels as $panel_page) {
-      if (!empty($panel_page->disabled)) {
-        continue;
-      }
-      if (strpos($panel_page->path, '%') !== FALSE) {
-        $path = explode('/', $panel_page->path);
-
-        // First pass:
-        // Check if the current path sufficiently matches $panel_page->path,
-        // which means: all fixed parts that come before the last %-wildcard
-        // need to match, while trailing fixed parts don't matter.
-        // We start with the last part and take up checking after reaching a %.
-        $check = FALSE;
-        foreach (array_reverse($path, TRUE) as $id => $chunk) {
-          if ($chunk == '%') {
-            $check = TRUE;
-            continue;
-          }
-          if ($check && $chunk != arg($id)) {
-            // Skip outer foreach loop to continue with the next $panel_page.
-            continue 2;
-          }
-        }
-
-        $args = array($panel_page, FALSE);
-
-        // Second pass:
-        $argument = reset($panel_page->arguments); // Get first argument.
-        foreach ($path as $id => $chunk) {
-          if ($chunk != '%') {
-            continue;
-          }
-          // For arguments that are embedded in the URL, we require the
-          // argument handler to return a context, if there is an argument handler.
-          if ($argument) {
-            // Try to avoid loading the plugins code unless necessary.
-            if (!$plugins_loaded) {
-              panels_load_include('plugins');
-              $plugins_loaded = TRUE;
-            }
-            $context = panels_argument_get_context($argument, arg($id));
-            if (!$context) {
-              break;
-            }
-            $panel_page->context[panels_argument_context_id($argument)] = $context;
-          }
-          $path[$id] = arg($id);
-          $args[] = arg($id);
-          $argument = next($panel_page->arguments); // Get next argument.
-        }
-        _panels_page_create_menu_item($items, $panel_page, implode('/', $path), $args);
-        // DEBUG: Above is now creating only the basic menu item, not the admin items.
-      }
+    else if (array_search('panels_page_admin', $router['load_functions'])) {
+      $status += PANELS_IS_ADMIN_ROUTER;
     }
   }
-  return $items;
+  return $status;
 }
 
-/**
- * Helper function to add a menu item for a panel.
- */
-function panels_page_admin_menu_items(&$items, $base, $page) {
-  $access = user_access('create panel-pages');
-
-  $items[] = array(
-    'path' => $base,
-    'title' => t('Preview'),
-    'access' => $access,
-    'callback' => 'panels_page_view_page',
-    'callback arguments' => array($page->name, TRUE),
-    'weight' => -10,
-    'type' => MENU_CALLBACK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/preview',
-    'title' => t('Preview'),
-    'access' => $access,
-    'callback' => 'panels_page_view_page',
-    'callback arguments' => array($page->name, TRUE),
-    'weight' => -10,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  // Set up for the 'default' display.
-  $items[] = array(
-    'path' => $base . '/edit/layout',
-    'title' => t('Layout'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_layout', $page->name),
-    'weight' => -9,
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/general',
-    'title' => t('Settings'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit', $page->name),
-    'weight' => -7,
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/settings',
-    'title' => t('Layout settings'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_layout_settings', $page->name, NULL),
-    'weight' => -5,
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/advanced',
-    'title' => t('Advanced'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_advanced', $page->name),
-    'weight' => -3,
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/context',
-    'title' => t('Context'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_context', $page->name),
-    'weight' => -2,
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/content',
-    'title' => t('Content'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_content', $page->name),
-    'weight' => -1,
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/layout/default',
-    'title' => t('Default'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_layout', $page->name),
-    'weight' => -1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/settings/default',
-    'title' => t('Default'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_layout_settings', $page->name, NULL),
-    'weight' => -1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $items[] = array(
-    'path' => $base . '/edit/content/default',
-    'title' => t('Default'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('panels_page_edit_content', $page->name),
-    'weight' => -1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  if (!empty($page->displays)) {
-    foreach ($page->displays as $display_id => $info) {
-      $items[] = array(
-        'path' => $base . '/edit/layout/' . $display_id,
-        'title' => $info['title'],
-        'access' => $access,
-        'callback' => 'panels_page_passthru',
-        'callback arguments' => array('panels_page_edit_layout', $page->name, $display_id),
-        'type' => MENU_LOCAL_TASK,
-      );
-
-      $items[] = array(
-        'path' => $base . '/edit/settings/' . $display_id,
-        'title' => $info['title'],
-        'access' => $access,
-        'callback' => 'panels_page_passthru',
-        'callback arguments' => array('panels_page_edit_layout_settings', $page->name, $display_id),
-        'type' => MENU_LOCAL_TASK,
-      );
-
-      $items[] = array(
-        'path' => $base . '/edit/content/' . $display_id,
-        'title' => $info['title'],
-        'access' => $access,
-        'callback' => 'panels_page_passthru',
-        'callback arguments' => array('panels_page_edit_content', $page->name, $display_id),
-        'type' => MENU_LOCAL_TASK,
-      );
+function panels_page_get_routers_by_path($path) {
+  // Caching this in a static var may be a TOTAL waste of memory.
+  static $routers = array();
+  if (!isset($routers[$path])) {
+    $routers[$path] = array();
+    $result = db_query('SELECT * FROM {panels_page_menu_router} WHERE path = \'%s\'', $path);
+    while ($row = db_fetch_array($result)) {
+      $routers[$path][] = $row;
     }
   }
-
-  $items[] = array(
-    'path' => $base . '/export',
-    'title' => t('Export'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('drupal_get_form', 'panels_page_edit_export', $page->name),
-    'weight' => 0,
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items[] = array(
-    'path' => $base . '/delete',
-    'title' => t('Delete panel page'),
-    'access' => $access,
-    'callback' => 'panels_page_passthru',
-    'callback arguments' => array('drupal_get_form', 'panels_page_delete_confirm', $page->name),
-    'type' => MENU_CALLBACK,
-  );
+  return $routers[$path];
 }
 
-/**
- * Create a menu item for a panel page.
- */
-function _panels_page_create_menu_item(&$items, $panel_page, $path, $args = array()) {
-  $access = panels_page_access($panel_page);
-  $title  = filter_xss_admin(panels_page_get_title($panel_page, 'menu'));
-  $type   = _panels_page_menu_type($panel_page);
-
-  if ($type == MENU_LOCAL_TASK || $type == MENU_DEFAULT_LOCAL_TASK) {
-    $weight = $panel_page->menu_tab_weight;
-  }
-  $items[] = _panels_page_menu_item($path, $title, $panel_page, $args, $access, $type, isset($weight) ? $weight : NULL);
-
-  if ($type == MENU_DEFAULT_LOCAL_TASK && dirname($path) && dirname($path) != '.') {
-    switch ($panel_page->menu_tab_default_parent_type) {
-      case 'tab':
-        $parent_type = MENU_LOCAL_TASK;
-        break;
-
-      case 'normal':
-        $parent_type = MENU_NORMAL_ITEM;
-        break;
-
-      default:
-      case 'existing':
-        $parent_type = 0;
-        break;
-    }
-    if ($parent_type) {
-      $title   = filter_xss_admin(panels_page_get_title($panel_page, 'menu-parent'));
-      $weight  = $panel_page->menu_parent_tab_weight;
-      $items[] = _panels_page_menu_item(dirname($path), $title, $panel_page, $args, $access, $parent_type, $weight);
-    }
-  }
-}
-
-/**
- * Helper function to create a menu item for a panel.
- */
-function _panels_page_menu_item($path, $title, $panel_page, $args, $access, $type, $weight = NULL) {
-  $retval = array('path' => $path,
-    'title' => $title,
-    'callback' => 'panels_page_view_page',
-    'callback arguments' => $args,
-    'access' => user_access('access content') && $access,
-    'type' => $type,
-  );
-  if ($weight !== NULL) {
-    $retval['weight'] = $weight;
-  }
-  return $retval;
-}
-
-/**
- * Determine what menu type a panel needs to use.
- */
-function _panels_page_menu_type($panel_page) {
-  if ($panel_page->menu) {
-    if ($panel_page->menu_tab_default) {
-      $type = MENU_DEFAULT_LOCAL_TASK;
-    }
-    else if ($panel_page->menu_tab) {
-      $type = MENU_LOCAL_TASK;
-    }
-    else {
-      $type = MENU_NORMAL_ITEM;
-    }
-  }
-  else {
-    $type = MENU_CALLBACK;
-  }
-  return $type;
+function panels_page_render_load($arg, $map, $index) {
+  $args = func_get_args();
+  array_splice($args, 1, 2);
+  $number_parts = count($map);
 }
 
 /**
@@ -584,10 +266,10 @@ function panels_page_get_url($panel_page, $args = NULL) {
 /**
  * Figure out if a panel is the current page; mostly useful in theming.
  */
-function panels_page_get_current($page = NULL) {
+function panels_page_get_current($panel_page = NULL) {
   static $cache = NULL;
-  if (isset($page)) {
-    $cache = $page;
+  if (isset($panel_page )) {
+    $cache = $panel_page;
   }
 
   return $cache;
