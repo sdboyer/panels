@@ -371,7 +371,7 @@ function panels_ct_pane_config_form($pane, $contexts, $parents, $op, $content_ty
  * @param string $op
  *  Either 'add' or 'edit' depending on the operation being performed.
  */
-function panels_ct_pane_validate_form($content_type, $form, $form_values, $op) {
+function panels_ct_pane_validate_form($content_type, $form, &$form_values, $op) {
   if ($function = panels_plugin_get_function('content_types', $content_type, "$op validate callback")) {
     return $function($form, $form_values);
   }
@@ -388,7 +388,7 @@ function panels_ct_pane_validate_form($content_type, $form, $form_values, $op) {
  * @param string $op
  *  Either 'add' or 'edit' depending on the operation being performed.
  */
-function panels_ct_pane_submit_form($content_type, $form_values, $op) {
+function panels_ct_pane_submit_form($content_type, &$form_values, $op) {
   if ($function = panels_plugin_get_function('content_types', $content_type, "$op submit callback")) {
     return $function($form_values);
   }

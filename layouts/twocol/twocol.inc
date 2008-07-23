@@ -18,4 +18,3 @@ function panels_twocol_panels_layouts() {
 
   return $items;
 }
-

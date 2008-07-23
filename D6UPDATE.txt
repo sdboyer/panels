@@ -1,0 +1,16 @@
+CHANGES DURING D6 UPDATE
+
+LAYOUTS
+=======
+
+All layouts should use templates
+'icon' now uses the defined path and should no longer have path built in.
+'css' now uses defined path and should no longer have path built in.
+DOCUMENTATION NOTE: You can just copy any layout css file directly to your theme. It should no longer be in theme/layouts directory.
+
+
+CONTENT TYPES
+=============
+
+panels_node_legacy module renamed to panels_node_content.module 
+-- NEED UPDATE TO RENAME IN SYSTEM TABLE.
