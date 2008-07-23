@@ -41,6 +41,11 @@ function theme_panels_list_style_render_panel($display, $panel_id, $panes, $sett
   foreach ($panes as $pane_id => $content) {
     $items[] = panels_render_pane($content, $display->content[$pane_id], $display);
   }
+
+  if (empty($settings['list_type'])) {
+    $settings['list_type'] = 'ul';
+  }
+
   return theme('item_list', $items, NULL, $settings['list_type']);
 }
 

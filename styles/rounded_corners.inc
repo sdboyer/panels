@@ -47,7 +47,7 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
     }
     $text = panels_render_pane($pane, $display->content[$pane_id], $display);
     if ($text) {
-      $output .= ($where == 'pane') ? theme('rounded_corners_box', $text) : $text;
+      $output .= ($where == 'pane') ? panels_rounded_corners_box($text) : $text;
     }
 
     // If we displayed a pane, this will become true; if not, it will become
@@ -56,7 +56,7 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
   }
 
   if ($where == 'panel') {
-    $output = theme('rounded_corners_box', $output);
+    $output = panels_rounded_corners_box($output);
   }
 
   panels_add_rounded_corners_css($display, $where);
@@ -67,7 +67,7 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
 function panels_add_rounded_corners_css($display, $where) {
   static $displays_used = array();
   if (empty($displays_used[$display->name])) {
-    theme('rounded_corners_css', $display, $where);
+    panels_rounded_corners_css($display, $where);
     $displays_used[$display->name] = TRUE;
   }
 }
@@ -77,7 +77,7 @@ function panels_add_rounded_corners_css($display, $where) {
  */
 function theme_panels_rounded_corners_style_render_pane($content, $pane, $display) {
   // Just stick a box around the standard theme_panels_pane.
-  $output = theme('rounded_corners_box', theme('panels_pane', $content, $pane, $display));
+  $output = panels_rounded_corners_box(theme('panels_pane', $content, $pane, $display));
   panels_add_rounded_corners_css($display, 'pane');
   return $output;
 }
@@ -100,15 +100,6 @@ function panels_rounded_corners_style_settings_form($style_settings) {
   return $form;
 }
 
-
-// ---------------------------------------------------------------------------
-// Themeing callbacks.
-
-/**
- * @ingroup themable
- * @{
- */
-
 /**
  * Generates the dynamic CSS.
  *
@@ -118,7 +109,7 @@ function panels_rounded_corners_style_settings_form($style_settings) {
  *   String indicating where the rounded corners should be applied, either
  *   'pane' or 'panel'.
  */
-function theme_rounded_corners_css($display, $where = 'pane') {
+function panels_rounded_corners_css($display, $where = 'pane') {
   $idstr = empty($display->css_id) ? '.rounded_corner' : "#$display->css_id";
   $url = panels_get_path('styles/corners', TRUE);
 
@@ -201,7 +192,7 @@ EOF;
  * @return
  *   The created HTML.
  */
-function theme_rounded_corners_box($content) {
+function panels_rounded_corners_box($content) {
   return <<<EOF
 <div class="rounded_corner">
   <div class="wrap-corner">
@@ -216,8 +207,3 @@ function theme_rounded_corners_box($content) {
 </div>
 EOF;
 }
-
-/**
- * @} End of "ingroup themeable".
- */
-
