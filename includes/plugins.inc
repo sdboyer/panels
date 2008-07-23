@@ -1428,9 +1428,12 @@ function _panels_process_plugin($module, $identifier, $path, $hook) {
 
   // Fill in defaults.
   foreach ($result as $name => $plugin) {
-    $result[$name]['module'] = $module;
-    $result[$name]['name'] = $name;
-    $result[$name]['path'] = $path;
+    $result[$name] += array(
+      'module' => $module,
+      'name' => $name,
+      'path' => $path,
+    );
+
     // Add some content type-specific defaults, but allow them to be overridden by declarations in the content type.
     if (preg_match('/content_type/', $hook)) {
       $result[$name] = array_merge(array('single' => FALSE, 'visibility serialize' => FALSE, 'role-based access' => TRUE), $result[$name]);

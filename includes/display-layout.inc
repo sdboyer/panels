@@ -74,7 +74,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
         return _panels_edit_layout($display, $finish, $destination, $allowed_layouts);
       }
 
-      if (!empty($form_state['clicked_button']['#save-display'])) {
+      if (!empty($change_form_state['clicked_button']['#save-display'])) {
         drupal_set_message(t('Panel layout has been updated.'));
         panels_save_display($display);
       }

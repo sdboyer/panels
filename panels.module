@@ -29,10 +29,6 @@ function panels_theme() {
     'arguments' => array('form'),
     'file' => 'includes/display-edit.inc',
   );
-/*  $theme['panels_edit_layout_form_change'] = array(
-    'arguments' => array('form'),
-    'file' => 'includes/display-edit.inc',
-  );*/
   $theme['panels_pane'] = array(
     'arguments' => array('content', 'pane', 'display'),
     'file' => 'includes/display-render.inc',
@@ -82,7 +78,13 @@ function panels_theme() {
     if (!empty($data['theme'])) {
       $theme[$data['theme']] = array(
         'arguments' => array('id' => NULL, 'content' => NULL, 'settings' => NULL),
+        'path' => $data['path'],
       );
+
+      // if no theme function exists, assume template.
+      if (!function_exists("theme_$data[theme]")) {
+        $theme[$data['theme']]['template'] = str_replace('_', '-', $data['theme']);
+      }
     }
   }
 
@@ -258,25 +260,6 @@ function panels_cache_clear($obj, $did) {
 function panels_cron() {
   // delete anything 7 days old or more.
   db_query("DELETE FROM {panels_object_cache} WHERE timestamp < %d", time() - (86400 * 7));
-}
-
-/**
- * Global storage function, used mostly so that _submit hooks can pass data
- * back to their originator more easily. TODO: deprecated but still in use.
- */
-function panels_set($var, $value = NULL) {
-  static $vars = array();
-  if ($value !== NULL) {
-    $vars[$var] = $value;
-  }
-  return $vars[$var];
-}
-
-/**
- * Retrieve from global storage
- */
-function panels_get($var) {
-  return panels_set($var);
 }
 
 // ---------------------------------------------------------------------------
@@ -876,10 +859,9 @@ function panels_print_layout($id, $content) {
 // @layout
 function panels_print_layout_icon($id, $layout, $title = NULL) {
   drupal_add_css(panels_get_path('css/panels_admin.css'));
-  $file = panels_get_path($layout['icon'], false, $layout['module']);
+  $file = $layout['path'] . '/' . $layout['icon'];
   return theme('panels_layout_icon', $id, theme('image', $file), $title);
 }
-
 
 /**
  * Theme the layout icon image

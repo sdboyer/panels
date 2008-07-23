@@ -1,17 +1,15 @@
 <?php
 // $Id$
 
-
 /**
- * implementation of hook_panels_layouts
+ * Implementation of hook_panels_layouts()
  */
 function panels_flexible_panels_layouts() {
   $items['flexible'] = array(
     'title' => t('Flexible'),
-    'icon' => 'layouts/flexible.png',
+    'icon' => 'flexible.png',
     'theme' => 'panels_flexible',
-    'theme arguments' => array('id', 'content', 'settings'), 
-    'css' => 'layouts/flexible.css',
+    'css' => 'flexible.css',
     'settings form' => 'panels_flexible_settings_form',
     'settings submit' => 'panels_flexible_settings_submit',
     'panels function' => 'panels_flexible_panels',

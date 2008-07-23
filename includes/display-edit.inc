@@ -22,7 +22,7 @@ function _panels_edit($display, $destination, $content_types) {
   }
 
   // Load the display being edited from cache, if possible.
-  if (/* !empty($_POST) && */ is_object($cache = panels_cache_get('display', $did))) {
+  if (!empty($_POST) && is_object($cache = panels_cache_get('display', $did))) {
     $display = $cache->display;
   }
   else {

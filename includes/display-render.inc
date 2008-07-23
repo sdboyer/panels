@@ -71,7 +71,7 @@ function panels_render_layout($layout, $content, $css_id = NULL, $settings = arr
       drupal_add_css(path_to_theme() . '/' . $layout['css']);
     }
     else {
-      drupal_add_css(panels_get_path($layout['css'], false, $layout['module']));
+      drupal_add_css($layout['path'] . '/' . $layout['css']);
     }
   }
   $display = NULL;
@@ -303,7 +303,7 @@ function panels_render_panel($display, $panel, $panes) {
  */
 function panels_print_layout_link($id, $layout, $link) {
   drupal_add_css(panels_get_path('css/panels_admin.css'));
-  $file  = panels_get_path($layout['icon'], false, $layout['module']);
+  $file = $layout['path'] . '/' . $layout['icon'];
   $image = l(theme('image', $file), $link, array('html' => true));
   $title = l($layout['title'], $link);
   return theme('panels_layout_link', $title, $id, $image, $link);
