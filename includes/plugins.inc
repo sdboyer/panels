@@ -1327,7 +1327,6 @@ function panels_plugin_get_function($plugin, $which, $function_name) {
 function panels_load_includes($plugin_type, $hook, $file = NULL) {
   // Load all our plugins.
   $directories = panels_get_directories($plugin_type);
-  $directories['panels_'] = panels_get_path($plugin_type);
   $file_list = array();
   foreach ($directories as $module => $path) {
     $file_list[$module] = drupal_system_listing("$file" . '.inc$', $path, 'name', 0);
@@ -1336,7 +1335,7 @@ function panels_load_includes($plugin_type, $hook, $file = NULL) {
   foreach (array_filter($file_list) as $module => $files) {
     foreach ($files as $file) {
       require_once ('./' . $file->filename);
-      $result = _panels_process_plugin('panels', $module . $file->name, dirname($file->filename), $hook);
+      $result = _panels_process_plugin($module, $module . '_' . $file->name, dirname($file->filename), $hook);
       if (is_array($result)) {
         $info = array_merge($info, $result);
       }
@@ -1348,40 +1347,51 @@ function panels_load_includes($plugin_type, $hook, $file = NULL) {
 /**
  * Invocation of panels_include_directory(), part of the main panels API.
  *
- * This hook allows other modules to create their own panels .inc files according to the
- * same filename and directory schema utilized by Panels itself, or some other arbitrary
- * schema defined in implementations of the hook. Essentially, instead of having to declare all
- * all callback definitions for a given plugin in a single hook implementation specific to that plugin
- * calling this hook allows the caller to define a directory where Panels will then look for
- * .inc files with callback declarations that conform to the naming scheme. The net result is the
- * same, but implementing this hook does allow for better organization and flexibility in
- * your .inc files, which is particularly preferable if you're implementing a lot of them.
+ * This hook allows other modules to create their own panels .inc files
+ * according to the same filename and directory schema utilized by Panels
+ * itself, or some other arbitrary schema defined in implementations of the
+ * hook. Essentially, instead of having to declare all all callback definitions
+ * for a given plugin in a single hook implementation specific to that plugin
+ * calling this hook allows the caller to define a directory where Panels will
+ * then look for .inc files with callback declarations that conform to the
+ * naming scheme. The net result is the same, but implementing this hook does
+ * allow for better organization and flexibility in your .inc files, which is
+ * particularly preferable if you're implementing a lot of them.
  *
- * PLEASE NOTE: There are strict naming conventions on implementing this hook; failure to
- * follow the conventions will likely cause your plugins not to work. Possibly even worse,
- * failure to follow the conventions can result in namespace collisions between your
- * module and other modules invoking the panels API.
+ * PLEASE NOTE: There are strict naming conventions on implementing this hook;
+ * failure to follow the conventions will likely cause your plugins not to
+ * work. Possibly even worse, failure to follow the conventions can result in
+ * namespace collisions between your module and other modules invoking the
+ * panels API.
  *
  * @ingroup mainapi
  *
  * @param string $plugintype
- *   The type of Panels plugin being requested. Can be any of the following seven:
- *  'content_types', 'contexts', 'arguments', 'layouts', 'styles', 'relationships'
+ *   The type of Panels plugin being requested. Can be any of the following
+ *   seven: 'content_types', 'contexts', 'arguments', 'layouts', 'styles',
+ *   'relationships'
  *
  * @return array $directories
- *   Returns an array of include subdirectories to call for the requested plugin type.
- *   Subdirectories should be ONLY the subdirectory of your module where the appropriate
- *   types of .inc files reside.
+ *   Returns an array of include subdirectories to call for the requested
+ *   plugin type.  Subdirectories should be ONLY the subdirectory of your
+ *   module where the appropriate types of .inc files reside.
  */
-function panels_get_directories($plugintype) {
+function panels_get_directories($plugin_type) {
   $directories = array();
   foreach (module_implements('panels_include_directory') as $module) {
-    $result = module_invoke($module, 'panels_include_directory', $plugintype);
+    $result = module_invoke($module, 'panels_include_directory', $plugin_type);
     if (isset($result) && is_string($result)) {
-      $directories[$module .'_'] = drupal_get_path('module', $module) .'/'. $result;
+      $directories[$module] = drupal_get_path('module', $module) .'/'. $result;
     }
   }
   return $directories;
+}
+
+/**
+ * Implementation of hook_panels_include_directory().
+ */
+function panels_panels_include_directory($plugin_type) {
+  return $plugin_type;
 }
 
 /**
