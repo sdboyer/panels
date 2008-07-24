@@ -1,49 +1,69 @@
 <?php
 // $Id$
 
+/**
+ * Implementation of hook_schema().
+ */
+function panels_mini_schema() {
+  // This should always point to our 'current' schema. This makes it relatively easy
+  // to keep a record of schema as we make changes to it.
+  return panels_mini_schema_1();
+}
 
 /**
- * Implementation of hook_install().
+ * Schema version 1 for Panels in D6.
+ */
+function panels_mini_schema_1() {
+  $schema = array();
+
+  $schema['panels_mini'] = array(
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'category' => array(
+        'type' => 'varchar',
+        'length' => '64',
+      ),
+      'did' => array(
+        'type' => 'int',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => '128',
+      ),
+      'requiredcontexts' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'contexts' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'relationships' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+    ),
+    'primary key' => array('pid'),
+    'unique keys' => array(
+      'name' => array('name'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_uninstall().
  */
 function panels_mini_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'pgsql':
-      db_query(<<<EOT
-        CREATE TABLE {panels_mini} (
-          pid integer NOT NULL DEFAULT 0,
-          name varchar(255) UNIQUE,
-          category varchar(64),
-          did integer,
-          title varchar(128),
-          requiredcontexts text,
-          contexts text,
-          relationships text,
-          PRIMARY KEY (pid)
-        );
-EOT
-      );
-      db_query("CREATE SEQUENCE {panels_mini}_pid_seq;");
-      db_query("CREATE INDEX {panels_mini}_name_idx ON {panels_mini} (name);");
-      break;
-
-    case 'mysql':
-    case 'mysqli':
-      db_query(<<<EOT
-        CREATE TABLE {panels_mini} (
-          pid int(10) NOT NULL DEFAULT 0 PRIMARY KEY,
-          name varchar(255) UNIQUE,
-          category varchar(64),
-          did int(10),
-          title varchar(128),
-          contexts longtext,
-          requiredcontexts longtext,
-          relationships longtext,
-          KEY (name)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */
-EOT
-      );
-      break;
-  }
+  drupal_install_schema('panels_mini');
 }
 
 /**
@@ -66,114 +86,6 @@ function panels_mini_uninstall() {
   }
 
   // Finally, delete all mini panels.
-  switch ($GLOBALS['db_type']) {
-    case 'pgsql':
-      db_query("DROP TABLE {panels_mini}");
-      db_query("DROP SEQUENCE {panels_mini}_pid_seq");
-      break;
-
-    case 'mysql':
-    case 'mysqli':
-      db_query("DROP TABLE IF EXISTS {panels_mini}");
-      break;
-  }
+  drupal_install_schema('panels_mini');
 }
 
-function panels_mini_update_5000() {
-  $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'pgsql':
-      db_add_column($ret, 'panels_mini', 'relationships', 'text', array());
-      db_add_column($ret, 'panels_mini', 'contexts', 'text', array());
-      db_add_column($ret, 'panels_mini', 'name', 'varchar(255) UNIQUE', array());
-      break;
-
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {panels_mini} ADD COLUMN relationships longtext");
-      $ret[] = update_sql("ALTER TABLE {panels_mini} ADD COLUMN contexts longtext");
-      $ret[] = update_sql("ALTER TABLE {panels_mini} ADD COLUMN name varchar(255) UNIQUE AFTER pid");
-      break;
-  }
-
-  $ret[] = update_sql("CREATE INDEX {panels_mini}_name_idx ON {panels_mini} (name)");
-  $ret[] = update_sql("UPDATE {panels_mini} SET name = CONCAT('mini_', pid)");
-
-  // Update all existing mini panels, which are being referenced by rid, to
-  // be referenced by name.
-  $ret[] = update_sql("UPDATE {blocks} b INNER JOIN {panels_mini} pm on pm.pid = b.delta SET b.delta = pm.name WHERE b.module = 'panels_mini'");
-
-  // Update all existing mini panels that are in panels since we're now using
-  // a different mechanism to display them
-  $pids = array();
-  $result = db_query("SELECT pid, name FROM {panels_mini}");
-  while ($mini = db_fetch_object($result)) {
-    $pids[$mini->pid] = $mini->name;
-  }
-
-  $result = db_query("SELECT * FROM {panels_pane} WHERE configuration LIKE '%panels_mini%' AND type = 'block'");
-  while ($pane = db_fetch_object($result)) {
-    $conf = unserialize($pane->configuration);
-    // double check so we don't make a mistake
-    if (empty($conf['module']) || $conf['module'] != 'panels_mini') {
-      continue;
-    }
-    unset($conf['module']);
-    $conf['name'] = $pids[$conf['delta']];
-    unset($conf['delta']);
-    // We can't use update_sql because without the safety of %s, serialize gets messed with
-    // by the code that does prefixing.
-    db_query("UPDATE {panels_pane} SET type = 'panels_mini', configuration = '%s', subtype = '%s' WHERE pid = %d", serialize($conf), $conf['name'], $pane->pid);
-  }
-
-  return $ret;
-}
-
-function panels_mini_update_5001() {
-  $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'pgsql':
-      db_add_column($ret, 'panels_mini', 'requiredcontexts', 'text', array());
-      break;
-
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {panels_mini} ADD COLUMN requiredcontexts longtext");
-  }
-
-  return $ret;
-}
-
-/**
- * Get rid of a duplicate index resulting from the CREATE TABLE queries
- * in the install() of panels schema 5214
- */
-function panels_mini_update_5002() {
-  $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = array('success' => TRUE, 'query' => t('It does NOT matter if the following query fails. If it fails, it means you did not have a duplicate \'name_2\' index, and trying to remove a non-existent index does not alter your database in any way. If it succeeds, then the duplicate index is gone, and your table is as it should be.'));
-      $ret[] = update_sql("ALTER TABLE {panels_mini} DROP INDEX name_2");
-  }
-  return $ret;
-}
-
-/**
- * Add the 'category' field, which allows panels administrators to assign mini
- * panels to custom categories.
- *
- */
-function panels_mini_update_5003() {
-  $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'pgsql':
-      db_add_column($ret, 'panels_mini', 'category', 'varchar(64)', array());
-      break;
-
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {panels_mini} ADD COLUMN category varchar(64) AFTER name");
-  }
-  return $ret;
-}

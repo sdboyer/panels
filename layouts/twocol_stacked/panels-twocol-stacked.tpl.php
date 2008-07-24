@@ -17,7 +17,7 @@
  *   - $content['bottom']: Content in the bottom row.
  */
 ?>
-<div class="panel-2col-stacked clear-block panel-display" $idstr>
+<div class="panel-2col-stacked clear-block panel-display" <?php if (!empty($css_id)) { print "id=\"$css_id\""; } ?>>
   <div class="panel-col-top panel-panel">
     <div class="inside"><?php print $content['top']; ?></div>
   </div>

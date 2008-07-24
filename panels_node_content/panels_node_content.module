@@ -13,18 +13,15 @@
 /**
  * Implementation of hook_menu().
  */
-function panels_node_content_menu($may_cache) {
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/panels/node-content',
-      'title' => t('content node panes'),
-      'access' => user_access('access administration pages'),
-      'type' => MENU_NORMAL_ITEM,
-      'callback' => 'panels_node_content_admin',
-      'description' => t('Information about the content node content type.'),
-    );
-    return $items;
-  }
+function panels_node_content_menu() {
+  $items['admin/panels/node-content'] = array(
+    'title' => 'Node panes',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'panels_node_content_admin',
+    'description' => t('Information about the content node content type.'),
+  );
+  return $items;
 }
 
 /**

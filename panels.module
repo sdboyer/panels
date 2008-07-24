@@ -77,7 +77,7 @@ function panels_theme() {
   foreach ($layouts as $name => $data) {
     if (!empty($data['theme'])) {
       $theme[$data['theme']] = array(
-        'arguments' => array('id' => NULL, 'content' => NULL, 'settings' => NULL),
+        'arguments' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL),
         'path' => $data['path'],
       );
 
@@ -889,3 +889,16 @@ function theme_panels_layout_link($title, $id, $image, $link) {
   $output .= '</div>';
   return $output;
 }
+
+/**
+ * Print the layout link. Sends out to a theme function.
+ * @layout
+ */
+function panels_print_layout_link($id, $layout, $link) {
+  drupal_add_css(panels_get_path('css/panels_admin.css'));
+  $file = $layout['path'] . '/' . $layout['icon'];
+  $image = l(theme('image', $file), $link, array('html' => true));
+  $title = l($layout['title'], $link);
+  return theme('panels_layout_link', $title, $id, $image, $link);
+}
+

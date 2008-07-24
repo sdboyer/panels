@@ -675,12 +675,12 @@ function _panels_common_context_js($name, $module, $type) {
     'up' => "input.$type-up",
     'down' => "input.$type-down",
     'configure' => "input.$type-settings",
-    'configure_path' => url("panels/common/ajax/edit/$module/$type/$name", NULL, NULL, TRUE),
+    'configure_path' => url("panels/common/ajax/edit/$module/$type/$name", array('absolute' => TRUE)),
 
     // The button that adds an item
     'add' => "input#edit-buttons-$type-add",
     // Path for ajax on adding an item
-    'path' => url("panels/common/ajax/add/$module/$type/$name", NULL, NULL, TRUE),
+    'path' => url("panels/common/ajax/add/$module/$type/$name", array('absolute' => TRUE)),
     // Which items to post when adding
     'post' => array("#edit-buttons-$type-item", "input#edit-buttons-$type-add"),
     // Where to get the id of an item
@@ -965,7 +965,7 @@ function panels_common_ajax_context_item_add($module, $type, $panel_name) {
     $title = t('Add @type "@context"', array('@type' => $type_info['singular title'], '@context' => $info['title']));
     $output = theme('status_messages');
     $output .= drupal_render_form($form_id, $form);
-    panels_ajax_render($output, $title, url($_GET['q'], NULL, NULL, TRUE));
+    panels_ajax_render($output, $title, url($_GET['q'], array('absolute' => TRUE)));
   }
 }
 
@@ -1048,7 +1048,7 @@ function panels_common_ajax_context_item_edit($module, $type, $panel_name) {
   else {
     $output = theme('status_messages');
     $output .= drupal_render_form($form_id, $form);
-    panels_ajax_render($output, $title, url($_GET['q'], NULL, NULL, TRUE));
+    panels_ajax_render($output, $title, url($_GET['q'], array('absolute' => TRUE)));
   }
 }
 

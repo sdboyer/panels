@@ -110,7 +110,7 @@ function panels_page_schema_1() {
       'path_idx' => array('path'),
     ),
   );
-  
+
   $schema['panels_page_menu_router'] = array(
     'fields' => array(
       'pid' => array(
@@ -161,7 +161,6 @@ function panels_page_schema_1() {
   );
   return $schema;
 }
-
 
 function panels_page_install() {
   db_query("UPDATE {system} SET weight = 10 WHERE name = 'panels_page'");
