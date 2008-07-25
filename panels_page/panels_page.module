@@ -20,39 +20,34 @@
  * is set but none of the others are, it indicates that that router is 'owned'
  * by another module and has not been overridden by Panels.
  */
-define('PANELS_ROUTER_EXISTS', 0x0001);
+define('PANELS_ROUTER_EXISTS', 1);
 /**
  * Indicates that the active router in the {menu_router} table is set and is
  * owned by Panels.
  */
-define('PANELS_IS_PANELS_ROUTER', 0x0002 | PANELS_ROUTER_EXISTS);
-// define('PANELS_IS_PANELS_ROUTER', 0x0003);
-
+define('PANELS_IS_PANELS_ROUTER', 1 << 1 | PANELS_ROUTER_EXISTS); // == 3
 /**
  * Indicates that there is at least one 'fallback' router that Panels has stored
  * for this router item.
  */
-define('PANELS_HAS_FALLBACK_ROUTER', 0x0004 | PANELS_IS_PANELS_ROUTER);
-// define('PANELS_HAS_FALLBACK_ROUTER', 0x0007);
-
+define('PANELS_HAS_FALLBACK_ROUTER', 1 << 2 | PANELS_IS_PANELS_ROUTER); // == 7
 /**
  * Indicates that the path is owned by a panels page admin editing router. This
  * should basically be a big "hands-off" sign.
  */
-define('PANELS_IS_ADMIN_ROUTER', 0x0008 | PANELS_IS_PANELS_ROUTER);
-// define('PANELS_IS_ADMIN_ROUTER', 0x0011);
+define('PANELS_IS_ADMIN_ROUTER', 1 << 3 | PANELS_IS_PANELS_ROUTER); // == 11
 
 // These deal with a particular pid's relationship with a given path
 /**
  * Panels display objects with this bitval set are an owner, although possibly
  * not the sole owner, of the router item at the provided path.
  */
-define('PANELS_PID_IS_OWNER', 0x0016 | PANELS_IS_PANELS_ROUTER); // == 19
+define('PANELS_PID_OWNS_ROUTER', 1 << 4 | PANELS_IS_PANELS_ROUTER); // == 19
 /**
  * Panels display objects with this bitval set are the sole owner of the router
  * item at the provided path.
  */
-define('PANELS_IS_SOLE_PANELS_OWNER', 0x0032 | PANELS_PID_IS_OWNER); // == 51
+define('PANELS_IS_SOLE_OWNER', 1 << 5 | PANELS_PID_OWNS_ROUTER); // == 51
 
 
 /**
@@ -104,40 +99,50 @@ function panels_page_menu_alter() {
 }
 
 /**
- * Determines the relationship between a particular panel page, identified by
- * $pid, and the router item for $path.
+ * Check the status of the menu router at $path.
+ *
+ * If $pid is provided, relationship of the panels_page identified by $pid
+ * is also indicated.
+ *
  * @param string $path
+ * @param int $pid
+ * @return int $status
+ *   A bitval indicating all the router relevant status flags per the provided
+ *   parameters.
  */
-function panels_page_check_router_status($path, $pid) {
+function panels_page_check_router_status($path, $pid = NULL) {
   $status = 0;
-  // TODO put in a preg_replace() that strips out loader function names from the
-  // path if they're provided. Essentially, beef up the str_replace() below.
+  
   // Find out if we're overriding a router on this path. (below is the manual query, saved just in case)
   // db_fetch_object(db_query("SELECT * FROM {menu_router} WHERE path LIKE (''%s'%%') AND path NOT LIKE (''%s'%%/%%')", $panel_page->path));
-  $router = menu_get_item(str_replace('%', '1', $panel_page->path));
-  if (!empty($router)) {
-    $status += PANELS_MENU_ITEM_EXISTS;
-    // TODO crude method for determining if a router is being implemented by
-    // panels.
-    if (array_search('panels_page_render_load', $router['load_functions'])) {
-      $status += PANELS_IS_PANELS_ROUTER;
-      $panels_routers = panels_page_get_routers_by_path($path);
-      foreach ($panels_routers as $key => $panels_router) {
-        if (empty($panels_router['pid'])) {
-          $status = $status | PANELS_HAS_FALLBACK_ROUTER;
-          unset($panels_routers[$key]);
-          continue;
-        }
-        if ($pid == $panels_router['pid']) {
-          $status = $status | PANELS_PID_IS_OWNER;
-        }
+  // TODO put in a preg_replace() that strips out loader function names from the
+  // path if they're provided. Essentially, beef up the str_replace() below.
+  $router = menu_get_item(str_replace('%', '1', $path));
+  if (empty($router)) { // No router at that path; return 0.
+    return $status;
+  }
+  else {
+    $status = $status | PANELS_ROUTER_EXISTS;
+  }
+  // TODO array_search() is a crude tool; improve this.
+  if (array_search('panels_page_admin', $router['load_functions'])) {
+    $status = PANELS_IS_ADMIN_ROUTER;
+  }
+  if (array_search('panels_page_render_load', $router['load_functions'])) {
+    $status = PANELS_IS_PANELS_ROUTER;
+    $panels_routers = panels_page_get_routers_by_path($path);
+    foreach ($panels_routers as $key => $panels_router) {
+      if (empty($panels_router['pid'])) {
+        $status = $status | PANELS_HAS_FALLBACK_ROUTER;
+        unset($panels_routers[$key]);
+        continue;
       }
-      if (count($panels_routers) == 1 && $status & PANELS_PID_IS_OWNER) {
-        $status += PANELS_IS_SOLE_PANELS_OWNER;
+      if ($pid == $panels_router['pid']) {
+        $status = $status | PANELS_PID_OWNS_ROUTER;
       }
     }
-    else if (array_search('panels_page_admin', $router['load_functions'])) {
-      $status += PANELS_IS_ADMIN_ROUTER;
+    if (count($panels_routers) == 1 && $status & PANELS_PID_OWNS_ROUTER) {
+      $status = $status | PANELS_IS_SOLE_OWNER;
     }
   }
   return $status;
