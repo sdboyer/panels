@@ -869,7 +869,7 @@ function panels_print_layout_icon($id, $layout, $title = NULL) {
  * @todo move to theme.inc
  */
 function theme_panels_layout_icon($id, $image, $title = NULL) {
-  $output .= '<div class="layout-icon">';
+  $output = '<div class="layout-icon">';
   $output .= $image;
   if ($title) {
     $output .= '<div class="caption">' . $title . '</div>';
@@ -883,7 +883,7 @@ function theme_panels_layout_icon($id, $image, $title = NULL) {
  * @layout
  */
 function theme_panels_layout_link($title, $id, $image, $link) {
-  $output .= '<div class="layout-link">';
+  $output = '<div class="layout-link">';
   $output .= $image;
   $output .= '<div>' . $title . '</div>';
   $output .= '</div>';
