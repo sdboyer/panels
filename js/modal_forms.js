@@ -1,4 +1,15 @@
 // $Id$
+/**
+ * @file
+ * Implement the modal forms used in Panels.
+ *
+ * The modal form is implemented primarily from mc.js; this contains the
+ * Drupal and Panel specific stuff to use it. The modal is now fairly
+ * generic and it can be activated mostly by setting up the right
+ * classes, but if you are using the modal you must include links to
+ * the images in settings, because the javascript does not inherently 
+ * know where the images are at.
+ */
 
 Drupal.Panels.Subform = {};
 
@@ -26,6 +37,8 @@ Drupal.Panels.Subform.bindAjaxResponse = function(data) {
       });
       return false;     
     });
+
+    // TODO: Make these their own thing set up with behaviors.
 
     if ($('#override-title-checkbox').size()) {
       Drupal.Panels.Checkboxes.bindCheckbox('#override-title-checkbox', ['#override-title-textfield']);
@@ -137,12 +150,54 @@ Drupal.Panels.clickAjaxLink = function() {
     dataType: 'json'
   });
   return false;
+}
 
+/**
+ * Generic replacement click handler to open the modal with the destination
+ * specified by the href of the link.
+ */
+Drupal.Panels.clickAjaxButton = function() {
+  var url = '';
+  // The URL for this gadget will be composed of the values of items by
+  // taking the ID of this item and adding -url and looking for that
+  // class. They need to be in the form in order since we will
+  // concat them all together using '/'.
+  var url_class = '.' + $(this).attr('id') + '-url';
+  $(url_class).each(
+    function() { 
+      if (url && $(this).val()) { 
+        url += '/'; 
+      }
+      url += $(this).val(); 
+    });
+
+  if (!url) {
+    return false;
+  }
+
+  // show the empty dialog right away.
+  if (!$(this).hasClass('panels-no-modal')) {
+    Drupal.Panels.Subform.show();
+  }
+
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: '',
+    global: true,
+    success: Drupal.Panels.Subform.bindAjaxResponse,
+    error: function() { 
+      alert("An error occurred while attempting to process " + url); 
+      Drupal.Panels.Subform.dismiss(); 
+    },
+    dataType: 'json'
+  });
+  return false;
 }
 
 /**
  * Bind a modal form to a button and a URL to go to.
- */
+ *
 Drupal.Panels.Subform.bindModal = function(id, info) {
   $(id).click(function() {
     var url = info[0];
@@ -163,12 +218,15 @@ Drupal.Panels.Subform.bindModal = function(id, info) {
     return false;
   });
 };
+*/
 
 /**
  * Bind all modals to their buttons. They'll be in the settings like so:
  * Drupal.settings.panels.modals.button-id = url
  */
 Drupal.Panels.Subform.autoAttach = function() {
+  Drupal.Panels.Subform.createModal();
+/*
   if (Drupal.settings && Drupal.settings.panels && Drupal.settings.panels.modals) {
     Drupal.Panels.Subform.createModal();
     for (var modal in Drupal.settings.panels.modals) {
@@ -178,6 +236,20 @@ Drupal.Panels.Subform.autoAttach = function() {
       }
     }
   }
+*/
 };
+
+Drupal.behaviors.PanelsSubForm = function(context) {
+  // Bind links
+  $('a.panels-ajax-link:not(.display-processed)', context)
+    .addClass('display-processed')
+    .click(Drupal.Panels.clickAjaxLink);
+
+  // Bind buttons
+  $('input.panels-ajax-link:not(.display-processed)', context)
+    .addClass('display-processed')
+    .click(Drupal.Panels.clickAjaxButton);
+};
+
 
 $(Drupal.Panels.Subform.autoAttach);

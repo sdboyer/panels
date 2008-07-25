@@ -74,8 +74,6 @@ function _panels_edit($display, $destination, $content_types) {
 function panels_edit_display_form(&$form_state) {
   $display = &$form_state['display'];
 
-  $modals = array();
-
   // Annoyingly, theme doesn't have access to form_state so we have to do this.
   $form['#display'] = $display;
 
@@ -144,16 +142,21 @@ function panels_edit_display_form(&$form_state) {
 
 
   if (user_access('use panels caching features')) {
+    $form['hide']['cache-settings-url'] = array(
+      '#type' => 'hidden',
+      '#value' => url('panels/ajax/cache-method/' . $display->did . '/display',  array('absolute' => true)),
+      '#attributes' => array('class' => 'panels-cache-settings-url'),
+    );
+
     $form['hide']['cache-settings'] = array(
       '#type' => 'submit',
       '#value' => t('Cache settings'),
       '#id' => 'panels-cache-settings',
+      '#attributes' => array('class' => 'panels-ajax-link'),
     );
-    // Set up the AJAX settings for the modal.
-    $modals['#panels-cache-settings'] = array(url('panels/ajax/cache-method/' . $display->did . '/display',  array('absolute' => true)));
   }
 
-  panels_modal_js_includes($modals);
+  panels_modal_js_includes();
   drupal_add_js(panels_get_path('js/display_editor.js'));
   drupal_add_css(panels_get_path('css/panels_dnd.css'));
   drupal_add_css(panels_get_path('css/panels_admin.css'));

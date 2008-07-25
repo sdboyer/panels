@@ -120,13 +120,20 @@ function panels_edit_layout_settings_form(&$form_state) {
     '#value' => '<div class="form-item clear-block"><label>' . t('Default panel style') . ':</label>',
   );
 
-  $modals = array();
+  // component #1 of the URL for hte panel style settings button.
+  $form['panel_settings']['edit_style_destination'] = array(
+    '#attributes' => array('class' => 'panels-style-settings-url'),
+    '#type' => 'hidden',
+    '#value' => url('panels/ajax/style-settings/' . $display->did . '/default',  array('absolute' => true)),
+  );
+
+  // Component #2 of the URL -- the value will be selected by the user.
   $form['panel_settings']['style'] = array(
     '#prefix' => '<div class="panels-style-settings-box">',
     '#suffix' => '</div>',
     '#type' => 'select',
     '#options' => $options,
-    '#id' => 'panel-settings-style',
+    '#attributes' => array('class' => 'panels-style-settings-url'),
     '#default_value' => $style['name'],
   );
 
@@ -137,14 +144,13 @@ function panels_edit_layout_settings_form(&$form_state) {
     '#type' => 'value',
     '#value' => $style_settings,
   );
+
   $form['panel_settings']['edit_style'] = array(
     '#type' => 'submit',
+    '#attributes' => array('class' => 'panels-ajax-link'),
     '#id' => 'panels-style-settings',
     '#value' => t('Edit style settings'),
   );
-
-  // Set up the AJAX settings for the modal.
-  $modals['#panels-style-settings'] = array(url('panels/ajax/style-settings/' . $display->did . '/default',  array('absolute' => true)), '#panel-settings-style');
 
   $form['panel_settings']['end_box'] = array(
     '#value' => '</div>',
@@ -166,12 +172,22 @@ function panels_edit_layout_settings_form(&$form_state) {
     $form['panel_settings']['panel'][$id]['start_box'] = array(
       '#value' => '<div class="form-item clear-block"><label>' . $name . ':</label>',
     );
+
+    // component #1 of the URL for hte panel style settings button.
+    $form['panel_settings']['panel'][$id]['edit_style_destination'] = array(
+      '#attributes' => array('class' => "panels-style-settings-$id-url"),
+      '#type' => 'hidden',
+      '#value' => url('panels/ajax/style-settings/' . $display->did . '/' . $id,  array('absolute' => true)),
+    );
+
+    // Component #2 of the URL -- the value will be selected by the user.
     $form['panel_settings']['panel'][$id]['style'] = array(
       '#prefix' => '<div class="panels-style-settings-box">',
       '#suffix' => '</div>',
       '#type' => 'select',
       '#options' => $layout_options,
       '#id' => 'panel-settings-style-' . $id,
+      '#attributes' => array('class' => "panels-style-settings-$id-url"),
       '#default_value' => $display->panel_settings['panel'][$id]['style'],
     );
     $checkboxes[] = '#panel-settings-style-' . $id;
@@ -179,13 +195,10 @@ function panels_edit_layout_settings_form(&$form_state) {
     $form['panel_settings']['panel'][$id]['edit_style'] = array(
       '#type' => 'submit',
       '#id' => 'panels-style-settings-' . $id,
-      '#attributes' => array('class' => 'panels-style-settings'),
+      '#attributes' => array('class' => 'panels-ajax-link'),
       '#value' => t('Edit style settings'),
     );
     $checkboxes[] = '#panels-style-settings-' . $id;
-
-    // Set up the AJAX settings for the modal.
-    $modals['#panels-style-settings-' . $id ] = array(url('panels/ajax/style-settings/' . $display->did . '/' . $id, array('absolute' => true)), '#panel-settings-style-' . $id);
 
     $form['panel_settings']['panel'][$id]['end_box'] = array(
       '#value' => '</div>',
@@ -209,7 +222,7 @@ function panels_edit_layout_settings_form(&$form_state) {
     '#value' => $form_state['finish'],
   );
 
-  panels_modal_js_includes($modals);
+  panels_modal_js_includes();
   // @todo -- why dnd? That's wrong.
   drupal_add_css(panels_get_path('css/panels_dnd.css'));
   $settings['panels']['checkboxes']['#panel-settings-individual'] = $checkboxes;

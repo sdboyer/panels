@@ -158,10 +158,10 @@ function panels_menu() {
     'file' => 'includes/callbacks.inc',
   ) + $base;
 
-  // On behalf of the 'common' api in common.inc
-  $items['panels/common/ajax'] = array(
-    'page callback' => 'panels_common_ajax',
-    'file' => 'includes/common.inc',
+  // For context add/configure calls in common-context.inc
+  $items['panels/ajax/context-add'] = array(
+    'page callback' => 'panels_ajax_context_item_add',
+    'file' => 'includes/common-context.inc',
   ) + $base;
 
   // Provide a nice location for a panels admin panel.
