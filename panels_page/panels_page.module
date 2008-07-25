@@ -20,34 +20,40 @@
  * is set but none of the others are, it indicates that that router is 'owned'
  * by another module and has not been overridden by Panels.
  */
-define('PANELS_ROUTER_EXISTS', 1);
+define('PANELS_ROUTER_EXISTS', 0x0001);
 /**
  * Indicates that the active router in the {menu_router} table is set and is
  * owned by Panels.
  */
-define('PANELS_IS_PANELS_ROUTER', PANELS_MENU_ITEM_EXISTS << 1);
-/**
- * Panels display objects with this bitval set are an owner, although possibly
- * not the sole owner, of the router item at the provided path.
- */
-define('PANELS_PID_IS_OWNER', PANELS_MENU_ITEM_EXISTS << 2);
-// TODO change to path-centric paradigm
-/**
- * Panels display objects with this bitval set are the sole owner of the router
- * item at the provided path.
- */
-define('PANELS_IS_SOLE_PANELS_OWNER', PANELS_MENU_ITEM_EXISTS << 3);
-// TODO change to path-centric paradigm
+define('PANELS_IS_PANELS_ROUTER', 0x0002 | PANELS_ROUTER_EXISTS);
+// define('PANELS_IS_PANELS_ROUTER', 0x0003);
+
 /**
  * Indicates that there is at least one 'fallback' router that Panels has stored
  * for this router item.
  */
-define('PANELS_HAS_FALLBACK_ROUTER', PANELS_MENU_ITEM_EXISTS << 4);
+define('PANELS_HAS_FALLBACK_ROUTER', 0x0004 | PANELS_IS_PANELS_ROUTER);
+// define('PANELS_HAS_FALLBACK_ROUTER', 0x0007);
+
 /**
  * Indicates that the path is owned by a panels page admin editing router. This
  * should basically be a big "hands-off" sign.
  */
-define('PANELS_IS_ADMIN_ROUTER', PANELS_MENU_ITEM_EXISTS << 5);
+define('PANELS_IS_ADMIN_ROUTER', 0x0008 | PANELS_IS_PANELS_ROUTER);
+// define('PANELS_IS_ADMIN_ROUTER', 0x0011);
+
+// These deal with a particular pid's relationship with a given path
+/**
+ * Panels display objects with this bitval set are an owner, although possibly
+ * not the sole owner, of the router item at the provided path.
+ */
+define('PANELS_PID_IS_OWNER', 0x0016 | PANELS_IS_PANELS_ROUTER); // == 19
+/**
+ * Panels display objects with this bitval set are the sole owner of the router
+ * item at the provided path.
+ */
+define('PANELS_IS_SOLE_PANELS_OWNER', 0x0032 | PANELS_PID_IS_OWNER); // == 51
+
 
 /**
  * Implementation of hook_help().
