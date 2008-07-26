@@ -27,10 +27,10 @@ define('PANELS_ROUTER_EXISTS', 1);
  */
 define('PANELS_IS_PANELS_ROUTER', 1 << 1 | PANELS_ROUTER_EXISTS); // == 3
 /**
- * Indicates that there is at least one 'fallback' router that Panels has stored
- * for this router item.
+ * Indicates that there is at least one stored loader that the router item at
+ * this path has overridden, and that Panels has stored for this router item.
  */
-define('PANELS_HAS_FALLBACK_ROUTER', 1 << 2 | PANELS_IS_PANELS_ROUTER); // == 7
+define('PANELS_HAS_STORED_LOADER', 1 << 2 | PANELS_IS_PANELS_ROUTER); // == 7
 /**
  * Indicates that the path is owned by a panels page admin editing router. This
  * should basically be a big "hands-off" sign.
@@ -54,6 +54,7 @@ define('PANELS_IS_SOLE_OWNER', 1 << 5 | PANELS_PID_OWNS_ROUTER); // == 51
  * Implementation of hook_help().
  */
 function panels_page_help($section = '') {
+  $output = NULL;
   switch ($section) {
     case 'admin/panels/panel-page':
     case 'admin/panels/panel-page/list':
@@ -84,8 +85,8 @@ function panels_page_perm() {
  * Delegates to an .inc file to reduce code load overhead.
  */
 function panels_page_menu() {
-  require_once panels_load_include('panels_page.menu', 'panels_page/');
-  return panels_page_construct_menu('menu');
+  require_once panels_get_path('panels_page.menu.inc', FALSE, 'panels_page');
+  return _panels_page_menu();
 }
 
 /**
@@ -93,9 +94,16 @@ function panels_page_menu() {
  *
  * Delegates to an .inc file to reduce code load overhead.
  */
-function panels_page_menu_alter() {
-  require_once panels_load_include('panels_page.menu', 'panels_page/');
-  return panels_page_construct_menu('menu_alter');
+function panels_page_menu_alter(&$callbacks) {
+  require_once panels_get_path('panels_page.menu.inc', FALSE, 'panels_page');
+  return _panels_page_menu_alter($callbacks);
+}
+
+function panels_page_menu_link_alter(&$item, &$menu) {
+  xdebug_var_dump(xdebug_get_stack_depth());
+  xdebug_var_dump(xdebug_debug_zval('item', 'menu'));
+  xdebug_var_dump(xdebug_get_function_stack());
+  xdebug_break();
 }
 
 /**
@@ -107,53 +115,55 @@ function panels_page_menu_alter() {
  * @param string $path
  * @param int $pid
  * @return int $status
- *   A bitval indicating all the router relevant status flags per the provided
+ *   A bitval indicating all the router relevant status flags, per the provided
  *   parameters.
  */
 function panels_page_check_router_status($path, $pid = NULL) {
   $status = 0;
+  $path = preg_replace('/%([a-z_]*)/', '1', $path);
   
   // Find out if we're overriding a router on this path. (below is the manual query, saved just in case)
   // db_fetch_object(db_query("SELECT * FROM {menu_router} WHERE path LIKE (''%s'%%') AND path NOT LIKE (''%s'%%/%%')", $panel_page->path));
-  // TODO put in a preg_replace() that strips out loader function names from the
-  // path if they're provided. Essentially, beef up the str_replace() below.
-  $router = menu_get_item(str_replace('%', '1', $path));
+  $router = menu_get_item($path);
   if (empty($router)) { // No router at that path; return 0.
     return $status;
   }
   else {
-    $status = $status | PANELS_ROUTER_EXISTS;
+    $status |= PANELS_ROUTER_EXISTS;
   }
   // TODO array_search() is a crude tool; improve this.
   if (array_search('panels_page_admin', $router['load_functions'])) {
-    $status = PANELS_IS_ADMIN_ROUTER;
+    $status |= PANELS_IS_ADMIN_ROUTER;
   }
   if (array_search('panels_page_render_load', $router['load_functions'])) {
-    $status = PANELS_IS_PANELS_ROUTER;
-    $panels_routers = panels_page_get_routers_by_path($path);
-    foreach ($panels_routers as $key => $panels_router) {
-      if (empty($panels_router['pid'])) {
-        $status = $status | PANELS_HAS_FALLBACK_ROUTER;
-        unset($panels_routers[$key]);
-        continue;
+    $status |= PANELS_IS_PANELS_ROUTER;
+    
+    $panels_routers = panels_page_get_items_by_path($path);
+    foreach ($panels_routers as $panels_router) {
+      if (!empty($panels_router['stored_loaders'])) {
+        $has_loaders = TRUE;
       }
       if ($pid == $panels_router['pid']) {
-        $status = $status | PANELS_PID_OWNS_ROUTER;
+        $status |= PANELS_PID_OWNS_ROUTER;
       }
     }
-    if (count($panels_routers) == 1 && $status & PANELS_PID_OWNS_ROUTER) {
-      $status = $status | PANELS_IS_SOLE_OWNER;
+    
+    if ($status & PANELS_PID_OWNS_ROUTER) {
+      $status |= !empty($has_loaders) ? PANELS_HAS_STORED_LOADER : $status;
+      if (count($panels_routers) == 1) {
+        $status |= PANELS_IS_SOLE_OWNER;
+      }
     }
   }
   return $status;
 }
 
-function panels_page_get_routers_by_path($path) {
-  // Caching this in a static var may be a TOTAL waste of memory.
+function panels_page_get_items_by_path($path) {
+  // FIXME Caching this in a static var may be a TOTAL waste of memory.
   static $routers = array();
   if (!isset($routers[$path])) {
     $routers[$path] = array();
-    $result = db_query('SELECT * FROM {panels_page_menu_router} WHERE path = \'%s\'', $path);
+    $result = db_query("SELECT * FROM {panels_page_menu} WHERE path = '%s'", $path);
     while ($row = db_fetch_array($result)) {
       $routers[$path][] = $row;
     }
@@ -161,10 +171,41 @@ function panels_page_get_routers_by_path($path) {
   return $routers[$path];
 }
 
+function panels_page_native_loader_path($panel_page) {
+  if (strpos('%', $panel_page->path) === FALSE) {
+    return $panel_page->path;
+  }
+  $map = explode('/', $panel_page->path);
+  reset($panel_page->arguments);
+  foreach ($map as $arg => $segment) {
+    if ($segment == '%') {
+      $argument = current($panel_page->arguments);
+      $map[$arg] = !empty($argument['loader']) ? '%' . $argument['loader'] : '%';
+      next($panel_page->arguments);
+    }
+  }
+  return implode('/', $map);
+}
+
 function panels_page_render_load($arg, $map, $index) {
-  $args = func_get_args();
-  array_splice($args, 1, 2);
+  $args = $map;
   $number_parts = count($map);
+}
+
+function panels_page_render_to_arg($arg, $map, $index) {
+  return $arg;
+}
+
+function panels_page_set_loader_data($object = NULL) {
+  static $panel_page;
+  if (!is_null($object)) {
+    $panel_page = $object;
+  }
+  return $panel_page;
+}
+
+function panels_page_get_loader_data() {
+  return panels_page_set_loader_data();
 }
 
 /**

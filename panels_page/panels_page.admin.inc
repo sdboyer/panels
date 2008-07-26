@@ -15,17 +15,17 @@
 function panels_page_admin_load($name) {
   panels_load_include('plugins');
   $panel_page = panels_page_load($name);
-  // rudimentary check to make sure we got
-  if ($panel_page->pid) {
-    return $panel_page;
-  }
-  else return FALSE;
+  return $panel_page->pid ? $panel_page : FALSE;
 }
 
 /**
  * Provide a list of panels, with links to edit or delete them.
+ *
+ * TODO Since we've already got the views dependency, should we just do this as
+ * a view?
  */
 function panels_page_list_page() {
+  panels_load_include('plugins');
   $layouts = panels_get_layouts();
   $items = array();
   $sorts = array();
@@ -103,7 +103,7 @@ function panels_page_list_page() {
     }
   }
 
-  if (drupal_strtolower($ts['sort']) == 'desc') {
+  if (!empty($ts['sort']) && drupal_strtolower($ts['sort']) == 'desc') {
     arsort($sorts);
   }
   else {
@@ -191,6 +191,7 @@ function panels_page_delete_confirm_submit($form_id, $form) {
  * Handle the add panel-page page.
  */
 function panels_page_add_page($layout = NULL) {
+  panels_load_include('plugins');
   $layouts = panels_get_layouts();
 
   // If the layout given is invalid, unset it.
@@ -222,6 +223,7 @@ function panels_page_add_page($layout = NULL) {
  * Called from both the add and edit points to provide for common flow.
  */
 function panels_page_edit($panel_page) {
+  panels_load_include('plugins');
   if (!is_object($panel_page)) {
     $panel_page = panels_page_load($panel_page);
   }
