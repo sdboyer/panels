@@ -23,7 +23,7 @@ function panels_page_schema_1() {
       ),
       'name' => array(
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => TRUE,
         'default' => '',
       ),
@@ -33,19 +33,19 @@ function panels_page_schema_1() {
       ),
       'title' => array(
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
       ),
       'access' => array(
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
       ),
       'path' => array(
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
       ),
       'css_id' => array(
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
       ),
       'css' => array(
         'type' => 'text',
@@ -79,12 +79,12 @@ function panels_page_schema_1() {
       ),
       'switcher_name' => array(
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => FALSE,
       ),
       'switcher_type' => array(
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => FALSE,
       ),
       'menu' => array(
@@ -103,7 +103,7 @@ function panels_page_schema_1() {
       ),
       'menu_title' => array(
         'type' => 'varchar',
-        'length' => '255',
+        'length' => 255,
       ),
       'menu_tab_default' => array(
         'type' => 'int',
@@ -111,11 +111,11 @@ function panels_page_schema_1() {
       ),
       'menu_tab_default_parent_type' => array(
         'type' => 'varchar',
-        'length' => '10',
+        'length' => 10,
       ),
       'menu_parent_title' => array(
         'type' => 'varchar',
-        'length' => '255',
+        'length' => 255,
       ),
       'menu_parent_tab_weight' => array(
         'type' => 'int',
@@ -135,29 +135,6 @@ function panels_page_schema_1() {
   $schema['panels_page_router_store'] = array(
     'description' => t('Maps paths to various callbacks (access, page and title)'),
     'fields' => array(
-      'pid' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        ''
-      ),
-      'primary_wildcard' => array(
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'wildcards' => array(
-        'type' => 'varchar',
-        'length' => '32',
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'arg_index' => array(
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'default' => -1,
-      ),
       'path' => array(
         'description' => t('The Drupal path this entry describes.'),
         'type' => 'varchar',
@@ -296,26 +273,56 @@ function panels_page_schema_1() {
     'primary key' => array('pid, arg_index'),
     );
   
-/*  $schema['panels_page_loader_store'] = array(
+  $schema['panels_page_router'] = array(
     'fields' => array(
       'pid' => array(
-        'type' => 'serial',
+        'type' => 'int',
         'not null' => TRUE,
+        'default' => 0,
       ),
       'arg_index' => array(
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,
+        'default' => -1,
       ),
-      'loader' => array(
+      'path' => array(
         'type' => 'varchar',
-        'length' => '255',
+        'length' => 255,
         'not null' => TRUE,
+        'default' => ''
+      ),
+      'primary_wildcard' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'static' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'wildcards' => array(
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'stored_loader' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
       ),
     ),
     'primary key' => array('pid', 'arg_index'),
-    'indexes' => array('loader_idx' => array('loader')),
-  );*/
+    'indexes' => array(
+      'loader_idx' => array('loader'),
+      'wildcards_idx' => array('wildcards'),
+    ),
+  );
   return $schema;
 }
 

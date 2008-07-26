@@ -19,47 +19,45 @@ function _panels_page_menu($for_alter = FALSE) {
 
 function _panels_page_menu_alter(&$callbacks) {
   $items = _panels_page_menu(TRUE);
-  $panels_wildcards = $wildcard_callbacks = array();
-  foreach ($callbacks as $path => $item) {
-    // Skip this item if it's something we ourselves implemented.
-    if ($item['module'] == 'panels_page') {
-      continue;
-    }
-    // Add this item if there's a wildcard.
-    if (strpos($path, '%') !== FALSE) {
-      $count = 0;
-      // Since we can't rely on all our args always having loaders (e.g., taxo)
-      // we need to normalize all data down to the raw path for comparison.
-      $raw_path = preg_replace('/%([a-z_]*)/', '%', $path, -1, $count);
-      $wildcard_callbacks[$raw_path]['map'] = explode('/', $path);
-      $wildcard_callbacks[$raw_path]['count'] = $count;
-    }
-  }
-  
-  foreach ($items['metadata'] as $path => $data) {
+  $panels_wildcards = $matches = array();
+  foreach ($items['menu_alter'] as $path => $data) {
     $panels_wildcards[$data['raw path']] = $data['pid'];
   }
-    
-  $matches = array_intersect(array_keys($wildcard_callbacks), array_keys($panels_wildcards));
-  if (empty($matches)) {
-    // No matches, so we bug out. TODO this is probably premature
-    return;
-  }
-  foreach ($matches as $match) {
-    
-  }
-/*
-  $router_entries = $loader_entries = array();
-  $result = db_query("SELECT * FROM {panels_page_menu}");
-  while ($row = db_fetch_object($result)) {
-    $router_entries[$row->pid] = $row;
+  
+  foreach ($callbacks as $path => $item) {
+    // Skip this item if it's ours, or if there's no wildcard.
+    if ($item['module'] == 'panels_page' || strpos($path, '%') === FALSE) {
+      continue;
+    }
+    $count = 0;
+    // Since we can't rely on all wildcard args always having loaders (e.g.,
+    // taxonomy) we normalize all the data down to raw paths for comparison.
+    $raw_path = preg_replace('/%([a-z_]*)/', '%', $path, -1, $count);
+    if (isset($panels_wildcards[$raw_path])) {
+      $matches[$raw_path]['map']   = explode('/', $path);
+      $matches[$raw_path]['count'] = $count;
+      $matches[$raw_path]['pid']   = $panels_wildcards[$raw_path];
+    }
   }
   
-  $result = db_query("SELECT * FROM {panels_page_menu_loader}");
-  while ($row = db_fetch_object($result)) {
-    $router_entries[$row->pid] = $row;
+  // No matches, so we bug out. TODO this is probably premature
+  if (empty($matches)) {
+    return;
   }
-  */
+  foreach ($matches as $raw_path => $match) {
+    
+  }
+}
+
+function panels_page_store_router($router_item) {
+  $schema = panels_page_router_table_query_fields();
+  $f = $q = $v = array();
+  foreach ($schema as $field => $placeholder) {
+    $f[] = $field;
+    $q[] = $placeholder;
+    $v[] = $router_item[strreplace('_', ' ', $field)];
+  }
+  db_query('INSERT INTO {panels_page_router_store} (' . implode(', ', $f) . ') VALUES (' . implode(', ', $q) . ')', $v);
 }
 
 function _panels_page_construct_menu() {
@@ -144,7 +142,11 @@ function _panels_page_construct_menu() {
   return $items;
 }
 
-function panels_page_admin_menu_items(&$items) {
+function panels_page_admin_menu_items(&$items, $path_prefix = NULL) {
+  // TODO path prefix may be superfluous
+  if (is_null($path_prefix)) {
+    $path_prefix = 'admin/panels/panels-page';
+  }
   $admin = array(
     'access arguments' => array('create panel-pages'),
     'file' => 'panels_page.admin.inc',
@@ -152,13 +154,13 @@ function panels_page_admin_menu_items(&$items) {
     'type' => MENU_LOCAL_TASK,
   );
   
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin'] = array(
     'title' => 'Settings',
     'page callback' => 'panels_page_edit',
     'weight' => -10,
     'type' => MENU_CALLBACK,
   ) + $admin;
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/settings'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/settings'] = array(
     'title' => 'Settings',
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -180,40 +182,40 @@ function panels_page_admin_menu_items(&$items) {
     'weight' => -8,
   );
 */
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/advanced'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/advanced'] = array(
     'title' => 'Advanced',
     'page callback' => 'panels_page_edit_advanced',
     'weight' => -8,
   ) + $admin;
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/context'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/context'] = array(
     'title' => 'Context',
     'page callback' => 'panels_page_edit_context',
     'weight' => -6,
   ) + $admin;
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/layout'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/layout'] = array(
     'title' => 'Layout',
     'page callback' => 'panels_page_edit_layout_settings',
     'load arguments' => array('%map'),
     'weight' => -4,
   ) + $admin;
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/layout_settings'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/layout_settings'] = array(
     'title' => 'Layout settings',
     'page callback' => 'panels_page_edit_layout_settings',
     // 'load arguments' => array('%map'),
     'weight' => -2,
   ) + $admin;
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/content'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/content'] = array(
     'title' => 'Content',
     'page callback' => 'panels_page_edit_content',
     // 'load arguments' => array('%map'),
     'weight' => 0,
   ) + $admin;
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/preview'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/preview'] = array(
     'title' => 'Preview',
     'page callback' => 'panels_page_preview_page',
     'weight' => 2,
   ) + $admin;
-  $items['menu_items']['admin/panels/panels-page/%panels_page_admin/export'] = array(
+  $items['menu_items'][$path_prefix . '/%panels_page_admin/export'] = array(
     'title' => 'Export',
     'page callback' => 'panels_page_edit_export',
     'weight' => 4,
@@ -222,7 +224,7 @@ function panels_page_admin_menu_items(&$items) {
 
 
 function panels_page_create_menu_structure() {
-  $items['menu_items'] = $items['metadata'] = $items = array();
+  $items['menu_items'] = $items['menu_alter'] = $items['menu_link_alter'] = $items = array();
   $panels = panels_page_load_all();
   foreach ($panels as $panel_page) {
     if (empty($panel_page->disabled)) {
@@ -245,18 +247,19 @@ function panels_page_construct_wildcard_menu_link(&$items, $panel_page, $map) {
   $path = preg_replace('/%/', '%panels_page_render', $panel_page->path, 1);
   
   $wildcards = array_keys($map, '%');
-  $items['metadata'][$path]['pid']                = $panel_page->pid;
-  $items['metadata'][$path]['raw path']           = $panel_page->path;
-  $items['metadata'][$path]['wildcards']          = implode('-', $wildcards);
+  $items['menu_alter'][$path]['pid']              = $panel_page->pid;
+  $items['menu_alter'][$path]['raw path']         = $panel_page->path;
+  $items['menu_alter'][$path]['wildcards']        = $wildcards;
+  $items['menu_alter'][$path]['primary wildcard'] = $primary_wildcard = array_shift($wildcards);
   // TODO possibly superfluous
-  $items['metadata'][$path]['primary wildcard']   = $primary_wildcard = array_shift($wildcards);
-  // TODO possibly superfluous
-  $items['metadata'][$path]['native loader path'] = panels_page_native_loader_path($panel_page);
+  // $items['menu_alter'][$path]['native loader path'] = panels_page_native_loader_path($panel_page);
   $type = _panels_page_menu_type($panel_page);
   
   // Construct the dynamic menu router item. If/when we get to multiple
   // panels_pages per wildcard path, we needn't worry about overwriting here.
   $items['menu_items'][$path] = _panels_page_construct_wildcard_menu_link($panel_page, array($primary_wildcard), array('arguments' => $primary_wildcard), $type);
+  $items['menu_link_alter'][$path]['type'] = $type;
+  // $items['menu_link_alter'][$path]['type']
   // FIXME parents are borked
   _panels_page_construct_parent_menu_item($items, $panel_page, $path, $type);
 }
@@ -264,26 +267,19 @@ function panels_page_construct_wildcard_menu_link(&$items, $panel_page, $map) {
 /**
  * Helper function to create a menu item for a panel.
  */
-function _panels_page_construct_wildcard_menu_link($panel_page, $page_arguments, $access, $type, $title = NULL, $weight = NULL) {
-  $item = array(
-    'title callback' => !empty($title) ? $title : filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
+function _panels_page_construct_wildcard_menu_link($panel_page, $page_arguments, $access, $type, $weight = 0) {
+  return array(
+    'title callback' => 'panels_page_get_title',
     'title arguments' => $page_arguments,
     // TODO $access['callback'] is currently always empty. Eliminate this ternary if we don't find a need for it presently.
     'access callback' => !empty($access['callback']) ? $access['callback'] : 'panels_page_access',
     'access arguments' => (array)$access['arguments'],
     'load arguments' => array('%map', '%index'),
-    'page callback' => 'panels_page_view_handler',
+    'page callback' => 'panels_page_render_handler',
     'page arguments' => $page_arguments,
     'type' => $type,
+    'weight' => $weight,
   );
-  
-  if ($weight !== NULL) {
-    $item['weight'] = $weight;
-  }
-  if ($title !== NULL) {
-    $item['title'] = $weight;
-  }
-  return $item;
 }
 
 /**
@@ -294,9 +290,9 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   $items['menu_items'][$panel_page->path] = array(
     'title' => filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
     'access callback' => 'panels_page_access',
-    'access arguments' => array('static'), // FIXME this is a ph
+    'access arguments' => array('static', $panel_page->name), // FIXME this is a ph
     'page callback' => 'panels_page_view_static_page',
-    'page arguments' => array($panel_page->name),
+    'page arguments' => array('static', $panel_page->name),
     'type' => $type,
   );
   _panels_page_construct_parent_menu_item($items, $panel_page, $path, $type);
@@ -352,4 +348,15 @@ function _panels_page_menu_type($panel_page) {
     $type = MENU_CALLBACK;
   }
   return $type;
+}
+
+function panels_page_router_table_query_fields() {
+  static $query_building_blocks = array();
+  if (empty($query_building_blocks)) {
+    $schema = drupal_get_schema('panels_page_router_store');
+    foreach ($schema['fields'] as $field => $data) {
+      $query_building_blocks[$field] = db_type_placeholder($data['type']);
+    }
+  }
+  return $query_building_blocks;
 }

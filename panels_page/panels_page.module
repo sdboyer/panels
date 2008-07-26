@@ -25,29 +25,40 @@ define('PANELS_ROUTER_EXISTS', 1);
  * Indicates that the active router in the {menu_router} table is set and is
  * owned by Panels.
  */
-define('PANELS_IS_PANELS_ROUTER', 1 << 1 | PANELS_ROUTER_EXISTS); // == 3
+// define('PANELS_IS_PANELS_ROUTER', 1 << 1 | PANELS_ROUTER_EXISTS); // == 3
+define('PANELS_IS_PANELS_ROUTER', 1 << 1); // == 2
 /**
  * Indicates that there is at least one stored loader that the router item at
  * this path has overridden, and that Panels has stored for this router item.
  */
-define('PANELS_HAS_STORED_LOADER', 1 << 2 | PANELS_IS_PANELS_ROUTER); // == 7
+// define('PANELS_HAS_STORED_LOADER', 1 << 2 | PANELS_IS_PANELS_ROUTER); // == 7
+define('PANELS_HAS_STORED_LOADER', 1 << 2); // == 4
 /**
  * Indicates that the path is owned by a panels page admin editing router. This
  * should basically be a big "hands-off" sign.
  */
-define('PANELS_IS_ADMIN_ROUTER', 1 << 3 | PANELS_IS_PANELS_ROUTER); // == 11
+// define('PANELS_IS_ADMIN_ROUTER', 1 << 3 | PANELS_IS_PANELS_ROUTER); // == 11
+define('PANELS_IS_ADMIN_ROUTER', 1 << 3); // == 8
+/**
+ * Indicates that the path is owned by a static panels page - that is, a panels
+ * page without a % wildcard in its path.
+ */
+// define('PANELS_IS_STATIC_ROUTER', 1 << 4 | PANELS_IS_PANELS_ROUTER); // == 19
+define('PANELS_IS_STATIC_ROUTER', 1 << 4); // == 16
 
 // These deal with a particular pid's relationship with a given path
 /**
  * Panels display objects with this bitval set are an owner, although possibly
  * not the sole owner, of the router item at the provided path.
  */
-define('PANELS_PID_OWNS_ROUTER', 1 << 4 | PANELS_IS_PANELS_ROUTER); // == 19
+// define('PANELS_PID_OWNS_ROUTER', 1 << 5 | PANELS_IS_PANELS_ROUTER); // == 35
+define('PANELS_PID_OWNS_ROUTER', 1 << 5); // == 32
 /**
  * Panels display objects with this bitval set are the sole owner of the router
  * item at the provided path.
  */
-define('PANELS_IS_SOLE_OWNER', 1 << 5 | PANELS_PID_OWNS_ROUTER); // == 51
+// define('PANELS_SOLELY_OWNS_ROUTER', 1 << 6 | PANELS_PID_OWNS_ROUTER); // == 99
+define('PANELS_PID_SOLELY_OWNS_ROUTER', 1 << 6); // == 64
 
 
 /**
@@ -100,77 +111,92 @@ function panels_page_menu_alter(&$callbacks) {
 }
 
 function panels_page_menu_link_alter(&$item, &$menu) {
-  xdebug_var_dump(xdebug_get_stack_depth());
-  xdebug_var_dump(xdebug_debug_zval('item', 'menu'));
-  xdebug_var_dump(xdebug_get_function_stack());
-  xdebug_break();
+  
 }
 
 /**
- * Check the status of the menu router at $path.
+ * Check for the existence a menu router at $path.
  *
- * If $pid is provided, relationship of the panels_page identified by $pid
- * is also indicated.
  *
  * @param string $path
- * @param int $pid
  * @return int $status
  *   A bitval indicating all the router relevant status flags, per the provided
  *   parameters.
+ *
+ * TODO This is turning into spaghetti. Reconceptualize and lay it out again.
  */
-function panels_page_check_router_status($path, $pid = NULL) {
+function panels_page_check_router_status(&$path, $pid = NULL) {
   $status = 0;
+  // Genericize the path.
   $path = preg_replace('/%([a-z_]*)/', '1', $path);
-  
-  // Find out if we're overriding a router on this path. (below is the manual query, saved just in case)
-  // db_fetch_object(db_query("SELECT * FROM {menu_router} WHERE path LIKE (''%s'%%') AND path NOT LIKE (''%s'%%/%%')", $panel_page->path));
-  $router = menu_get_item($path);
-  if (empty($router)) { // No router at that path; return 0.
+  // Get the highest-fit router for this path.
+  $router = panels_page_get_router($path);
+  if (empty($router)) { // Check for any routers at $path.
     return $status;
   }
+  
+    $router = menu_get_item($path);
+    return empty($router) ? 0 : PANELS_ROUTER_EXISTS;
+  }
   else {
-    $status |= PANELS_ROUTER_EXISTS;
+    $status |= (PANELS_ROUTER_EXISTS | PANELS_IS_PANELS_ROUTER);
+  }
+  return $status;
+}
+
+function panels_page_check_pid_on_path($path, $pid) {
+  $status = panels_page_check_router_status($path);
+  
+  if (is_null($pid)) {
+    // If we're just checking a path, this is where we stop.
+    return $status;
   }
   // TODO array_search() is a crude tool; improve this.
+  // TODO this logic hard-codes the requirement of one override per path.
+  foreach ($panels_routers as $router) {
+  }
+  return $status;
+}
+
+function _panels_page_check_router_status($router, $pid) {
+  $status = 0;
   if (array_search('panels_page_admin', $router['load_functions'])) {
     $status |= PANELS_IS_ADMIN_ROUTER;
   }
   if (array_search('panels_page_render_load', $router['load_functions'])) {
     $status |= PANELS_IS_PANELS_ROUTER;
-    
-    $panels_routers = panels_page_get_items_by_path($path);
-    foreach ($panels_routers as $panels_router) {
-      if (!empty($panels_router['stored_loaders'])) {
-        $has_loaders = TRUE;
-      }
-      if ($pid == $panels_router['pid']) {
-        $status |= PANELS_PID_OWNS_ROUTER;
-      }
+    if (!empty($router['stored_loaders'])) {
+      $status |= PANELS_HAS_STORED_LOADER;
+    }
+    if ($pid == $router['pid']) {
+      $status |= PANELS_PID_OWNS_ROUTER;
     }
     
     if ($status & PANELS_PID_OWNS_ROUTER) {
       $status |= !empty($has_loaders) ? PANELS_HAS_STORED_LOADER : $status;
-      if (count($panels_routers) == 1) {
-        $status |= PANELS_IS_SOLE_OWNER;
+      if (count($routers) == 1) {
+        $status |= PANELS_PID_SOLELY_OWNS_ROUTER;
       }
     }
   }
-  return $status;
 }
 
-function panels_page_get_items_by_path($path) {
-  // FIXME Caching this in a static var may be a TOTAL waste of memory.
+function panels_page_get_router($path) {
   static $routers = array();
   if (!isset($routers[$path])) {
     $routers[$path] = array();
-    $result = db_query("SELECT * FROM {panels_page_menu} WHERE path = '%s'", $path);
+    // We left join because of cases like node/%/edit, where our loader catches
+    // a load with tail args that are intended for another router.
+    // TODO Again, this hardcodes one router per-path
+    $result = db_query_range("SELECT * FROM {menu_router} AS m LEFT JOIN {panels_page_router} AS p ON p.path = m.path WHERE m.path LIKE ('%s%%') ORDER BY m.fit DESC", $path, 0, 1);
     while ($row = db_fetch_array($result)) {
-      $routers[$path][] = $row;
+      $routers[$row['path']][] = $row;
     }
   }
   return $routers[$path];
 }
 
+// TODO probably remove this, it's likely cruft.
 function panels_page_native_loader_path($panel_page) {
   if (strpos('%', $panel_page->path) === FALSE) {
     return $panel_page->path;
@@ -188,6 +214,15 @@ function panels_page_native_loader_path($panel_page) {
 }
 
 function panels_page_render_load($arg, $map, $index) {
+  $render_handler = new stdClass();
+  $status = panels_page_check_router_status(implode('/', $map));
+  // Panels doesn't own the router that's the best fit for this path. Bomb out
+  // and call that router, instead.
+  if ($status ^ PANELS_IS_PANELS_ROUTER == 2) {
+    return FALSE;
+    return panels_page_prepare_stored_router($status, $arg, $map, $index); // TODO this
+  }
+  
   $args = $map;
   $number_parts = count($map);
 }
@@ -196,12 +231,16 @@ function panels_page_render_to_arg($arg, $map, $index) {
   return $arg;
 }
 
+function panels_page_prepare_stored_router($status, $arg, $map, $index) {
+  
+}
+
 function panels_page_set_loader_data($object = NULL) {
-  static $panel_page;
+  static $render_handler;
   if (!is_null($object)) {
-    $panel_page = $object;
+    $render_handler = $object;
   }
-  return $panel_page;
+  return $render_handler;
 }
 
 function panels_page_get_loader_data() {
