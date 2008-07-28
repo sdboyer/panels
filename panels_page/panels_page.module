@@ -91,16 +91,6 @@ function panels_page_perm() {
 }
 
 /**
- * Implementation of hook_menu().
- *
- * Delegates to an .inc file to reduce code load overhead.
- */
-function panels_page_menu() {
-  require_once panels_get_path('panels_page.menu.inc', FALSE, 'panels_page');
-  return _panels_page_menu();
-}
-
-/**
  * Implementation of hook_menu_alter().
  *
  * Delegates to an .inc file to reduce code load overhead.
@@ -133,10 +123,6 @@ function panels_page_check_router_status(&$path, $pid = NULL) {
   $router = panels_page_get_router($path);
   if (empty($router)) { // Check for any routers at $path.
     return $status;
-  }
-  
-    $router = menu_get_item($path);
-    return empty($router) ? 0 : PANELS_ROUTER_EXISTS;
   }
   else {
     $status |= (PANELS_ROUTER_EXISTS | PANELS_IS_PANELS_ROUTER);
@@ -215,7 +201,8 @@ function panels_page_native_loader_path($panel_page) {
 
 function panels_page_render_load($arg, $map, $index) {
   $render_handler = new stdClass();
-  $status = panels_page_check_router_status(implode('/', $map));
+  $path = implode('/', $map);
+  $status = panels_page_check_router_status($path);
   // Panels doesn't own the router that's the best fit for this path. Bomb out
   // and call that router, instead.
   if ($status ^ PANELS_IS_PANELS_ROUTER == 2) {
@@ -235,10 +222,10 @@ function panels_page_prepare_stored_router($status, $arg, $map, $index) {
   
 }
 
-function panels_page_set_loader_data($object = NULL) {
+function panels_page_set_loader_data($array = NULL) {
   static $render_handler;
-  if (!is_null($object)) {
-    $render_handler = $object;
+  if (!is_null($array)) {
+    $render_handler = $array;
   }
   return $render_handler;
 }

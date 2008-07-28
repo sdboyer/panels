@@ -95,7 +95,7 @@ function panels_page_schema_1() {
       'menu_tab' => array(
         'type' => 'int',
         'size' => 'tiny',
-        'not null'
+        'not null' => FALSE,
       ),
       'menu_tab_weight' => array(
         'type' => 'int',
@@ -267,36 +267,29 @@ function panels_page_schema_1() {
     ),
     'indexes' => array(
       'fit_idx' => array('fit'),
-      'path_idx' => array('path'),
       'number_parts_idx' => array('number_parts'),
       ),
-    'primary key' => array('pid, arg_index'),
+    'primary key' => array('path'),
     );
   
-  $schema['panels_page_router'] = array(
+  $schema['panels_page_router_quickref'] = array(
     'fields' => array(
       'pid' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
-      'arg_index' => array(
-        'type' => 'int',
-        'size' => 'tiny',
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 128,
         'not null' => TRUE,
-        'default' => -1,
+        'default' => '',
       ),
       'path' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''
-      ),
-      'primary_wildcard' => array(
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'default' => 0,
       ),
       'static' => array(
         'type' => 'int',
@@ -306,20 +299,22 @@ function panels_page_schema_1() {
       ),
       'wildcards' => array(
         'type' => 'varchar',
-        'length' => '32',
+        'length' => 32,
         'not null' => TRUE,
         'default' => '',
       ),
-      'stored_loader' => array(
+      'stored_router' => array(
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,
         'default' => 0,
       ),
     ),
-    'primary key' => array('pid', 'arg_index'),
+    'primary key' => array('pid'),
     'indexes' => array(
-      'loader_idx' => array('loader'),
+      'name_idx' => array('name'),
+      'path_idx' => array('path'),
+      // TODO indexing wildcards may be superfluous
       'wildcards_idx' => array('wildcards'),
     ),
   );
