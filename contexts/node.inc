@@ -15,7 +15,8 @@ function panels_node_panels_contexts() {
     'context' => 'panels_context_create_node',
     'settings form' => 'panels_context_node_settings_form',
     'settings form validate' => 'panels_context_node_settings_form_validate',
-    'keyword' => 'node',
+    'settings form submit' => 'panels_context_node_settings_form_submit',
+'keyword' => 'node',
     'context name' => 'node',
   );
   return $args;
@@ -63,7 +64,6 @@ function panels_context_node_settings_form($conf, $external = FALSE) {
     );
   }
 
-
   $form['node'] = array(
     '#prefix' => '<div class="no-float">',
     '#suffix' => '</div>',
@@ -87,13 +87,20 @@ function panels_context_node_settings_form($conf, $external = FALSE) {
     '#value' => $conf['nid'],
   );
 
+  $form['set_identifier'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => FALSE,
+    '#title' => t('Reset identifier to node title'),
+    '#description' => t('If checked, the identifier will be reset to the node title of the selected node.'),
+  );
+
   return $form;
 }
 
 /**
  * Validate a node.
  */
-function panels_context_node_settings_form_validate($form, $form_values) {
+function panels_context_node_settings_form_validate($form, &$form_values) {
   // Validate the autocomplete
   if (empty($form_values['external']) && empty($form_values['nid']) && empty($form_values['node'])) {
     form_error($form['node'], t('You must select a node.'));
@@ -125,7 +132,16 @@ function panels_context_node_settings_form_validate($form, $form_values) {
     form_error($form['node'], t('Invalid node selected.'));
   }
   else {
-    form_set_value($form['nid'], $node->nid);
+    $form_values['nid'] = $node->nid;
   }
 }
 
+function panels_context_node_settings_form_submit($form, &$form_values, &$form_state) {
+  if ($form_values['set_identifier']) {
+    $node = node_load($form_values['nid']);
+    $form_state['values']['context']['identifier'] = $node->title;
+  }
+
+  // Don't let this be stored.
+  unset($form_values['set_identifier']);
+}

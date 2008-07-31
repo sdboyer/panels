@@ -81,6 +81,18 @@ Drupal.Panels.Subform.bindAjaxResponse = function(data) {
     // just dismiss the dialog.
     Drupal.Panels.Subform.dismiss();
   }
+
+  // check for global replacements
+  if (data.replace) {
+    for (id in data.replace) {
+      // Replace the HTML in the pane
+      $(id).replaceWith(data.replace[id]);
+
+      Drupal.Panels.changed($(id));
+      Drupal.attachBehaviors(id);  
+    }
+  }
+
 };
 
 /**
@@ -150,7 +162,7 @@ Drupal.Panels.clickAjaxLink = function() {
     dataType: 'json'
   });
   return false;
-}
+};
 
 /**
  * Generic replacement click handler to open the modal with the destination
@@ -193,32 +205,45 @@ Drupal.Panels.clickAjaxButton = function() {
     dataType: 'json'
   });
   return false;
-}
-
-/**
- * Bind a modal form to a button and a URL to go to.
- *
-Drupal.Panels.Subform.bindModal = function(id, info) {
-  $(id).click(function() {
-    var url = info[0];
-    if (info[1]) {
-      url += '/' + $(info[1]).val();
-    }
-    // show the empty dialog right away.
-    Drupal.Panels.Subform.show();
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: '',
-      global: true,
-      success: Drupal.Panels.Subform.bindAjaxResponse,
-      error: function() { alert("Invalid response from server."); Drupal.Panels.Subform.dismiss(); },
-      dataType: 'json'
-    });
-    return false;
-  });
 };
-*/
+
+Drupal.Panels.makeTableDraggable = function(item) {
+  // transform the item from just an identifier to the actual item. This
+  // is necessary or tabledrag information gets lost.
+  item = $(item).get(0);
+  // Only process rows that don't have drag handles already
+  if ($('.tabledrag-handle', item).size() != 0) {
+    return;
+  }
+
+  // figure out parent table id
+  var parent = $(item).parents('table');
+  // skip if parent hasn't already been processed
+  if (!$(parent).hasClass('tabledrag-processed')) {
+    return;
+  }
+
+  var id = $(parent).attr('id');
+  if (Drupal.tableDrag[id]) {
+    Drupal.tableDrag[id].makeDraggable(item);
+
+    // redisplay cells so that hideColumns won't just exit
+    for (var group in Drupal.tableDrag[id].tableSettings) {
+      // Find the first field in Drupal.tableDrag[id] group.
+      for (var d in Drupal.tableDrag[id].tableSettings[group]) {
+        var field = $('.' + Drupal.tableDrag[id].tableSettings[group][d]['target'] + ':first', Drupal.tableDrag[id].table);
+        if (field.size() && Drupal.tableDrag[id].tableSettings[group][d]['hidden']) {
+          var hidden = Drupal.tableDrag[id].tableSettings[group][d]['hidden'];
+          var cell = field.parents('td:first');
+          break;
+        }
+      }
+      $(cell).css('display', 'block');
+    }
+    // Hide columns containing affected form elements.
+    Drupal.tableDrag[id].hideColumns();
+  }
+};
 
 /**
  * Bind all modals to their buttons. They'll be in the settings like so:
@@ -226,17 +251,6 @@ Drupal.Panels.Subform.bindModal = function(id, info) {
  */
 Drupal.Panels.Subform.autoAttach = function() {
   Drupal.Panels.Subform.createModal();
-/*
-  if (Drupal.settings && Drupal.settings.panels && Drupal.settings.panels.modals) {
-    Drupal.Panels.Subform.createModal();
-    for (var modal in Drupal.settings.panels.modals) {
-      if (!$(modal + '.modal-processed').size()) {
-        Drupal.Panels.Subform.bindModal(modal, Drupal.settings.panels.modals[modal]);
-        $(modal).addClass('modal-processed');
-      }
-    }
-  }
-*/
 };
 
 Drupal.behaviors.PanelsSubForm = function(context) {
@@ -249,6 +263,16 @@ Drupal.behaviors.PanelsSubForm = function(context) {
   $('input.panels-ajax-link:not(.display-processed)', context)
     .addClass('display-processed')
     .click(Drupal.Panels.clickAjaxButton);
+
+  // tabledrag.js doesn't have a behavior to make new rows draggable
+  // so we have to do it for it.
+  $('tr.draggable', context).each(function() {
+    Drupal.Panels.makeTableDraggable(this);
+  });
+
+  if ($(context).hasClass('draggable')) {
+    Drupal.Panels.makeTableDraggable(context);
+  }
 };
 
 

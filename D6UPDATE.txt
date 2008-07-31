@@ -14,3 +14,18 @@ CONTENT TYPES
 
 panels_node_legacy module renamed to panels_node_content.module 
 -- NEED UPDATE TO RENAME IN SYSTEM TABLE.
+
+CONTEXTS
+========
+
+Function signature on submit and validate handlers now: ($form, &$form_values, &$form_state)
+
+RELATIONSHIPS
+========
+
+Function signature on submit and validate handlers now: ($form, &$form_values, &$form_state)
+
+ARGUMENTS
+========
+
+Function signature on submit and validate handlers now: ($form, &$form_values, &$form_state)

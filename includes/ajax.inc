@@ -21,6 +21,7 @@ function panels_modal_js_includes($modals = array()) {
     $ajax['panels']['modals'] = $modals;
   }
 
+  drupal_add_js(panels_get_path('js/panels-base.js'));
   drupal_add_js($ajax, 'setting');
   drupal_add_js(panels_get_path('js/lib/dimensions.js'));
   drupal_add_js(panels_get_path('js/lib/mc.js'));

@@ -51,13 +51,6 @@ Drupal.Panels.bindPortlet = function() {
   }
 };
 
-Drupal.Panels.changed = function(item) {
-  if (!item.is('.changed')) {
-    item.addClass('changed');
-    item.find('div.grabber span.text').append(' <span class="star">*</span> ');
-  }
-};
-
 Drupal.Panels.Draggable = {
   // The draggable object
   object: null,

@@ -481,39 +481,6 @@ function panels_common_ajax($module = NULL, $data = NULL, $info = NULL, $info2 =
   }
 }
 
-// TODO: Move this somewhere more appropriate
-function panels_common_get_arg_id($arguments, $name) {
-  // Figure out which instance of this argument we're creating
-  $id = 0;
-  foreach ($arguments as $arg) {
-    if ($arg['name'] == $name) {
-      if ($arg['id'] > $id) {
-        $id = $arg['id'];
-      }
-    }
-  }
-  return $id;
-}
-
-function panels_common_get_keyword($page, $word) {
-  // Create a complete set of keywords
-  $keywords = array();
-  foreach (array('arguments', 'relationships', 'contexts', 'requiredcontexts') as $type) {
-    if (!empty($page->$type) && is_array($page->$type)) {
-      foreach ($page->$type as $info) {
-        $keywords[$info['keyword']] = TRUE;
-      }
-    }
-  }
-
-  $keyword = $word;
-  $count = 0;
-  while ($keywords[$keyword]) {
-    $keyword = $word . '_' . ++$count;
-  }
-  return $keyword;
-}
-
 /**
  * Create a visible list of content in a display.
  * Note that the contexts must be pre-loaded.

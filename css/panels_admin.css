@@ -135,3 +135,8 @@ tr.changed td span.star {
   font-weight: bold;
   color: #E09010;
 }
+
+td select {
+  margin: 0;
+  padding: 0;
+}
