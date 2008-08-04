@@ -89,18 +89,6 @@ function panels_common_add_argument_form($module, &$form, &$form_state, &$form_l
     '#panels_context_module' => $module,
   );
 
-  $form['arguments'] = array(
-    '#type' => 'value',
-    '#value' => $object->arguments,
-  );
-
-  // Store the order the choices are in so javascript can manipulate it.
-  $form['argument_order'] = array(
-    '#type' => 'hidden',
-    '#id' => 'argument-order',
-    '#default_value' => $object->arguments ? implode(',', array_keys($object->arguments)) : '',
-  );
-
   $args = panels_get_arguments();
   $choices = array();
   foreach ($args as $name => $arg) {
@@ -112,15 +100,9 @@ function panels_common_add_argument_form($module, &$form, &$form_state, &$form_l
   if (!empty($choices) || !empty($object->arguments)) {
     panels_common_add_item_table('argument', $form_location, $choices, $object->arguments);
   }
-  return _panels_common_context_js($object->name, $module, 'argument');
 }
 
 function panels_common_add_context_form($module, &$form, &$form_state, &$form_location, $object) {
-  $form['contexts'] = array(
-    '#type' => 'value',
-    '#value' => $object->contexts,
-  );
-
   $form_location = array(
     '#prefix' => '<div id="panels-contexts-table">',
     '#suffix' => '</div>',
@@ -133,11 +115,6 @@ function panels_common_add_context_form($module, &$form, &$form_state, &$form_lo
   // Store the order the choices are in so javascript can manipulate it.
   $form_location['markup'] = array(
     '#value' => '&nbsp;',
-  );
-  $form['context_order'] = array(
-    '#type' => 'hidden',
-    '#id' => 'context-order',
-    '#default_value' => $object->contexts ? implode(',', array_keys($object->contexts)) : '',
   );
 
   $choices = array();
@@ -152,15 +129,9 @@ function panels_common_add_context_form($module, &$form, &$form_state, &$form_lo
   if (!empty($choices) || !empty($object->contexts)) {
     panels_common_add_item_table('context', $form_location, $choices, $object->contexts);
   }
-  return _panels_common_context_js($object->name, $module, 'context');
 }
 
 function panels_common_add_required_context_form($module, &$form, &$form_state, &$form_location, $object) {
-  $form['requiredcontexts'] = array(
-    '#type' => 'value',
-    '#value' => $object->requiredcontexts,
-  );
-
   $form_location = array(
     '#prefix' => '<div id="panels-requiredcontexts-table">',
     '#suffix' => '</div>',
@@ -174,11 +145,6 @@ function panels_common_add_required_context_form($module, &$form, &$form_state, 
   $form_location['markup'] = array(
     '#value' => '&nbsp;',
   );
-  $form['requiredcontext_order'] = array(
-    '#type' => 'hidden',
-    '#id' => 'requiredcontext-order',
-    '#default_value' => $object->requiredcontexts ? implode(',', array_keys($object->requiredcontexts)) : '',
-  );
 
   $choices = array();
   foreach (panels_get_contexts() as $name => $arg) {
@@ -190,15 +156,9 @@ function panels_common_add_required_context_form($module, &$form, &$form_state, 
   if (!empty($choices) || !empty($object->contexts)) {
     panels_common_add_item_table('requiredcontext', $form_location, $choices, $object->requiredcontexts);
   }
-  return _panels_common_context_js($object->name, $module, 'requiredcontext');
 }
 
 function panels_common_add_relationship_form($module, &$form, &$form_state, &$form_location, $object) {
-  $form['relationships'] = array(
-    '#type' => 'value',
-    '#value' => $object->relationships,
-  );
-
   $form_location = array(
     '#prefix' => '<div id="panels-relationships-table">',
     '#suffix' => '</div>',
@@ -212,44 +172,11 @@ function panels_common_add_relationship_form($module, &$form, &$form_state, &$fo
   $form_location['markup'] = array(
     '#value' => '&nbsp;',
   );
-  $form['relationship_order'] = array(
-    '#type' => 'hidden',
-    '#id' => 'relationship-order',
-    '#default_value' => $object->relationships ? implode(',', array_keys($object->relationships)) : '',
-  );
 
   $available_relationships = panels_get_relevant_relationships(panels_context_load_contexts($object));
 
-//  if (!empty($available_relationships) || !empty($object->relationships)) {
-    panels_common_add_item_table('relationship', $form_location, $available_relationships, $object->relationships);
-//  }
+  panels_common_add_item_table('relationship', $form_location, $available_relationships, $object->relationships);
 
-  return _panels_common_context_js($object->name, $module, 'relationship');
-}
-
-function _panels_common_context_js($name, $module, $type) {
-  return array($type . '-table' => array(
-    // The buttons that do stuff.
-    'remove' => "input.$type-remove",
-    // The gadget that stores our the order of items.
-    'order' => "input#$type-order",
-    'up' => "input.$type-up",
-    'down' => "input.$type-down",
-    'configure' => "input.$type-settings",
-    'configure_path' => url("panels/common/ajax/edit/$module/$type/$name", array('absolute' => TRUE)),
-
-    // The button that adds an item
-    'add' => "input#edit-buttons-$type-add",
-    // Path for ajax on adding an item
-    'path' => url("panels/common/ajax/add/$module/$type/$name", array('absolute' => TRUE)),
-    // Which items to post when adding
-    'post' => array("#edit-buttons-$type-item", "input#edit-buttons-$type-add"),
-    // Where to get the id of an item
-    'tr' => $type . '-row-',
-    'row_class' => "tr.$type-row",
-    // Additional HTML to replace on add.
-    'replace' => array('div#panels-relationships-table div.buttons' => 'relationships_table'),
-  ));
 }
 
 function panels_common_add_context_js($base) {
@@ -342,7 +269,7 @@ function panels_common_add_item_to_form($module, $type, $name, &$form, $position
     );
   }
 
-  $form['remove'] = array('#value' => panels_ajax_image_button('icon-delete.png', "panels/ajax/delete-context/$type/$position", t('Configure settings for this item.')));
+  $form['remove'] = array('#value' => panels_ajax_image_button('icon-delete.png', "panels/ajax/context-delete/$module/$type/$name/$position", t('Remove this item.'), 'panels-no-modal'));
 
   $form['settings'] = array('#value' => panels_ajax_image_button('icon-configure.png', "panels/ajax/context-configure/$module/$type/$name/$position", t('Configure settings for this item.')));
 }
@@ -491,8 +418,11 @@ function panels_ajax_context_item_add($module = NULL, $type = NULL, $panel_name 
     $arg_form[$type] = array(
       '#tree' => TRUE,
     );
+    $arg_form[$type][$position] = array(
+      '#tree' => TRUE,
+    );
 
-    panels_common_add_item_to_form($module, $type, $panel_name, $arg_form[$type], $position, $ref[$position]);
+    panels_common_add_item_to_form($module, $type, $panel_name, $arg_form[$type][$position], $position, $ref[$position]);
     $arg_form = form_builder($type_info['form id'], $arg_form, $arg_form_state);
 
     // Build the relationships table so we can ajax it in.
@@ -520,7 +450,7 @@ function panels_ajax_context_item_add($module = NULL, $type = NULL, $panel_name 
     }
 
     $output->type     = 'add';
-    $output->output   = theme('panels_common_context_item_row', $type, $arg_form[$type], $position, $position);
+    $output->output   = theme('panels_common_context_item_row', $type, $arg_form[$type][$position], $position, $position);
     $output->region = '#' . $type . '-table tbody';
     $output->id = '#' . $type . '-row-' . $position;
   }
@@ -593,12 +523,15 @@ function panels_ajax_context_item_edit($module = NULL, $type = NULL, $panel_name
     $arg_form[$type] = array(
       '#tree' => TRUE,
     );
+    $arg_form[$type][$position] = array(
+      '#tree' => TRUE,
+    );
 
-    panels_common_add_item_to_form($module, $type, $panel_name, $arg_form[$type], $position, $ref[$position]);
+    panels_common_add_item_to_form($module, $type, $panel_name, $arg_form[$type][$position], $position, $ref[$position]);
     $arg_form = form_builder($type_info['form id'], $arg_form, $arg_form_state);
 
     $output->replace = array(
-      '#' . $type . '-row-' . $position => theme('panels_common_context_item_row', $type, $arg_form[$type], $position, $position)
+      '#' . $type . '-row-' . $position => theme('panels_common_context_item_row', $type, $arg_form[$type][$position], $position, $position)
     );
   }
   panels_ajax_render($output);
@@ -712,11 +645,6 @@ function panels_common_edit_requiredcontext_form(&$form_state) {
     '#value' => $context['name'],
   );
 
-  $form['requiredcontext']['id'] = array(
-    '#type' => 'value',
-    '#value' => $ctext['id'],
-  );
-
   $form['requiredcontext']['identifier'] = array(
     '#type' => 'textfield',
     '#title' => t('Identifier'),
@@ -729,11 +657,6 @@ function panels_common_edit_requiredcontext_form(&$form_state) {
     '#title' => t('Keyword'),
     '#description' => t('Enter a keyword to use for substitution in titles.'),
     '#default_value' => $ctext['keyword'],
-  );
-
-  $form['context_info'] = array(
-    '#type' => 'value',
-    '#value' => $context,
   );
 
   $form['end_form'] = array('#value' => '</div>');
@@ -933,6 +856,44 @@ function panels_common_edit_argument_form_submit($form_id, $form_values) {
   }
 
   $form_state['ref'][$form_state['position']] = $form_state['values']['argument'];
+}
+
+/**
+ * Ajax entry point to edit an item
+ */
+function panels_ajax_context_item_delete($module = NULL, $type = NULL, $panel_name = NULL, $position = NULL) {
+  panels_load_include('plugins');
+  panels_load_include('ajax');
+
+  if (!isset($position)) {
+    return panels_ajax_render();
+  }
+
+  // Load stored object from cache.
+  if (!($object = panels_cache_get("panel_object:$module", $panel_name))) {
+    panels_ajax_render(t('Invalid panel name.'));
+  }
+
+  $type_info = panels_common_context_info($type);
+
+  // Create a reference to the place our context lives. Since this is fairly
+  // generic, this is the easiest way to get right to the place of the
+  // object without knowing precisely what data we're poking at.
+  $ref = &$object->{$type_info['key']};
+
+  if (!array_key_exists($position, $ref)) {
+    panels_ajax_render(t('Unable to delete missing item!'));
+  }
+
+  unset($ref[$position]);
+  panels_cache_set("panel_object:$module", $panel_name, $object);
+
+  $output = new stdClass();
+  $output->type = $output->output = 'dismiss';
+
+  $output->replace = array('#' . $type . '-row-' . $position => '');
+  $output->exec = "Drupal.Panels.restripeTable('#$type-table');";
+  panels_ajax_render($output);
 }
 
 // --- End of contexts

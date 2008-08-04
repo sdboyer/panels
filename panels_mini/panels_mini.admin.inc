@@ -569,15 +569,12 @@ function panels_mini_context_form(&$form_state, $panel_mini, $next = NULL) {
   panels_load_include('plugins');
   $layout = panels_get_layout($panel_mini->display->layout);
 
-  $form['pid'] = array(
-    '#type' => 'value',
-    '#value' => $panel_mini->pid,
-  );
-
   $form['panel_mini'] = array(
     '#type' => 'value',
     '#value' => $panel_mini,
   );
+
+  $form_state['panel_mini'] = $panel_mini;
 
   $form['right'] = array(
     '#prefix' => '<div class="right-container">',
@@ -610,21 +607,16 @@ function panels_mini_context_form(&$form_state, $panel_mini, $next = NULL) {
  * Process submission of the mini panel edit form.
  */
 function panels_mini_context_form_submit($form, &$form_state) {
-  $form_values = &$form_state['values'];
-
-  $panel_mini = $form_values['panel_mini'];
+  $panel_mini = $form_state['panel_mini'];
 
   // Organize these from the common form.
-
-//  panels_common_save_context('context', $panel_mini->contexts, $form_values);
-  panels_common_save_context('requiredcontext', $panel_mini->requiredcontexts, $form_values);
-//  panels_common_save_context('relationship', $panel_mini->relationships, $form_values);
+  panels_common_save_context('requiredcontext', $panel_mini->requiredcontexts, $form_state['values']);
 
   drupal_set_message(t('Your changes have been saved.'));
   panels_mini_save($panel_mini);
   panels_cache_clear('panel_object:panel_mini', $panel_mini->name);
   if ($form_values['submit'] == t('Save and proceed')) {
-    return "admin/panels/panel-mini/$panel_mini->name/edit-content";
+    $form_state['redirect'] = "admin/panels/panel-mini/$panel_mini->name/edit-content";
   }
 }
 

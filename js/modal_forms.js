@@ -93,6 +93,10 @@ Drupal.Panels.Subform.bindAjaxResponse = function(data) {
     }
   }
 
+  // Execute any pure javascript code we were sent.
+  if (data.exec) {
+    eval(data.exec);
+  }
 };
 
 /**
@@ -227,21 +231,20 @@ Drupal.Panels.makeTableDraggable = function(item) {
   if (Drupal.tableDrag[id]) {
     Drupal.tableDrag[id].makeDraggable(item);
 
-    // redisplay cells so that hideColumns won't just exit
+    // Look for columns that we have to hide. This code is kind of annoying.
     for (var group in Drupal.tableDrag[id].tableSettings) {
       // Find the first field in Drupal.tableDrag[id] group.
       for (var d in Drupal.tableDrag[id].tableSettings[group]) {
-        var field = $('.' + Drupal.tableDrag[id].tableSettings[group][d]['target'] + ':first', Drupal.tableDrag[id].table);
+        var field = $('.' + Drupal.tableDrag[id].tableSettings[group][d]['target'] + ':first', item);
         if (field.size() && Drupal.tableDrag[id].tableSettings[group][d]['hidden']) {
           var hidden = Drupal.tableDrag[id].tableSettings[group][d]['hidden'];
           var cell = field.parents('td:first');
           break;
         }
       }
-      $(cell).css('display', 'block');
+      // Hide columns containing affected form elements.
+      $(cell).css('display', 'none');
     }
-    // Hide columns containing affected form elements.
-    Drupal.tableDrag[id].hideColumns();
   }
 };
 

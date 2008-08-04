@@ -167,6 +167,10 @@ function panels_menu() {
     'page callback' => 'panels_ajax_context_item_edit',
     'file' => 'includes/common-context.inc',
   ) + $base;
+  $items['panels/ajax/context-delete'] = array(
+    'page callback' => 'panels_ajax_context_item_delete',
+    'file' => 'includes/common-context.inc',
+  ) + $base;
 
   // Provide a nice location for a panels admin panel.
   //
