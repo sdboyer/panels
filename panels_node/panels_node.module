@@ -23,86 +23,69 @@ function panels_node_perm() {
 /**
  * Implementation of hook_menu().
  */
-function panels_node_menu($may_cache) {
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'node/add/panel',
-      'title' => t('Panel'),
-      'access' => user_access('create panel-nodes'),
-      'type' => MENU_NORMAL_ITEM,
-    );
-    $items[] = array(
-      'path' => 'admin/panels/panel-nodes',
-      'title' => t('Panel nodes'),
-      'access' => user_access('create panel-nodes') && user_access('access administration pages'),
-      'type' => MENU_NORMAL_ITEM,
-      'callback' => 'panels_node_admin',
-      'description' => t('Information about panel nodes.'),
-    );
+function panels_node_menu() {
+/*
+  $items['node/add/panel'] = array(
+    'title' => 'Panel',
+    'access arguments' => array('create panel-nodes'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+*/
+  $items['admin/panels/panel-nodes'] = array(
+    'title' => 'Panel nodes',
+    'access arguments' => array('create panel-nodes'),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'panels_node_admin',
+    'description' => t('Panel nodes are nodes that are laid out with panel displays.'),
+  );
 
-    $items[] = array(
-      'path' => 'admin/panels/panel-nodes/information',
-      'title' => t('Information'),
-      'access' => user_access('create panel-nodes') && user_access('access administration pages'),
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-    );
+  $items['admin/panels/panel-nodes/information'] = array(
+    'title' => 'Information',
+    'access arguments' => array('create panel-nodes'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
 
-    $items[] = array(
-      'path' => 'admin/panels/panel-nodes/settings',
-      'title' => t('Settings'),
-      'description' => t('Configure panel node content availability.'),
-      'access' => user_access('administer panel-nodes'),
-      'callback' => 'panels_node_settings',
-      'type' => MENU_LOCAL_TASK,
-    );
-  }
-  else {
-    if (arg(0) == 'node' && is_numeric(arg(1))) {
-      $node = node_load(arg(1));
-      if ($node && $node->type == 'panel' && node_access('update', $node)) {
-        $base = 'node/' . arg(1) . '/panel_';
-        $items[] = array(
-          'path' => $base . 'layout',
-          'title' => t('Panel layout'),
-          'access' => TRUE,
-          'callback' => 'panels_node_edit_layout',
-          'callback arguments' => array($node),
-          'weight' => 2,
-          'type' => MENU_LOCAL_TASK,
-        );
+  $items['admin/panels/panel-nodes/settings'] = array(
+    'title' => 'Settings',
+    'description' => t('Configure which content is available to add to panel node displays.'),
+    'access arguments' => array('administer panel-nodes'),
+    'page callback' => 'panels_node_settings',
+    'type' => MENU_LOCAL_TASK,
+  );
 
-        $items[] = array(
-          'path' => $base . 'settings',
-          'title' => t('Panel layout settings'),
-          'access' => TRUE,
-          'callback' => 'panels_node_edit_layout_settings',
-          'callback arguments' => array($node),
-          'weight' => 2,
-          'type' => MENU_LOCAL_TASK,
-        );
+  // Avoid some repetition on these:
+  $base = array(
+    'access callback' => 'node_access',
+    'access arguments' => array('update', 1),
+    'page arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['node/%node/panel_layout'] = array(
+    'path' => $base . 'layout',
+    'title' => 'Panel layout',
+    'page callback' => 'panels_node_edit_layout',
+    'weight' => 2,
+  ) + $base;
 
-        $items[] = array(
-          'path' => $base . 'content',
-          'title' => t('Panel content'),
-          'access' => TRUE,
-          'callback' => 'panels_node_edit_content',
-          'callback arguments' => array($node),
-          'weight' => 3,
-          'type' => MENU_LOCAL_TASK,
-        );
-      }
-    }
-    // Hard override of node/add
-    if (arg(0) == 'node' && arg(1) == 'add' && arg(2) == 'panel' && arg(3) == NULL) {
-      $items[] = array(
-        'path' => 'node/add/panel',
-        'title' => t('Panel'),
-        'access' => user_access('create panel-nodes'),
-        'callback' => 'panels_node_add',
-        'type' => MENU_NORMAL_ITEM,
-      );
-    }
-  }
+  $items['node/%node/panel_settings'] = array(
+    'title' => 'Panel layout settings',
+    'page callback' => 'panels_node_edit_layout_settings',
+    'weight' => 2,
+  ) + $base;
+
+  $items['node/%node/panel_layout'] = array(
+    'title' => 'Panel content',
+    'page callback' => 'panels_node_edit_content',
+    'weight' => 3,
+  ) + $base;
+
+  $items['node/add/panel/choose-layout'] = array(
+    'title' => 'Choose layout',
+    'access arguments' => array('create panel-nodes'),
+    'page callback' => 'panels_node_add',
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -166,7 +149,7 @@ function panels_node_add() {
   panels_load_include('plugins');
   // If no layout selected, present a list of choices.
   foreach (panels_get_layouts() as $id => $layout) {
-    $output .= panels_print_layout_link($id, $layout, $_GET['q'] . '/' . $id);
+    $output .= panels_print_layout_link($id, $layout, 'node/add/panel/' . $id);
   }
   return $output;
 }
@@ -177,9 +160,12 @@ function panels_node_add() {
 function panels_node_form(&$node, &$param) {
   $form['panels_node']['#tree'] = TRUE;
   if (!$node->nid) {
-    // Grab our selected layout from the $node, If it doesn't exist, try arg(3) 
+    // Grab our selected layout from the $node, If it doesn't exist, try arg(3)
     // and if that doesn't work present them with a list to pick from.
-    $panel_layout = $node->panel_layout ? $node->panel_layout : arg(3);
+    $panel_layout = isset($node->panel_layout) ? $node->panel_layout : arg(3);
+    if (empty($panel_layout)) {
+      return drupal_goto('node/add/panel/choose-layout');
+    }
 
     panels_load_include('plugins');
     $layout = panels_get_layout($panel_layout);

@@ -223,7 +223,7 @@ class panels_allowed_layouts {
  * A common settings page for Panels modules, because this code is relevant to
  * any modules that don't already have special requirements.
  */
-function panels_common_settings($module_name = 'panels_common') {
+function panels_common_settings(&$form_state, $module_name = 'panels_common') {
   panels_load_include('plugins');
   $content_types = panels_get_content_types();
   $default_types = variable_get($module_name . '_default', NULL);
@@ -272,7 +272,11 @@ function panels_common_settings($module_name = 'panels_common') {
       }
     }
 
-    $form['content_types'] = array('#tree' => TRUE);
+    $form['content_types'] = array(
+      '#tree' => TRUE,
+      '#prefix' => '<div class="clear-block">',
+      '#suffix' => '</div>',
+    );
     // cheat a bit
     $content_types['other'] = array('title' => t('Other'), 'weight' => 10);
     foreach ($content_types as $id => $info) {
@@ -306,12 +310,12 @@ function panels_common_settings($module_name = 'panels_common') {
 /**
  * Submit hook for panels_common_settings
  */
-function panels_common_settings_submit($form_id, $form_values) {
-  $module_name = $form_values['module_name'];
-  variable_set($module_name . '_default', $form_values['panels_common_default']);
-  if (!$form_values['skip']) {
+function panels_common_settings_submit($form, &$form_state) {
+  $module_name = $form_state['values']['module_name'];
+  variable_set($module_name . '_default', $form_state['values']['panels_common_default']);
+  if (!$form_state['values']['skip']) {
     // merge the broken apart array neatly back together
-    variable_set($module_name . '_allowed_types', call_user_func_array('array_merge', $form_values['content_types']));
+    variable_set($module_name . '_allowed_types', call_user_func_array('array_merge', $form_state['values']['content_types']));
   }
   drupal_set_message(t('Your changes have been saved.'));
 }
@@ -455,30 +459,6 @@ function panels_common_get_layout_information($panel_implementation, $contexts =
   );
 
   return $form;
-}
-
-// ---------------------------------------------------------------------------
-// Ajax tools
-
-/**
- * Incoming menu function for ajax calls. This routes to the proper 'module'
- * -- we really only need this because common.inc relies on panels.module for
- * its menu hook, and this way the code stays together.
- */
-function panels_common_ajax($module = NULL, $data = NULL, $info = NULL, $info2 = NULL) {
-  switch ($module) {
-    case 'edit':
-      return panels_common_ajax_context_item_edit($data, $info, $info2);
-
-    case 'add':
-      return panels_common_ajax_context_item_add($data, $info, $info2);
-
-    case 'panel_settings':
-      return panels_common_panel_settings_ajax($data, $info);
-
-    default:
-      panels_ajax_render(t('An error occurred'), t('Error'));
-  }
 }
 
 /**
