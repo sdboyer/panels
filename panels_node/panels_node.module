@@ -36,7 +36,7 @@ function panels_node_menu() {
     'access arguments' => array('create panel-nodes'),
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'panels_node_admin',
-    'description' => t('Panel nodes are nodes that are laid out with panel displays.'),
+    'description' => 'Panel nodes are nodes that are laid out with panel displays.',
   );
 
   $items['admin/panels/panel-nodes/information'] = array(
@@ -47,7 +47,7 @@ function panels_node_menu() {
 
   $items['admin/panels/panel-nodes/settings'] = array(
     'title' => 'Settings',
-    'description' => t('Configure which content is available to add to panel node displays.'),
+    'description' => 'Configure which content is available to add to panel node displays.',
     'access arguments' => array('administer panel-nodes'),
     'page callback' => 'panels_node_settings',
     'type' => MENU_LOCAL_TASK,

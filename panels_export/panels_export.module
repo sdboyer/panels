@@ -1,7 +1,6 @@
 <?php
 // $Id$
 
-
 /**
  * @file panels_export.module
  *
@@ -12,26 +11,32 @@
 /**
  * Implementation of hook_menu().
  */
-function panels_export_menu($may_cache) {
-  if ($may_cache) {
-    $items = array();
-    $items[] = array(
-      'path' => 'admin/panels/export',
-      'title' => t('Export panels'),
-      'access' => user_access('use panels exporter'),
-      'callback' => 'panels_export_export',
-      'description' => t('Export panels in bulk.'),
-    );
-    $items[] = array(
-      'path' => 'admin/panels/export/results',
-      'access' => user_access('use panels exporter'),
-      'callback' => 'panels_export_export',
-      'type' => MENU_CALLBACK,
-    );
-    return $items;
-  }
+function panels_export_menu() {
+  $items = array();
+  $items['admin/panels/export'] = array(
+    'title' => 'Export panels',
+    'access arguments' => array('use panels exporter'),
+    'page callback' => 'panels_export_export',
+    'description' => 'Export panels in bulk.',
+  );
+  $items['admin/panels/export/results'] = array(
+    'access arguments' => array('use panels exporter'),
+    'page callback' => 'panels_export_export',
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
 }
 
+/**
+ * Implementation of hook_theme()
+ */
+function panels_export_theme() {
+  return array(
+    'panels_export_export_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
+}
 /**
  * Implementation of hook_perm().
  */
@@ -49,11 +54,14 @@ function panels_export_export() {
     $exportables[$module] = $function('list');
   }
   if ($exportables) {
-    $form_id = 'panels_export_export_form';
-    $form    = drupal_retrieve_form($form_id, $exportables);
-    $output  = drupal_process_form($form_id, $form);
+    $form_state = array(
+      're_render' => FALSE,
+      'no_redirect' => TRUE,
+      'exportables' => $exportables,
+    );
+    $output = drupal_build_form('panels_export_export_form', $form_state);
     if (!$output) {
-      $output = drupal_render_form($form_id, $form);
+      $output = $form_state['output'];
     }
     return $output;
   }
@@ -65,9 +73,13 @@ function panels_export_export() {
 /**
  * Form to choose a group of panels to export.
  */
-function panels_export_export_form($exportables) {
-  foreach ($exportables as $module => $panels) {
-    $form['modules']['#tree'] = TRUE;
+function panels_export_export_form(&$form_state) {
+  foreach ($form_state['exportables'] as $module => $panels) {
+    $form['modules'] = array(
+      '#prefix' => '<div class="clear-block">',
+      '#suffix' => '</div>',
+      '#tree' => TRUE,
+    );
     $form['modules'][$module] = array(
       '#type' => 'checkboxes',
       '#options' => $panels,
@@ -87,8 +99,7 @@ function panels_export_export_form($exportables) {
   );
 
   $form['#action'] = url('admin/panels/export/results');
-  $form['#redirect'] = FALSE;
-  $form['#exportables'] = $exportables;
+  $form['#exportables'] = $form_state['exportables'];
   return $form;
 }
 
@@ -114,16 +125,16 @@ function theme_panels_export_export_form($form) {
   return $output;
 }
 
-function panels_export_export_form_submit($form_id, $form_values) {
+function panels_export_export_form_submit($form, &$form_state) {
   $code = '';
-  if (empty($form_values['name'])) {
-    $form_values['name'] = 'foo';
+  if (empty($form_state['values']['name'])) {
+    $form_state['values']['name'] = 'foo';
   }
 
-  foreach ($form_values['modules'] as $module => $panels) {
+  foreach ($form_state['values']['modules'] as $module => $panels) {
     $panels = array_filter($panels);
     if ($panels) {
-      $code .= module_invoke($module, 'panels_exportables', 'export', $panels, $form_values['name']) . "\n\n";
+      $code .= module_invoke($module, 'panels_exportables', 'export', $panels, $form_state['values']['name']) . "\n\n";
     }
   }
 
@@ -138,6 +149,6 @@ function panels_export_export_form_submit($form_id, $form_values) {
     '#parents' => array(),
   );
 
-  return theme('textarea', $element);
+  $form_state['output'] = theme('textarea', $element);
 }
 
