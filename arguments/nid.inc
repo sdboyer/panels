@@ -25,23 +25,18 @@ function panels_nid_panels_arguments() {
 /**
  * Discover if this argument gives us the node we crave.
  */
-function panels_nid_context($arg = NULL, $conf = NULL, $empty = FALSE) {
+function panels_nid_context($node = NULL, $conf = NULL, $empty = FALSE) {
   // If unset it wants a generic, unfilled context.
   if ($empty) {
     return panels_context_create_empty('node');
   }
 
-  if (!is_numeric($arg)) {
-    return FALSE;
-  }
-
-  $node = node_load($arg);
-  if (!$node) {
-    return FALSE;
+  if (!is_object($node)) {
+    return PANELS_BAD_ARG;
   }
 
   if (array_filter($conf['types']) && empty($conf['types'][$node->type])) {
-    return FALSE;
+    return PANELS_USE_FALLBACK_ROUTER;
   }
 
   return panels_context_create('node', $node);
