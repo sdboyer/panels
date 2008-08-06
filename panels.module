@@ -173,18 +173,11 @@ function panels_menu() {
   ) + $base;
 
   // Provide a nice location for a panels admin panel.
-  //
-  // TODO: Provide a cute little panel-base administrative panel
-  // that provides things like "Recently edited", "recently added"
-  // and other administrative items to make dealing with the complexity
-  // of panels a little easier.
-
   $items['admin/panels'] = array(
     'title' => t('Panels'),
     'access arguments' => array('access administration pages'),
-    'page callback' => 'system_admin_menu_block_page',
-    'file' => 'system.admin.inc',
-    'file path' => drupal_get_path('module', 'system'),
+    'page callback' => 'panels_admin_page',
+    'file' => 'includes/callbacks.inc',
     'description' => t('Administer items related to the Panels module.'),
   );
 

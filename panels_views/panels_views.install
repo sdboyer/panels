@@ -1,0 +1,182 @@
+<?php
+// $Id$
+/**
+ * Implementation of hook_schema().
+ */
+function panels_views_schema() {
+  // This should always point to our 'current' schema. This makes it relatively easy
+  // to keep a record of schema as we make changes to it.
+  return panels_views_schema_1();
+}
+
+/**
+ * Schema version 1 for Panels in D6.
+ */
+function panels_views_schema_1() {
+  $schema = array();
+
+  // Schema version 0
+  $schema['panels_views'] = array(
+    'fields' => array(
+      'pvid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'view' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'category' => array(
+        'type' => 'varchar',
+        'length' => '255',
+//        'my_default' => 'Views',
+      ),
+      'category_weight' => array(
+        'type' => 'int',
+        'my_default' => '-1',
+      ),
+      // note: Remove this from table in update
+/*
+      'view_type' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+*/
+      'use_pager' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'pager_id' => array(
+        'type' => 'int',
+        'my_default' => 0,
+      ),
+      'nodes_per_page' => array(
+        'type' => 'int',
+        'my_default' => 0,
+      ),
+      'offset' => array(
+        'type' => 'int',
+        'my_default' => 0,
+      ),
+      'link_to_view' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'more_link' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'more_text' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'feed_icons' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'url_override' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'url' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'url_from_panel' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'contexts' => array(
+        'type' => 'text',
+      ),
+      // Whether or not array these things are allowed from the pane UI.
+      'allow_type' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_nodes_per_page' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_offset' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_use_pager' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_link_to_view' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_more_link' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_more_text' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_feed_icons' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_url_override' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+      'allow_url_from_panel' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'my_default' => FALSE,
+      ),
+    ),
+    'primary key' => array('pvid'),
+    'unique keys' => array(
+      'name'     => array('name')
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function panels_views_install() {
+  drupal_install_schema('panels_views');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function panels_views_uninstall() {
+  drupal_uninstall_schema('panels_views');
+}
