@@ -48,7 +48,7 @@ function _panels_page_menu_alter(&$callbacks) {
     // Only save a router quickref if the item has metadata
     $raw_path = panels_page_get_raw_path($path);
     if (!empty($panels_items['metadata'][$raw_path])) {
-      $panels_items['metadata'][$raw_path]['meta'] |= isset($matches[$path]) ? PANELS_HAS_STORED_ROUTER : 0;
+      $panels_items['metadata'][$raw_path]['meta'] |= isset($matches[$path]) ? PANELS_HAS_FALLBACK_ROUTER : 0;
       $schema = panels_page_router_table_query_fields('panels_page_router_quickref');
       $f = $q = $v = array();
       foreach ($schema as $field => $placeholder) {
