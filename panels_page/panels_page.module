@@ -30,7 +30,7 @@ define('PANELS_IS_PANELS_ITEM', 1 << 1);
  * Indicates that there is at least one stored loader that the router item at
  * this path has overridden, and that Panels has stored for this router item.
  */
-define('PANELS_HAS_STORED_ROUTER', (1 << 2) | PANELS_IS_PANELS_ITEM);
+define('PANELS_HAS_FALLBACK_ROUTER', (1 << 2) | PANELS_IS_PANELS_ITEM);
 /**
  * Indicates that the path is owned by a static panels page - that is, a panels
  * page without a % wildcard in its path.
@@ -54,7 +54,7 @@ define('PANELS_PID_OWNS_PATH', (1 << 5) | PANELS_IS_PANELS_ITEM);
  */
 define('PANELS_PID_SHARES_PATH', 1 << 6 | PANELS_IS_PANELS_ITEM | PANELS_PID_OWNS_PATH);
 
-define('PANELS_BAD_ARG_DATA', 1);
+define('PANELS_BAD_ARG', 1);
 define('PANELS_USE_FALLBACK_ROUTER', 1 << 1);
 
 /**
@@ -148,14 +148,14 @@ function _panels_page_check_router_status($router, $pid) {
   if (array_search('panels_page_render_load', $router['load_functions'])) {
     $status |= PANELS_IS_PANELS_ROUTER;
     if (!empty($router['stored_loaders'])) {
-      $status |= PANELS_HAS_STORED_ROUTER;
+      $status |= PANELS_HAS_FALLBACK_ROUTER;
     }
     if ($pid == $router['pid']) {
       $status |= PANELS_PID_OWNS_ROUTER;
     }
     
     if ($status & PANELS_PID_OWNS_ROUTER) {
-      $status |= !empty($has_loaders) ? PANELS_HAS_STORED_ROUTER : $status;
+      $status |= !empty($has_loaders) ? PANELS_HAS_FALLBACK_ROUTER : $status;
       if (count($routers) == 1) {
         $status |= PANELS_PID_SOLELY_OWNS_ROUTER;
       }
@@ -170,45 +170,120 @@ function _panels_page_check_router_status($router, $pid) {
  *
  * @param $pid
  * @param $args
- * @return unknown_type
+ * @return array $loader_data
  */
 function panels_page_get_loader_data($pid, $args) {
-  static $handler_data = array();
-  if (!empty($handler_data)) {
-    return $handler_data;
+  static $loader_data = array();
+  if (!empty($loader_data)) {
+    return $loader_data;
   }
-  $path = explode('/', $_GET['q']);
+  $map = explode('/', $_GET['q']);
   // TODO Multiple p-pages per path will necessitate more complex logic here
-  $router_meta = db_fetch_array(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
-  foreach ($router_meta as $key => $value) {
-    
-  }
-  $loader_data['meta'] =
+  $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
+  // $loader_data['meta'] = $quickref->meta;
   
   $load_objects = array();
   // Wanted to defer this for as long as possible...
   panels_load_include('plugins');
-  $panel_page = panels_page_load($pid, TRUE);
+  $panel_page = panels_page_load($pid);
   // for ($i = 0, $argument = reset($panel_page->arguments); !empty($argument); ++$i, $argument = next($panel_page->arguments)) {
   // for (list($i, $argument) = each($panel_page->arguments); !empty($argument); list($i, $argument) = each($panel_page->arguments)) {
   foreach ($panel_page->arguments as $id => $argument) {
+    $ignore = $argument['default'] == 'ignore';
     // FIXME The directness of this association is questionable
     $load_objects[$id] = array_shift($args);
-    $context = panels_argument_get_context($argument, $load_objects[$id]);
+    $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_BAD_ARG;
     if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
-      $ignore = $argument['default'] == 'ignore';
       if ($context & PANELS_USE_FALLBACK_ROUTER) {
-        
+        if ($quickref->meta & PANELS_HAS_FALLBACK_ROUTER) {
+          $loader_data['fallback'] = TRUE;
+          panels_page_prepare_fallback_render($loader_data, $quickref, $map);
+          break;
+        }
+        else if ($ignore) {
+          continue;
+        }
       }
-      else if ($context & PANELS_BAD_ARG_DATA && $argument['default'] == 'ignore') {
+      // TODO Are there other cases? If not, this is an overspecified if
+      else if ($context & PANELS_BAD_ARG && $ignore) {
         continue;
       }
-      // Bail out to 404 if we get this far.
+      // Bail out and 404 if we get this far.
       drupal_not_found();
     }
     $panel_page->context[panels_argument_context_id($argument)] = $context;
   }
+  // If we've determined that we're falling back, bail out.
+  if ($loader_data['fallback'] === TRUE) {
+    return $loader_data;
+  }
+  // We're now 100% certain we're proceeding with a p-page load.
+  panels_page_prepare_panels_render($loader_data, $quickref, $map, $panel_page);
   
+}
+
+function panels_page_prepare_panels_render(&$loader_data, $quickref, $map, $panel_page) {
+  panels_load_include('panels_page.render', 'panels_page/');
+  
+  _panels_page_check_switchers($panel_page);
+  
+  $loader_data['page callback'] = 'panels_page_render_page';
+  $loader_data['page arguments'] = array($panel_page, FALSE);
+}
+
+function panels_page_prepare_fallback_render(&$loader_data, $quickref, $map) {
+  list($ancestors, $placeholders) = menu_get_ancestors(explode('/', $quickref->path));
+  if ($router_item = db_fetch_array(db_query_range('SELECT * FROM {panels_page_menu_store} WHERE path IN ('. implode (',', $placeholders) .') ORDER BY fit DESC', $ancestors, 0, 1))) {
+    // TODO Ideally we could skip some of this, much has already been loaded.
+    $map = _menu_translate($router_item, $original_map);
+    if ($map === FALSE) {
+      $router_items[$path] = FALSE;
+      return FALSE;
+    }
+    if ($router_item['access']) {
+      $router_item['map'] = $map;
+      $router_item['page_arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
+    }
+  }
+  $load_data['router'] = $router_item;
+}
+
+function _panels_page_check_switchers(&$panel_page) {
+  $switchers = panels_get_switchers();
+  if ($switchers) {
+    $candidates = $list = array();
+    $result = db_query("SELECT name FROM {panels_page} WHERE switcher_name = '%s'", $panel_page->name);
+    // get a list of all pages that might switch for this one
+    while ($candidate = db_fetch_object($result)) {
+      $list[] = $candidate->name;
+    }
+    // Add default panels that apply to the list as well
+    foreach (panels_page_default_panels() as $page) {
+      if ($page->switcher_name == $panel_page->name) {
+        $candidates[$page->name] = $page;
+      }
+    }
+
+    if ($list) {
+      $candidates += (count($list) > 1) ? panels_page_load_all($list) : array(panels_page_load($list[0]));
+    }
+
+    if ($candidates) {
+      // separate them based on switcher type
+      $pages = array();
+      foreach ($candidates as $candidate) {
+        $pages[$candidate->switcher_type][$candidate->name] = $candidate;
+      }
+
+      // go through switcher types and switch the first one that matches.
+      foreach ($pages as $plugin => $candidates) {
+        if ($page = panels_switcher_switch($plugin, 'panel_page', $panel_page->name, $candidates)) {
+          $panel_page = $page;
+          break;
+        }
+      }
+    }
+  }
 }
 
 function panels_page_access_handler() {
