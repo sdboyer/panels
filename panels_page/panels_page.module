@@ -54,8 +54,6 @@ define('PANELS_PID_OWNS_PATH', (1 << 5) | PANELS_IS_PANELS_ITEM);
  */
 define('PANELS_PID_SHARES_PATH', 1 << 6 | PANELS_IS_PANELS_ITEM | PANELS_PID_OWNS_PATH);
 
-define('PANELS_BAD_ARG', 1);
-define('PANELS_USE_FALLBACK_ROUTER', 1 << 1);
 
 /**
  * Implementation of hook_help().
