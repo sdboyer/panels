@@ -32,16 +32,16 @@ function panels_node_edit_context($arg = NULL, $conf = NULL, $empty = FALSE) {
   }
 
   if (!is_numeric($arg)) {
-    return FALSE;
+    return PANELS_BAD_ARG;
   }
 
   $node = node_load($arg);
   if (!$node) {
-    return FALSE;
+    return PANELS_BAD_ARG;
   }
 
   if (array_filter($conf['types']) && empty($conf['types'][$node->type])) {
-    return FALSE;
+    return PANELS_USE_FALLBACK_ROUTER;
   }
 
   // This will perform a node_access check, so we don't have to.

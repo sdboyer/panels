@@ -32,7 +32,7 @@ function panels_node_add_context($arg = NULL, $conf = NULL, $empty = FALSE) {
   }
 
   if (array_filter($conf['types']) && empty($conf['types'][$arg])) {
-    return FALSE;
+    return PANELS_USE_FALLBACK_ROUTER;
   }
 
   return panels_context_create('node_add_form', $arg);
