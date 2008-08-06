@@ -26,13 +26,14 @@ function _panels_page_menu_alter(&$callbacks) {
     if (strpos($path, '%') === FALSE) {
       continue;
     }
-    $raw_path = preg_replace('/%([a-z_]*)/', '%', $path);
+    $raw_path = panels_page_get_raw_path($path);
     if (isset($panels_items['menu items'][$raw_path])) {
-      $panels_items['menu items'][$path] = array_merge_recursive($item, $panels_items['menu items'][$raw_path]);
+      // $panels_items['menu items'][$path] = array_merge_recursive($item, $panels_items['menu items'][$raw_path]);
+      $panels_items['menu items'][$path] = array_merge($item, $panels_items['menu items'][$raw_path]);
       $matches[$path] = TRUE;
       // TODO this is another point that hardcodes one item per path.
       if ($raw_path != $path) {
-        // Only unset if the raw path is different (e.g., taxo)
+        // Only unset if the raw path is different (e.g., taxo is same)
         unset($panels_items['menu items'][$raw_path]);
       }
     }
@@ -45,15 +46,15 @@ function _panels_page_menu_alter(&$callbacks) {
   db_query('DELETE FROM {panels_page_router_quickref}');
   foreach ($panels_items['menu items'] as $path => $item) {
     // Only save a router quickref if the item has metadata
-    $raw_path = preg_replace('/%([a-z_]*)/', '%', $path);
-    if (!empty($panels_items['metadata'][$path])) {
-      $panels_items['metadata'][$path]['stored_router'] = isset($matches[$path]) ? TRUE : FALSE;
+    $raw_path = panels_page_get_raw_path($path);
+    if (!empty($panels_items['metadata'][$raw_path])) {
+      $panels_items['metadata'][$raw_path]['stored_router'] = isset($matches[$path]) ? TRUE : FALSE;
       $schema = panels_page_router_table_query_fields('panels_page_router_quickref');
       $f = $q = $v = array();
       foreach ($schema as $field => $placeholder) {
         $f[] = $field;
         $q[] = $placeholder;
-        $v[] = $panels_items['metadata'][$path][$field];
+        $v[] = $panels_items['metadata'][$raw_path][$field];
       }
       db_query('INSERT INTO {panels_page_router_quickref} (' . implode(', ', $f) . ') VALUES (' . implode(', ', $q) . ')', $v);
     }
@@ -253,8 +254,9 @@ function panels_page_construct_wildcard_menu_link(&$items, $panel_page, $map) {
   
   // Construct the dynamic menu router item. If/when we get to multiple
   // panels_pages per wildcard path, we needn't worry about overwriting here.
-  $items['menu items'][$panel_page->path] = _panels_page_construct_wildcard_menu_link($panel_page, array($primary_wildcard), array('arguments' => $primary_wildcard), $type);
-  
+  $items['menu items'][$panel_page->path] = _panels_page_construct_wildcard_menu_link(
+    $panel_page, array('pid-' . $panel_page->pid, $primary_wildcard), array('arguments' => array('pid-' . $panel_page->pid, $primary_wildcard)), $type);
+
   // $items['menu_link_alter'][$path]['type']
   // FIXME parents are borked
   _panels_page_construct_parent_menu_item($items, $panel_page, $panel_page->path, $type);
@@ -268,13 +270,14 @@ function _panels_page_construct_wildcard_menu_link($panel_page, $page_arguments,
     'title callback' => 'panels_page_title_handler',
     'title arguments' => $page_arguments,
     // TODO $access['callback'] is currently always empty. Eliminate this ternary if we don't find a need for it presently.
-    'access callback' => !empty($access['callback']) ? $access['callback'] : 'panels_page_access',
-    'access arguments' => (array)$access['arguments'],
+    // 'access callback' => !empty($access['callback']) ? $access['callback'] : 'panels_page_access',
+    // 'access arguments' => (array)$access['arguments'],
     'page callback' => 'panels_page_render_handler',
     'page arguments' => $page_arguments,
     'type' => $type,
     'weight' => $weight,
     'module' => 'panels_page',
+    'file' => NULL, // Ensure we don't get the overriddee's file property
   );
 }
 
@@ -293,6 +296,7 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
     'page arguments' => array($panel_page->name),
     'type' => $type,
     'module' => 'panels_page',
+    'file' => 'panels_page.render.inc',
   );
   _panels_page_construct_parent_menu_item($items, $panel_page, $panel_page->path, $type);
 }
@@ -368,6 +372,10 @@ function panels_page_router_table_query_fields($table) {
     }
   }
   return $query_building_blocks[$table];
+}
+
+function panels_page_get_raw_path($path) {
+  return preg_replace('/%([a-z_]*)/', '%', $path);
 }
 
 /**
