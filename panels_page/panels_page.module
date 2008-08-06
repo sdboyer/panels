@@ -25,41 +25,37 @@ define('PANELS_ROUTER_EXISTS', 1);
  * Indicates that the active router in the {menu_router} table is set and is
  * owned by Panels.
  */
-// define('PANELS_IS_PANELS_ROUTER', 1 << 1 | PANELS_ROUTER_EXISTS); // == 3
-define('PANELS_IS_PANELS_ROUTER', 1 << 1); // == 2
+define('PANELS_IS_PANELS_ITEM', 1 << 1);
 /**
  * Indicates that there is at least one stored loader that the router item at
  * this path has overridden, and that Panels has stored for this router item.
  */
-// define('PANELS_HAS_STORED_LOADER', 1 << 2 | PANELS_IS_PANELS_ROUTER); // == 7
-define('PANELS_HAS_STORED_LOADER', 1 << 2); // == 4
-/**
- * Indicates that the path is owned by a panels page admin editing router. This
- * should basically be a big "hands-off" sign.
- */
-// define('PANELS_IS_ADMIN_ROUTER', 1 << 3 | PANELS_IS_PANELS_ROUTER); // == 11
-define('PANELS_IS_ADMIN_ROUTER', 1 << 3); // == 8
+define('PANELS_HAS_STORED_ROUTER', (1 << 2) | PANELS_IS_PANELS_ITEM);
 /**
  * Indicates that the path is owned by a static panels page - that is, a panels
  * page without a % wildcard in its path.
  */
-// define('PANELS_IS_STATIC_ROUTER', 1 << 4 | PANELS_IS_PANELS_ROUTER); // == 19
-define('PANELS_IS_STATIC_ROUTER', 1 << 4); // == 16
+define('PANELS_IS_STATIC', (1 << 3) | PANELS_IS_PANELS_ITEM);
+/**
+ * Indicates that the path is owned by a panels page admin editing router. This
+ * should basically be a big "hands-off" sign.
+ */
+define('PANELS_IS_ADMIN_PATH', (1 << 4) | PANELS_IS_STATIC | PANELS_IS_PANELS_ITEM);
 
 // These deal with a particular pid's relationship with a given path
 /**
  * Panels display objects with this bitval set are an owner, although possibly
  * not the sole owner, of the router item at the provided path.
  */
-// define('PANELS_PID_OWNS_ROUTER', 1 << 5 | PANELS_IS_PANELS_ROUTER); // == 35
-define('PANELS_PID_OWNS_ROUTER', 1 << 5); // == 32
+define('PANELS_PID_OWNS_PATH', (1 << 5) | PANELS_IS_PANELS_ITEM);
 /**
- * Panels display objects with this bitval set are the sole owner of the router
- * item at the provided path.
+ * Panels display objects with this bitval set share the provided path with
+ * another panel.
  */
-// define('PANELS_SOLELY_OWNS_ROUTER', 1 << 6 | PANELS_PID_OWNS_ROUTER); // == 99
-define('PANELS_PID_SOLELY_OWNS_ROUTER', 1 << 6); // == 64
+define('PANELS_PID_SHARES_PATH', 1 << 6 | PANELS_IS_PANELS_ITEM | PANELS_PID_OWNS_PATH);
 
+define('PANELS_BAD_ARG_DATA', 1);
+define('PANELS_USE_FALLBACK_ROUTER', 1 << 1);
 
 /**
  * Implementation of hook_help().
@@ -152,82 +148,19 @@ function _panels_page_check_router_status($router, $pid) {
   if (array_search('panels_page_render_load', $router['load_functions'])) {
     $status |= PANELS_IS_PANELS_ROUTER;
     if (!empty($router['stored_loaders'])) {
-      $status |= PANELS_HAS_STORED_LOADER;
+      $status |= PANELS_HAS_STORED_ROUTER;
     }
     if ($pid == $router['pid']) {
       $status |= PANELS_PID_OWNS_ROUTER;
     }
     
     if ($status & PANELS_PID_OWNS_ROUTER) {
-      $status |= !empty($has_loaders) ? PANELS_HAS_STORED_LOADER : $status;
+      $status |= !empty($has_loaders) ? PANELS_HAS_STORED_ROUTER : $status;
       if (count($routers) == 1) {
         $status |= PANELS_PID_SOLELY_OWNS_ROUTER;
       }
     }
   }
-}
-
-function panels_page_get_router($path) {
-  static $routers = array();
-  if (!isset($routers[$path])) {
-    $routers[$path] = array();
-    // We left join because of cases like node/%/edit, where our loader catches
-    // a load with tail args that are intended for another router.
-    // TODO Again, this hardcodes one router per-path
-    $result = db_query_range("SELECT * FROM {menu_router} AS m LEFT JOIN {panels_page_router} AS p ON p.path = m.path WHERE m.path LIKE ('%s%%') ORDER BY m.fit DESC", $path, 0, 1);
-    while ($row = db_fetch_array($result)) {
-      $routers[$row['path']][] = $row;
-    }
-  }
-  return $routers[$path];
-}
-
-// TODO probably remove this, it's likely cruft.
-function panels_page_native_loader_path($panel_page) {
-  if (strpos('%', $panel_page->path) === FALSE) {
-    return $panel_page->path;
-  }
-  $map = explode('/', $panel_page->path);
-  reset($panel_page->arguments);
-  foreach ($map as $arg => $segment) {
-    if ($segment == '%') {
-      $argument = current($panel_page->arguments);
-      $map[$arg] = !empty($argument['loader']) ? '%' . $argument['loader'] : '%';
-      next($panel_page->arguments);
-    }
-  }
-  return implode('/', $map);
-}
-
-function panels_page_render_load($arg, $map, $index) {
-  $render_handler = new stdClass();
-  $path = implode('/', $map);
-  $status = panels_page_check_router_status($path);
-  // Panels doesn't own the router that's the best fit for this path. Bomb out
-  // and call that router, instead.
-  if ($status ^ PANELS_IS_PANELS_ROUTER == 2) {
-    return FALSE;
-    return panels_page_prepare_stored_router($status, $arg, $map, $index); // TODO this
-  }
-  
-  $args = $map;
-  $number_parts = count($map);
-}
-
-function panels_page_render_to_arg($arg, $map, $index) {
-  return $arg;
-}
-
-function panels_page_prepare_stored_router($status, $arg, $map, $index) {
-  
-}
-
-function panels_page_set_loader_data($array = NULL) {
-  static $render_handler;
-  if (!is_null($array)) {
-    $render_handler = $array;
-  }
-  return $render_handler;
 }
 
 /**
@@ -240,11 +173,41 @@ function panels_page_set_loader_data($array = NULL) {
  * @return unknown_type
  */
 function panels_page_get_loader_data($pid, $args) {
-  static $loader_data;
-  if (!empty($loader_data)) {
-    return $load_data;
+  static $handler_data = array();
+  if (!empty($handler_data)) {
+    return $handler_data;
   }
   $path = explode('/', $_GET['q']);
+  // TODO Multiple p-pages per path will necessitate more complex logic here
+  $router_meta = db_fetch_array(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
+  foreach ($router_meta as $key => $value) {
+    
+  }
+  $loader_data['meta'] =
+  
+  $load_objects = array();
+  // Wanted to defer this for as long as possible...
+  panels_load_include('plugins');
+  $panel_page = panels_page_load($pid, TRUE);
+  // for ($i = 0, $argument = reset($panel_page->arguments); !empty($argument); ++$i, $argument = next($panel_page->arguments)) {
+  // for (list($i, $argument) = each($panel_page->arguments); !empty($argument); list($i, $argument) = each($panel_page->arguments)) {
+  foreach ($panel_page->arguments as $id => $argument) {
+    // FIXME The directness of this association is questionable
+    $load_objects[$id] = array_shift($args);
+    $context = panels_argument_get_context($argument, $load_objects[$id]);
+    if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
+      $ignore = $argument['default'] == 'ignore';
+      if ($context & PANELS_USE_FALLBACK_ROUTER) {
+        
+      }
+      else if ($context & PANELS_BAD_ARG_DATA && $argument['default'] == 'ignore') {
+        continue;
+      }
+      // Bail out to 404 if we get this far.
+      drupal_not_found();
+    }
+    $panel_page->context[panels_argument_context_id($argument)] = $context;
+  }
   
 }
 
@@ -261,6 +224,8 @@ function panels_page_render_handler() {
 
 function panels_page_title_handler() {
   $args = func_get_args();
+  $pid = substr(array_shift($args), 4);
+  panels_page_get_loader_data($pid, $args);
   return 'dummy panels_page title';
 }
 
