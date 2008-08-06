@@ -101,69 +101,6 @@ function panels_page_menu_link_alter(&$item, &$menu) {
 }
 
 /**
- * Check for the existence a menu router at $path.
- *
- *
- * @param string $path
- * @return int $status
- *   A bitval indicating all the router relevant status flags, per the provided
- *   parameters.
- *
- * TODO This is turning into spaghetti. Reconceptualize and lay it out again.
- */
-function panels_page_check_router_status(&$path, $pid = NULL) {
-  $status = 0;
-  // Genericize the path.
-  $path = preg_replace('/%([a-z_]*)/', '1', $path);
-  // Get the highest-fit router for this path.
-  $router = panels_page_get_router($path);
-  if (empty($router)) { // Check for any routers at $path.
-    return $status;
-  }
-  else {
-    $status |= (PANELS_ROUTER_EXISTS | PANELS_IS_PANELS_ROUTER);
-  }
-  return $status;
-}
-
-function panels_page_check_pid_on_path($path, $pid) {
-  $status = panels_page_check_router_status($path);
-  
-  if (is_null($pid)) {
-    // If we're just checking a path, this is where we stop.
-    return $status;
-  }
-  // TODO array_search() is a crude tool; improve this.
-  // TODO this logic hard-codes the requirement of one override per path.
-  foreach ($panels_routers as $router) {
-  }
-  return $status;
-}
-
-function _panels_page_check_router_status($router, $pid) {
-  $status = 0;
-  if (array_search('panels_page_admin', $router['load_functions'])) {
-    $status |= PANELS_IS_ADMIN_ROUTER;
-  }
-  if (array_search('panels_page_render_load', $router['load_functions'])) {
-    $status |= PANELS_IS_PANELS_ROUTER;
-    if (!empty($router['stored_loaders'])) {
-      $status |= PANELS_HAS_FALLBACK_ROUTER;
-    }
-    if ($pid == $router['pid']) {
-      $status |= PANELS_PID_OWNS_ROUTER;
-    }
-    
-    if ($status & PANELS_PID_OWNS_ROUTER) {
-      $status |= !empty($has_loaders) ? PANELS_HAS_FALLBACK_ROUTER : $status;
-      if (count($routers) == 1) {
-        $status |= PANELS_PID_SOLELY_OWNS_ROUTER;
-      }
-    }
-  }
-}
-
-/**
  * Determine the appropriate render-time that panels_page should take.
  *
  * This function is basically the brains of the dynamic override system.
@@ -284,11 +221,6 @@ function _panels_page_check_switchers(&$panel_page) {
       }
     }
   }
-}
-
-function panels_page_access_handler() {
-  $args = func_get_args();
-  return TRUE;
 }
 
 function panels_page_render_handler() {
