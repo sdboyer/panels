@@ -230,8 +230,38 @@ function panels_page_set_loader_data($array = NULL) {
   return $render_handler;
 }
 
-function panels_page_get_loader_data() {
-  return panels_page_set_loader_data();
+/**
+ * Determine the appropriate render-time that panels_page should take.
+ *
+ * This function is basically the brains of the dynamic override system.
+ *
+ * @param $pid
+ * @param $args
+ * @return unknown_type
+ */
+function panels_page_get_loader_data($pid, $args) {
+  static $loader_data;
+  if (!empty($loader_data)) {
+    return $load_data;
+  }
+  $path = explode('/', $_GET['q']);
+  
+}
+
+function panels_page_access_handler() {
+  $args = func_get_args();
+  return TRUE;
+}
+
+function panels_page_render_handler() {
+  $args = func_get_args();
+  $pid = substr(array_shift($args), 4);
+  return node_view(node_load(1));
+}
+
+function panels_page_title_handler() {
+  $args = func_get_args();
+  return 'dummy panels_page title';
 }
 
 /**
@@ -708,15 +738,15 @@ function panels_page_load_all($names = array(), $page_size = 0) {
   }
 
   while ($page = db_fetch_object($result)) {
-    $page->access = ($page->access ? explode(', ', $page->access) : array());
-    $page->arguments = (!empty($page->arguments)) ? unserialize($page->arguments) : array();
-    $page->displays = (!empty($page->displays)) ? unserialize($page->displays) : array();
-    $page->contexts = (!empty($page->contexts)) ? unserialize($page->contexts) : array();
-    $page->relationships = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
+    $page->access           = ($page->access ? explode(', ', $page->access) : array());
+    $page->arguments        = (!empty($page->arguments)) ? unserialize($page->arguments) : array();
+    $page->displays         = (!empty($page->displays)) ? unserialize($page->displays) : array();
+    $page->contexts         = (!empty($page->contexts)) ? unserialize($page->contexts) : array();
+    $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
     $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
-
-    $page->type = t('Local');
-    $pages[$page->name] = panels_page_sanitize($page);
+    $page->type             = t('Local');
+    
+    $pages[$page->name]     = panels_page_sanitize($page);
   }
 
   $status = variable_get('panel_page_defaults', array());
@@ -763,11 +793,11 @@ function panels_page_load($pid, $load_display = FALSE) {
     return;
   }
 
-  $page->access = ($page->access ? explode(', ', $page->access) : array());
-  $page->arguments = (!empty($page->arguments)) ? unserialize($page->arguments) : array();
-  $page->displays = (!empty($page->displays)) ? unserialize($page->displays) : array();
-  $page->contexts = (!empty($page->contexts)) ? unserialize($page->contexts) : array();
-  $page->relationships = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
+  $page->access           = ($page->access ? explode(', ', $page->access) : array());
+  $page->arguments        = (!empty($page->arguments)) ? unserialize($page->arguments) : array();
+  $page->displays         = (!empty($page->displays)) ? unserialize($page->displays) : array();
+  $page->contexts         = (!empty($page->contexts)) ? unserialize($page->contexts) : array();
+  $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
   $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
 
   $cache[$pid] = panels_page_sanitize($page);
