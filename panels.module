@@ -1,6 +1,9 @@
 <?php
 // $Id$
 
+define('PANELS_BAD_ARG', 1);
+define('PANELS_USE_FALLBACK_ROUTER', 1 << 1);
+
 /**
  * Returns the API version of Panels. This didn't exist in 1.
  *
