@@ -48,7 +48,7 @@ function _panels_page_menu_alter(&$callbacks) {
     // Only save a router quickref if the item has metadata
     $raw_path = panels_page_get_raw_path($path);
     if (!empty($panels_items['metadata'][$raw_path])) {
-      $panels_items['metadata'][$raw_path]['stored_router'] = isset($matches[$path]) ? TRUE : FALSE;
+      $panels_items['metadata'][$raw_path]['meta'] |= isset($matches[$path]) ? PANELS_HAS_STORED_ROUTER : 0;
       $schema = panels_page_router_table_query_fields('panels_page_router_quickref');
       $f = $q = $v = array();
       foreach ($schema as $field => $placeholder) {
@@ -249,7 +249,7 @@ function panels_page_create_menu_structure() {
 function panels_page_construct_wildcard_menu_link(&$items, $panel_page, $map) {
   $type = _panels_page_menu_type($panel_page);
   $primary_wildcard = array_search('%', $map);
-  panels_page_construct_menu_item_metadata($items, $panel_page);
+  panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_PID_OWNS_PATH);
   
   
   // Construct the dynamic menu router item. If/when we get to multiple
@@ -286,7 +286,7 @@ function _panels_page_construct_wildcard_menu_link($panel_page, $page_arguments,
  */
 function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   $type = _panels_page_menu_type($panel_page);
-  panels_page_construct_menu_item_metadata($items, $panel_page, TRUE);
+  panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_IS_STATIC);
   
   $items['menu items'][$panel_page->path] = array(
     'title' => filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
@@ -301,13 +301,13 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   _panels_page_construct_parent_menu_item($items, $panel_page, $panel_page->path, $type);
 }
 
-function panels_page_construct_menu_item_metadata(&$items, $panel_page, $static = FALSE) {
+function panels_page_construct_menu_item_metadata(&$items, $panel_page, $meta) {
   $items['metadata'][$panel_page->path] = array(
     'pid'    => $panel_page->pid,
     'name'   => $panel_page->name,
-    'static' => $static,
     'type'   => _panels_page_menu_type($panel_page),
     'path'   => $panel_page->path,
+    'meta'   => $meta,
   );
 }
 
