@@ -297,11 +297,11 @@ function panels_page_schema_1() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'wildcards' => array(
-        'type' => 'varchar',
-        'length' => 32,
+      'meta' => array(
+        'type' => 'int',
+        'size' => 'normal',
         'not null' => TRUE,
-        'default' => '',
+        'default' => 0,
       ),
       'stored_router' => array(
         'type' => 'int',
