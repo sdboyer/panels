@@ -291,11 +291,11 @@ function panels_page_schema_1() {
         'not null' => TRUE,
         'default' => ''
       ),
-      'static' => array(
-        'type' => 'int',
-        'size' => 'tiny',
+      'wildcards' => array(
+        'type' => 'varchar',
+        'length' => 32,
         'not null' => TRUE,
-        'default' => 0,
+        'default' => '',
       ),
       'meta' => array(
         'type' => 'int',

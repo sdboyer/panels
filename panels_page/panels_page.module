@@ -114,15 +114,20 @@ function panels_page_get_loader_data($pid, $args) {
   if (!empty($loader_data)) {
     return $loader_data;
   }
-  $map = explode('/', $_GET['q']);
+  
   // TODO Multiple p-pages per path will necessitate more complex logic here
   $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
-  // $loader_data['meta'] = $quickref->meta;
+  $map = explode('/', $_GET['q']);
+  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, explode('-', $quickref->wildcards));
   
   $load_objects = array();
   // Wanted to defer this for as long as possible...
   panels_load_include('plugins');
-  $panel_page = panels_page_load($pid);
+  $panel_page = panels_page_load($pid, TRUE);
+  // TODO this may be premature. Check.
+  if (!panels_page_access($panel_page)) {
+    drupal_access_denied();
+  }
   // for ($i = 0, $argument = reset($panel_page->arguments); !empty($argument); ++$i, $argument = next($panel_page->arguments)) {
   // for (list($i, $argument) = each($panel_page->arguments); !empty($argument); list($i, $argument) = each($panel_page->arguments)) {
   foreach ($panel_page->arguments as $id => $argument) {
@@ -155,34 +160,48 @@ function panels_page_get_loader_data($pid, $args) {
     return $loader_data;
   }
   // We're now 100% certain we're proceeding with a p-page load.
-  panels_page_prepare_panels_render($loader_data, $quickref, $map, $panel_page);
+  panels_page_prepare_panels_render($loader_data, $panel_page);
   
 }
 
-function panels_page_prepare_panels_render(&$loader_data, $quickref, $map, $panel_page) {
+function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
+  foreach ($positions as $key => $position) {
+    $map[$position] = $load_objects[$key];
+  }
+}
+
+function panels_page_prepare_panels_render(&$loader_data, $panel_page) {
   panels_load_include('panels_page.render', 'panels_page/');
   
   _panels_page_check_switchers($panel_page);
   
-  $loader_data['page callback'] = 'panels_page_render_page';
-  $loader_data['page arguments'] = array($panel_page, FALSE);
+    // Store the instructions back in our loading handler.
+  $loader_data['panel page']      = $panel_page;
+  $loader_data['page callback']   = 'panels_page_render_page';
+  // Pass by ref to reduce static variable size & ensure php4/5 consistency.
+  $loader_data['page arguments']  = array(&$loader_data['panel page'], FALSE);
+  $loader_data['title callback']  = 'panels_page_get_title';
+  $loader_data['title arguments'] = array(&$loader_data['panel page']);
 }
 
 function panels_page_prepare_fallback_render(&$loader_data, $quickref, $map) {
+  // Lifted from menu_get_item().
   list($ancestors, $placeholders) = menu_get_ancestors(explode('/', $quickref->path));
   if ($router_item = db_fetch_array(db_query_range('SELECT * FROM {panels_page_menu_store} WHERE path IN ('. implode (',', $placeholders) .') ORDER BY fit DESC', $ancestors, 0, 1))) {
     // TODO Ideally we could skip some of this, much has already been loaded.
     $map = _menu_translate($router_item, $original_map);
-    if ($map === FALSE) {
-      $router_items[$path] = FALSE;
-      return FALSE;
-    }
     if ($router_item['access']) {
       $router_item['map'] = $map;
-      $router_item['page_arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
+      $loader_data['page arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
     }
   }
-  $load_data['router'] = $router_item;
+
+  $loader_data['page callback']   = $router_item['page callback'];
+  // $loader_data['router item']     = $router_item;
+  $loader_data['map']             = $map;
+  // $loader_data['title callback']  = '_menu_item_localize';
+  // $loader_data['title arguments'] = array($router_item, $map);
+  
 }
 
 function _panels_page_check_switchers(&$panel_page) {
@@ -223,18 +242,34 @@ function _panels_page_check_switchers(&$panel_page) {
   }
 }
 
+function panels_page_access_handler() {
+  return TRUE;
+}
+
 function panels_page_render_handler() {
   $args = func_get_args();
   $pid = substr(array_shift($args), 4);
-  return node_view(node_load(1));
+  $loader_data = panels_page_get_loader_data($pid, $args);
+  
+  return call_user_func_array($loader_data['page callback'], $loader_data['page arguments']);
+  // return node_view(node_load(1));
 }
 
 function panels_page_title_handler() {
   $args = func_get_args();
   $pid = substr(array_shift($args), 4);
-  panels_page_get_loader_data($pid, $args);
-  return 'dummy panels_page title';
+  $loader_data = panels_page_get_loader_data($pid, $args);
+  if ($loader_data['fallback'] === TRUE) {
+    return _menu_item_localize($loader_data['router item'], $loader_data['map']);
+  }
+  else {
+    return panels_page_get_title($loader_data['panel page']);
+  }
 }
+
+/* =======================================================================
+ * Look pa! it's an ugly, crufty, -devvy dividing line between new and old code!
+ */
 
 /**
  * Determine if the specified user has access to a panel.
