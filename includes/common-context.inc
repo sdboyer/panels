@@ -2,7 +2,7 @@
 // $Id$
 
 /**
- * @file
+ * @file includes/common-context.inc
  * Provide API for adding contexts for modules that embed displays.
  */
 
