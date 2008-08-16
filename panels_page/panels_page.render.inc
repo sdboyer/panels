@@ -13,6 +13,7 @@ function panels_page_render_page($panel_page, $admin) {
   // remove the admin flag.
   array_shift($args);
 
+  // TODO separate this out prior to this point using the logic handler
   $output = '';
   if ($admin) {
     // Display an admin form to make it easy to set up arguments.
@@ -20,7 +21,7 @@ function panels_page_render_page($panel_page, $admin) {
     $output .= drupal_get_form('panels_page_admin_view', $panel_page, $args);
   }
 
-  if (empty($panel_page->context)) {
+  if (empty($panel_page->context)) { // FIXME die
     $panel_page->context = array();
   }
 
@@ -50,14 +51,14 @@ function panels_page_render_page($panel_page, $admin) {
   // This is the first point at which it is safe to add items to the display
   // as the argument handling, above, may choose which display is actually
   // used.
-  $display->args     = $args;
-  $display->context  = $panel_page->context;
-  $display->keywords = $panel_page->keywords;
-  $display->css_id   = $panel_page->css_id;
-  $display->owner    = $panel_page;
+  $display->args      = $args;
+  $display->context   = $panel_page->context;
+  $display->keywords  = $panel_page->keywords;
+  $display->css_id    = $panel_page->css_id;
+  $display->owner     = $panel_page;
   // unique id of this display's owner.
   $display->owner->id = $panel_page->name;
-  $display->type = 'panel_page';
+  $display->type      = 'panel_page';
 
   // Set this as 'current' so that other stuff can utilize it.
   panels_page_get_current($panel_page);
@@ -76,8 +77,14 @@ function panels_page_render_page($panel_page, $admin) {
   }
 
   if ($panel_page->css) {
-    drupal_set_html_head("<style type=\"text/css\" media=\"all\">" . filter_xss_admin($panel_page->css) . "</style>\n");
+    panels_load_include('panels_page.css_filter', 'panels_page/');
+    $css = panels_page_filter_css(panels_page_disassemble_css($panel_page->css));
+    // If the custom css didn't survive filtering, don't bother adding it.
+    if (!empty($css)) {
+      drupal_set_html_head("<style type=\"text/css\" media=\"all\">" . panels_page_compress_css($css) . "</style>\n");
+    }
   }
+
   if ($panel_page->no_blocks) {
     print theme('page', $output, FALSE);
   }
