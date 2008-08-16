@@ -95,7 +95,7 @@ function panels_page_menu_alter(&$callbacks) {
 }
 
 function panels_page_menu_link_alter(&$item, &$menu) {
-  
+
 }
 
 /**
@@ -112,12 +112,12 @@ function panels_page_get_loader_data($pid, $args) {
   if (!empty($loader_data)) {
     return $loader_data;
   }
-  
+
   // TODO Multiple p-pages per path will necessitate more complex logic here
   $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
   $map = explode('/', $_GET['q']);
   $map = array_map('_panels_page_rebuild_menu_map', $map, $args, explode('-', $quickref->wildcards));
-  
+
   $load_objects = array();
   // Wanted to defer this for as long as possible...
   panels_load_include('plugins');
@@ -159,7 +159,7 @@ function panels_page_get_loader_data($pid, $args) {
   }
   // We're now 100% certain we're proceeding with a p-page load.
   panels_page_prepare_panels_render($loader_data, $panel_page);
-  
+
 }
 
 function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
@@ -170,9 +170,9 @@ function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
 
 function panels_page_prepare_panels_render(&$loader_data, $panel_page) {
   panels_load_include('panels_page.render', 'panels_page/');
-  
+
   _panels_page_check_switchers($panel_page);
-  
+
     // Store the instructions back in our loading handler.
   $loader_data['panel page']      = $panel_page;
   $loader_data['page callback']   = 'panels_page_render_page';
@@ -199,7 +199,7 @@ function panels_page_prepare_fallback_render(&$loader_data, $quickref, $map) {
   $loader_data['map']             = $map;
   // $loader_data['title callback']  = '_menu_item_localize';
   // $loader_data['title arguments'] = array($router_item, $map);
-  
+
 }
 
 function _panels_page_check_switchers(&$panel_page) {
@@ -248,7 +248,7 @@ function panels_page_render_handler() {
   $args = func_get_args();
   $pid = substr(array_shift($args), 4);
   $loader_data = panels_page_get_loader_data($pid, $args);
-  
+
   return call_user_func_array($loader_data['page callback'], $loader_data['page arguments']);
   // return node_view(node_load(1));
 }
@@ -631,11 +631,12 @@ function panels_page_fetch_display(&$panel_page, $id = NULL) {
   }
   else {
     // Otherwise, fetch from our alternative displays.
-    $panel_page->display = $display = _panels_page_fetch_display($panel_page, $id);
+    $panel_page->display = _panels_page_fetch_display($panel_page, $id);
+    $display =& $panel_page->display;
   }
 
   $display->owner = $panel_page;
-  $display->owner->id = $name;
+  $display->owner->id = $panel_page->name;
   return $display;
 }
 
@@ -651,23 +652,23 @@ function _panels_page_fetch_display(&$panel_page, $id) {
   // At this point the display does not yet exist, which means we need to
   // create one and save the panel page to reflect this.
   if (!empty($info['default'])) {
-    $display = _panels_fetch_display_from_info($panel_page->displays[$info['default']]);
-    if (empty($display)) {
-      // Use the default display.
-      if (empty($panel_page->display)) {
-        // Load it if not already loaded
-        $panel_page->display = $display = panels_load_display($panel_page->did);
-      }
-      else {
-        // Otherwise, use the loaded display
-        $display = $panel_page->display;
-      }
+    // If there's a default for the context we're switching on, use that.
+    if (!empty($panel_page->displays[$info['default']])) {
+      $for_export = _panels_fetch_display_from_info($info);
+    }
+    // Otherwise, use the default display. Load it if it's not already loaded.
+    else if (empty($panel_page->display)) {
+      $panel_page->display = $for_export = panels_load_display($panel_page->did);
+    }
+    // If the default display isn't already loaded, then load it.
+    else {
+      $for_export = $panel_page->display;
     }
   }
 
   // Make a copy of the display; using the export forces all the IDs properly,
   // since we don't want this to actually *be* the original display.
-  $code = panels_export_display($display);
+  $code = panels_export_display($for_export);
   eval($code);
 
   return $display;
@@ -750,7 +751,7 @@ function panels_page_load_all($names = array(), $page_size = 0) {
     $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
     $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
     $page->type             = t('Local');
-    
+
     $pages[$page->name]     = panels_page_sanitize($page);
   }
 
@@ -779,6 +780,9 @@ function panels_page_load($pid, $load_display = FALSE) {
   static $cache = array();
 
   if (array_key_exists($pid, $cache)) {
+    if ($load_display && empty($cache[$pid]->display)) {
+      $cache[$pid]->display = panels_load_display($cache[$pid]->did);
+    }
     return $cache[$pid];
   }
 
@@ -951,13 +955,22 @@ function panels_page_export($panel_page, $prefix = '') {
   $fields = panels_page_fields();
   $output .= $prefix . '$page = new stdClass()' . ";\n";
   $output .= $prefix . '$page->pid = \'new\'' . ";\n";
-  foreach ($fields as $field => $q) {
-    if ($field == 'displays') {
+  foreach (array_keys($fields) as $field) {
+    if (!isset($panel_page->$field) || in_array($field, array('displays', 'contexts', 'display'))) {
       continue;
     }
-
     $output .= $prefix . '  $page->' . $field . ' = ' . panels_var_export($panel_page->$field, '  ') . ";\n";
   }
+  // Export the contexts.
+  $output .= $prefix . '$page->contexts = array()' . ";\n";
+  foreach ($panel_page->contexts as $id => $info) {
+    $output .= $prefix . '  $page->contexts[\'' . $id . "'] = array(\n";
+    foreach ($info as $key => $value) {
+      $output .= $prefix . "    '$key' => " . panels_var_export($value, '    ') . ";\n";
+    }
+    $output .= $prefix . "  );\n";
+  }
+
   // Export the primary display
   $display = !empty($panel_page->display) ? $panel_page->display : panels_load_display($panel_page->did);
   $output .= panels_export_display($display, $prefix);
@@ -977,6 +990,8 @@ function panels_page_export($panel_page, $prefix = '') {
 
 /**
  * Get all 'default' panels.
+ *
+ * @ingroup HookInvokers
  */
 function panels_page_default_panels() {
   $panels = module_invoke_all('default_panel_pages');
