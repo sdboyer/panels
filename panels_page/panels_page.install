@@ -43,6 +43,12 @@ function panels_page_schema_1() {
         'type' => 'varchar',
         'length' => 128,
       ),
+      'flags' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'css_id' => array(
         'type' => 'varchar',
         'length' => 128,
@@ -272,7 +278,7 @@ function panels_page_schema_1() {
     'primary key' => array('path'),
     );
 
-  $schema['panels_page_router_quickref'] = array(
+/*  $schema['panels_page_router_quickref'] = array(
     'fields' => array(
       'pid' => array(
         'type' => 'int',
@@ -291,12 +297,12 @@ function panels_page_schema_1() {
         'not null' => TRUE,
         'default' => ''
       ),
-/*      'wildcards' => array(
+      'wildcards' => array(
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
         'default' => '',
-      ),*/
+      ),
       'flags' => array(
         'type' => 'int',
         'size' => 'normal',
@@ -311,7 +317,7 @@ function panels_page_schema_1() {
       // TODO indexing wildcards may be superfluous
       'wildcards_idx' => array('wildcards'),
     ),
-  );
+  );*/
   return $schema;
 }
 
