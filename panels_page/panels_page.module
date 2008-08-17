@@ -112,7 +112,7 @@ function panels_page_menu_alter(&$callbacks) {
  */
 function panels_page_admin_load($name, $map = NULL) {
   panels_load_include('plugins');
-  $panel_page = panels_page_load($name);
+  $panel_page = panels_page_load($name, TRUE);
   return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
 }
 
@@ -126,6 +126,7 @@ function panels_page_admin_load($name, $map = NULL) {
  * @return array $loader_data
  */
 function panels_page_get_loader_data($pid, $args) {
+  // TODO Multiple p-pages per path will necessitate more complex logic here
   static $loader_data = array();
   if (!empty($loader_data)) {
     return $loader_data;
@@ -133,21 +134,14 @@ function panels_page_get_loader_data($pid, $args) {
   // Start off by assuming that we won't fall back.
   $loader_data['fallback'] = FALSE;
 
-  // TODO Multiple p-pages per path will necessitate more complex logic here
-  // FIXME quickref should be entirely absorbed into the panels_page table itself.
-  $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
-  $quickref->wildcards = array_keys(explode('/', $quickref->path), '%');
-
-  $load_objects = array();
-  // Wanted to defer this for as long as possible...
   panels_load_include('plugins');
   // TODO check; we shouldn't have to load the display this early.
   $panel_page = panels_page_load($pid, TRUE);
-  $panel_page->loader_flags = $quickref->loader_flags;
   $loader_data['access'] = panels_page_access($panel_page);
   $map = explode('/', $_GET['q']);
-  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, $quickref->wildcards);
+  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, array_keys(explode('/', $panel_page->path), '%'));
 
+  $load_objects = array();
   foreach ($panel_page->arguments as $id => $argument) {
     $ignore = $argument['default'] == 'ignore';
     // FIXME The directness of this association is questionable
@@ -155,7 +149,7 @@ function panels_page_get_loader_data($pid, $args) {
     $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_BAD_ARG;
     if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
       if ($context & PANELS_USE_FALLBACK_ROUTER) {
-        if ($quickref->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
+        if ($panel_page->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
           $loader_data['fallback'] = TRUE;
           panels_page_prepare_fallback_render($loader_data, $quickref, $map);
           break;
@@ -191,6 +185,20 @@ function panels_page_get_loader_data($pid, $args) {
   return $loader_data;
 }
 
+/**
+ * Callback for array_map() that rebuilds the menu $map using data passed in to
+ * the panels callback handlers from the menu system.
+ *
+ * @param array $map
+ *   A incomplete menu map - it has only $_GET['q'] data initially - that this
+ *   callback will rebuild.
+ * @param array $load_objects
+ *   The set of menu-loader-returned objects provided by the menu system to the
+ *   panels callback handlers.
+ * @param array $positions
+ *   The positions within the path map (i.e., arg(0), arg(1), etc...) that the
+ *   loader objects correspond to.
+ */
 function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
   foreach ($positions as $key => $position) {
     $map[$position] = $load_objects[$key];
@@ -222,6 +230,7 @@ function panels_page_access_handler() {
 
 function panels_page_render_handler() {
   $args = func_get_args();
+  // Get the pid, which is passed in with a prepended string.
   $pid = substr(array_shift($args), 4);
   $loader_data = panels_page_get_loader_data($pid, $args);
 
@@ -231,6 +240,7 @@ function panels_page_render_handler() {
 
 function panels_page_title_handler() {
   $args = func_get_args();
+  // Get the pid, which is passed in with a prepended string.
   $pid = substr(array_shift($args), 4);
   $loader_data = panels_page_get_loader_data($pid, $args);
   if ($loader_data['fallback'] === TRUE) {
