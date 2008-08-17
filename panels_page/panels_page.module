@@ -130,6 +130,7 @@ function panels_page_get_loader_data($pid, $args) {
   }
   // Start off by assuming that we won't fall back.
   $load_data['fallback'] = FALSE;
+  $access = panels_page_access($panel_page);
 
   // TODO Multiple p-pages per path will necessitate more complex logic here
   $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
@@ -178,7 +179,7 @@ function panels_page_get_loader_data($pid, $args) {
   // We're now 100% certain we're proceeding with a panel_page load, so first
   // check the panels_page native access function. If that passes, then include
   // the render inc file and proceed there.
-  if (empty(panels_page_access($panel_page))) {
+  if (empty($access)) {
     drupal_access_denied();
   }
   panels_page_load_include('render');
