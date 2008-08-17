@@ -11,24 +11,13 @@
 function panels_page_admin_static_menu_items() {
   $items = array();
   $admin = array(
-    // FIXME is 'create panel-pages' still the best name for this perm?
+    // TODO is 'create panel-pages' still the best name for this perm?
     // TODO we'll need to granulate this perm significantly in panels3.
     'access arguments' => array('create panel-pages'),
     'file' => 'panels_page.admin.inc',
     'type' => MENU_LOCAL_TASK,
-    //'module' => 'panels_page',
   );
 
-  // TODO can i do it this way and have all the funcs in scope? check later
-  $ajax = array(
-    'access callback' => TRUE,
-    'file' => 'panels_page.ajax.inc',
-    'page callback' => 'panels_page_ajax_passthru',
-    'type' => MENU_CALLBACK,
-    //'module' => 'panels_page',
-  );
-
-  // General callbacks not specific to any panels_page
   $items['admin/panels/panel-page'] = array(
     'title' => 'Panels Pages',
     'page callback' => 'panels_page_list_page',
@@ -54,35 +43,11 @@ function panels_page_admin_static_menu_items() {
     'page callback' => 'panels_page_import_page',
     'weight' => 5,
   ) + $admin;
-
-  // Callbacks for the editing of specific panels_pages
-
-  // Ajax callback responders
-  $items['panels/argument/ajax/add'] = array(
-    'page arguments' => array('panels_page_ajax_argument_add'),
-  ) + $ajax;
-  $items['panels/argument/ajax/edit'] = array(
-    'page arguments' => array('panels_page_ajax_argument_edit'),
-  ) + $ajax;
-
-  $items['panels/relationship/ajax/add'] = array(
-    'page arguments' => array('panels_page_ajax_relationship_add'),
-  ) + $ajax;
-  $items['panels/relationship/ajax/edit'] = array(
-    'page arguments' => array('panels_page_ajax_relationship_edit'),
-  ) + $ajax;
-
-  $items['panels/context/ajax/add'] = array(
-    'page arguments' => array('panels_page_ajax_context_add'),
-  ) + $ajax;
-  $items['panels/context/ajax/edit'] = array(
-    'page arguments' => array('panels_page_ajax_context_edit'),
-  ) + $ajax;
   return $items;
 }
 
 function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = NULL) {
-  // TODO path prefix may be superfluous
+  // TODO allowing a dynamic path prefix may be superfluous
   if (is_null($path_prefix)) {
     $path_prefix = 'admin/panels/panel-page/';
   }
