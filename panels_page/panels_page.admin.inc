@@ -42,19 +42,19 @@ function panels_page_list_page() {
   foreach ($panel_pages as $panel_page) {
     $ops = array();
     if (empty($panel_page->disabled)) {
-      $ops[] = l(t('Edit'), "admin/panels/panel-page/edit/$panel_page->name/settings");
-      $ops[] = l(t('Export'), "admin/panels/panel-page/export/$panel_page->name");
+      $ops[] = l(t('Edit'), "admin/panels/panel-page/{$panel_page->name}/edit");
+      $ops[] = l(t('Export'), "admin/panels/panel-page/{$panel_page->name}/edit/export");
     }
     if ($panel_page->type != t('Default')) {
       $text = $panel_page->type == t('Overridden') ? t('Revert') : t('Delete');
-      $ops[] = l($text, "admin/panels/panel-page/delete/$panel_page->name");
+      $ops[] = l($text, "admin/panels/panel-page/delete/{$panel_page->name}");
     }
     else {
       if (empty($panel_page->disabled)) {
-        $ops[] = l(t('Disable'), "admin/panels/panel-page/disable/$panel_page->name", NULL, drupal_get_destination());
+        $ops[] = l(t('Disable'), "admin/panels/panel-page/disable/{$panel_page->name}", NULL, drupal_get_destination());
       }
       else {
-        $ops[] = l(t('Enable'), "admin/panels/panel-page/enable/$panel_page->name", NULL, drupal_get_destination());
+        $ops[] = l(t('Enable'), "admin/panels/panel-page/enable/{$panel_page->name}", NULL, drupal_get_destination());
       }
     }
 
@@ -398,9 +398,9 @@ function panels_page_edit_form_submit($form_id, $form_values) {
     $layout = panels_get_layout($panel_page->display->layout);
 
     if ($layout['settings form']) {
-      return "admin/panels/panel-page/edit/$panel_page->name/settings/next";
+      return "admin/panels/panel-page/{$panel_page->name}/edit/settings/next";
     }
-    return "admin/panels/panel-page/edit/$panel_page->name/advanced/next";
+    return "admin/panels/panel-page/{$panel_page->name}/edit/advanced/next";
   }
   else {
     drupal_set_message(t('Your changes have been saved.'));
@@ -571,23 +571,23 @@ function panels_page_advanced_form($panel_page, $next = NULL) {
 function panels_page_advanced_form_submit($form_id, $form_values) {
   $panel_page = $form_values['panel_page'];
 
-  $panel_page->css = $form_values['css'];
-  $panel_page->no_blocks = $form_values['no_blocks'];
-  $panel_page->menu = $form_values['menu'];
-  $panel_page->menu_tab = $form_values['menu_tab'];
-  $panel_page->menu_tab_weight = $form_values['menu_tab_weight'];
-  $panel_page->menu_title = $form_values['menu_title'];
-  $panel_page->menu_tab_default = $form_values['menu_tab_default'];
+  $panel_page->css                          = $form_values['css'];
+  $panel_page->no_blocks                    = $form_values['no_blocks'];
+  $panel_page->menu                         = $form_values['menu'];
+  $panel_page->menu_tab                     = $form_values['menu_tab'];
+  $panel_page->menu_tab_weight              = $form_values['menu_tab_weight'];
+  $panel_page->menu_title                   = $form_values['menu_title'];
+  $panel_page->menu_tab_default             = $form_values['menu_tab_default'];
   $panel_page->menu_tab_default_parent_type = $form_values['menu_tab_default_parent_type'];
-  $panel_page->menu_parent_title = $form_values['menu_parent_title'];
-  $panel_page->menu_parent_tab_weight = $form_values['menu_parent_tab_weight'];
+  $panel_page->menu_parent_title            = $form_values['menu_parent_title'];
+  $panel_page->menu_parent_tab_weight       = $form_values['menu_parent_tab_weight'];
 
   $panel_page->access = array_keys(array_filter($form_values['access']));
 
   drupal_set_message(t('Your changes have been saved.'));
   panels_page_save($panel_page);
   if ($form_values['submit'] == t('Save and proceed')) {
-    return "admin/panels/panel-page/edit/$panel_page->name/context/next";
+    return "admin/panels/panel-page/{$panel_page->name}/edit/context/next";
   }
 }
 
@@ -699,7 +699,7 @@ function panels_page_context_form_submit($form_id, $form_values) {
   panels_page_save($panel_page);
   panels_cache_clear('panel_object:panel_page', $panel_page->name);
   if ($form_values['submit'] == t('Save and proceed')) {
-    return "admin/panels/panel-page/edit/$panel_page->name/content";
+    return "admin/panels/panel-page/{$panel_page->name}/edit/content";
   }
 }
 
@@ -721,7 +721,7 @@ function panels_page_edit_layout($panel_page, $did = NULL) {
     // If this is a default page, and was saved, we have to make it real.
     panels_page_set_display($panel_page, $did, $output);
 
-    $dest = "admin/panels/panel-page/edit/$panel_page->name/layout";
+    $dest = "admin/panels/panel-page/edit/{$panel_page->name}/layout";
     if ($did) {
       $dest .= "/$did";
     }
@@ -744,14 +744,14 @@ function panels_page_edit_layout_settings($panel_page, $did = NULL, $next = NULL
 
   if (empty($next)) {
     $button = t('Save');
-    $dest = "admin/panels/panel-page/edit/$panel_page->name/settings";
+    $dest = "admin/panels/panel-page/{$panel_page->name}/edit/settings";
     if ($did) {
       $dest .= "/$did";
     }
   }
   else {
     $button = t('Save and proceed');
-    $dest = "admin/panels/panel-page/edit/$panel_page->name/advanced/next";
+    $dest = "admin/panels/panel-page/{$panel_page->name}/edit/advanced/next";
   }
 
   // The following form will return the $display upon successful submit, if
@@ -792,7 +792,7 @@ function panels_page_edit_content($panel_page, $did = NULL) {
     panels_page_set_display($panel_page, $did, $output);
 
     // And do the drupal_goto that a submit function ordinarily would have.
-    $dest = "admin/panels/panel-page/edit/$panel_page->name/content";
+    $dest = "admin/panels/panel-page/{$panel_page->name}/edit/content";
     if ($did) {
       $dest .= "/$did";
     }
@@ -967,7 +967,7 @@ function panels_page_admin_view($panel_page, $args) {
 
 function panels_page_admin_view_submit($form_id, $form_values) {
   $count = 0;
-  $url = "admin/panels/panel-page/preview" . $form_values['panel_page']->name;
+  $url = "admin/panels/panel-page/" . $form_values['panel_page']->name . '/edit/preview';
   foreach ($form_values['contexts'] as $context) {
     $url .= "/" . $form_values["arg$count"];
     $count++;

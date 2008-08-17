@@ -59,13 +59,13 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
     'module' => 'panels_page',
   );
 
-  $items[$path_prefix . 'edit/%panels_page_admin'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit'] = array(
     'title' => 'Settings',
     'page callback' => 'panels_page_edit',
     'weight' => -10,
     'type' => MENU_CALLBACK,
   ) + $admin;
-  $items[$path_prefix . 'edit/%panels_page_admin/settings'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/settings'] = array(
     'title' => 'Settings',
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -87,40 +87,40 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
     'weight' => -8,
   );
 */
-  $items[$path_prefix . 'edit/%panels_page_admin/advanced'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/advanced'] = array(
     'title' => 'Advanced',
     'page callback' => 'panels_page_edit_advanced',
     'weight' => -8,
   ) + $admin;
-  $items[$path_prefix . 'edit/%panels_page_admin/context'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/context'] = array(
     'title' => 'Context',
     'page callback' => 'panels_page_edit_context',
     'weight' => -6,
   ) + $admin;
-  $items[$path_prefix . 'edit/%panels_page_admin/layout'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/layout'] = array(
     'title' => 'Layout',
     'page callback' => 'panels_page_edit_layout_settings',
     'load arguments' => array('%map'),
     'weight' => -4,
   ) + $admin;
-  $items[$path_prefix . 'edit/%panels_page_admin/layout-settings'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/layout-settings'] = array(
     'title' => 'Layout settings',
     'page callback' => 'panels_page_edit_layout_settings',
     'load arguments' => array('%map'),
     'weight' => -2,
   ) + $admin;
-  $items[$path_prefix . 'edit/%panels_page_admin/content'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/content'] = array(
     'title' => 'Content',
     'page callback' => 'panels_page_edit_content',
     'load arguments' => array('%map'),
     'weight' => 0,
   ) + $admin;
-  $items[$path_prefix . 'edit/%panels_page_admin/preview'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/preview'] = array(
     'title' => 'Preview',
     'page callback' => 'panels_page_preview_page',
     'weight' => 2,
   ) + $admin;
-  $items[$path_prefix . 'edit/%panels_page_admin/export'] = array(
+  $items[$path_prefix . '%panels_page_admin/edit/export'] = array(
     'title' => 'Export',
     'page callback' => 'panels_page_edit_export',
     'weight' => 4,
