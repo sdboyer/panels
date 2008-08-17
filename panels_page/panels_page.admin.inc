@@ -118,7 +118,7 @@ function panels_page_settings() {
 }
 
 /**
- * Enable a default panel.
+ * Enable a default panel_page.
  */
 function panels_page_enable_page($name = NULL) {
   $defaults = panels_page_default_panels();
@@ -133,7 +133,7 @@ function panels_page_enable_page($name = NULL) {
 }
 
 /**
- * Disable a default panel.
+ * Disable a default panel_page.
  */
 function panels_page_disable_page($name = NULL) {
   $defaults = panels_page_default_panels();
@@ -151,9 +151,6 @@ function panels_page_disable_page($name = NULL) {
  * Provide a form to confirm deletion of a panel page.
  */
 function panels_page_delete_confirm($panel_page) {
-  if (!is_object($panel_page)) {
-    $panel_page = panels_page_load($panel_page);
-  }
   $form['pid'] = array('#type' => 'value', '#value' => $panel_page->pid);
   $form['did'] = array('#type' => 'value', '#value' => $panel_page->did);
   if ($panel_page->type != t('Overridden')) {
@@ -345,35 +342,31 @@ function panels_page_edit_form($panel_page, $next = NULL) {
  * Validate a panel page edit form.
  */
 function panels_page_edit_form_validate($form_id, $form_values, $form) {
-  // Test uniqueness of name:
+  // Validate the system name; check for its presence, pass it through a preg
+  // filter for allowed characters, and test for uniqueness.
   if (!$form_values['name']) {
     form_error($form['left']['info']['name'], t('Panel name is required.'));
   }
   else if (preg_match("/[^A-Za-z0-9_]/", $form_values['name'])) {
-    form_error($form['left']['info']['name'], t('Name must be alphanumeric or underscores only.'));
+    form_error($form['left']['info']['name'], t('Panel name must be alphanumeric or underscores only.'));
   }
   else {
-    $query = "SELECT pid FROM {panels_page} WHERE name = '%s'";
-    if (!empty($form_values['pid']) && is_numeric($form_values['pid'])) {
-      $query .= " AND pid != $form_values[pid]";
-    }
-    if (db_result(db_query($query, $form_values['name']))) {
+    if (db_result(db_query("SELECT pid FROM {panels_page} WHERE name = '%s' AND pid <> %d", $form_values['name'], $form_values['pid']))) {
       form_error($form['left']['info']['name'], t('Panel name must be unique.'));
     }
   }
 
+  // Validate the path; check for its presence, uniqueness within panels_page,
+  // and uniqueness with respect to path aliases.
   if (!$form_values['path']) {
     form_error($form['left']['info']['path'], t('Path is required.'));
   }
   else {
-    $result = db_result(db_query("SELECT pid FROM {panels_page} WHERE path = '%s' AND pid <> %d", $form_values['path'], $form_values['pid']));
-    if ($result) {
-      form_error($form['left']['info']['path'], t('Path may not be the same as another panel page path.'));
+    if (db_result(db_query("SELECT name FROM {panels_page} WHERE path = '%s' AND pid <> %d", $form_values['path'], $form_values['pid']))) {
+      form_error($form['left']['info']['path'], t("'Path' must be unique among Panels Page paths. The path '@path' is currently in owned by '@name'.",
+        array('@path' => $form_values['path'], '@name' => $result)));
     }
-
-    // validate against aliases
-    $result = db_result(db_query("SELECT src FROM {url_alias} WHERE dst = '%s'", $form_values['path']));
-    if ($result) {
+    if (db_result(db_query("SELECT src FROM {url_alias} WHERE dst = '%s'", $form_values['path']))) {
       form_error($form['left']['info']['path'], t('The path you have chosen is already aliased to @src.', array('@src' => $result)));
     }
   }
