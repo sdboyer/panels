@@ -2,9 +2,61 @@
 // $Id$
 
 /**
- * @file
+ * @file panels_page.render.inc
+ *  Functions utilized during the panels_page render process. On any given page
+ *  request, this file is lazy-loaded by panels_page itself only once it's been
+ *  absolutely verified that we'll need it.
  */
 
+function panels_page_prepare_panels_render(&$loader_data, $panel_page) {
+  _panels_page_check_switchers($panel_page);
+
+    // Store the instructions back in our loading handler.
+  $loader_data['panel page']      = $panel_page;
+  $loader_data['page callback']   = 'panels_page_render_page';
+  // Pass by ref to reduce static variable size & ensure php4/5 consistency.
+  $loader_data['page arguments']  = array(&$loader_data['panel page'], FALSE);
+  $loader_data['title callback']  = 'panels_page_get_title';
+  $loader_data['title arguments'] = array(&$loader_data['panel page']);
+}
+
+function _panels_page_check_switchers(&$panel_page) {
+  $switchers = panels_get_switchers();
+  if ($switchers) {
+    $candidates = $list = array();
+    $result = db_query("SELECT name FROM {panels_page} WHERE switcher_name = '%s'", $panel_page->name);
+    // get a list of all pages that might switch for this one
+    while ($candidate = db_fetch_object($result)) {
+      $list[] = $candidate->name;
+    }
+    // Add default panels that apply to the list as well
+    foreach (panels_page_default_panels() as $page) {
+      if ($page->switcher_name == $panel_page->name) {
+        $candidates[$page->name] = $page;
+      }
+    }
+
+    if ($list) {
+      $candidates += (count($list) > 1) ? panels_page_load_all($list) : array(panels_page_load($list[0]));
+    }
+
+    if ($candidates) {
+      // separate them based on switcher type
+      $pages = array();
+      foreach ($candidates as $candidate) {
+        $pages[$candidate->switcher_type][$candidate->name] = $candidate;
+      }
+
+      // go through switcher types and switch the first one that matches.
+      foreach ($pages as $plugin => $candidates) {
+        if ($page = panels_switcher_switch($plugin, 'panel_page', $panel_page->name, $candidates)) {
+          $panel_page = $page;
+          break;
+        }
+      }
+    }
+  }
+}
 
 function panels_page_render_page($panel_page, $admin) {
   $args = func_get_args();
@@ -92,3 +144,4 @@ function panels_page_render_page($panel_page, $admin) {
     return $output;
   }
 }
+
