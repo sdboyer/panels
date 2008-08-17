@@ -315,7 +315,7 @@ function _panels_page_get_title($panel_page, $op, $default_title) {
   }
 
   // Fall back on the panel default title
-  if ($panel_page->title) {
+  if (!empty($panel_page->title)) {
     return $panel_page->title;
   }
 
@@ -629,11 +629,16 @@ function panels_page_load($pid, $load_display = FALSE) {
   $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
   $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
 
-  $cache[$pid] = panels_page_sanitize($page);
-
   if ($load_display) {
-    $cache[$pid]->display = panels_load_display($cache[$pid]->did);
+    $page->display = panels_load_display($page->did);
   }
+
+  $cache[$pid] = panels_page_sanitize($page);
+  // Make sure that we've statically cached the loaded page for both possible
+  // unique identifiers - $page->pid AND $page->name.
+  $other_id = is_numeric($pid) || $pid == 'new' ? $page->name : $page->pid;
+  $cache[$other_id] =& $cache[$pid];
+
 
   return $cache[$pid];
 }
