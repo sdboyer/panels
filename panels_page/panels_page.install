@@ -271,7 +271,7 @@ function panels_page_schema_1() {
       ),
     'primary key' => array('path'),
     );
-  
+
   $schema['panels_page_router_quickref'] = array(
     'fields' => array(
       'pid' => array(
@@ -291,21 +291,15 @@ function panels_page_schema_1() {
         'not null' => TRUE,
         'default' => ''
       ),
-      'wildcards' => array(
+/*      'wildcards' => array(
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
         'default' => '',
-      ),
-      'meta' => array(
+      ),*/
+      'flags' => array(
         'type' => 'int',
         'size' => 'normal',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'stored_router' => array(
-        'type' => 'int',
-        'size' => 'tiny',
         'not null' => TRUE,
         'default' => 0,
       ),
