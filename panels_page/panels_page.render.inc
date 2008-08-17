@@ -105,6 +105,8 @@ function panels_page_render_page_normal($panel_page, $args) {
 */
   _panels_page_prepare_display($panel_page, $args);
   $output = panels_render_display($display);
+  panels_page_custom_css($panel_page);
+
   // FIXME I believe this method no longer works.
   if ($panel_page->no_blocks) {
     print theme('page', $output, FALSE);
@@ -121,6 +123,15 @@ function panels_page_render_page_form($panel_page, $args) {
   $form->form['#theme'] = 'panels_page_render_form';
   $form->form['#display'] = $panel_page->display;
   $output = drupal_render_form($form->form_id, $form->form);
+  panels_page_custom_css($panel_page);
+
+  // FIXME I believe this method no longer works.
+  if ($panel_page->no_blocks) {
+    print theme('page', $output, FALSE);
+  }
+  else {
+    return $output;
+  }
 }
 
 function panels_page_custom_css($panel_page) {
