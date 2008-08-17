@@ -9,16 +9,6 @@
  */
 
 /**
- * Menu loader for the panels admin screens. Loads the panels_page specified by
- * the name arg, or 404s out if a bad value has been provided.
- */
-function panels_page_admin_load($name) {
-  panels_load_include('plugins');
-  $panel_page = panels_page_load($name);
-  return $panel_page->pid ? $panel_page : FALSE;
-}
-
-/**
  * Provide a list of panels, with links to edit or delete them.
  *
  * TODO Since we've already got the views dependency, should we just do this as
@@ -52,12 +42,12 @@ function panels_page_list_page() {
   foreach ($panel_pages as $panel_page) {
     $ops = array();
     if (empty($panel_page->disabled)) {
-      $ops[] = l(t('Edit'), "admin/panels/panel-page/$panel_page->name/edit/general");
-      $ops[] = l(t('Export'), "admin/panels/panel-page/$panel_page->name/export");
+      $ops[] = l(t('Edit'), "admin/panels/panel-page/edit/$panel_page->name/settings");
+      $ops[] = l(t('Export'), "admin/panels/panel-page/export/$panel_page->name");
     }
     if ($panel_page->type != t('Default')) {
       $text = $panel_page->type == t('Overridden') ? t('Revert') : t('Delete');
-      $ops[] = l($text, "admin/panels/panel-page/$panel_page->name/delete");
+      $ops[] = l($text, "admin/panels/panel-page/delete/$panel_page->name");
     }
     else {
       if (empty($panel_page->disabled)) {
@@ -117,6 +107,14 @@ function panels_page_list_page() {
 
   $output = theme('table', $header, $i);
   return $output;
+}
+
+/**
+ * Settings for panel pages.
+ */
+function panels_page_settings() {
+  panels_load_include('common');
+  return drupal_get_form('panels_common_settings', 'panels_page');
 }
 
 /**
@@ -400,9 +398,9 @@ function panels_page_edit_form_submit($form_id, $form_values) {
     $layout = panels_get_layout($panel_page->display->layout);
 
     if ($layout['settings form']) {
-      return "admin/panels/panel-page/$panel_page->name/edit/settings/next";
+      return "admin/panels/panel-page/edit/$panel_page->name/settings/next";
     }
-    return "admin/panels/panel-page/$panel_page->name/edit/advanced/next";
+    return "admin/panels/panel-page/edit/$panel_page->name/advanced/next";
   }
   else {
     drupal_set_message(t('Your changes have been saved.'));
@@ -589,7 +587,7 @@ function panels_page_advanced_form_submit($form_id, $form_values) {
   drupal_set_message(t('Your changes have been saved.'));
   panels_page_save($panel_page);
   if ($form_values['submit'] == t('Save and proceed')) {
-    return "admin/panels/panel-page/$panel_page->name/edit/context/next";
+    return "admin/panels/panel-page/edit/$panel_page->name/context/next";
   }
 }
 
@@ -701,7 +699,7 @@ function panels_page_context_form_submit($form_id, $form_values) {
   panels_page_save($panel_page);
   panels_cache_clear('panel_object:panel_page', $panel_page->name);
   if ($form_values['submit'] == t('Save and proceed')) {
-    return "admin/panels/panel-page/$panel_page->name/edit/content";
+    return "admin/panels/panel-page/edit/$panel_page->name/content";
   }
 }
 
@@ -723,7 +721,7 @@ function panels_page_edit_layout($panel_page, $did = NULL) {
     // If this is a default page, and was saved, we have to make it real.
     panels_page_set_display($panel_page, $did, $output);
 
-    $dest = "admin/panels/panel-page/$panel_page->name/edit/layout";
+    $dest = "admin/panels/panel-page/edit/$panel_page->name/layout";
     if ($did) {
       $dest .= "/$did";
     }
@@ -746,14 +744,14 @@ function panels_page_edit_layout_settings($panel_page, $did = NULL, $next = NULL
 
   if (empty($next)) {
     $button = t('Save');
-    $dest = "admin/panels/panel-page/$panel_page->name/edit/settings";
+    $dest = "admin/panels/panel-page/edit/$panel_page->name/settings";
     if ($did) {
       $dest .= "/$did";
     }
   }
   else {
     $button = t('Save and proceed');
-    $dest = "admin/panels/panel-page/$panel_page->name/edit/advanced/next";
+    $dest = "admin/panels/panel-page/edit/$panel_page->name/advanced/next";
   }
 
   // The following form will return the $display upon successful submit, if
@@ -794,7 +792,7 @@ function panels_page_edit_content($panel_page, $did = NULL) {
     panels_page_set_display($panel_page, $did, $output);
 
     // And do the drupal_goto that a submit function ordinarily would have.
-    $dest = "admin/panels/panel-page/$panel_page->name/edit/content";
+    $dest = "admin/panels/panel-page/edit/$panel_page->name/content";
     if ($did) {
       $dest .= "/$did";
     }
@@ -832,7 +830,7 @@ function panels_page_edit_export($panel_page) {
  * Page callback to import a panel page from PHP code.
  */
 function panels_page_import_page() {
-  if ($_POST['form_id'] == 'panels_page_edit_form') {
+  if (!empty($_POST['form_id']) && $_POST['form_id'] == 'panels_page_edit_form') {
     $panel_page = unserialize($_SESSION['pp_import']);
     drupal_set_title(t('Import panel page "@s"', array('@s' => $panel_page->title)));
     return drupal_get_form('panels_page_edit_form', $panel_page);
@@ -969,7 +967,7 @@ function panels_page_admin_view($panel_page, $args) {
 
 function panels_page_admin_view_submit($form_id, $form_values) {
   $count = 0;
-  $url = "admin/panels/panel-page/" . $form_values['panel_page']->name . "/preview";
+  $url = "admin/panels/panel-page/preview" . $form_values['panel_page']->name;
   foreach ($form_values['contexts'] as $context) {
     $url .= "/" . $form_values["arg$count"];
     $count++;
