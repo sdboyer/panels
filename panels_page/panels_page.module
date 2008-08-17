@@ -108,7 +108,7 @@ function panels_page_menu_alter(&$callbacks) {
  * Menu loader for the panels admin screens. Loads the panels_page specified by
  * the name arg, induces a 404 when a bad arg is provided.
  */
-function panels_page_admin_load($name) {
+function panels_page_admin_load($name, $map = NULL) {
   panels_load_include('plugins');
   $panel_page = panels_page_load($name);
   return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
@@ -128,20 +128,20 @@ function panels_page_get_loader_data($pid, $args) {
   if (!empty($loader_data)) {
     return $loader_data;
   }
+  // Start off by assuming that we won't fall back.
+  $load_data['fallback'] = FALSE;
 
   // TODO Multiple p-pages per path will necessitate more complex logic here
   $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
+  $quickref->wildcards = array_keys(explode($quickref->path), '%');
   $map = explode('/', $_GET['q']);
-  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, explode('-', $quickref->wildcards));
+  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, $quickref->wildcards);
 
   $load_objects = array();
   // Wanted to defer this for as long as possible...
   panels_load_include('plugins');
   $panel_page = panels_page_load($pid, TRUE);
-  // TODO this may be premature. Check.
-  if (!panels_page_access($panel_page)) {
-    drupal_access_denied();
-  }
+
   // for ($i = 0, $argument = reset($panel_page->arguments); !empty($argument); ++$i, $argument = next($panel_page->arguments)) {
   // for (list($i, $argument) = each($panel_page->arguments); !empty($argument); list($i, $argument) = each($panel_page->arguments)) {
   foreach ($panel_page->arguments as $id => $argument) {
@@ -165,6 +165,7 @@ function panels_page_get_loader_data($pid, $args) {
         continue;
       }
       // Bail out and 404 if we get this far.
+      // TODO should this 'business logic' be separated out?
       drupal_not_found();
     }
     $panel_page->context[panels_argument_context_id($argument)] = $context;
@@ -173,10 +174,17 @@ function panels_page_get_loader_data($pid, $args) {
   if ($loader_data['fallback'] === TRUE) {
     return $loader_data;
   }
-  // We're now 100% certain we're proceeding with a panel_page load, so we
-  // include the render file and proceed there.
+
+  // We're now 100% certain we're proceeding with a panel_page load, so first
+  // check the panels_page native access function. If that passes, then include
+  // the render inc file and proceed there.
+  if (empty(panels_page_access($panel_page))) {
+    drupal_access_denied();
+  }
   panels_page_load_include('render');
   panels_page_prepare_panels_render($loader_data, $panel_page);
+
+  return $loader_data;
 }
 
 function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
@@ -189,7 +197,7 @@ function panels_page_prepare_fallback_render(&$loader_data, $quickref, $map) {
   // Lifted from menu_get_item().
   list($ancestors, $placeholders) = menu_get_ancestors(explode('/', $quickref->path));
   if ($router_item = db_fetch_array(db_query_range('SELECT * FROM {panels_page_menu_store} WHERE path IN ('. implode (',', $placeholders) .') ORDER BY fit DESC', $ancestors, 0, 1))) {
-    // TODO Ideally we could skip some of this, much has already been loaded.
+    // FIXME Ideally we could skip some of this, much has already been loaded.
     $map = _menu_translate($router_item, $original_map);
     if ($router_item['access']) {
       $router_item['map'] = $map;
@@ -237,10 +245,6 @@ function panels_page_title_handler() {
   }
 }
 
-/* =======================================================================
- * Look pa! it's an ugly, crufty, -devvy dividing line between new and old code!
- */
-
 /**
  * Determine if the specified user has access to a panel.
  */
@@ -255,8 +259,8 @@ function panels_page_access($panel_page, $account = NULL) {
     return TRUE;
   }
 
-  // All views with an empty access setting are available to all roles.
-  if (!$panel_page->access || !is_array($panel_page->access)) {
+  // All panels displays with an empty access setting are available to all roles.
+  if (empty($panel_page->access) || !is_array($panel_page->access)) {
     return TRUE;
   }
 
