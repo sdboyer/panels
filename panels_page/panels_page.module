@@ -27,15 +27,15 @@
  */
 /*define('PANELS_IS_PANELS_ITEM', 1 << 1);*/
 /**
- * Indicates that there is at least one stored loader that the router item at
- * this path has overridden, and that Panels has stored for this router item.
- */
-define('PANELS_HAS_FALLBACK_ROUTER', 1);
-/**
  * Indicates that the item utilizes a dynamic path - that is, it has a
  *  wildcard (%) in its path.
  */
-define('PANELS_IS_DYNAMIC', 1 << 1);
+define('PANELS_IS_DYNAMIC', 1);
+/**
+ * Indicates that there is at least one stored loader that the router item at
+ * this path has overridden, and that Panels has stored for this router item.
+ */
+define('PANELS_HAS_FALLBACK_ROUTER', 1 << 1 | PANELS_IS_DYNAMIC);
 /**
  * Indicates that the path is owned by a panels page admin editing router. This
  * should basically be a big "hands-off" sign.
@@ -47,14 +47,12 @@ define('PANELS_IS_DYNAMIC', 1 << 1);
  * Panels display objects with this bitval set are an owner, although possibly
  * not the sole owner, of the router item at the provided path.
  */
-define('PANELS_PID_OWNS_PATH', 1 << 2);
+/*define('PANELS_PID_OWNS_PATH', 1 << 2);*/
 /**
  * Panels display objects with this bitval set share the provided path with
  * another panel.
  */
-define('PANELS_PID_SHARES_PATH', (1 << 3 | PANELS_PID_OWNS_PATH));
-
-define('PANELS_HAS_FORM_CONTEXT', 1 << 4); // TODO get rid of this
+define('PANELS_PID_SHARES_PATH', 1 << 2 | PANELS_IS_DYNAMIC);
 
 
 /**
@@ -139,19 +137,17 @@ function panels_page_get_loader_data($pid, $args) {
   // FIXME quickref should be entirely absorbed into the panels_page table itself.
   $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
   $quickref->wildcards = array_keys(explode('/', $quickref->path), '%');
-  $map = explode('/', $_GET['q']);
-  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, $quickref->wildcards);
 
   $load_objects = array();
   // Wanted to defer this for as long as possible...
   panels_load_include('plugins');
   // TODO check; we shouldn't have to load the display this early.
   $panel_page = panels_page_load($pid, TRUE);
-  $panel_page->flags = $quickref->flags;
+  $panel_page->loader_flags = $quickref->loader_flags;
   $loader_data['access'] = panels_page_access($panel_page);
+  $map = explode('/', $_GET['q']);
+  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, $quickref->wildcards);
 
-  // for ($i = 0, $argument = reset($panel_page->arguments); !empty($argument); ++$i, $argument = next($panel_page->arguments)) {
-  // for (list($i, $argument) = each($panel_page->arguments); !empty($argument); list($i, $argument) = each($panel_page->arguments)) {
   foreach ($panel_page->arguments as $id => $argument) {
     $ignore = $argument['default'] == 'ignore';
     // FIXME The directness of this association is questionable
@@ -159,7 +155,7 @@ function panels_page_get_loader_data($pid, $args) {
     $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_BAD_ARG;
     if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
       if ($context & PANELS_USE_FALLBACK_ROUTER) {
-        if ($quickref->flags & PANELS_HAS_FALLBACK_ROUTER) {
+        if ($quickref->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
           $loader_data['fallback'] = TRUE;
           panels_page_prepare_fallback_render($loader_data, $quickref, $map);
           break;
@@ -592,6 +588,7 @@ function panels_page_load_all($names = array(), $page_size = 0) {
     $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
     $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
     $page->type             = t('Local');
+    $page->loader_flags     = (int) $page->loader_flags;
 
     $pages[$page->name]     = panels_page_sanitize($page);
   }
@@ -649,6 +646,7 @@ function panels_page_load($pid, $load_display = FALSE) {
   $page->contexts         = (!empty($page->contexts)) ? unserialize($page->contexts) : array();
   $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
   $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
+  $page->loader_flags     = (int) $page->loader_flags;
 
   if ($load_display) {
     $page->display = panels_load_display($page->did);
