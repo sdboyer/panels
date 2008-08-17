@@ -84,6 +84,11 @@ function panels_page_perm() {
   return array('create panel-pages', 'access all panel-pages');
 }
 
+function panels_page_menu() {
+  panels_page_load_include('menu');
+  return array_merge(panels_page_admin_static_menu_items(), panels_page_admin_dynamic_menu_items());
+}
+
 /**
  * Implementation of hook_menu_alter().
  *
@@ -94,12 +99,23 @@ function panels_page_menu_alter(&$callbacks) {
   return _panels_page_menu_alter($callbacks);
 }
 
-function panels_page_menu_link_alter(&$item, &$menu) {
+/*function panels_page_menu_link_alter(&$item, &$menu) {
 
+}*/
+
+
+/**
+ * Menu loader for the panels admin screens. Loads the panels_page specified by
+ * the name arg, induces a 404 when a bad arg is provided.
+ */
+function panels_page_admin_load($name) {
+  panels_load_include('plugins');
+  $panel_page = panels_page_load($name);
+  return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
 }
 
 /**
- * Determine the appropriate render-time that panels_page should take.
+ * Determine the render-time behavior of panels_page.
  *
  * This function is basically the brains of the dynamic override system.
  *
@@ -157,29 +173,16 @@ function panels_page_get_loader_data($pid, $args) {
   if ($loader_data['fallback'] === TRUE) {
     return $loader_data;
   }
-  // We're now 100% certain we're proceeding with a p-page load.
+  // We're now 100% certain we're proceeding with a panel_page load, so we
+  // include the render file and proceed there.
+  panels_page_load_include('render');
   panels_page_prepare_panels_render($loader_data, $panel_page);
-
 }
 
 function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
   foreach ($positions as $key => $position) {
     $map[$position] = $load_objects[$key];
   }
-}
-
-function panels_page_prepare_panels_render(&$loader_data, $panel_page) {
-  panels_page_load_include('render');
-
-  _panels_page_check_switchers($panel_page);
-
-    // Store the instructions back in our loading handler.
-  $loader_data['panel page']      = $panel_page;
-  $loader_data['page callback']   = 'panels_page_render_page';
-  // Pass by ref to reduce static variable size & ensure php4/5 consistency.
-  $loader_data['page arguments']  = array(&$loader_data['panel page'], FALSE);
-  $loader_data['title callback']  = 'panels_page_get_title';
-  $loader_data['title arguments'] = array(&$loader_data['panel page']);
 }
 
 function panels_page_prepare_fallback_render(&$loader_data, $quickref, $map) {
@@ -199,45 +202,6 @@ function panels_page_prepare_fallback_render(&$loader_data, $quickref, $map) {
   $loader_data['map']             = $map;
   // $loader_data['title callback']  = '_menu_item_localize';
   // $loader_data['title arguments'] = array($router_item, $map);
-
-}
-
-function _panels_page_check_switchers(&$panel_page) {
-  $switchers = panels_get_switchers();
-  if ($switchers) {
-    $candidates = $list = array();
-    $result = db_query("SELECT name FROM {panels_page} WHERE switcher_name = '%s'", $panel_page->name);
-    // get a list of all pages that might switch for this one
-    while ($candidate = db_fetch_object($result)) {
-      $list[] = $candidate->name;
-    }
-    // Add default panels that apply to the list as well
-    foreach (panels_page_default_panels() as $page) {
-      if ($page->switcher_name == $panel_page->name) {
-        $candidates[$page->name] = $page;
-      }
-    }
-
-    if ($list) {
-      $candidates += (count($list) > 1) ? panels_page_load_all($list) : array(panels_page_load($list[0]));
-    }
-
-    if ($candidates) {
-      // separate them based on switcher type
-      $pages = array();
-      foreach ($candidates as $candidate) {
-        $pages[$candidate->switcher_type][$candidate->name] = $candidate;
-      }
-
-      // go through switcher types and switch the first one that matches.
-      foreach ($pages as $plugin => $candidates) {
-        if ($page = panels_switcher_switch($plugin, 'panel_page', $panel_page->name, $candidates)) {
-          $panel_page = $page;
-          break;
-        }
-      }
-    }
-  }
 }
 
 function panels_page_access_handler() {
@@ -312,7 +276,7 @@ function panels_page_access($panel_page, $account = NULL) {
  */
 function panels_page_get_title($panel_page, $context = 'page', $default_title = NULL) {
   $title = _panels_page_get_title($panel_page, $context, $default_title);
-  if ($panel_page->keywords) {
+  if (!empty($panel_page->keywords)) {
     $title = strtr($title, $panel_page->keywords);
   }
   return $title;
@@ -328,7 +292,7 @@ function _panels_page_get_title($panel_page, $op, $default_title) {
   }
 
   // Context has the highest priority
-  if ($panel_page->context) {
+  if (!empty($panel_page->context)) {
     $title = NULL;
     foreach ($panel_page->context as $context) {
       if (empty($context->data)) {
@@ -346,7 +310,7 @@ function _panels_page_get_title($panel_page, $op, $default_title) {
 
   // If no context returned a title use the display title configured in layout
   // settings
-  if ($panel_page->display->title) {
+  if (!empty($panel_page->display->title)) {
     return $panel_page->display->title;
   }
 
@@ -398,14 +362,6 @@ function panels_page_get_current($panel_page = NULL) {
 
 // ---------------------------------------------------------------------------
 // panel page administrative pages
-
-/**
- * Settings for panel pages.
- */
-function panels_page_settings() {
-  panels_load_include('common');
-  return drupal_get_form('panels_common_settings', 'panels_page');
-}
 
 /**
  * Pass-through to admin.inc.
