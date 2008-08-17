@@ -8,16 +8,27 @@
  *  absolutely verified that we'll need it.
  */
 
-function panels_page_prepare_panels_render(&$loader_data, $panel_page) {
-  _panels_page_check_switchers($panel_page);
+function panels_page_prepare_render(&$loader_data, &$panel_page) {
+  _panels_page_prepare_render($panel_page);
 
-    // Store the instructions back in our loading handler.
-  $loader_data['panel page']      = $panel_page;
-  $loader_data['page callback']   = 'panels_page_render_page';
-  // Pass by ref to reduce static variable size & ensure php4/5 consistency.
-  $loader_data['page arguments']  = array(&$loader_data['panel page'], FALSE);
+  // Store the instructions back in our load handler array.
+  $loader_data['page callback']   = 'panels_page_render_page_' . $panel_page->form ? 'form' : 'normal';
   $loader_data['title callback']  = 'panels_page_get_title';
+  // Pass by ref to ENSURE php4/5 consistency and keep down static cache size.
+  $loader_data['panel page']      =& $panel_page;
+  $loader_data['page arguments']  = array(&$loader_data['panel page'], FALSE);
   $loader_data['title arguments'] = array(&$loader_data['panel page']);
+}
+
+function _panels_page_prepare_render(&$panel_page) {
+  _panels_page_check_switchers($panel_page);
+  $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->context);
+  $panel_page->keywords = panels_context_get_keywords($panel_page->context);
+  // Figure out which display to use.
+  $display_id = panels_argument_get_display($panel_page->arguments, $panel_page->context);
+  $panel_page->display = panels_page_fetch_display($panel_page, $display_id);
+  $panel_page->form = panels_context_get_form($panel_page->context);
+  panels_page_set_current($panel_page);
 }
 
 function _panels_page_check_switchers(&$panel_page) {
@@ -58,15 +69,19 @@ function _panels_page_check_switchers(&$panel_page) {
   }
 }
 
-function panels_page_render_page($panel_page, $admin) {
-  $args = func_get_args();
-  // remove the name.
-  array_shift($args);
-  // remove the admin flag.
-  array_shift($args);
+function _panels_page_prepare_display($panel_page, $args = array()) {
+  $panel_page->display->args      = $args;
+  $panel_page->display->context   = $panel_page->context;
+  $panel_page->display->keywords  = $panel_page->keywords;
+  $panel_page->display->css_id    = $panel_page->css_id;
+  $panel_page->display->owner     = $panel_page; // TODO ref/value php4/5 compat problem?
+  $panel_page->display->owner->id = $panel_page->name;
+  $panel_page->display->type      = 'panel_page';
+}
 
+function panels_page_render_page_normal($panel_page, $args) {
   // TODO separate this out prior to this point using the logic handler
-  $output = '';
+/*  $output = '';
   if ($admin) {
     // Display an admin form to make it easy to set up arguments.
     panels_load_include('panels_page.admin', 'panels_page/');
@@ -87,47 +102,28 @@ function panels_page_render_page($panel_page, $admin) {
       }
     }
   }
-
-  $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->context);
-  $panel_page->keywords = panels_context_get_keywords($panel_page->context);
-
-  // Figure out which display to use.
-  $display_id = panels_argument_get_display($panel_page->arguments, $panel_page->context);
-
-  $panel_page->display = $display = panels_page_fetch_display($panel_page, $display_id);
-
-  // Figure out if these contexts include a form; will be NULL if there
-  // isn't one, or the context if there is.
-  $form = panels_context_get_form($panel_page->context);
-
-  // This is the first point at which it is safe to add items to the display
-  // as the argument handling, above, may choose which display is actually
-  // used.
-  $display->args      = $args;
-  $display->context   = $panel_page->context;
-  $display->keywords  = $panel_page->keywords;
-  $display->css_id    = $panel_page->css_id;
-  $display->owner     = $panel_page;
-  // unique id of this display's owner.
-  $display->owner->id = $panel_page->name;
-  $display->type      = 'panel_page';
-
-  // Set this as 'current' so that other stuff can utilize it.
-  panels_page_get_current($panel_page);
-
-  if ($form) {
-    $form->form['#theme'] = 'panels_page_render_form';
-    $form->form['#display'] = $display;
-    $output .= drupal_render_form($form->form_id, $form->form);
+*/
+  _panels_page_prepare_display($panel_page, $args);
+  $output = panels_render_display($display);
+  // FIXME I believe this method no longer works.
+  if ($panel_page->no_blocks) {
+    print theme('page', $output, FALSE);
   }
   else {
-    $output .= panels_render_display($display);
+    return $output;
   }
+}
 
-  if ($output == NULL) {
-    return drupal_not_found();
-  }
+function panels_page_render_page_form($panel_page, $args) {
+  $form = array_shift($args);
+  _panels_page_render_display($panel_page, $args);
+  $form = panels_context_get_form($panel_page->context);
+  $form->form['#theme'] = 'panels_page_render_form';
+  $form->form['#display'] = $panel_page->display;
+  $output = drupal_render_form($form->form_id, $form->form);
+}
 
+function panels_page_custom_css($panel_page) {
   if ($panel_page->css) {
     panels_load_include('panels_page.css_filter', 'panels_page/');
     $css = panels_page_filter_css(panels_page_disassemble_css($panel_page->css));
@@ -136,12 +132,6 @@ function panels_page_render_page($panel_page, $admin) {
       drupal_set_html_head("<style type=\"text/css\" media=\"all\">" . panels_page_compress_css($css) . "</style>\n");
     }
   }
-
-  if ($panel_page->no_blocks) {
-    print theme('page', $output, FALSE);
-  }
-  else {
-    return $output;
-  }
 }
+
 
