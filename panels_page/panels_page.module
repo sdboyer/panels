@@ -151,7 +151,7 @@ function panels_page_get_loader_data($pid, $args) {
     $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_BAD_ARG;
     if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
       if ($context & PANELS_USE_FALLBACK_ROUTER) {
-        if ($quickref->meta & PANELS_HAS_FALLBACK_ROUTER) {
+        if ($quickref->flags & PANELS_HAS_FALLBACK_ROUTER) {
           $loader_data['fallback'] = TRUE;
           panels_page_prepare_fallback_render($loader_data, $quickref, $map);
           break;
