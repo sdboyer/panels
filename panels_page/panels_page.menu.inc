@@ -106,13 +106,13 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
   $items[$path_prefix . 'edit/%panels_page_admin/layout-settings'] = array(
     'title' => 'Layout settings',
     'page callback' => 'panels_page_edit_layout_settings',
-    // 'load arguments' => array('%map'),
+    'load arguments' => array('%map'),
     'weight' => -2,
   ) + $admin;
   $items[$path_prefix . 'edit/%panels_page_admin/content'] = array(
     'title' => 'Content',
     'page callback' => 'panels_page_edit_content',
-    // 'load arguments' => array('%map'),
+    'load arguments' => array('%map'),
     'weight' => 0,
   ) + $admin;
   $items[$path_prefix . 'edit/%panels_page_admin/preview'] = array(
@@ -169,15 +169,16 @@ function _panels_page_menu_alter(&$callbacks) {
     // Only save a router quickref if the item has metadata
     if (!empty($panels_items['metadata'][$raw_path])) {
       $metadata =& $panels_items['metadata'][$raw_path];
-      $metadata['flags'] |= isset($matches[$path]) ? PANELS_HAS_FALLBACK_ROUTER : 0;
-      $schema = panels_page_router_table_query_fields('panels_page_router_quickref');
+      $metadata->loader_flags |= isset($matches[$path]) ? PANELS_HAS_FALLBACK_ROUTER : 0;
+      db_query('UPDATE {panels_page} SET loader_flags = %d WHERE pid = %d', $metadata->loader_flags, $metadata->pid);
+/*      $schema = panels_page_router_table_query_fields('panels_page_router_quickref');
       $f = $q = $v = array();
       foreach ($schema as $field => $placeholder) {
         $f[] = $field;
         $q[] = $placeholder;
-        $v[] = $metadata[$field];
+        $v[] = $metadata->$field;
       }
-      db_query('INSERT INTO {panels_page_router_quickref} (' . implode(', ', $f) . ') VALUES (' . implode(', ', $q) . ')', $v);
+      db_query('INSERT INTO {panels_page_router_quickref} (' . implode(', ', $f) . ') VALUES (' . implode(', ', $q) . ')', $v);*/
     }
   }
   // Re-call our helper function and store updated items into the static cache.
@@ -185,6 +186,7 @@ function _panels_page_menu_alter(&$callbacks) {
 }
 
 function _panels_page_create_menu_structure() {
+  panels_load_include('plugins');
   $items = array();
   $panels = panels_page_load_all();
   foreach ($panels as $panel_page) {
@@ -204,12 +206,15 @@ function _panels_page_create_menu_structure() {
 function panels_page_construct_wildcard_menu_link(&$items, $panel_page, $map) {
   $type = _panels_page_menu_type($panel_page);
   $primary_wildcard = array_search('%', $map);
-  panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_PID_OWNS_PATH);
+  // FIXME (this data) quickref should be entirely absorbed into the panels_page table itself.
+  panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_IS_DYNAMIC);
 
   // Construct the dynamic menu router item. If/when we get to multiple
   // panels_pages per wildcard path, we needn't worry about overwriting here.
   $items['menu items'][$panel_page->path] = _panels_page_construct_wildcard_menu_link(
-    $panel_page, array('pid-' . $panel_page->pid, $primary_wildcard), array('arguments' => array('pid-' . $panel_page->pid, $primary_wildcard)), $type);
+    $panel_page, array('pid-' . $panel_page->pid, $primary_wildcard),
+    array('arguments' => array('pid-' . $panel_page->pid, $primary_wildcard)),
+     $type);
 
   // $items['menu_link_alter'][$path]['type']
   // FIXME parents are borked
@@ -240,7 +245,7 @@ function _panels_page_construct_wildcard_menu_link($panel_page, $page_arguments,
  */
 function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   $type = _panels_page_menu_type($panel_page);
-  panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_IS_STATIC);
+  panels_page_construct_menu_item_metadata($items, $panel_page);
 
   $items['menu items'][$panel_page->path] = array(
     'title' => filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
@@ -255,14 +260,15 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   _panels_page_construct_parent_menu_item($items, $panel_page, $panel_page->path, $type);
 }
 
-function panels_page_construct_menu_item_metadata(&$items, $panel_page, $flags) {
-  $items['metadata'][$panel_page->path] = array(
-    'pid'    => $panel_page->pid,
-    'name'   => $panel_page->name,
-    'type'   => _panels_page_menu_type($panel_page),
-    'path'   => $panel_page->path,
-    'flags'   => $flags,
-  );
+function panels_page_construct_menu_item_metadata(&$items, $panel_page, $flags = 0) {
+  $metadata = new stdClass();
+  $metadata->pid          = $panel_page->pid;
+  $metadata->name         = $panel_page->name;
+  $metadata->type         = _panels_page_menu_type($panel_page);
+  $metadata->path         = $panel_page->path;
+  $metadata->loader_flags = $flags;
+
+  $items['metadata'][$panel_page->path] = $metadata;
 }
 
 /**
