@@ -20,39 +20,41 @@
  * is set but none of the others are, it indicates that that router is 'owned'
  * by another module and has not been overridden by Panels.
  */
-define('PANELS_ROUTER_EXISTS', 1);
+/*define('PANELS_ROUTER_EXISTS', 1);*/
 /**
  * Indicates that the active router in the {menu_router} table is set and is
  * owned by Panels.
  */
-define('PANELS_IS_PANELS_ITEM', 1 << 1);
+/*define('PANELS_IS_PANELS_ITEM', 1 << 1);*/
 /**
  * Indicates that there is at least one stored loader that the router item at
  * this path has overridden, and that Panels has stored for this router item.
  */
-define('PANELS_HAS_FALLBACK_ROUTER', (1 << 2) | PANELS_IS_PANELS_ITEM);
+define('PANELS_HAS_FALLBACK_ROUTER', 1);
 /**
- * Indicates that the path is owned by a static panels page - that is, a panels
- * page without a % wildcard in its path.
+ * Indicates that the item utilizes a dynamic path - that is, it has a
+ *  wildcard (%) in its path.
  */
-define('PANELS_IS_STATIC', (1 << 3) | PANELS_IS_PANELS_ITEM);
+define('PANELS_IS_DYNAMIC', 1 << 1);
 /**
  * Indicates that the path is owned by a panels page admin editing router. This
  * should basically be a big "hands-off" sign.
  */
-define('PANELS_IS_ADMIN_PATH', (1 << 4) | PANELS_IS_STATIC | PANELS_IS_PANELS_ITEM);
+/*define('PANELS_IS_ADMIN_PATH', (1 << 4) | PANELS_IS_STATIC | PANELS_IS_PANELS_ITEM);*/
 
 // These deal with a particular pid's relationship with a given path
 /**
  * Panels display objects with this bitval set are an owner, although possibly
  * not the sole owner, of the router item at the provided path.
  */
-define('PANELS_PID_OWNS_PATH', (1 << 5) | PANELS_IS_PANELS_ITEM);
+define('PANELS_PID_OWNS_PATH', 1 << 2);
 /**
  * Panels display objects with this bitval set share the provided path with
  * another panel.
  */
-define('PANELS_PID_SHARES_PATH', 1 << 6 | PANELS_IS_PANELS_ITEM | PANELS_PID_OWNS_PATH);
+define('PANELS_PID_SHARES_PATH', (1 << 3 | PANELS_PID_OWNS_PATH));
+
+define('PANELS_HAS_FORM_CONTEXT', 1 << 4); // TODO get rid of this
 
 
 /**
@@ -86,7 +88,9 @@ function panels_page_perm() {
 
 function panels_page_menu() {
   panels_page_load_include('menu');
-  return array_merge(panels_page_admin_static_menu_items(), panels_page_admin_dynamic_menu_items());
+  $items = panels_page_admin_static_menu_items();
+  $items = panels_page_admin_dynamic_menu_items($items);
+  return $items;
 }
 
 /**
@@ -129,19 +133,22 @@ function panels_page_get_loader_data($pid, $args) {
     return $loader_data;
   }
   // Start off by assuming that we won't fall back.
-  $load_data['fallback'] = FALSE;
-  $access = panels_page_access($panel_page);
+  $loader_data['fallback'] = FALSE;
 
   // TODO Multiple p-pages per path will necessitate more complex logic here
+  // FIXME quickref should be entirely absorbed into the panels_page table itself.
   $quickref = db_fetch_object(db_query('SELECT * FROM {panels_page_router_quickref} WHERE pid = %d', $pid));
-  $quickref->wildcards = array_keys(explode($quickref->path), '%');
+  $quickref->wildcards = array_keys(explode('/', $quickref->path), '%');
   $map = explode('/', $_GET['q']);
   $map = array_map('_panels_page_rebuild_menu_map', $map, $args, $quickref->wildcards);
 
   $load_objects = array();
   // Wanted to defer this for as long as possible...
   panels_load_include('plugins');
+  // TODO check; we shouldn't have to load the display this early.
   $panel_page = panels_page_load($pid, TRUE);
+  $panel_page->flags = $quickref->flags;
+  $loader_data['access'] = panels_page_access($panel_page);
 
   // for ($i = 0, $argument = reset($panel_page->arguments); !empty($argument); ++$i, $argument = next($panel_page->arguments)) {
   // for (list($i, $argument) = each($panel_page->arguments); !empty($argument); list($i, $argument) = each($panel_page->arguments)) {
@@ -161,7 +168,7 @@ function panels_page_get_loader_data($pid, $args) {
           continue;
         }
       }
-      // TODO Are there other cases? If not, this is an overspecified if
+      // TODO Are there other cases? If not, this else is an unnecessary overspecification
       else if ($context & PANELS_BAD_ARG && $ignore) {
         continue;
       }
@@ -178,8 +185,8 @@ function panels_page_get_loader_data($pid, $args) {
 
   // We're now 100% certain we're proceeding with a panel_page load, so first
   // check the panels_page native access function. If that passes, then include
-  // the render inc file and proceed there.
-  if (empty($access)) {
+  // the render inc file and proceed inside there.
+  if (empty($loader_data['access'])) {
     drupal_access_denied();
   }
   panels_page_load_include('render');
@@ -355,13 +362,22 @@ function panels_page_get_url($panel_page, $args = NULL) {
 
 /**
  * Figure out if a panel is the current page; mostly useful in theming.
+ *
+ * This function will return NULL until panels_page_set_current() has been
+ * properly called and loaded.
  */
-function panels_page_get_current($panel_page = NULL) {
-  static $cache = NULL;
-  if (isset($panel_page )) {
-    $cache = $panel_page;
-  }
+function panels_page_get_current() {
+  $fubar = NULL; // PHP4 compatibility
+  return panels_page_set_current($fubar);
+}
 
+function panels_page_set_current(&$panel_page) {
+  static $cache = NULL;
+  // Only allow it to be set once per request.
+  if (!isset($cache) && isset($panel_page)) {
+    // Pass by reference so as to
+    $cache =& $panel_page;
+  }
   return $cache;
 }
 
