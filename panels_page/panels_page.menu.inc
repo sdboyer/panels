@@ -143,7 +143,7 @@ function panels_page_create_menu_structure($new_items = NULL) {
 function _panels_page_menu_alter(&$callbacks) {
   $panels_items = panels_page_create_menu_structure();
   $matches = array();
-  foreach ($callbacks as $path => $item) {
+  while (list($path, $item) = each($callbacks)) {
     if (strpos($path, '%') === FALSE) {
       continue;
     }
