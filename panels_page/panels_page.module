@@ -223,9 +223,9 @@ function panels_page_prepare_fallback_render(&$loader_data, $map) {
     }
   }
 
-  $loader_data['page callback']   = $router_item['page callback'];
+  $loader_data['page callback'] = $router_item['page callback'];
   // $loader_data['router item']     = $router_item;
-  $loader_data['map']             = $map;
+  // $loader_data['map']             = $map;
   // $loader_data['title callback']  = '_menu_item_localize';
   // $loader_data['title arguments'] = array($router_item, $map);
 }
@@ -234,6 +234,16 @@ function panels_page_access_handler() {
   return TRUE;
 }
 
+/**
+ * Execute the stored render process.
+ *
+ * This is the master handler through which ALL non-admin panels_page-touched
+ * callbacks pass. It takes the callback and arguments calculated by the main
+ * brain, panels_page_get_loader_data(), and fires out the callback with its
+ * arguments.
+ *
+ * @return mixed
+ */
 function panels_page_render_handler() {
   $args = func_get_args();
   // Get the pid, which is passed in with a prepended string.
@@ -475,7 +485,10 @@ function panels_page_fetch_display(&$panel_page, $id = NULL) {
     // If empty, use the default display.
     if (empty($panel_page->display)) {
       // Load it if not already loaded
-      $panel_page->display = $display = panels_load_display($panel_page->did);
+      $panel_page->display = panels_load_display($panel_page->did);
+      $display =& $panel_page->display;
+      // Refresh the static cache with the now-loaded display.
+      panels_page_loaded_cache($panel_page->name, $panel_page);
     }
     else {
       // Otherwise, use the loaded display
@@ -579,14 +592,16 @@ function panels_page_set_display($panel_page, $id, $display) {
 /**
  * Fetch all panel pages in the system.
  *
- * This function does not cache.
+ * For the moment, this function does not cache. It may be integrated into the
+ * panels_page_loaded_cache() caching mechanism at some point, but its utility
+ * in D6 is significantly lessened vs. D5, so there is much less need to do so.
  */
 function panels_page_load_all($names = array(), $page_size = 0) {
   $pages = $dids = array();
   $query = "SELECT * FROM {panels_page}";
 
-  if ($names) {
-    $query .= " WHERE name IN (" . implode(', ', array_fill(0, sizeof($names), "'%s'")) . ")";
+  if (!empty($names)) {
+    $query .= " WHERE name IN (" . implode(', ', array_fill(0, count($names), "'%s'")) . ")";
   }
 
   if ($page_size) {
@@ -630,27 +645,31 @@ function panels_page_load_all($names = array(), $page_size = 0) {
 /**
  * Load a panel page.
  */
-function panels_page_load($pid, $load_display = FALSE) {
-  static $cache = array();
+function panels_page_load($id, $load_display = FALSE) {
+  $cache = panels_page_loaded_cache($id);
 
-  if (array_key_exists($pid, $cache)) {
-    if ($load_display && empty($cache[$pid]->display)) {
-      $cache[$pid]->display = panels_load_display($cache[$pid]->did);
+  if ($cache) {
+    if ($load_display && empty($cache->display)) {
+      $cache->display = panels_load_display($cache->did);
+      panels_page_loaded_cache($id, $cache);
     }
-    return $cache[$pid];
+    return $cache;
   }
 
-  if (!is_numeric($pid)) {
+  if (!is_numeric($id)) {
     $where = "name = '%s'";
   }
   else {
     $where = 'pid = %d';
   }
-  $page = db_fetch_object(db_query("SELECT * FROM {panels_page} WHERE $where", $pid));
+  $page = db_fetch_object(db_query("SELECT * FROM {panels_page} WHERE $where", $id));
   if (!$page) {
     $defaults = panels_page_default_panels();
-    if (isset($defaults[$pid])) {
-      $page = $cache[$pid] = $defaults[$pid];
+    if (isset($defaults[$id])) {
+      // Default panel pages will always only be identified by name, so no need
+      // for the both-ids-point-to-same-object trick. And, they're in code, so
+      // no real need to statically cache them, either.
+      $page = $defaults[$id];
       return $page;
     }
     return;
@@ -668,15 +687,24 @@ function panels_page_load($pid, $load_display = FALSE) {
     $page->display = panels_load_display($page->did);
   }
 
-  $cache[$pid] = panels_page_sanitize($page);
-  // Make sure that we've statically cached the loaded page for both possible
-  // unique identifiers - $page->pid AND $page->name.
-  $other_id = is_numeric($pid) || $pid == 'new' ? $page->name : $page->pid;
-  $cache[$other_id] =& $cache[$pid];
-
-
-  return $cache[$pid];
+  panels_page_loaded_cache($id, $page);
+  return $page;
 }
+
+
+function panels_page_loaded_cache($id, $panel_page = NULL) {
+  static $cache = array();
+  if (is_object($panel_page)) {
+    $cache[$id] = $panel_page;
+    // Make sure that we've statically cached the loaded page for both possible
+    // unique identifiers - $page->pid AND $page->name.
+    $other_id = is_numeric($id) ? $panel_page->name : $panel_page->pid;
+    $cache[$other_id] =& $cache[$id];
+  }
+  return array_key_exists($id, $cache) ? $cache[$id] : FALSE;
+}
+
+
 
 /**
  * A list of the fields used in the panel_page table.
