@@ -109,6 +109,10 @@ function panels_page_list_page() {
   return $output;
 }
 
+function panels_page_admin_title($section, $panel_page) {
+  return $section . ': ' . $panel_page->name;
+}
+
 /**
  * General settings configuration page for panel pages.
  */
@@ -150,7 +154,7 @@ function panels_page_disable_page($name = NULL) {
 /**
  * Provide a form to confirm deletion of a panel page.
  */
-function panels_page_delete_confirm($panel_page) {
+function panels_page_delete_confirm(&$form_state, $panel_page) {
   $form['pid'] = array('#type' => 'value', '#value' => $panel_page->pid);
   $form['did'] = array('#type' => 'value', '#value' => $panel_page->did);
   if ($panel_page->type != t('Overridden')) {
@@ -234,7 +238,7 @@ function panels_page_edit($panel_page) {
 /**
  * The form to edit the page portion of a panel.
  */
-function panels_page_edit_form($form_state, $panel_page, $next = NULL) {
+function panels_page_edit_form(&$form_state, $panel_page, $next = NULL) {
   panels_load_include('common');
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $layout = panels_get_layout($panel_page->display->layout);
@@ -341,32 +345,32 @@ function panels_page_edit_form($form_state, $panel_page, $next = NULL) {
 /**
  * Validate a panel page edit form.
  */
-function panels_page_edit_form_validate($form_id, $form_values, $form) {
+function panels_page_edit_form_validate($form, &$form_state) {
   // Validate the system name; check for its presence, pass it through a preg
   // filter for allowed characters, and test for uniqueness.
-  if (!$form_values['name']) {
+  if (!$form_state['values']['name']) {
     form_error($form['left']['info']['name'], t('Panel name is required.'));
   }
-  else if (preg_match("/[^A-Za-z0-9_]/", $form_values['name'])) {
+  else if (preg_match("/[^A-Za-z0-9_]/", $form_state['values']['name'])) {
     form_error($form['left']['info']['name'], t('Panel name must be alphanumeric or underscores only.'));
   }
   else {
-    if (db_result(db_query("SELECT pid FROM {panels_page} WHERE name = '%s' AND pid <> %d", $form_values['name'], $form_values['pid']))) {
+    if (db_result(db_query("SELECT pid FROM {panels_page} WHERE name = '%s' AND pid <> %d", $form_state['values']['name'], $form_state['values']['pid']))) {
       form_error($form['left']['info']['name'], t('Panel name must be unique.'));
     }
   }
 
   // Validate the path; check for its presence, uniqueness within panels_page,
   // and uniqueness with respect to path aliases.
-  if (!$form_values['path']) {
+  if (!$form_state['values']['path']) {
     form_error($form['left']['info']['path'], t('Path is required.'));
   }
   else {
-    if (db_result(db_query("SELECT name FROM {panels_page} WHERE path = '%s' AND pid <> %d", $form_values['path'], $form_values['pid']))) {
+    if (db_result(db_query("SELECT name FROM {panels_page} WHERE path = '%s' AND pid <> %d", $form_state['values']['path'], $form_state['values']['pid']))) {
       form_error($form['left']['info']['path'], t("'Path' must be unique among Panels Page paths. The path '@path' is currently in owned by '@name'.",
-        array('@path' => $form_values['path'], '@name' => $result)));
+        array('@path' => $form_state['values']['path'], '@name' => $result)));
     }
-    if (db_result(db_query("SELECT src FROM {url_alias} WHERE dst = '%s'", $form_values['path']))) {
+    if (db_result(db_query("SELECT src FROM {url_alias} WHERE dst = '%s'", $form_state['values']['path']))) {
       form_error($form['left']['info']['path'], t('The path you have chosen is already aliased to @src.', array('@src' => $result)));
     }
   }
@@ -375,13 +379,13 @@ function panels_page_edit_form_validate($form_id, $form_values, $form) {
 /**
  * Process submission of the panel page edit form
  */
-function panels_page_edit_form_submit($form_id, $form_values) {
-  $panel_page = $form_values['panel_page'];
+function panels_page_edit_form_submit($form, &$form_state) {
+  $panel_page = $form_state['values']['panel_page'];
 
-  $panel_page->title  = $form_values['title'];
-  $panel_page->name   = preg_replace("/[\W]+/", '', $form_values['name']);
-  $panel_page->css_id = $form_values['css_id'];
-  $panel_page->path   = $form_values['path'];
+  $panel_page->title  = $form_state['values']['title'];
+  $panel_page->name   = preg_replace("/[\W]+/", '', $form_state['values']['name']);
+  $panel_page->css_id = $form_state['values']['css_id'];
+  $panel_page->path   = $form_state['values']['path'];
 
   if ($panel_page->pid == 'new') {
     unset($_SESSION['pp_import']);
@@ -415,7 +419,7 @@ function panels_page_edit_advanced($panel_page, $next = NULL) {
 /**
  * The form to edit the advanced settings of a panel page.
  */
-function panels_page_advanced_form($form_state, $panel_page, $next) {
+function panels_page_advanced_form(&$form_state, $panel_page, $next) {
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $form_state['panel_page'] =& $panel_page;
 
@@ -559,25 +563,25 @@ function panels_page_advanced_form($form_state, $panel_page, $next) {
 /**
  * Process submission of the panel page edit form.
  */
-function panels_page_advanced_form_submit($form_id, $form_values) {
-  $panel_page = $form_values['panel_page'];
+function panels_page_advanced_form_submit($form, &$form_state) {
+  $panel_page = $form_state['values']['panel_page'];
 
-  $panel_page->css                          = $form_values['css'];
-  $panel_page->no_blocks                    = $form_values['no_blocks'];
-  $panel_page->menu                         = $form_values['menu'];
-  $panel_page->menu_tab                     = $form_values['menu_tab'];
-  $panel_page->menu_tab_weight              = $form_values['menu_tab_weight'];
-  $panel_page->menu_title                   = $form_values['menu_title'];
-  $panel_page->menu_tab_default             = $form_values['menu_tab_default'];
-  $panel_page->menu_tab_default_parent_type = $form_values['menu_tab_default_parent_type'];
-  $panel_page->menu_parent_title            = $form_values['menu_parent_title'];
-  $panel_page->menu_parent_tab_weight       = $form_values['menu_parent_tab_weight'];
+  $panel_page->css                          = $form_state['values']['css'];
+  $panel_page->no_blocks                    = $form_state['values']['no_blocks'];
+  $panel_page->menu                         = $form_state['values']['menu'];
+  $panel_page->menu_tab                     = $form_state['values']['menu_tab'];
+  $panel_page->menu_tab_weight              = $form_state['values']['menu_tab_weight'];
+  $panel_page->menu_title                   = $form_state['values']['menu_title'];
+  $panel_page->menu_tab_default             = $form_state['values']['menu_tab_default'];
+  $panel_page->menu_tab_default_parent_type = $form_state['values']['menu_tab_default_parent_type'];
+  $panel_page->menu_parent_title            = $form_state['values']['menu_parent_title'];
+  $panel_page->menu_parent_tab_weight       = $form_state['values']['menu_parent_tab_weight'];
 
-  $panel_page->access = array_keys(array_filter($form_values['access']));
+  $panel_page->access = array_keys(array_filter($form_state['values']['access']));
 
   drupal_set_message(t('Your changes have been saved.'));
   panels_page_save($panel_page);
-  if ($form_values['submit'] == t('Save and proceed')) {
+  if ($form_state['values']['submit'] == t('Save and proceed')) {
     return "admin/panels/panel-page/{$panel_page->name}/edit/context/next";
   }
 }
@@ -585,30 +589,19 @@ function panels_page_advanced_form_submit($form_id, $form_values) {
 /**
  * Edit advanced settings of a panel page.
  */
-function panels_page_edit_context($name, $next = NULL) {
-  if (!empty($_POST)) {
-    $panel_page = panels_cache_get('panel_object:panel_page', $name);
-  }
-  else {
-    $panel_page = panels_page_load($name);
-    panels_cache_set('panel_object:panel_page', $name, $panel_page);
-  }
-
-  drupal_set_title(check_plain(panels_page_get_title($panel_page)));
+function panels_page_edit_context($panel_page, $next = NULL) {
+  // drupal_set_title(check_plain(panels_page_get_title($panel_page)));
   return drupal_get_form('panels_page_context_form', $panel_page, $next);
 }
 
 /**
  * The form to edit the context settings of a panel page.
  */
-function panels_page_context_form($panel_page, $next = NULL) {
+function panels_page_context_form(&$form_state, $panel_page, $next) {
+  panels_load_include('plugins');
+  $form_state['panel_page'] = $panel_page;
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $layout = panels_get_layout($panel_page->display->layout);
-
-  $form['panel_page'] = array(
-    '#type' => 'value',
-    '#value' => $panel_page,
-  );
 
   $form['right'] = array(
     '#prefix' => '<div class="right-container">',
@@ -622,9 +615,9 @@ function panels_page_context_form($panel_page, $next = NULL) {
 
   panels_load_include('common-context');
 
-  $settings = panels_common_add_argument_form('panel_page', $form, $form['left']['arguments_table'], $panel_page);
-  $settings += panels_common_add_context_form('panel_page', $form, $form['right']['contexts_table'], $panel_page);
-  $settings += panels_common_add_relationship_form('panel_page', $form, $form['left']['relationships_table'], $panel_page);
+  $settings = panels_common_add_argument_form('panel_page', $form, $form_state, $form['left']['arguments_table'], $panel_page);
+  $settings += panels_common_add_context_form('panel_page', $form, $form_state, $form['right']['contexts_table'], $panel_page);
+  $settings += panels_common_add_relationship_form('panel_page', $form, $form_state, $form['left']['relationships_table'], $panel_page);
   panels_common_add_context_js($settings);
 
   $label = ($next) ? t('Save and proceed') : t('Save');
@@ -639,13 +632,13 @@ function panels_page_context_form($panel_page, $next = NULL) {
 /**
  * Process submission of the panel page edit form.
  */
-function panels_page_context_form_submit($form_id, $form_values) {
-  $panel_page = $form_values['panel_page'];
+function panels_page_context_form_submit($form, &$form_state) {
+  $panel_page = $form_state['panel_page'];
 
   // Organize these from the common form.
-  panels_common_save_context('argument', $panel_page->arguments, $form_values);
-  panels_common_save_context('context', $panel_page->contexts, $form_values);
-  panels_common_save_context('relationship', $panel_page->relationships, $form_values);
+  panels_common_save_context('argument', $panel_page->arguments, $form_state['values']);
+  panels_common_save_context('context', $panel_page->contexts, $form_state['values']);
+  panels_common_save_context('relationship', $panel_page->relationships, $form_state['values']);
 
   // Match up our displays, carry them forward and add new ones.
   $old_displays = $panel_page->displays;
@@ -689,7 +682,7 @@ function panels_page_context_form_submit($form_id, $form_values) {
   drupal_set_message(t('Your changes have been saved.'));
   panels_page_save($panel_page);
   panels_cache_clear('panel_object:panel_page', $panel_page->name);
-  if ($form_values['submit'] == t('Save and proceed')) {
+  if ($form_state['values']['submit'] == t('Save and proceed')) {
     return "admin/panels/panel-page/{$panel_page->name}/edit/content";
   }
 }
@@ -697,13 +690,7 @@ function panels_page_context_form_submit($form_id, $form_values) {
 /**
  * Pass through to the panels layout editor.
  */
-function panels_page_edit_layout($panel_page, $did = NULL) {
-  if (!is_object($panel_page)) {
-    $panel_page = panels_page_load($panel_page);
-  }
-
-  $display = panels_page_fetch_display($panel_page, $did);
-
+function panels_page_edit_layout($panel_page) {
   // The following form will return the $display upon successful submit, if
   // we didn't send the $dest. Which we don't, here. That way we can update
   // our panel_page if necessary and do our own goto.
@@ -713,8 +700,8 @@ function panels_page_edit_layout($panel_page, $did = NULL) {
     panels_page_set_display($panel_page, $did, $output);
 
     $dest = "admin/panels/panel-page/edit/{$panel_page->name}/layout";
-    if ($did) {
-      $dest .= "/$did";
+    if ($panel_page->display->did != $panel_page->did) {
+      $dest .= "/{$panel_page->display->did}";
     }
     drupal_goto($dest);
   }
@@ -726,18 +713,12 @@ function panels_page_edit_layout($panel_page, $did = NULL) {
 /**
  * Pass through to the panels layout settings editor.
  */
-function panels_page_edit_layout_settings($panel_page, $did = NULL, $next = NULL) {
-  if (!is_object($panel_page)) {
-    $panel_page = panels_page_load($panel_page);
-  }
-
-  $display = panels_page_fetch_display($panel_page, $did);
-
+function panels_page_edit_layout_settings($panel_page, $next = NULL) {
   if (empty($next)) {
     $button = t('Save');
     $dest = "admin/panels/panel-page/{$panel_page->name}/edit/settings";
-    if ($did) {
-      $dest .= "/$did";
+    if ($panel_page->display->did != $panel_page->did) {
+      $dest .= "/{$panel_page->display->did}";
     }
   }
   else {
@@ -747,7 +728,7 @@ function panels_page_edit_layout_settings($panel_page, $did = NULL, $next = NULL
 
   // The following form will return the $display upon successful submit, if
   // we didn't send the $dest. Which we don't, here.
-  $output = panels_edit_layout_settings($display, $button, NULL, $panel_page->title);
+  $output = panels_edit_layout_settings($panel_page->display, $button, NULL, $panel_page->title);
   if (is_object($output)) {
     panels_page_set_display($panel_page, $did, $output);
     drupal_goto($dest);
@@ -760,32 +741,25 @@ function panels_page_edit_layout_settings($panel_page, $did = NULL, $next = NULL
 /**
  * Pass through to the panels content editor.
  */
-function panels_page_edit_content($panel_page, $did = NULL) {
-  if (!is_object($panel_page)) {
-    $panel_page = panels_page_load($panel_page);
-  }
-
-  $display = panels_page_fetch_display($panel_page, $did);
-
-  // Collect a list of contexts required by the arguments on this page.
-  $contexts = panels_context_load_contexts($panel_page);
-
-  $display->context = $contexts;
-  $display->args = array();
+function panels_page_edit_content($panel_page) {
+  panels_load_include('plugins');
+  panels_load_include('common');
+  // Collect a list of the contexts (potentially) available to this panel page.
+  $panel_page->display->context = panels_context_load_contexts($panel_page);
+  $panel_page->display->args = array();
 
   // Get a list of available content.
-  require_once drupal_get_path('module', 'panels') . '/includes/common.inc';
-  $content_types = panels_common_get_allowed_types('panels_page', $contexts);
+  $content_types = panels_common_get_allowed_types('panels_page', $panel_page->display->context);
 
-  $output = panels_edit($display, NULL, $content_types);
+  $output = panels_edit($panel_page->display, NULL, $content_types);
   if (is_object($output)) {
     // If this is a default page, and was saved, we have to make it real.
     panels_page_set_display($panel_page, $did, $output);
 
     // And do the drupal_goto that a submit function ordinarily would have.
     $dest = "admin/panels/panel-page/{$panel_page->name}/edit/content";
-    if ($did) {
-      $dest .= "/$did";
+    if ($display->did != $panel_page->did) {
+      $dest .= "/{$panel_page->display->did}";
     }
     drupal_goto($dest);
   }
@@ -795,26 +769,6 @@ function panels_page_edit_content($panel_page, $did = NULL) {
   // messes up the drag & drop.
   drupal_set_title(check_plain(panels_page_get_title($panel_page)));
   print theme('page', $output, FALSE);
-}
-
-/**
- * Page callback to export a panel page to PHP code.
- */
-function panels_page_edit_export($panel_page) {
-  if (!is_object($panel_page)) {
-    $panel_page = panels_page_load($panel_page);
-  }
-  drupal_set_title(check_plain($panel_page->title));
-  $code = panels_page_export($panel_page);
-
-  $lines = substr_count($code, "\n");
-  $form['code'] = array(
-    '#type' => 'textarea',
-    '#title' => $panel_page->title,
-    '#default_value' => $code,
-    '#rows' => $lines,
-  );
-  return $form;
 }
 
 /**
@@ -833,7 +787,7 @@ function panels_page_import_page() {
 /**
  * Form to for the panel page import
  */
-function panels_page_import_form() {
+function panels_page_import_form(&$form_state) {
   $form['panel_page'] = array(
     '#type' => 'textarea',
     '#title' => t('Panel page code'),
@@ -854,7 +808,7 @@ function panels_page_import_form() {
 /**
  * Handle the submit button on importing a panel page.
  */
-function panels_page_import_form_submit($form_id, $form) {
+function panels_page_import_form_submit($form, &$form_state) {
   ob_start();
   eval($form['panel_page']);
   ob_end_clean();
@@ -873,17 +827,47 @@ function panels_page_import_form_submit($form_id, $form) {
   }
 }
 
-function panels_page_preview_page() {
+function panels_page_preview_page(&$form_state, $panel_page) {
+  panels_page_load_include('render');
   $args = func_get_args();
   $panel_page = array_shift($args);
+  return t('The Preview function has not yet been ported; expect it in a later alpha release.');
+  $load_objects = array();
+  // FIXME copied from the master loader; this NEEDS to be retooled for previews.
+/*  foreach ($panel_page->arguments as $id => $argument) {
+    $ignore = $argument['default'] == 'ignore';
+    $load_objects[$id] = array_shift($args);
+    $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_BAD_ARG;
+    if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
+      if ($context & PANELS_USE_FALLBACK_ROUTER) {
+        if ($panel_page->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
+          $loader_data['fallback'] = TRUE;
+          break;
+        }
+        else if ($ignore) {
+          continue;
+        }
+      }
+      // TODO Are there other cases? If not, this else is an unnecessary overspecification
+      else if ($context & PANELS_BAD_ARG && $ignore) {
+        continue;
+      }
+      // Bail out and 404 if we get this far.
+      // TODO should this 'business logic' be separated out?
+      drupal_not_found();
+    }
+    $panel_page->context[panels_argument_context_id($argument)] = $context;
+  }
+  _panels_page_prepare_render($panel_page);
+  */
 }
 
-function panels_page_admin_view($panel_page, $args) {
+function panels_page_admin_view(&$form_state, $panel_page, $args) {
   $form = array();
 
   $form['fieldset'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Administrative view: enter arguments'),
+    '#title' => t('Administrative preview: enter arguments'),
     '#collapsible' => TRUE,
   );
 
@@ -956,15 +940,15 @@ function panels_page_admin_view($panel_page, $args) {
   return $form;
 }
 
-function panels_page_admin_view_submit($form_id, $form_values) {
+function panels_page_admin_view_submit($form, &$form_state) {
   $count = 0;
-  $url = "admin/panels/panel-page/" . $form_values['panel_page']->name . '/edit/preview';
-  foreach ($form_values['contexts'] as $context) {
-    $url .= "/" . $form_values["arg$count"];
+  $url = "admin/panels/panel-page/" . $form_state['values']['panel_page']->name . '/edit/preview';
+  foreach ($form_state['values']['contexts'] as $context) {
+    $url .= "/" . $form_state['values']["arg$count"];
     $count++;
   }
-  if (!empty($form_values['additional'])) {
-    $url .= "/" . $form_values['additional'];
+  if (!empty($form_state['values']['additional'])) {
+    $url .= "/" . $form_state['values']['additional'];
   }
   return $url;
 }
