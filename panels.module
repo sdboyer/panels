@@ -782,7 +782,10 @@ function panels_export_display($display, $prefix = '') {
   $output = '';
   $output .= $prefix . '$display = new panels_display()' . ";\n";
   $output .= $prefix . '$display->did = \'new\'' . ";\n";
-  $fields = array('name', 'layout', 'layout_settings', 'panel_settings');
+  // $fields = array('name', 'layout', 'layout_settings', 'panel_settings');
+  // TODO 'name' field was removed several months ago, so temporarily removing
+  // it from here whil investigations into exactly why it was removed continue
+  $fields = array('layout', 'layout_settings', 'panel_settings');
   foreach ($fields as $field) {
     $output .= $prefix . '$display->' . $field . ' = ' . panels_var_export($display->$field, $prefix) . ";\n";
   }
