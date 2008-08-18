@@ -4,15 +4,15 @@
 /**
  * @file panels_page.render.inc
  *  Functions utilized during the panels_page render process. On any given page
- *  request, this file is lazy-loaded by panels_page itself only once it's been
- *  absolutely verified that we'll need it.
+ *  request, this file is lazy-loaded by panels_page itself only after it's been
+ *  absolutely verified that it's needed.
  */
 
-function panels_page_prepare_render(&$loader_data, &$panel_page) {
-  _panels_page_prepare_render($panel_page);
+function panels_page_prepare_panels_render(&$loader_data, &$panel_page) {
+  _panels_page_prepare_panels_render($panel_page);
 
   // Store the instructions back in our load handler array.
-  $loader_data['page callback']   = 'panels_page_render_page_' . $panel_page->form ? 'form' : 'normal';
+  $loader_data['page callback']   = 'panels_page_render_page_' . ($panel_page->form ? 'form' : 'normal');
   $loader_data['title callback']  = 'panels_page_get_title';
   // Pass by ref to ENSURE php4/5 consistency and keep down static cache size.
   $loader_data['panel page']      =& $panel_page;
@@ -20,7 +20,7 @@ function panels_page_prepare_render(&$loader_data, &$panel_page) {
   $loader_data['title arguments'] = array(&$loader_data['panel page']);
 }
 
-function _panels_page_prepare_render(&$panel_page) {
+function _panels_page_prepare_panels_render(&$panel_page) {
   _panels_page_check_switchers($panel_page);
   $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->context);
   $panel_page->keywords = panels_context_get_keywords($panel_page->context);
@@ -104,7 +104,7 @@ function panels_page_render_page_normal($panel_page, $args) {
   }
 */
   _panels_page_prepare_display($panel_page, $args);
-  $output = panels_render_display($display);
+  $output = panels_render_display($panel_page->display);
   panels_page_custom_css($panel_page);
 
   // FIXME I believe this method no longer works.
