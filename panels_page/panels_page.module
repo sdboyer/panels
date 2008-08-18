@@ -136,10 +136,14 @@ function panels_page_get_loader_data($pid, $args) {
 
   panels_load_include('plugins');
   // TODO check; we shouldn't have to load the display this early.
-  $panel_page = panels_page_load($pid, TRUE);
-  $loader_data['access'] = panels_page_access($panel_page);
+  // $panel_page = panels_page_load($pid, TRUE);
+  $panel_page = panels_page_load($pid);
   $map = explode('/', $_GET['q']);
-  $map = array_map('_panels_page_rebuild_menu_map', $map, $args, array_keys(explode('/', $panel_page->path), '%'));
+  // TODO remove this
+  if ($panel_page->loader_flags & PANELS_IS_DYNAMIC) {
+    $wildcards = array_keys(explode('/', $panel_page->path), '%');
+    $map = _panels_page_rebuild_menu_map($map, $args, $wildcards);
+  }
 
   $load_objects = array();
   foreach ($panel_page->arguments as $id => $argument) {
@@ -151,7 +155,6 @@ function panels_page_get_loader_data($pid, $args) {
       if ($context & PANELS_USE_FALLBACK_ROUTER) {
         if ($panel_page->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
           $loader_data['fallback'] = TRUE;
-          panels_page_prepare_fallback_render($loader_data, $quickref, $map);
           break;
         }
         else if ($ignore) {
@@ -170,12 +173,14 @@ function panels_page_get_loader_data($pid, $args) {
   }
   // If we've determined that we're falling back, bail out.
   if ($loader_data['fallback'] === TRUE) {
+    panels_page_prepare_fallback_render($loader_data, $map);
     return $loader_data;
   }
 
   // We're now 100% certain we're proceeding with a panel_page load, so first
   // check the panels_page native access function. If that passes, then include
   // the render inc file and proceed inside there.
+  $loader_data['access'] = panels_page_access($panel_page);
   if (empty($loader_data['access'])) {
     drupal_access_denied();
   }
@@ -186,8 +191,8 @@ function panels_page_get_loader_data($pid, $args) {
 }
 
 /**
- * Callback for array_map() that rebuilds the menu $map using data passed in to
- * the panels callback handlers from the menu system.
+ * Rebuild a drupal menu system-style $map using data passed in to the panels
+ * callback handlers from the menu system.
  *
  * @param array $map
  *   A incomplete menu map - it has only $_GET['q'] data initially - that this
@@ -203,9 +208,10 @@ function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
   foreach ($positions as $key => $position) {
     $map[$position] = $load_objects[$key];
   }
+  return $map;
 }
 
-function panels_page_prepare_fallback_render(&$loader_data, $quickref, $map) {
+function panels_page_prepare_fallback_render(&$loader_data, $map) {
   // Lifted from menu_get_item().
   list($ancestors, $placeholders) = menu_get_ancestors(explode('/', $quickref->path));
   if ($router_item = db_fetch_array(db_query_range('SELECT * FROM {panels_page_menu_store} WHERE path IN ('. implode (',', $placeholders) .') ORDER BY fit DESC', $ancestors, 0, 1))) {
