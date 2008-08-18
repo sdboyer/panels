@@ -51,10 +51,12 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
   if (is_null($path_prefix)) {
     $path_prefix = 'admin/panels/panel-page/';
   }
+  $loader_arg = count(explode('/', $path_prefix));
+
   $admin = array(
     'access arguments' => array('create panel-pages'),
     'file' => 'panels_page.admin.inc',
-    'page arguments' => array(3),
+    'page arguments' => array($loader_arg),
     'type' => MENU_LOCAL_TASK,
     'module' => 'panels_page',
   );
@@ -92,37 +94,39 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
     'page callback' => 'panels_page_edit_advanced',
     'weight' => -8,
   ) + $admin;
-  $items[$path_prefix . '%panels_page_admin/edit/context'] = array(
+  $items[$path_prefix . '%panels_page_admin_cache/edit/context'] = array(
     'title' => 'Context',
     'page callback' => 'panels_page_edit_context',
     'weight' => -6,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/layout'] = array(
     'title' => 'Layout',
-    'page callback' => 'panels_page_edit_layout_settings',
-    'load arguments' => array('%map'),
+    'page callback' => 'panels_page_edit_layout',
+    'load arguments' => array(6),
     'weight' => -4,
   ) + $admin;
-  $items[$path_prefix . '%panels_page_admin/edit/layout-settings'] = array(
+  $items[$path_prefix . '%panels_page_admin_cache/edit/layout-settings'] = array(
     'title' => 'Layout settings',
     'page callback' => 'panels_page_edit_layout_settings',
-    'load arguments' => array('%map'),
+    'load arguments' => array(6),
     'weight' => -2,
   ) + $admin;
-  $items[$path_prefix . '%panels_page_admin/edit/content'] = array(
+  $items[$path_prefix . '%panels_page_admin_cache/edit/content'] = array(
     'title' => 'Content',
     'page callback' => 'panels_page_edit_content',
-    'load arguments' => array('%map'),
+    'load arguments' => array(6),
     'weight' => 0,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/preview'] = array(
     'title' => 'Preview',
-    'page callback' => 'panels_page_preview_page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('panels_page_preview_page', $loader_arg),
     'weight' => 2,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/export'] = array(
     'title' => 'Export',
-    'page callback' => 'panels_page_edit_export',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('panels_page_export_page', $loader_arg),
     'weight' => 4,
   ) + $admin;
   return $items;
