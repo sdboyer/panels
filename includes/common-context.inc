@@ -252,6 +252,7 @@ function panels_common_add_item_table_buttons($type, $module, &$form, $available
  * the ajax to add an item.
  */
 function panels_common_add_item_to_form($module, $type, $name, &$form, $position, $item) {
+  panels_load_include('ajax');
   // This is the single function way to load any plugin by variable type.
   $info = panels_common_context_data($type, $item['name']);
   $form['title'] = array(
