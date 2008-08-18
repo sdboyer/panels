@@ -110,7 +110,7 @@ function panels_page_list_page() {
 }
 
 /**
- * Settings for panel pages.
+ * General settings configuration page for panel pages.
  */
 function panels_page_settings() {
   panels_load_include('common');
@@ -234,7 +234,7 @@ function panels_page_edit($panel_page) {
 /**
  * The form to edit the page portion of a panel.
  */
-function panels_page_edit_form($panel_page, $next = NULL) {
+function panels_page_edit_form($form_state, $panel_page, $next = NULL) {
   panels_load_include('common');
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $layout = panels_get_layout($panel_page->display->layout);
@@ -404,22 +404,20 @@ function panels_page_edit_form_submit($form_id, $form_values) {
 /**
  * Edit advanced settings of a panel page.
  */
-function panels_page_edit_advanced($name, $next = NULL) {
-  $panel_page = panels_page_load($name);
-  drupal_set_title(check_plain(panels_page_get_title($panel_page)));
+function panels_page_edit_advanced($panel_page, $next = NULL) {
+  $form_state = array(
+    'panel_page' => &$panel_page,
+    'next' => $next,
+  );
   return drupal_get_form('panels_page_advanced_form', $panel_page, $next);
 }
 
 /**
  * The form to edit the advanced settings of a panel page.
  */
-function panels_page_advanced_form($panel_page, $next = NULL) {
+function panels_page_advanced_form($form_state, $panel_page, $next) {
   drupal_add_css(panels_get_path('css/panels_admin.css'));
-
-  $form['panel_page'] = array(
-    '#type' => 'value',
-    '#value' => $panel_page,
-  );
+  $form_state['panel_page'] =& $panel_page;
 
   $form['right'] = array(
     '#prefix' => '<div class="right-container">',
@@ -622,7 +620,7 @@ function panels_page_context_form($panel_page, $next = NULL) {
     '#suffix' => '</div>',
   );
 
-  panels_load_include('common');
+  panels_load_include('common-context');
 
   $settings = panels_common_add_argument_form('panel_page', $form, $form['left']['arguments_table'], $panel_page);
   $settings += panels_common_add_context_form('panel_page', $form, $form['right']['contexts_table'], $panel_page);
