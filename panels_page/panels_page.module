@@ -107,12 +107,47 @@ function panels_page_menu_alter(&$callbacks) {
 
 
 /**
- * Menu loader for the panels admin screens. Loads the panels_page specified by
- * the name arg, induces a 404 when a bad arg is provided.
+ * Menu loader for some panels_page admin screens. Loads the panels_page
+ * specified by the name arg, induces a 404 when a bad arg is provided.
+ *
+ * Use the empty string so that the behavior of callers that don't pass arg(6)
+ * will be the same as callers who do pass arg(6), but arg(6) is empty.
+ *
+ * @param $name
+ * @param $which
+ * @return mixed
  */
-function panels_page_admin_load($name, $map = NULL) {
+function panels_page_admin_load($name, $which = '') {
   panels_load_include('plugins');
-  $panel_page = panels_page_load($name, TRUE);
+  $panel_page = panels_page_load($name);
+  $panel_page->display = panels_page_fetch_display($panel_page, $which);
+  return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
+}
+
+/**
+ * Menu loader for some panels_page admin screens. Loads the panels_page
+ * specified by the name arg from the edit cache, or induces a 404 when a bad
+ * arg is provided.
+ *
+ * Use the empty string so that the behavior of callers that don't pass arg(6)
+ * will be identical to callers who do pass arg(6), but arg(6) is empty.
+ *
+ * @param $name
+ * @param $which
+ * @return mixed
+ */
+function panels_page_admin_cache_load($name, $which = '') {
+  if (!empty($_POST)) {
+    // FIXME With the way the menu system currently works, this is likely to be
+    // fired AT LEAST six times per page request. Bollocks. Figure out yet
+    // another fracking caching method...
+    $panel_page = panels_cache_get('panel_object:panel_page', $name);
+  }
+  else {
+    $panel_page = panels_page_load($name);
+    panels_cache_set('panel_object:panel_page', $name, $panel_page);
+  }
+  $panel_page->display = panels_page_fetch_display($panel_page, $which);
   return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
 }
 
