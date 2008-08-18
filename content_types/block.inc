@@ -24,7 +24,7 @@ function panels_block_panels_content_types() {
  * Output function for the 'block' content type. Outputs a block
  * based on the module and delta supplied in the configuration.
  */
-function panels_content_block($conf) {
+function panels_content_block($subtype, $conf) {
   $block = (object) module_invoke($conf['module'], 'block', 'view', $conf['delta']);
   if (empty($block)) {
     return;
@@ -203,7 +203,7 @@ function panels_admin_fix_block_tree(&$form, $key = NULL) {
 /**
  * Returns the administrative title for a type.
  */
-function panels_admin_title_block($conf) {
+function panels_admin_title_block($subtype, $conf) {
   $block = module_invoke($conf['module'], 'block', 'list');
   if (empty($block) || empty($block[$conf['delta']])) {
     return t('Deleted/missing block @module-@delta', array('@module' => $conf['module'], '@delta' => $conf['delta']));

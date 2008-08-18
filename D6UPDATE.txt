@@ -15,6 +15,9 @@ CONTENT TYPES
 panels_node_legacy module renamed to panels_node_content.module 
 -- NEED UPDATE TO RENAME IN SYSTEM TABLE.
 
+'title callback' now has $subtype as the first argument.
+'render' now has $subtype as the first argument.
+
 CONTEXTS
 ========
 

@@ -216,9 +216,9 @@ function _panels_pane_access_role($pane, $account) {
  * @param $incoming_content
  *   Any incoming content, if this display is a wrapper.
  */
-function panels_ct_get_content($type, $conf, $args, $context, $incoming_content) {
+function panels_ct_get_content($type, $subtype, $conf, $args, $context, $incoming_content) {
   if ($function = panels_plugin_get_function('content_types', $type, 'render callback')) {
-    $content = $function($conf, $args, $context, $incoming_content);
+    $content = $function($subtype, $conf, $args, $context, $incoming_content);
     if (empty($content->title) && !empty($content->subject)) {
       $content->title = $content->subject;
     }
@@ -243,9 +243,9 @@ function panels_ct_get_content($type, $conf, $args, $context, $incoming_content)
  * @param $incoming_content
  *   Any incoming content, if this display is a wrapper.
  */
-function panels_ct_get_title($type, $conf, $context = NULL, $incoming_content = NULL) {
+function panels_ct_get_title($type, $subtype, $conf, $context = NULL, $incoming_content = NULL) {
   if ($function = panels_plugin_get_function('content_types', $type, 'title callback')) {
-    return $function($conf, $context, $incoming_content);
+    return $function($subtype, $conf, $context, $incoming_content);
   }
   return t('Deleted/missing content type @type', array('@type' => $type));
 }
@@ -533,7 +533,7 @@ function panels_get_pane_content($display, $pane, $args = array(), $context = NU
     $content = $cache->content;
   }
   else {
-    $content = panels_ct_get_content($pane->type, $pane->configuration, $args, $context, $incoming_content);
+    $content = panels_ct_get_content($pane->type, $pane->subtype, $pane->configuration, $args, $context, $incoming_content);
     foreach (module_implements('panels_pane_content_alter') as $module) {
       // TODO This makes the third hook invocation on the render path. How badly is this hindering performance?
       $function = $module . '_panels_pane_content_alter';
@@ -742,7 +742,7 @@ function panels_get_pane_title(&$pane, $context = array(), $incoming_content = N
       return t('Does not meet context requirements');
     }
   }
-  return panels_ct_get_title($pane->type, $pane->configuration, $pane->context, $incoming_content);
+  return panels_ct_get_title($pane->type, $pane->subtype, $pane->configuration, $pane->context, $incoming_content);
 }
 
 /**

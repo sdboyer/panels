@@ -59,7 +59,7 @@ function panels_node_panels_content_types() {
  *
  * Outputs a node based on the module and delta supplied in the configuration.
  */
-function panels_node_content_render($conf, $panel_args) {
+function panels_node_content_render($subtype, $conf, $panel_args) {
   $nid = $conf['nid'];
   $block = new stdClass();
 
@@ -218,7 +218,7 @@ function panels_node_content_edit_validate($form, &$form_values) {
 /**
  * Returns the administrative title for a node.
  */
-function panels_node_content_title($conf) {
+function panels_node_content_title($subtype, $conf) {
   if (!is_numeric($conf['nid'])) {
     return t('Node loaded from @var', array('@var' => $conf['nid']));
   }

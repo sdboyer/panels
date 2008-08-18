@@ -359,15 +359,27 @@ function panels_add_content($cache, $panel_id) {
 
   foreach ($cache->content_types as $type_name => $subtypes) {
     if (is_array($subtypes)) {
+      $content_type = panels_get_content_type($type_name);
       foreach ($subtypes as $subtype_name => $subtype_info) {
         $title = filter_xss_admin($subtype_info['title']);
         $description = isset($subtype_info['description']) ? $subtype_info['description'] : $title;
 
+        $icon = '';
+
         if (isset($subtype_info['icon'])) {
           $icon = $subtype_info['icon'];
-          $path = isset($subtype_info['path']) ? $subtype_info['path'] : panels_get_path("content_types/$type_name");
+          if (isset($subtype_info['path']) && file_exists($subtype_info['path'] . '/' . $icon)) {
+            $path = $subtype_info['path'];
+          }
+          else if (isset($content_type['path']) && file_exists($content_type['path'] . '/' . $icon)) {
+            $path = $content_type['path'];
+          }
+          else if (file_exists(panels_get_path("content_types/$type_name") . '/' . $icon)) {
+            $path = panels_get_path("content_types/$type_name");
+          }
         }
-        else {
+
+        if (empty($icon)) {
           $icon = 'no-icon.png';
           $path = panels_get_path('images');
         }
@@ -385,7 +397,7 @@ function panels_add_content($cache, $panel_id) {
           }
         }
         else {
-          $category = t('Contrib modules');
+          $category = t('Contrib blocks');
         }
 
         $output = '<div class="content-type-button clear-block">';
