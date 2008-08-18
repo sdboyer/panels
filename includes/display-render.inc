@@ -189,30 +189,32 @@ function panels_render_pane_content(&$display, &$pane) {
     $content->css_class = $pane->configuration['css_class'];
   }
 
-  // Perform substitutions
-  if (!empty($keywords)) {
-    $content->title = strtr($content->title, $keywords);
-  }
-
-  // Sterilize the title
-  $content->title = filter_xss_admin($content->title);
-
-  // If a link is specified, populate.
-  if (!empty($content->title_link)) {
-    if (!is_array($content->title_link)) {
-      $url = array('href' => $content->title_link);
+  if (!empty($content->title)) {
+    // Perform substitutions
+    if (!empty($keywords)) {
+      $content->title = strtr($content->title, $keywords);
     }
-    else {
-      $url = $content->title_link;
+
+    // Sterilize the title
+    $content->title = filter_xss_admin($content->title);
+
+    // If a link is specified, populate.
+    if (!empty($content->title_link)) {
+      if (!is_array($content->title_link)) {
+        $url = array('href' => $content->title_link);
+      }
+      else {
+        $url = $content->title_link;
+      }
+      // set defaults so we don't bring up notices
+      $url += array('href' => '', 'attributes' => NULL, 'query' => NULL, 'fragment' => NULL, 'absolute' => NULL);
+      $content->title = l($content->title,
+        $url['href'],
+        $url['attributes'],
+        $url['query'],
+        $url['fragment'],
+        $url['absolute'], TRUE);
     }
-    // set defaults so we don't bring up notices
-    $url += array('href' => '', 'attributes' => NULL, 'query' => NULL, 'fragment' => NULL, 'absolute' => NULL);
-    $content->title = l($content->title,
-      $url['href'],
-      $url['attributes'],
-      $url['query'],
-      $url['fragment'],
-      $url['absolute'], TRUE);
   }
   return $content;
 }
