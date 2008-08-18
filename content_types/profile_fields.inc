@@ -46,7 +46,7 @@ function panels_profile_fields_content($conf, $panel_args, $context) {
       }
     }
 
-    if (sizeof($vars) == 0) {
+    if (count($vars) == 0) {
       // Output the given empty text
       $output = $conf['empty'];
     }
