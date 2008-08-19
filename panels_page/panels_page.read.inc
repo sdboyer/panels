@@ -164,9 +164,20 @@ function panels_page_fetch_primary_display(&$panel_page) {
 
 /**
  * Load a display based upon information from the $displays list.
+ *
+ * The family of panels_page_fetch*() functions are specifically dedicated to
+ * retrieving a particular display and placing them in $panels_page->display
+ * via reference to its permanent home in the $panels_page object. The
+ * permanent homes vary:
+ *
+ *   -# For the primary display, that location is $panels_page->primary.
+ *   -# For alternate default displays, that location is in
+ *      $panels_page->alternates['defaults'][$did].
+ *   -# For alternate non-default displays, that location is in
+ *      $panels_page->alternates['all'][$did].
  */
-function panels_page_fetch_display(&$panel_page, $id) {
-  // We should REALLY try to never have this happen, but...just to be sure.
+function panels_page_fetch_display(&$panel_page, $id = NULL) {
+  // No id is provided - we want the primary display. Get it and get out.
   if (empty($id)) {
     panels_page_fetch_primary_display($panel_page);
     return;
@@ -174,17 +185,14 @@ function panels_page_fetch_display(&$panel_page, $id) {
 
   // FIXME I don't grok this part of the logic, and am assuming this is OK.
   $info = $panel_page->displays[$id];
-  if ($display = _panels_fetch_display_from_info($info)) {
-    $panel_page->display =& $display;
-    panels_page_loaded_cache($panel_page->name, $panel_page);
+  if (panels_fetch_display_from_info($panel_page, $info)) {
     return;
   }
 
   // The requested display does not exist. First, we try to fall back to the
   // default display for the context we're switching on.
   if (!empty($info['default']) && !empty($panel_page->displays[$info['default']])) {
-    $panel_page->display = _panels_page_fetch_display_from_info($panel_page->displays[$info['default']]);
-    panels_page_loaded_cache($panel_page->name, $panel_page);
+    panels_page_fetch_display_from_info($panel_page, $panel_page->displays[$info['default']]);
   }
   // Otherwise, use the primary display. Load it if it's not already loaded.
   else {
@@ -197,16 +205,23 @@ function panels_page_fetch_display(&$panel_page, $id) {
 /**
  * Get a display based on whether it's already in code or needs to be loaded.
  */
-function _panels_page_fetch_display_from_info($info) {
+function panels_page_fetch_display_from_info(&$panel_page, $info) {
+  $ret = NULL;
   // If the 'display' is set it's the result of an export/default
   if (isset($info['display'])) {
-    return $info['display'];
+    $ret = $info['display'];
   }
 
   if (is_numeric($info['did'])) {
-    return panels_load_display($info['did']);
+    $ret = panels_load_display($info['did']);
   }
 
+  if (is_object($ret)) {
+    $panel_page->alternates[$ret->name] = $ret; // By val doesn't matter here
+    $panel_page->display =& $panel_page->alternates[$ret->name];
+    panels_page_loaded_cache($panel_page->name, $panel_page);
+    return TRUE;
+  }
   return FALSE;
 }
 
