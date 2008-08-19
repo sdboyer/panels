@@ -67,9 +67,9 @@ function panels_page_load($id, $load_display = FALSE) {
   $cache = panels_page_loaded_cache($id);
 
   if ($cache) {
-    if ($load_display && empty($cache->display)) {
-      $cache->display = panels_load_display($cache->did);
-      panels_page_loaded_cache($id, $cache);
+    // This is deprecated; ideally the fetcher should be called directly
+    if ($load_display && empty($cache->primary)) {
+      panels_page_fetch_primary_display($cache);
     }
     return $cache;
   }
@@ -103,6 +103,8 @@ function panels_page_load($id, $load_display = FALSE) {
 
   if ($load_display) {
     $page->primary = panels_load_display($page->did);
+    // By default, we set the primary display as the current display.
+    $page->display =& $page->primary;
   }
 
   panels_page_loaded_cache($id, $page);
@@ -120,7 +122,6 @@ function panels_page_loaded_cache($id, $panel_page = NULL) {
   }
   return array_key_exists($id, $cache) ? $cache[$id] : FALSE;
 }
-
 
 /**
  * Get all 'default' panels.
@@ -154,8 +155,10 @@ function panels_page_set_current(&$panel_page) {
  * @param object $panel_page
  */
 function panels_page_fetch_primary_display(&$panel_page) {
-  if (!is_a($panel_page->primary, 'panels_display')) {
-    $panel_page->primary            = panels_load_display($panel_page->did);
+  // Commented out is a more precise way of telling, but it's probably moot.
+  // if (empty($panel_page->primary) || !is_a($panel_page->primary, 'panels_display')) {
+  if (empty($panel_page->primary) || !is_object($panel_page->primary)) {
+    $panel_page->primary = panels_load_display($panel_page->did);
   }
   $panel_page->display =& $panel_page->primary;
   // Update the cache.
@@ -196,7 +199,7 @@ function panels_page_fetch_display(&$panel_page, $id = NULL) {
 
   // FIXME I don't grok this part of the logic, and am assuming this is OK.
   $info = $panel_page->displays[$id];
-  if (panels_fetch_display_from_info($panel_page, $info)) {
+  if (panels_page_fetch_display_from_info($panel_page, $info)) {
     return;
   }
 
