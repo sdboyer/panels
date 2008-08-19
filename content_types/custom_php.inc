@@ -26,10 +26,10 @@ function panels_custom_php_panels_content_types() {
  * privileged users to enter custom php code that is evaluated while
  * $context is in scope. Use with caution!
  */
-function panels_content_custom_php($conf, $panel_args, $context) {
+function panels_content_custom_php($subtype, $conf, $panel_args, $context) {
   static $delta = 0;
   $block = new stdClass();
-  
+
   // eval() the php that has been entered by the user.
   eval($conf['body']);
   $block->delta = ++$delta;
@@ -47,7 +47,7 @@ function panels_content_custom_php($conf, $panel_args, $context) {
       $block->$member = $value;
     }
   }
-  
+
   return $block;
 }
 
@@ -100,7 +100,7 @@ function panels_admin_edit_custom_php($id, $parents, $conf = NULL) {
   $body = t('Any content you want to have passed along to theme function for displaying MUST be stored in $block->content.') . "\n\n";
   $body .= t('MAKE SURE YOU ERASE ALL OF THIS HELP TEXT. Only error-free php code should be saved in this field.') . "\n\n";
   $body .= t('Do NOT use php tags.');
-  
+
   $form['body'] = array(
     '#title' => t('Body'),
     '#type' => 'textarea',

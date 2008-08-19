@@ -9,7 +9,6 @@ function panels_term_list_panels_content_types() {
   $items['term_list'] = array(
     'title' => t('List of related terms'),
     'content_types' => 'panels_admin_content_types_term_list',
-    // only provides a single content type
     'single' => TRUE,
     'render callback' => 'panels_content_term_list',
     'add callback' => 'panels_admin_edit_term_list',
@@ -19,11 +18,7 @@ function panels_term_list_panels_content_types() {
   return $items;
 }
 
-/**
- * Output function for the 'node' content type. Outputs a node
- * based on the module and delta supplied in the configuration.
- */
-function panels_content_term_list($conf, $panel_args, $context) {
+function panels_content_term_list($subtype, $conf, $panel_args, $context) {
   $term = isset($context->data) ? drupal_clone($context->data) : NULL;
   $block = new stdClass();
   $block->module = 'term-list';

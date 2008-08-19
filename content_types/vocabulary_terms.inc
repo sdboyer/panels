@@ -24,7 +24,7 @@ function panels_vocabulary_terms_panels_content_types() {
  * Output function for the 'vocabulary terms' content type. Outputs a
  * list of terms for the input vocabulary.
  */
-function panels_content_vocabulary_terms($conf, $panel_args, $context) {
+function panels_content_vocabulary_terms($subtype, $conf, $panel_args, $context) {
   $vocab = isset($context->data) ? drupal_clone($context->data) : NULL;
   $max_depth = (!empty($conf['max_depth']) ? (int)$conf['max_depth'] : NULL);
   if ($conf['tree'] == FALSE) {

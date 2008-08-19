@@ -21,11 +21,7 @@ function panels_node_comments_panels_content_types() {
   return $items;
 }
 
-/**
- * Output function for the 'node comments' content type. Outputs the comments
- * that have been made on a given nid, as provided by the $context.
- */
-function panels_content_node_comments($conf, $panel_args, $context) {
+function panels_content_node_comments($subtype, $conf, $panel_args, $context) {
   $node = isset($context->data) ? drupal_clone($context->data) : NULL;
   $block = new stdClass();
   $block->module = 'comments';

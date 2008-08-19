@@ -25,7 +25,7 @@ function panels_profile_fields_panels_content_types() {
 /**
  * 'Render' callback for the 'profile fields' content type.
  */
-function panels_profile_fields_content($conf, $panel_args, $context) {
+function panels_profile_fields_content($subtype, $conf, $panel_args, $context) {
   $account = isset($context->data) ? drupal_clone($context->data) : NULL;
   $block = new stdClass();
   $block->module = 'profile fields';

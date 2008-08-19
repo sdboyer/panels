@@ -9,7 +9,6 @@ function panels_term_description_panels_content_types() {
   $items['term_description'] = array(
     'title' => t('Term description'),
     'content_types' => 'panels_admin_content_types_term_description',
-    // only provides a single content type
     'single' => TRUE,
     'render callback' => 'panels_content_term_description',
     'add callback' => 'panels_admin_edit_term_description',
@@ -19,11 +18,7 @@ function panels_term_description_panels_content_types() {
   return $items;
 }
 
-/**
- * Output function for the 'node' content type. Outputs a node
- * based on the module and delta supplied in the configuration.
- */
-function panels_content_term_description($conf, $panel_args, $context) {
+function panels_content_term_description($subtype, $conf, $panel_args, $context) {
   $term = isset($context->data) ? drupal_clone($context->data) : NULL;
   $block = new stdClass();
   $block->module = 'node_type';

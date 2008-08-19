@@ -9,7 +9,6 @@ function panels_node_content_panels_content_types() {
   $items['node_content'] = array(
     'title' => t('Node content'),
     'weight' => -10,
-    // only provides a single content type
     'single' => TRUE,
     'content_types' => 'panels_admin_content_types_node_content',
     'render callback' => 'panels_content_node_content',
@@ -40,7 +39,7 @@ function panels_admin_content_types_node_content() {
  * Output function for the 'node' content type. Outputs a node
  * based on the module and delta supplied in the configuration.
  */
-function panels_content_node_content($conf, $panel_args, $context) {
+function panels_content_node_content($subtype, $conf, $panel_args, $context) {
   if (!empty($context) && empty($context->data)) {
     return;
   }

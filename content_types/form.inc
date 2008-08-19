@@ -40,7 +40,7 @@ function panels_admin_content_types_form() {
  * Output function for the 'node' content type. Outputs a node
  * based on the module and delta supplied in the configuration.
  */
-function panels_content_form($conf, $panel_args, &$context) {
+function panels_content_form($subtype, $conf, $panel_args, &$context) {
   $block = new stdClass();
   $block->module = 'form';
 

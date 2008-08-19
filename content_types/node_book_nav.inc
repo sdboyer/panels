@@ -9,7 +9,6 @@ function panels_node_book_nav_panels_content_types() {
   if (module_exists('book')) {
     $items['node_book_nav'] = array(
       'title' => t('Node book navigation'),
-      // only provides a single content type
       'single' => TRUE,
       'content_types' => 'panels_admin_content_types_node_book_nav',
       'render callback' => 'panels_content_node_book_nav',
@@ -19,11 +18,7 @@ function panels_node_book_nav_panels_content_types() {
   }
 }
 
-/**
- * Output function for the 'node' content type. Outputs a node
- * based on the module and delta supplied in the configuration.
- */
-function panels_content_node_book_nav($conf, $panel_args, $context) {
+function panels_content_node_book_nav($subtype, $conf, $panel_args, $context) {
   $node = isset($context->data) ? drupal_clone($context->data) : NULL;
   $block = new stdClass();
   $block->module = 'book_nav';
