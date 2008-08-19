@@ -5,27 +5,18 @@
 /**
  * @file panels_page.module
  *
- * This module is the primary implementation pf the Panels API.
- * It provides Panel pages that are used to create full page layouts.
- *
- * Code exclusively used on admin pages can be found in panels_page.admin.inc.
+ * This module is the primary implementation pf the Panels API. It provides
+ * Panel pages that are used to create full page layouts. It utilizes numerous
+ * .inc files for various segments of its functionality. These includes are
+ * lazy-loaded (some through the menu system, some internally) in order to keep
+ * code weight to an absolute minimum.
  */
 
 /**
  * Bitvalues used to determine the status of the panels_page override at a given
- * path. @see panels_page_check_router_status() for details on how these are
- * implemented.
+ * path. These are set during menu rebuild and used at render-time to speed
+ * along calculations somewhat.
  *
- * Indicates that the menu router for a particular path exists. If this bitval
- * is set but none of the others are, it indicates that that router is 'owned'
- * by another module and has not been overridden by Panels.
- */
-/*define('PANELS_ROUTER_EXISTS', 1);*/
-/**
- * Indicates that the active router in the {menu_router} table is set and is
- * owned by Panels.
- */
-/*define('PANELS_IS_PANELS_ITEM', 1 << 1);*/
 /**
  * Indicates that the item utilizes a dynamic path - that is, it has a
  *  wildcard (%) in its path.
@@ -36,18 +27,6 @@ define('PANELS_IS_DYNAMIC', 1);
  * this path has overridden, and that Panels has stored for this router item.
  */
 define('PANELS_HAS_FALLBACK_ROUTER', 1 << 1 | PANELS_IS_DYNAMIC);
-/**
- * Indicates that the path is owned by a panels page admin editing router. This
- * should basically be a big "hands-off" sign.
- */
-/*define('PANELS_IS_ADMIN_PATH', (1 << 4) | PANELS_IS_STATIC | PANELS_IS_PANELS_ITEM);*/
-
-// These deal with a particular pid's relationship with a given path
-/**
- * Panels display objects with this bitval set are an owner, although possibly
- * not the sole owner, of the router item at the provided path.
- */
-/*define('PANELS_PID_OWNS_PATH', 1 << 2);*/
 /**
  * Panels display objects with this bitval set share the provided path with
  * another panel.
@@ -170,7 +149,7 @@ function panels_page_get_loader_data($pid, $args) {
   if (!empty($loader_data[$pid])) {
     return $loader_data[$pid];
   }
-  $load =& $loader_data[$pid];
+  $load = &$loader_data[$pid];
 
   panels_load_include('plugins');
   panels_page_load_include('read');
@@ -462,28 +441,12 @@ function theme_panels_page_render_form($form) {
   return theme('form', $form);
 }
 
-// ---------------------------------------------------------------------------
-// Database functions
-
-
-/**
- * Sanitize a panel prior to saving it.
- */
-function panels_page_sanitize($page) {
-  foreach (array('arguments', 'displays', 'contexts', 'relationships', 'switcher_options') as $id) {
-    if (!is_array($page->$id)) {
-      $page->$id = array();
-    }
-  }
-
-  return $page;
-}
-
 /**
  * Wrapper for panels_load_include() that specifically targets panels_page
  * include files.
  * @param string $include
  *   The name of the panels_page include file, without the .inc extension.
+ * TODO move me to an inc!
  */
 function panels_page_load_include($include) {
   panels_load_include($include, 'panels_page/panels_page.');

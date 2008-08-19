@@ -104,7 +104,7 @@ function panels_page_load($id, $load_display = FALSE) {
   if ($load_display) {
     $page->primary = panels_load_display($page->did);
     // By default, we set the primary display as the current display.
-    $page->display =& $page->primary;
+    $page->display = &$page->primary;
   }
 
   panels_page_loaded_cache($id, $page);
@@ -118,7 +118,7 @@ function panels_page_loaded_cache($id, $panel_page = NULL) {
     // Make sure that we've statically cached the loaded page for both possible
     // unique identifiers - $page->pid AND $page->name.
     $other_id = is_numeric($id) ? $panel_page->name : $panel_page->pid;
-    $cache[$other_id] =& $cache[$id];
+    $cache[$other_id] = &$cache[$id];
   }
   return array_key_exists($id, $cache) ? $cache[$id] : FALSE;
 }
@@ -142,7 +142,7 @@ function panels_page_set_current(&$panel_page) {
   static $cache = NULL;
   // Only allow it to be set once per request.
   if (!isset($cache) && isset($panel_page)) {
-    $cache =& $panel_page;
+    $cache = &$panel_page;
   }
   return $cache;
 }
@@ -160,7 +160,7 @@ function panels_page_fetch_primary_display(&$panel_page) {
   if (empty($panel_page->primary) || !is_object($panel_page->primary)) {
     $panel_page->primary = panels_load_display($panel_page->did);
   }
-  $panel_page->display =& $panel_page->primary;
+  $panel_page->display = &$panel_page->primary;
   // Update the cache.
   panels_page_loaded_cache($panel_page->name, $panel_page);
 }
@@ -232,7 +232,7 @@ function panels_page_fetch_display_from_info(&$panel_page, $info) {
 
   if (is_object($ret)) {
     $panel_page->alternates[$ret->name] = $ret; // By val doesn't matter here
-    $panel_page->display =& $panel_page->alternates['all'][$ret->name];
+    $panel_page->display = &$panel_page->alternates['all'][$ret->name];
     panels_page_loaded_cache($panel_page->name, $panel_page);
     return TRUE;
   }

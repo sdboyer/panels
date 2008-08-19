@@ -15,7 +15,7 @@ function panels_page_prepare_panels_render(&$loader_data, &$panel_page) {
   $loader_data['page callback']   = 'panels_page_render_page_' . ($panel_page->form ? 'form' : 'normal');
   $loader_data['title callback']  = 'panels_page_get_title';
   // Pass by ref to ENSURE php4/5 consistency and keep down static cache size.
-  $loader_data['panel page']      =& $panel_page;
+  $loader_data['panel page']      = &$panel_page;
   $loader_data['page arguments']  = array(&$loader_data['panel page'], FALSE);
   $loader_data['title arguments'] = array(&$loader_data['panel page']);
 }
@@ -76,7 +76,7 @@ function _panels_page_prepare_display($panel_page, $args = array()) {
   $panel_page->display->context   = $panel_page->context;
   $panel_page->display->keywords  = $panel_page->keywords;
   $panel_page->display->css_id    = $panel_page->css_id;
-  $panel_page->display->owner     =& $panel_page; // TODO ref/value php4/5 compat problem?
+  $panel_page->display->owner     = &$panel_page; // TODO ref/value php4/5 compat problem?
   $panel_page->display->owner->id = $panel_page->name;
   $panel_page->display->type      = 'panel_page';
 }
