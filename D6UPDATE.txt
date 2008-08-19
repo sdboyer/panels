@@ -32,3 +32,7 @@ ARGUMENTS
 ========
 
 Function signature on submit and validate handlers now: ($form, &$form_values, &$form_state)
+
+When argument plugins fail to load a context at runtime, they must now return
+error codes instead of FALSE or NULL (previously the practice). The error codes,
+and their respective documentation, can be found at the top of panels.module. 
