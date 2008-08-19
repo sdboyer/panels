@@ -16,7 +16,7 @@ function panels_node_panels_contexts() {
     'settings form' => 'panels_context_node_settings_form',
     'settings form validate' => 'panels_context_node_settings_form_validate',
     'settings form submit' => 'panels_context_node_settings_form_submit',
-'keyword' => 'node',
+    'keyword' => 'node',
     'context name' => 'node',
   );
   return $args;
@@ -61,6 +61,12 @@ function panels_context_create_node($empty, $data = NULL, $conf = FALSE) {
     $context->data     = $data;
     $context->title    = $data->title;
     $context->argument = $data->nid;
+    if (is_array($context->type)) {
+      $context->type[] = 'node-' . $data->type;
+    }
+    else {
+      $context->type = array($context->type, 'node-' . $data->type);
+    }
     return $context;
   }
 }
