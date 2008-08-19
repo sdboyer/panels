@@ -85,6 +85,7 @@ function panels_page_perm() {
 
 function panels_page_menu() {
   panels_page_load_include('menu');
+  panels_page_load_include('read');
   $items = panels_page_admin_static_menu_items();
   $items = panels_page_admin_dynamic_menu_items($items);
   return $items;
@@ -112,14 +113,16 @@ function panels_page_menu_alter(&$callbacks) {
  * Use the empty string so that the behavior of callers that don't pass arg(6)
  * will be the same as callers who do pass arg(6), but arg(6) is empty.
  *
- * @param $name
- * @param $which
+ * @param string $name
+ * @param string $which
  * @return mixed
  */
 function panels_page_admin_load($name, $which = '') {
+  panels_page_load_include('write');
   panels_load_include('plugins');
+
   $panel_page = panels_page_load($name);
-  $panel_page->display = panels_page_fetch_display($panel_page, $which);
+  panels_page_fetch_display($panel_page, $which);
   return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
 }
 
@@ -131,22 +134,25 @@ function panels_page_admin_load($name, $which = '') {
  * Use the empty string so that the behavior of callers that don't pass arg(6)
  * will be identical to callers who do pass arg(6), but arg(6) is empty.
  *
- * @param $name
- * @param $which
+ * @param string $name
+ * @param string $which
  * @return mixed
  */
 function panels_page_admin_cache_load($name, $which = '') {
+  panels_page_load_include('write');
+  panels_load_include('plugins');
+
   if (!empty($_POST)) {
     // FIXME With the way the menu system currently works, this is likely to be
-    // fired AT LEAST six times per page request. Bollocks. Figure out yet
-    // another fracking caching method...
+    // fired AT LEAST six times per admin page request. BOLLOCKS. Time to
+    // figure out yet another fracking caching method...maybe just right here?
     $panel_page = panels_cache_get('panel_object:panel_page', $name);
   }
   else {
     $panel_page = panels_page_load($name);
     panels_cache_set('panel_object:panel_page', $name, $panel_page);
   }
-  $panel_page->display = panels_page_fetch_display($panel_page, $which);
+  panels_page_fetch_display($panel_page, $which);
   return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
 }
 
@@ -160,35 +166,43 @@ function panels_page_admin_cache_load($name, $which = '') {
  * @return array $loader_data
  */
 function panels_page_get_loader_data($pid, $args) {
-  // TODO Multiple p-pages per path will necessitate more complex logic here
   static $loader_data = array();
-  if (!empty($loader_data)) {
-    return $loader_data;
+  if (!empty($loader_data[$pid])) {
+    return $loader_data[$pid];
   }
-  // Start off by assuming that we won't fall back.
-  $loader_data['fallback'] = FALSE;
+  $load =& $loader_data[$pid];
 
   panels_load_include('plugins');
-  // TODO check; we shouldn't have to load the display this early.
-  // $panel_page = panels_page_load($pid, TRUE);
+  panels_page_load_include('read');
   $panel_page = panels_page_load($pid);
-  $map = explode('/', $_GET['q']);
-  // TODO remove this
-  if ($panel_page->loader_flags & PANELS_IS_DYNAMIC) {
-    $wildcards = array_keys(explode('/', $panel_page->path), '%');
-    $map = _panels_page_rebuild_menu_map($map, $args, $wildcards);
+  // Handle static pages then duck out early.
+  if (!($panel_page->loader_flags & PANELS_IS_DYNAMIC)) {
+    $load['access'] = (bool) panels_page_access($panel_page);
+    if ($load['access']) {
+      panels_page_load_include('render');
+      $load['panels_page'] = panels_page_load($pid, TRUE);
+    }
+    return $load;
   }
+
+  // At this point, we know we're handling a dynamic/override panels_page.
+  // Start off by assuming that we won't fall back.
+  $load['fallback'] = FALSE;
+  $map = explode('/', $_GET['q']);
+  // TODO Multiple p-pages per path will necessitate more complex logic here
+  $wildcards = array_keys(explode('/', $panel_page->path), '%');
+  $map = _panels_page_rebuild_menu_map($map, $args, $wildcards);
 
   $load_objects = array();
   foreach ($panel_page->arguments as $id => $argument) {
-    $ignore = $argument['default'] == 'ignore';
+    $ignore = ($argument['default'] == 'ignore');
     // FIXME The directness of this association is questionable
     $load_objects[$id] = array_shift($args);
-    $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_BAD_ARG;
+    $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_ARG_IS_BAD;
     if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
-      if ($context & PANELS_USE_FALLBACK_ROUTER) {
+      if ($context & PANELS_ARG_USE_FALLBACK) {
         if ($panel_page->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
-          $loader_data['fallback'] = TRUE;
+          $load['fallback'] = TRUE;
           break;
         }
         else if ($ignore) {
@@ -206,22 +220,22 @@ function panels_page_get_loader_data($pid, $args) {
     $panel_page->context[panels_argument_context_id($argument)] = $context;
   }
   // If we've determined that we're falling back, bail out.
-  if ($loader_data['fallback'] === TRUE) {
-    panels_page_prepare_fallback_render($loader_data, $map);
-    return $loader_data;
+  if ($load['fallback'] === TRUE) {
+    panels_page_prepare_fallback_render($load, $map);
+    return $load;
   }
 
-  // We're now 100% certain we're proceeding with a panel_page load, so first
+  // We're now 100% certain we're proceeding with a panel_page render, so first
   // check the panels_page native access function. If that passes, then include
   // the render inc file and proceed inside there.
-  $loader_data['access'] = panels_page_access($panel_page);
-  if (empty($loader_data['access'])) {
+  $load['access'] = panels_page_access($panel_page);
+  if (empty($load['access'])) {
     drupal_access_denied();
   }
   panels_page_load_include('render');
-  panels_page_prepare_panels_render($loader_data, $panel_page);
+  panels_page_prepare_panels_render($load, $panel_page);
 
-  return $loader_data;
+  return $load;
 }
 
 /**
@@ -245,7 +259,7 @@ function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
   return $map;
 }
 
-function panels_page_prepare_fallback_render(&$loader_data, $map) {
+function panels_page_prepare_fallback_render(&$load, $map) {
   // Lifted from menu_get_item().
   list($ancestors, $placeholders) = menu_get_ancestors(explode('/', $quickref->path));
   if ($router_item = db_fetch_array(db_query_range('SELECT * FROM {panels_page_menu_store} WHERE path IN ('. implode (',', $placeholders) .') ORDER BY fit DESC', $ancestors, 0, 1))) {
@@ -253,25 +267,37 @@ function panels_page_prepare_fallback_render(&$loader_data, $map) {
     $map = _menu_translate($router_item, $original_map);
     if ($router_item['access']) {
       $router_item['map'] = $map;
-      $loader_data['page arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
+      $load['page arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
     }
   }
 
-  $loader_data['page callback'] = $router_item['page callback'];
-  // $loader_data['router item']     = $router_item;
-  // $loader_data['map']             = $map;
-  // $loader_data['title callback']  = '_menu_item_localize';
-  // $loader_data['title arguments'] = array($router_item, $map);
-}
-
-function panels_page_access_handler() {
-  return TRUE;
+  $load['page callback'] = $router_item['page callback'];
+  // $load['router item']     = $router_item;
+  // $load['map']             = $map;
+  // $load['title callback']  = '_menu_item_localize';
+  // $load['title arguments'] = array($router_item, $map);
 }
 
 /**
- * Execute the stored render process.
+ * Check whether the current page request is allowed.
  *
- * This is the master handler through which ALL non-admin panels_page-touched
+ * Note that this handler is ONLY used by static panel_pages; the rest are all
+ * handled internally by the master loader.
+ *
+ * @return boolean
+ */
+function panels_page_access_handler() {
+  $args = func_get_args();
+  // Get the pid, which is passed in with a prepended string.
+  $pid = substr(array_shift($args), 4);
+  $loader_data = panels_page_get_loader_data($pid, $args);
+  return $loader_data['access'];
+}
+
+/**
+ * Execute the active page rendering callback.
+ *
+ * This is the master handler through which ALL (non-admin) panels_page-touched
  * callbacks pass. It takes the callback and arguments calculated by the main
  * brain, panels_page_get_loader_data(), and fires out the callback with its
  * arguments.
@@ -297,45 +323,12 @@ function panels_page_title_handler() {
     return _menu_item_localize($loader_data['router item'], $loader_data['map']);
   }
   else {
-    return panels_page_get_title($loader_data['panel page']);
+    if (!$loader_data['panel page']->display->hide_title && $title = filter_xss_admin(panels_page_get_title($loader_data['panel page'], 'page', ''))) {
+      return $title;
+    }
+    // TODO necessary?
+    return '';
   }
-
-  // from old cruft
-  if (!$display->hide_title && $title = filter_xss_admin(panels_page_get_title($panel_page, 'page', ''))) {
-    drupal_set_title($title);
-  }
-  else {
-    drupal_set_title('');
-  }
-}
-
-/**
- * Determine if the specified user has access to a panel.
- */
-function panels_page_access($panel_page, $account = NULL) {
-  if (!$account) {
-    global $user;
-    $account = $user;
-  }
-
-  // Administrator privileges
-  if (user_access('access all panel-pages', $account)) {
-    return TRUE;
-  }
-
-  // All panels displays with an empty access setting are available to all roles.
-  if (empty($panel_page->access) || !is_array($panel_page->access)) {
-    return TRUE;
-  }
-
-  // Otherwise, check roles
-  static $roles = array();
-  if (!isset($roles[$account->uid])) {
-    $roles[$account->uid] = array_keys($account->roles);
-    $roles[$account->uid][] = $account->uid ? DRUPAL_AUTHENTICATED_RID : DRUPAL_ANONYMOUS_RID;
-  }
-
-  return array_intersect($panel_page->access, $roles[$account->uid]);
 }
 
 /**
@@ -459,9 +452,6 @@ function panels_move_menu_tabs($path, $tab) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// view panels page
-
 /**
  * Theme function to render our panel as a form.
  *
@@ -470,82 +460,6 @@ function panels_move_menu_tabs($path, $tab) {
 function theme_panels_page_render_form($form) {
   $form['#children'] = panels_render_display($form['#display']);
   return theme('form', $form);
-}
-
-/**
- * Load a display based upon information from the $displays list.
- */
-function panels_page_fetch_display(&$panel_page, $id = NULL, $render = FALSE) {
-  $did = NULL;
-  if (empty($id)) {
-    // If empty, use the default display.
-    if (empty($panel_page->display)) {
-      // Load it if not already loaded
-      $panel_page->display = panels_load_display($panel_page->did);
-      $display =& $panel_page->display;
-      // Refresh the static cache with the now-loaded display.
-      panels_page_loaded_cache($panel_page->name, $panel_page);
-    }
-    else {
-      // Otherwise, use the loaded display
-      $display =& $panel_page->display;
-    }
-  }
-  else {
-    // Otherwise, fetch from our alternative displays.
-    _panels_page_fetch_display($panel_page, $id, $render);
-    $display =& $panel_page->display;
-  }
-
-  $display->owner = $panel_page;
-  $display->owner->id = $panel_page->name;
-  return $display;
-}
-
-/**
- * Fetch a display from a panel pages alternative list of displays.
- */
-function _panels_page_fetch_display(&$panel_page, $id, $render) {
-  $info = $panel_page->displays[$id];
-  if ($display = _panels_fetch_display_from_info($info)) {
-    return $display;
-  }
-
-  // At this point the display does not yet exist, which means we need to
-  // create one and save the panel page to reflect this.
-  if (!empty($info['default'])) {
-    // If there's a default for the context we're switching on, use that.
-    if (!empty($panel_page->displays[$info['default']])) {
-      $ret = _panels_fetch_display_from_info($info);
-    }
-    // Otherwise, use the default display. Load it if it's not already loaded.
-    else if (empty($panel_page->display)) {
-      $ret = panels_load_display($panel_page->did);
-    }
-  }
-
-  // Make a copy of the display; using the export forces all the IDs properly,
-  // since we don't want this to actually *be* the original display.
-  $code = panels_export_display($for_export);
-  eval($code);
-
-  return $display;
-}
-
-/**
- * Get a display based on whether it's already in code or needs to be loaded.
- */
-function _panels_fetch_display_from_info($info) {
-  // If the 'display' is set it's the result of an export/default
-  if (isset($info['display'])) {
-    return $info['display'];
-  }
-
-  if (is_numeric($info['did'])) {
-    return panels_load_display($info['did']);
-  }
-
-  return FALSE;
 }
 
 // ---------------------------------------------------------------------------
@@ -572,7 +486,7 @@ function panels_page_sanitize($page) {
  *   The name of the panels_page include file, without the .inc extension.
  */
 function panels_page_load_include($include) {
-  return panels_load_include($include, 'panels_page/panels_page.');
+  panels_load_include($include, 'panels_page/panels_page.');
 }
 
 /**
