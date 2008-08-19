@@ -49,7 +49,7 @@ function panels_page_import_form(&$form_state) {
  */
 function panels_page_import_form_submit($form, &$form_state) {
   ob_start();
-  eval($form['panel_page']);
+  eval($form_state['values']['panel_page']);
   ob_end_clean();
 
   if (isset($page)) {
@@ -155,7 +155,6 @@ function panels_page_save($panel_page) {
   $values[] = $page_clone->pid;
 
   db_query($sql, $values);
-  menu_rebuild();
   return $page_clone->pid;
 }
 

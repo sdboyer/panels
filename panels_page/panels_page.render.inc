@@ -22,7 +22,8 @@ function panels_page_prepare_panels_render(&$loader_data, &$panel_page) {
 
 function _panels_page_prepare_panels_render(&$panel_page) {
   _panels_page_check_switchers($panel_page);
-  $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->context);
+  // $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->context);
+  $panel_page->context = panels_context_load_contexts($panel_page);
   // If we're wrapping FAPI with with panel, this function gets the data.
   $panel_page->form = panels_context_get_form($panel_page->context);
   // Get any keywords (for title substitution in panes)
@@ -30,7 +31,6 @@ function _panels_page_prepare_panels_render(&$panel_page) {
   // Figure out which display to use, then retrieve it into the current spot.
   panels_page_fetch_display($panel_page, panels_argument_get_display($panel_page->arguments, $panel_page->context));
   panels_page_set_current($panel_page);
-
 }
 
 function _panels_page_check_switchers(&$panel_page) {
@@ -108,7 +108,7 @@ function panels_page_render_page_normal($panel_page, $args) {
  */
 function panels_page_render_page_form($panel_page, $args) {
   _panels_page_prepare_display($panel_page, $args);
-  $form = drupal_clone($panel_page);
+  $form = drupal_clone($panel_page->form);
   $form->form['#theme'] = 'panels_page_render_form';
   $form->form['#display'] = $panel_page->display;
   $output = drupal_render_form($form->form_id, $form->form);

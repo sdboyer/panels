@@ -110,10 +110,6 @@ function panels_page_list_page() {
   return $output;
 }
 
-function panels_page_admin_title($section, $panel_page) {
-  return $section . ': ' . $panel_page->name;
-}
-
 /**
  * General settings configuration page for panel pages.
  */
@@ -190,15 +186,13 @@ function panels_page_delete_confirm_submit($form_id, $form) {
 /**
  * Handle the add panel-page page.
  */
-function panels_page_add_page($layout = NULL) {
+function panels_page_add_handler() {
+  $args = func_get_args();
+  drupal_set_title(t('Add panel page'));
   panels_load_include('plugins');
+
   $layouts = panels_get_layouts();
 
-  // If the layout given is invalid, unset it.
-  if (is_array($layout) && isset($layouts[$layout])) {
-    drupal_set_message(t('The chosen layout %layout is invalid. Please select a new one.', array('%layout' => $layout)), 'warning');
-    unset($layout);
-  }
   // If no page layout is given, choose one first.
   if ($layout === NULL) {
     foreach ($layouts as $id => $layout) {
@@ -212,8 +206,6 @@ function panels_page_add_page($layout = NULL) {
   $panel_page->display->layout = $layout;
   $panel_page->pid = 'new';
   $panel_page->did = 'new';
-
-  drupal_set_title(t('Add panel page'));
   return drupal_get_form('panels_page_edit_form', panels_page_sanitize($panel_page));
 }
 
@@ -222,30 +214,47 @@ function panels_page_add_page($layout = NULL) {
  *
  * Called from both the add and edit points to provide for common flow.
  */
-function panels_page_edit($panel_page) {
-  $args = func_get_args();
-  // drupal_build_form();
-  // drupal_set_title(check_plain(panels_page_get_title($panel_page)));
-  return drupal_get_form('panels_page_edit_form', $panel_page);
+function panels_page_edit($panel_page, $next = NULL) {
+  drupal_set_title(check_plain(panels_page_get_title($panel_page)));
+  return drupal_get_form('panels_page_edit_form', $panel_page, $next);
+  /*
+  $form_state = array(
+    'panel_page' => $panel_page,
+    'pid' => $panel_page->pid,
+    'next' => $next,
+  );
+  $output = drupal_build_form('panels_page_edit_form', $form_state);
+  // no output == submit
+  if (!$output) {
+    if (!empty($form_state['clicked_button']['#save-display'])) {
+      drupal_set_message(t('Panel content has been updated.'));
+      panels_save_display($display);
+    }
+    else {
+      drupal_set_message(t('Your changes have been discarded.'));
+    }
+
+    panels_cache_clear('display', $display->did);
+    if ($destination) {
+      return drupal_goto($destination);
+    }
+    return $form_state['display'];
+  }
+
+  return $output;*/
 }
 
 /**
  * The form to edit the page portion of a panel.
  */
-function panels_page_edit_form(&$form_state, $panel_page, $next = NULL) {
+function panels_page_edit_form(&$form_state, $panel_page, $next) {
   panels_load_include('common');
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $layout = panels_get_layout($panel_page->display->layout);
 
-  $form['pid'] = array(
-    '#type' => 'value',
-    '#value' => $panel_page->pid,
-  );
-
-  $form['panel_page'] = array(
-    '#type' => 'value',
-    '#value' => $panel_page,
-  );
+  $form_state['panel_page'] = &$panel_page;
+  $form_state['pid']        = $panel_page->pid;
+  $form_state['next']       = $next;
 
   $form['right'] = array(
     '#prefix' => '<div class="layout-container">',
@@ -327,10 +336,9 @@ function panels_page_edit_form(&$form_state, $panel_page, $next = NULL) {
     '#required' => TRUE,
   );
 
-  $label = ($panel_page->pid == 'new') ? t('Save and proceed') : t('Save');
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => $label,
+    '#value' => $panel_page->pid == 'new' ? t('Save and proceed') : t('Save'),
   );
 
   return $form;
@@ -385,18 +393,20 @@ function panels_page_edit_form_submit($form, &$form_state) {
     unset($_SESSION['pp_import']);
     drupal_set_message(t('Your new panel page %title has been saved.', array('%title' => $panel_page->title)));
     $pid = panels_page_save($panel_page);
-    $GLOBALS['form_values']['pid'] = $pid;
+    $form_state['values']['pid'] = $pid;
     $layout = panels_get_layout($panel_page->display->layout);
 
     if ($layout['settings form']) {
-      return "admin/panels/panel-page/{$panel_page->name}/edit/settings/next";
+      return "admin/panels/panel-page/{$panel_page->name}/add/settings/next";
     }
-    return "admin/panels/panel-page/{$panel_page->name}/edit/advanced/next";
+    return "admin/panels/panel-page/{$panel_page->name}/add/advanced/next";
   }
   else {
     drupal_set_message(t('Your changes have been saved.'));
     panels_page_save($panel_page);
   }
+  // The path may have changed - rebuild the menu.
+  menu_rebuild();
 }
 
 /**
@@ -415,7 +425,7 @@ function panels_page_edit_advanced($panel_page, $next = NULL) {
  */
 function panels_page_advanced_form(&$form_state, $panel_page, $next) {
   drupal_add_css(panels_get_path('css/panels_admin.css'));
-  $form_state['panel_page'] =& $panel_page;
+  $form_state['panel_page'] = &$panel_page;
 
   $form['right'] = array(
     '#prefix' => '<div class="right-container">',
