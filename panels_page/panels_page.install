@@ -277,47 +277,6 @@ function panels_page_schema_1() {
       ),
     'primary key' => array('path'),
     );
-
-/*  $schema['panels_page_router_quickref'] = array(
-    'fields' => array(
-      'pid' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'name' => array(
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'path' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => ''
-      ),
-      'wildcards' => array(
-        'type' => 'varchar',
-        'length' => 32,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'flags' => array(
-        'type' => 'int',
-        'size' => 'normal',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-    ),
-    'primary key' => array('pid'),
-    'indexes' => array(
-      'name_idx' => array('name'),
-      'path_idx' => array('path'),
-      // TODO indexing wildcards may be superfluous
-      'wildcards_idx' => array('wildcards'),
-    ),
-  );*/
   return $schema;
 }
 
