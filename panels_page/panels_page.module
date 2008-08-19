@@ -129,10 +129,71 @@ function panels_page_admin_cache_load($name, $which = '') {
   }
   else {
     $panel_page = panels_page_load($name);
+    panels_page_fetch_display($panel_page, $which);
     panels_cache_set('panel_object:panel_page', $name, $panel_page);
   }
-  panels_page_fetch_display($panel_page, $which);
   return is_object($panel_page) && !empty($panel_page->pid) ? $panel_page : FALSE;
+}
+
+/**
+ * Check whether the current page request is allowed.
+ *
+ * Note that this handler is ONLY used by static panel_pages; the rest are all
+ * handled internally by the master loader.
+ *
+ * @return boolean
+ */
+function panels_page_access_handler() {
+  $args = func_get_args();
+  // Get the pid, which is passed in with a prepended string.
+  $pid = substr(array_shift($args), 4);
+  $loader_data = panels_page_get_loader_data($pid, $args);
+  return $loader_data['access'];
+}
+
+/**
+ * Execute the active page rendering callback.
+ *
+ * This is the master handler through which ALL (non-admin) panels_page-touched
+ * callbacks pass. It takes the callback and arguments calculated by the main
+ * brain, panels_page_get_loader_data(), and fires out the callback with its
+ * arguments.
+ *
+ * @return mixed
+ */
+function panels_page_render_handler() {
+  $args = func_get_args();
+  // Get the pid, which is passed in with a prepended string.
+  // TODO switch to name...
+  $pid = substr(array_shift($args), 4);
+  $loader_data = panels_page_get_loader_data($pid, $args);
+
+  return call_user_func_array($loader_data['page callback'], $loader_data['page arguments']);
+}
+
+function panels_page_static_render_handler() {
+  $args = func_get_args();
+  // Get the pid, which is passed in with a prepended string.
+  $pid = substr(array_shift($args), 4);
+  $loader_data = panels_page_get_loader_data($pid, $args);
+  return panels_page_render_page_normal($loader_data['panel_page']);
+}
+
+function panels_page_title_handler() {
+  $args = func_get_args();
+  // Get the pid, which is passed in with a prepended string.
+  $pid = substr(array_shift($args), 4);
+  $loader_data = panels_page_get_loader_data($pid, $args);
+  if ($loader_data['fallback'] === TRUE) {
+    return _menu_item_localize($loader_data['router item'], $loader_data['map']);
+  }
+  else {
+    if (!$loader_data['panel page']->display->hide_title && $title = filter_xss_admin(panels_page_get_title($loader_data['panel page'], 'page', ''))) {
+      return $title;
+    }
+    // TODO necessary?
+    return '';
+  }
 }
 
 /**
@@ -159,7 +220,10 @@ function panels_page_get_loader_data($pid, $args) {
     $load['access'] = (bool) panels_page_access($panel_page);
     if ($load['access']) {
       panels_page_load_include('render');
-      $load['panels_page'] = panels_page_load($pid, TRUE);
+      panels_page_fetch_primary_display($panel_page);
+      _panels_page_prepare_panels_render($panel_page);
+      panels_page_set_current($panel_page);
+      $load['panel_page'] = &$panel_page;
     }
     return $load;
   }
@@ -189,7 +253,7 @@ function panels_page_get_loader_data($pid, $args) {
         }
       }
       // TODO Are there other cases? If not, this else is an unnecessary overspecification
-      else if ($context & PANELS_BAD_ARG && $ignore) {
+      else if ($context & PANELS_ARG_IS_BAD && $ignore) {
         continue;
       }
       // Bail out and 404 if we get this far.
@@ -245,69 +309,16 @@ function panels_page_prepare_fallback_render(&$load, $map) {
     // FIXME Ideally we could skip some of this, much has already been loaded.
     $map = _menu_translate($router_item, $original_map);
     if ($router_item['access']) {
-      $router_item['map'] = $map;
+      $load['map'] = $map;
       $load['page arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
     }
   }
 
   $load['page callback'] = $router_item['page callback'];
-  // $load['router item']     = $router_item;
+  $load['router item']     = $router_item;
   // $load['map']             = $map;
   // $load['title callback']  = '_menu_item_localize';
   // $load['title arguments'] = array($router_item, $map);
-}
-
-/**
- * Check whether the current page request is allowed.
- *
- * Note that this handler is ONLY used by static panel_pages; the rest are all
- * handled internally by the master loader.
- *
- * @return boolean
- */
-function panels_page_access_handler() {
-  $args = func_get_args();
-  // Get the pid, which is passed in with a prepended string.
-  $pid = substr(array_shift($args), 4);
-  $loader_data = panels_page_get_loader_data($pid, $args);
-  return $loader_data['access'];
-}
-
-/**
- * Execute the active page rendering callback.
- *
- * This is the master handler through which ALL (non-admin) panels_page-touched
- * callbacks pass. It takes the callback and arguments calculated by the main
- * brain, panels_page_get_loader_data(), and fires out the callback with its
- * arguments.
- *
- * @return mixed
- */
-function panels_page_render_handler() {
-  $args = func_get_args();
-  // Get the pid, which is passed in with a prepended string.
-  $pid = substr(array_shift($args), 4);
-  $loader_data = panels_page_get_loader_data($pid, $args);
-
-  return call_user_func_array($loader_data['page callback'], $loader_data['page arguments']);
-  // return node_view(node_load(1));
-}
-
-function panels_page_title_handler() {
-  $args = func_get_args();
-  // Get the pid, which is passed in with a prepended string.
-  $pid = substr(array_shift($args), 4);
-  $loader_data = panels_page_get_loader_data($pid, $args);
-  if ($loader_data['fallback'] === TRUE) {
-    return _menu_item_localize($loader_data['router item'], $loader_data['map']);
-  }
-  else {
-    if (!$loader_data['panel page']->display->hide_title && $title = filter_xss_admin(panels_page_get_title($loader_data['panel page'], 'page', ''))) {
-      return $title;
-    }
-    // TODO necessary?
-    return '';
-  }
 }
 
 /**
@@ -481,5 +492,18 @@ function panels_page_panels_exportables($op = 'list', $panels = NULL, $name = 'f
     $code .= "}\n";
     return $code;
   }
+}
+
+/**
+ * Sanitize a panel with safe empty values.
+ */
+function panels_page_sanitize($page) {
+  foreach (array('arguments', 'displays', 'contexts', 'relationships', 'switcher_options') as $id) {
+    if (!is_array($page->$id)) {
+      $page->$id = array();
+    }
+  }
+
+  return $page;
 }
 
