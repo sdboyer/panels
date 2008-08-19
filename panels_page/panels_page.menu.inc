@@ -58,7 +58,7 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
     'file' => 'panels_page.admin.inc',
     'page arguments' => array($loader_arg),
     'type' => MENU_LOCAL_TASK,
-    'module' => 'panels_page',
+    // 'module' => 'panels_page',
   );
 
   $items[$path_prefix . '%panels_page_admin/edit'] = array(
@@ -175,14 +175,6 @@ function _panels_page_menu_alter(&$callbacks) {
       $metadata =& $panels_items['metadata'][$raw_path];
       $metadata->loader_flags |= isset($matches[$path]) ? PANELS_HAS_FALLBACK_ROUTER : 0;
       db_query('UPDATE {panels_page} SET loader_flags = %d WHERE pid = %d', $metadata->loader_flags, $metadata->pid);
-/*      $schema = panels_page_router_table_query_fields('panels_page_router_quickref');
-      $f = $q = $v = array();
-      foreach ($schema as $field => $placeholder) {
-        $f[] = $field;
-        $q[] = $placeholder;
-        $v[] = $metadata->$field;
-      }
-      db_query('INSERT INTO {panels_page_router_quickref} (' . implode(', ', $f) . ') VALUES (' . implode(', ', $q) . ')', $v);*/
     }
   }
   // Re-call our helper function and store updated items into the static cache.
@@ -254,7 +246,7 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   $items['menu items'][$panel_page->path] = array(
     'title' => filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
     'access callback' => 'panels_page_access_handler',
-    'access arguments' => array('static', $panel_page->name),
+    'access arguments' => array('pid-' . $panel_page->pid),
     'page callback' => 'panels_page_static_render_handler',
     'page arguments' => array($panel_page->name),
     'type' => $type,
