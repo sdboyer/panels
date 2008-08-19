@@ -1,8 +1,8 @@
 <?php
 // $Id$
 
-define('PANELS_BAD_ARG', 1);
-define('PANELS_USE_FALLBACK_ROUTER', 1 << 1);
+define('PANELS_ARG_IS_BAD', 1);
+define('PANELS_ARG_USE_FALLBACK', 1 << 1);
 
 /**
  * Returns the API version of Panels. This didn't exist in 1.
@@ -199,7 +199,7 @@ function panels_init() {
  * Load a panels include file.
  */
 function panels_load_include($include, $path = 'includes/') {
-  require_once './' . panels_get_path("$path$include.inc");
+  require_once './' . panels_get_path("{$path}{$include}.inc");
 }
 
 /**
