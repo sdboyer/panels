@@ -15,6 +15,7 @@
  * a view?
  */
 function panels_page_list_page() {
+  panels_page_load_include('read');
   panels_load_include('plugins');
   $layouts = panels_get_layouts();
   $items = array();
@@ -222,16 +223,9 @@ function panels_page_add_page($layout = NULL) {
  * Called from both the add and edit points to provide for common flow.
  */
 function panels_page_edit($panel_page) {
-  panels_load_include('plugins');
-  if (!is_object($panel_page)) {
-    $panel_page = panels_page_load($panel_page);
-  }
-
-  if (empty($panel_page->display)) {
-    $panel_page->display = panels_load_display($panel_page->did);
-  }
-
-  drupal_set_title(check_plain(panels_page_get_title($panel_page)));
+  $args = func_get_args();
+  // drupal_build_form();
+  // drupal_set_title(check_plain(panels_page_get_title($panel_page)));
   return drupal_get_form('panels_page_edit_form', $panel_page);
 }
 
@@ -537,18 +531,20 @@ function panels_page_advanced_form(&$form_state, $panel_page, $next) {
   $form['left']['menu-info']['default-tab']['menu_parent_tab_weight'] = array(
     '#type' => 'textfield',
     '#title' => t('Tab Weight'),
+    '#disabled' => TRUE,
     '#default_value' => $panel_page->menu_parent_tab_weight,
     '#size' => 5,
-    '#description' => t('If the parent menu item is a tab, select the weight; lower numbers will be further to the left.'),
+    '#description' => t('If the parent menu item is a tab, select the weight; lower numbers will be further to the left. <b>DISABLED IN D6 ALPHA</b>'),
   );
 
   $form['left']['menu-info']['default-tab']['menu_parent_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Parent Menu Item Title'),
+    '#disabled' => TRUE,
     '#default_value' => $panel_page->menu_parent_title,
     '#size' => 35,
     '#maxlength' => 255,
-    '#description' => t('If the Parent Menu Item is being defined by this panel (if you set the %type_field to either %tab or %menu), you can specify its title here.  If blank, the menu title will be used if that is defined, or the page title if not.', array('%type_field' => t('Parent Menu Item Type'), '%tab' => t('Tab'), '%menu' => t('Normal menu item'))),
+    '#description' => t('If the Parent Menu Item is being defined by this panel (if you set the %type_field to either %tab or %menu), you can specify its title here.  If blank, the menu title will be used if that is defined, or the page title if not. <b>DISABLED IN D6 ALPHA</b>', array('%type_field' => t('Parent Menu Item Type'), '%tab' => t('Tab'), '%menu' => t('Normal menu item'))),
   );
 
   $label = ($next) ? t('Save and proceed') : t('Save');
@@ -769,62 +765,6 @@ function panels_page_edit_content($panel_page) {
   // messes up the drag & drop.
   drupal_set_title(check_plain(panels_page_get_title($panel_page)));
   print theme('page', $output, FALSE);
-}
-
-/**
- * Page callback to import a panel page from PHP code.
- */
-function panels_page_import_page() {
-  if (!empty($_POST['form_id']) && $_POST['form_id'] == 'panels_page_edit_form') {
-    $panel_page = unserialize($_SESSION['pp_import']);
-    drupal_set_title(t('Import panel page "@s"', array('@s' => $panel_page->title)));
-    return drupal_get_form('panels_page_edit_form', $panel_page);
-  }
-
-  return drupal_get_form('panels_page_import_form');
-}
-
-/**
- * Form to for the panel page import
- */
-function panels_page_import_form(&$form_state) {
-  $form['panel_page'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Panel page code'),
-    '#cols' => 60,
-    '#rows' => 15,
-    '#description' => t('Cut and paste the results of an exported panel page here.'),
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Import'),
-  );
-
-  $form['#redirect'] = FALSE;
-  return $form;
-}
-
-/**
- * Handle the submit button on importing a panel page.
- */
-function panels_page_import_form_submit($form, &$form_state) {
-  ob_start();
-  eval($form['panel_page']);
-  ob_end_clean();
-
-  if (isset($page)) {
-    drupal_set_title(t('Import panel page "@s"', array('@s' => $page->title)));
-    // As $page contains non-stdClass objects,
-    // it needs to be serialized before being stored in the session variable.
-    $_SESSION['pp_import'] = serialize($page);
-    $output = drupal_get_form('panels_page_edit_form', $page);
-    print theme('page', $output);
-    exit;
-  }
-  else {
-    drupal_set_message(t('Unable to get a panel page out of that.'));
-  }
 }
 
 function panels_page_preview_page(&$form_state, $panel_page) {
