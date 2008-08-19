@@ -59,11 +59,11 @@ function panels_term_context($arg = NULL, $conf = NULL, $empty = FALSE) {
   }
 
   if (empty($term)) {
-    return PANELS_BAD_ARG;
+    return PANELS_ARG_IS_BAD;
   }
 
   if (!empty($conf['vids']) && array_filter($conf['vids']) && empty($conf['vids'][$term->vid])) {
-    return PANELS_USE_FALLBACK_ROUTER;
+    return PANELS_ARG_USE_FALLBACK;
   }
 
   return panels_context_create('term', $term);

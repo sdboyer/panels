@@ -32,12 +32,12 @@ function panels_uid_context($arg = NULL, $conf = NULL, $empty = FALSE) {
   }
 
   if (!is_numeric($arg)) {
-    return PANELS_BAD_ARG;
+    return PANELS_ARG_IS_BAD;
   }
 
   $user = user_load(array('uid' => $arg));
   if (!$user) {
-    return PANELS_BAD_ARG;
+    return PANELS_ARG_IS_BAD;
   }
 
   return panels_context_create('user', $user);

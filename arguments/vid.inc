@@ -32,12 +32,12 @@ function panels_vid_context($arg = NULL, $conf = NULL, $empty = FALSE) {
   }
 
   if (!is_numeric($arg)) {
-    return PANELS_BAD_ARG;
+    return PANELS_ARG_IS_BAD;
   }
 
   $vocabulary = taxonomy_get_vocabulary($arg);
   if (!$vocabulary) {
-    return PANELS_BAD_ARG;
+    return PANELS_ARG_IS_BAD;
   }
 
   return panels_context_create('vocabulary', $vocabulary);

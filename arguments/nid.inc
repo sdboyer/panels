@@ -32,11 +32,11 @@ function panels_nid_context($node = NULL, $conf = NULL, $empty = FALSE) {
   }
 
   if (!is_object($node)) {
-    return PANELS_BAD_ARG;
+    return PANELS_ARG_IS_BAD;
   }
 
   if (array_filter($conf['types']) && empty($conf['types'][$node->type])) {
-    return PANELS_USE_FALLBACK_ROUTER;
+    return PANELS_ARG_USE_FALLBACK;
   }
 
   return panels_context_create('node', $node);
