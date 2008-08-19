@@ -51,24 +51,24 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
   if (is_null($path_prefix)) {
     $path_prefix = 'admin/panels/panel-page/';
   }
-  $loader_arg = count(explode('/', $path_prefix));
+  $loader_arg = count(explode('/', $path_prefix)) - 1;
 
   $admin = array(
+    'title callback' => 'panels_page_admin_title_handler',
     'access arguments' => array('create panel-pages'),
     'file' => 'panels_page.admin.inc',
     'page arguments' => array($loader_arg),
     'type' => MENU_LOCAL_TASK,
-    // 'module' => 'panels_page',
   );
 
   $items[$path_prefix . '%panels_page_admin/edit'] = array(
-    'title' => 'Settings',
+    'title' => t('Settings'),
     'page callback' => 'panels_page_edit',
     'weight' => -10,
     'type' => MENU_CALLBACK,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/settings'] = array(
-    'title' => 'Settings',
+    'title' => t('Settings'),
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   ) + $admin;
@@ -90,41 +90,41 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
   );
 */
   $items[$path_prefix . '%panels_page_admin/edit/advanced'] = array(
-    'title' => 'Advanced',
+    'title' => t('Advanced'),
     'page callback' => 'panels_page_edit_advanced',
     'weight' => -8,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin_cache/edit/context'] = array(
-    'title' => 'Context',
+    'title' => t('Context'),
     'page callback' => 'panels_page_edit_context',
     'weight' => -6,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/layout'] = array(
-    'title' => 'Layout',
+    'title' => t('Layout'),
     'page callback' => 'panels_page_edit_layout',
-    'load arguments' => array(6),
+    'load arguments' => array($loader_arg + 4),
     'weight' => -4,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin_cache/edit/layout-settings'] = array(
-    'title' => 'Layout settings',
+    'title' => t('Layout settings'),
     'page callback' => 'panels_page_edit_layout_settings',
-    'load arguments' => array(6),
+    'load arguments' => array($loader_arg + 4),
     'weight' => -2,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin_cache/edit/content'] = array(
-    'title' => 'Content',
+    'title' => t('Content'),
     'page callback' => 'panels_page_edit_content',
-    'load arguments' => array(6),
+    'load arguments' => array($loader_arg + 4),
     'weight' => 0,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/preview'] = array(
-    'title' => 'Preview',
+    'title' => t('Preview'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_page_preview_page', $loader_arg),
     'weight' => 2,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/export'] = array(
-    'title' => 'Export',
+    'title' => t('Export'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_page_export_page', $loader_arg),
     'weight' => 4,
@@ -192,22 +192,22 @@ function _panels_page_create_menu_structure() {
         panels_page_construct_static_menu_link($items, $panel_page, $map);
       }
       else {
-        panels_page_construct_wildcard_menu_link($items, $panel_page, $map);
+        panels_page_construct_dynamic_menu_link($items, $panel_page, $map);
       }
     }
   }
   return $items;
 }
 
-function panels_page_construct_wildcard_menu_link(&$items, $panel_page, $map) {
+function panels_page_construct_dynamic_menu_link(&$items, $panel_page, $map) {
   $type = _panels_page_menu_type($panel_page);
   $primary_wildcard = array_search('%', $map);
   // FIXME (this data) quickref should be entirely absorbed into the panels_page table itself.
   panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_IS_DYNAMIC);
 
   // Construct the dynamic menu router item. If/when we get to multiple
-  // panels_pages per wildcard path, we needn't worry about overwriting here.
-  $items['menu items'][$panel_page->path] = _panels_page_construct_wildcard_menu_link(
+  // panels_pages per dynamic path, we needn't worry about overwriting here.
+  $items['menu items'][$panel_page->path] = _panels_page_construct_dynamic_menu_link(
     $panel_page, array('pid-' . $panel_page->pid, $primary_wildcard),
     array('arguments' => array('pid-' . $panel_page->pid, $primary_wildcard)),
      $type);
@@ -220,13 +220,10 @@ function panels_page_construct_wildcard_menu_link(&$items, $panel_page, $map) {
 /**
  * Helper function to create a menu item for a panel.
  */
-function _panels_page_construct_wildcard_menu_link($panel_page, $page_arguments, $access, $type, $weight = 0) {
+function _panels_page_construct_dynamic_menu_link($panel_page, $page_arguments, $access, $type, $weight = 0) {
   return array(
     'title callback' => 'panels_page_title_handler',
     'title arguments' => $page_arguments,
-    // TODO $access['callback'] is currently always empty. Eliminate this ternary if we don't find a need for it presently.
-    // 'access callback' => !empty($access['callback']) ? $access['callback'] : 'panels_page_access',
-    // 'access arguments' => (array)$access['arguments'],
     'page callback' => 'panels_page_render_handler',
     'page arguments' => $page_arguments,
     'type' => $type,
