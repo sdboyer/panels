@@ -23,12 +23,14 @@ function panels_page_prepare_panels_render(&$loader_data, &$panel_page) {
 function _panels_page_prepare_panels_render(&$panel_page) {
   _panels_page_check_switchers($panel_page);
   $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->context);
-  $panel_page->keywords = panels_context_get_keywords($panel_page->context);
-  // Figure out which display to use.
-  $display_id = panels_argument_get_display($panel_page->arguments, $panel_page->context);
-  $panel_page->display = panels_page_fetch_display($panel_page, $display_id);
+  // If we're wrapping FAPI with with panel, this function gets the data.
   $panel_page->form = panels_context_get_form($panel_page->context);
+  // Get any keywords (for title substitution in panes)
+  $panel_page->keywords = panels_context_get_keywords($panel_page->context);
+  // Figure out which display to use, then retrieve it into the current spot.
+  panels_page_fetch_display($panel_page, panels_argument_get_display($panel_page->arguments, $panel_page->context));
   panels_page_set_current($panel_page);
+
 }
 
 function _panels_page_check_switchers(&$panel_page) {
@@ -74,40 +76,22 @@ function _panels_page_prepare_display($panel_page, $args = array()) {
   $panel_page->display->context   = $panel_page->context;
   $panel_page->display->keywords  = $panel_page->keywords;
   $panel_page->display->css_id    = $panel_page->css_id;
-  $panel_page->display->owner     = $panel_page; // TODO ref/value php4/5 compat problem?
+  $panel_page->display->owner     =& $panel_page; // TODO ref/value php4/5 compat problem?
   $panel_page->display->owner->id = $panel_page->name;
   $panel_page->display->type      = 'panel_page';
 }
 
+/**
+ * Execute a normal (i.e., non-form embedded) panels_page render.
+ *
+ * @param object $panel_page
+ * @param array $args
+ */
 function panels_page_render_page_normal($panel_page, $args) {
-  // TODO separate this out prior to this point using the logic handler
-/*  $output = '';
-  if ($admin) {
-    // Display an admin form to make it easy to set up arguments.
-    panels_load_include('panels_page.admin', 'panels_page/');
-    $output .= drupal_get_form('panels_page_admin_view', $panel_page, $args);
-  }
-
-  if (empty($panel_page->context)) { // FIXME die
-    $panel_page->context = array();
-  }
-
-  if ($panel_page->arguments) {
-    if (!panels_argument_load_contexts($panel_page->arguments, $panel_page->context, $args)) {
-      if ($admin) {
-        return $output . t('Page reports "Page not found" due to argument restrictions');
-      }
-      else {
-        return drupal_not_found();
-      }
-    }
-  }
-*/
   _panels_page_prepare_display($panel_page, $args);
   $output = panels_render_display($panel_page->display);
   panels_page_custom_css($panel_page);
 
-  // FIXME I believe this method no longer works.
   if ($panel_page->no_blocks) {
     print theme('page', $output, FALSE);
   }
@@ -116,16 +100,20 @@ function panels_page_render_page_normal($panel_page, $args) {
   }
 }
 
+/**
+ * Execute a panels_page render with an embedded form.
+ *
+ * @param $panel_page
+ * @param $args
+ */
 function panels_page_render_page_form($panel_page, $args) {
-  $form = array_shift($args);
-  _panels_page_render_display($panel_page, $args);
-  $form = panels_context_get_form($panel_page->context);
+  _panels_page_prepare_display($panel_page, $args);
+  $form = drupal_clone($panel_page);
   $form->form['#theme'] = 'panels_page_render_form';
   $form->form['#display'] = $panel_page->display;
   $output = drupal_render_form($form->form_id, $form->form);
   panels_page_custom_css($panel_page);
 
-  // FIXME I believe this method no longer works.
   if ($panel_page->no_blocks) {
     print theme('page', $output, FALSE);
   }
@@ -134,6 +122,11 @@ function panels_page_render_page_form($panel_page, $args) {
   }
 }
 
+/**
+ * Add custom css entered on the configuration form, if any. Filter it first.
+ *
+ * @param $panel_page
+ */
 function panels_page_custom_css($panel_page) {
   if ($panel_page->css) {
     panels_load_include('panels_page.css_filter', 'panels_page/');
