@@ -906,6 +906,19 @@ function panels_page_admin_view_submit($form, &$form_state) {
 
 
 /**
+ * Page callback to import a panel page from PHP code.
+ */
+function panels_page_import_page() {
+  if (!empty($_POST['form_id']) && $_POST['form_id'] == 'panels_page_edit_form') {
+    $panel_page = unserialize($_SESSION['pp_import']);
+    drupal_set_title(t('Import panel page "@s"', array('@s' => $panel_page->title)));
+    return drupal_get_form('panels_page_edit_form', $panel_page);
+  }
+
+  return drupal_get_form('panels_page_import_form');
+}
+
+/**
  * Form to for the panel page import
  */
 function panels_page_import_form(&$form_state) {

@@ -20,62 +20,6 @@ function panels_page_fields() {
 }
 
 /**
- * Page callback to import a panel page from PHP code.
- */
-function panels_page_import_page() {
-  if (!empty($_POST['form_id']) && $_POST['form_id'] == 'panels_page_edit_form') {
-    $panel_page = unserialize($_SESSION['pp_import']);
-    drupal_set_title(t('Import panel page "@s"', array('@s' => $panel_page->title)));
-    return drupal_get_form('panels_page_edit_form', $panel_page);
-  }
-
-  return drupal_get_form('panels_page_import_form');
-}
-
-/**
- * Form to for the panel page import
- */
-function panels_page_import_form(&$form_state) {
-  $form['panel_page'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Panel page code'),
-    '#cols' => 60,
-    '#rows' => 15,
-    '#description' => t('Cut and paste the results of an exported panel page here.'),
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Import'),
-  );
-
-  $form['#redirect'] = FALSE;
-  return $form;
-}
-
-/**
- * Handle the submit button on importing a panel page.
- */
-function panels_page_import_form_submit($form, &$form_state) {
-  ob_start();
-  eval($form_state['values']['panel_page']);
-  ob_end_clean();
-
-  if (isset($page)) {
-    drupal_set_title(t('Import panel page "@s"', array('@s' => $page->title)));
-    // As $page contains non-stdClass objects,
-    // it needs to be serialized before being stored in the session variable.
-    $_SESSION['pp_import'] = serialize($page);
-    $output = drupal_get_form('panels_page_edit_form', $page);
-    print theme('page', $output);
-    exit;
-  }
-  else {
-    drupal_set_message(t('Unable to get a panel page out of that.'));
-  }
-}
-
-/**
  * Check to see if the panel page needs to be saved due to a display having
  * been just saved.
  *
