@@ -392,8 +392,8 @@ function panels_page_edit_form_submit($form, &$form_state) {
   if ($panel_page->pid == 'new') {
     unset($_SESSION['pp_import']);
     drupal_set_message(t('Your new panel page %title has been saved.', array('%title' => $panel_page->title)));
-    $pid = panels_page_save($panel_page);
-    $form_state['values']['pid'] = $pid;
+    panels_page_save($panel_page);
+    $form_state['values']['pid'] = $panel_page->pid;
     $layout = panels_get_layout($panel_page->display->layout);
 
     if ($layout['settings form']) {
@@ -702,8 +702,8 @@ function panels_page_edit_layout($panel_page) {
   // our panel_page if necessary and do our own goto.
   $output = panels_edit_layout($panel_page->display, t('Save'));
   if (is_object($output)) {
-    // If this is a default page, and was saved, we have to make it real.
-    panels_page_set_display($panel_page, $did, $output);
+    $panel_page->display = $output;
+    panels_page_save_display($panel_page);
 
     $dest = "admin/panels/panel-page/edit/{$panel_page->name}/layout";
     if ($panel_page->display->did != $panel_page->did) {
@@ -736,7 +736,8 @@ function panels_page_edit_layout_settings($panel_page, $next = NULL) {
   // we didn't send the $dest. Which we don't, here.
   $output = panels_edit_layout_settings($panel_page->display, $button, NULL, $panel_page->title);
   if (is_object($output)) {
-    panels_page_set_display($panel_page, $did, $output);
+    $panel_page->display = $output;
+    panels_page_save_display($panel_page);
     drupal_goto($dest);
   }
 
@@ -759,8 +760,8 @@ function panels_page_edit_content($panel_page) {
 
   $output = panels_edit($panel_page->display, NULL, $content_types);
   if (is_object($output)) {
-    // If this is a default page, and was saved, we have to make it real.
-    panels_page_set_display($panel_page, $did, $output);
+    $panel_page->display = $output;
+    panels_page_save_display($panel_page);
 
     // And do the drupal_goto that a submit function ordinarily would have.
     $dest = "admin/panels/panel-page/{$panel_page->name}/edit/content";
@@ -903,3 +904,46 @@ function panels_page_admin_view_submit($form, &$form_state) {
   return $url;
 }
 
+
+/**
+ * Form to for the panel page import
+ */
+function panels_page_import_form(&$form_state) {
+  $form['panel_page'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Panel page code'),
+    '#cols' => 60,
+    '#rows' => 15,
+    '#description' => t('Cut and paste the results of an exported panel page here.'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  );
+
+  $form['#redirect'] = FALSE;
+  return $form;
+}
+
+/**
+ * Handle the submit button on importing a panel page.
+ */
+function panels_page_import_form_submit($form, &$form_state) {
+  ob_start();
+  eval($form_state['values']['panel_page']);
+  ob_end_clean();
+
+  if (isset($page)) {
+    drupal_set_title(t('Import panel page "@s"', array('@s' => $page->title)));
+    // As $page contains non-stdClass objects,
+    // it needs to be serialized before being stored in the session variable.
+    $_SESSION['pp_import'] = serialize($page);
+    $output = drupal_get_form('panels_page_edit_form', $page);
+    print theme('page', $output);
+    exit;
+  }
+  else {
+    drupal_set_message(t('Unable to get a panel page out of that.'));
+  }
+}

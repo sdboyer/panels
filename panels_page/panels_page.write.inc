@@ -8,7 +8,16 @@
  */
 
 // Ugly, but whenever we need to write, we need to read, so...
-require_once dirname(__FILE__). '/panels_page.read.inc';
+require_once dirname(__FILE__) . '/panels_page.read.inc';
+
+function panels_page_fields() {
+  $fields = array();
+  $schema = drupal_get_schema('panels_page');
+  foreach ($schema['fields'] as $field => $info) {
+    $fields[$field] = db_type_placeholder($info['type']);
+  }
+  return $fields;
+}
 
 /**
  * Page callback to import a panel page from PHP code.
@@ -69,93 +78,107 @@ function panels_page_import_form_submit($form, &$form_state) {
 /**
  * Check to see if the panel page needs to be saved due to a display having
  * been just saved.
+ *
+ * Wrapper for panels_page_save().
  */
-function panels_page_set_display($panel_page, $id, $display) {
-  $save = FALSE;
-  if ($panel_page->pid == 'new') {
-    $save = TRUE;
-
-    if (empty($id)) {
-      $panel_page->display = $display;
-      $panel_page->did = $display->did;
-    }
-  }
-
-  if (!empty($id)) {
-    if (empty($panel_page->displays[$id]['did']) || $panel_page->displays[$id]['did'] == 'new') {
-      $save = TRUE;
-      $panel_page->displays[$id]['did'] = $display->did;
-      if (isset($panel_page->displays[$id]['display'])) {
-        unset($panel_page->displays[$id]['display']);
-      }
-    }
-  }
-
-  if ($save) {
-    panels_page_save($panel_page);
+function panels_page_save_display(&$panel_page, $id) {
+  if (empty($panel_page->displays[$panel_page->current]['did']) || $panel_page->displays[$panel_page->current]['did'] == 'new') {
+    return panels_page_save($panel_page);
   }
 }
 
 /**
- * Save a panel page.
+ * Prepare an imported panel page for insertion into the database, then
+ * insert it.
+ *
+ * Wrapper for panels_page_save().
  */
-function panels_page_save($panel_page) {
-  $fields = $types = $values = $pairs = array();
+function panels_page_save_import(&$panel_page) {
+  foreach ($panel_page->displays as $id => $info) {
+    $imported_display = panels_save_display($info['display']);
+    $panel_page->displays[$id]['did'] = $imported_display->did;
+    unset($panel_page->displays[$id]['display']);
+  }
+  return panels_page_save($panel_page);
+}
+
+/**
+ * Main entry point for panels_page save functions.
+ */
+function panels_page_save(&$panel_page) {
+  $function = '_panels_page_' . ($panel_page->pid == 'new' ? 'insert' : 'save');
+  return $function($panel_page);
+}
+
+/**
+ * Insert a new panel page into the database.
+ *
+ */
+function _panels_page_insert(&$panel_page) {
+  $fields = $types = $values = array();
+  panels_page_sanitize($panel_page);
+
+  // Save the primary display, thus creating a $display->did.
+  panels_save_display($panel_page->primary);
+  foreach (panels_page_fields() as $field => $type) {
+    if (isset($panel_page->$field)) {
+      $fields[] = $field;
+      $types[] = $type;
+
+      $serialize = in_array($field, array('arguments', 'displays', 'contexts', 'relationships', 'switcher_options'));
+      $values[] = $serialize ? serialize($panel_page->$field) : $panel_page->$field;
+    }
+  }
+  // TODO horrible, ugly to do it this way, but we shouldn't change the value in $panel_page. Why were we storing access this way, anyway? Why not just serialize?
+  $values[array_search('access', $fields)] = implode(',', $values[array_search('access', $fields)]);
+
+  // Build the query adding the new pid and did.
+  $panel_page->pid = db_next_id('{panels_page}_pid');
+  $sql = 'INSERT INTO {panels_page} (' . implode(', ', $fields) . ', did, pid) VALUES (' . implode(', ', $types) . ', %d, %d)';
+  $values[] = $panel_page->primary->did;
+
+  db_query($sql, $values);
+  // Return the pid for convenience.
+  return $panel_page->pid;
+}
+
+/**
+ * Save an existing panel page to the database.
+ */
+function _panels_page_save(&$panel_page) {
+  $values = $pairs = array();
+
   // Save the display if one was given to us.
   if (!empty($panel_page->display)) {
-    $display = panels_save_display($panel_page->display);
-  }
-  // Ensure empty values get translated correctly. Also make sure we don't
-  // mess up the original.
-  $page_clone = drupal_clone(panels_page_sanitize($panel_page));
-
-  // Check to see if we need to save any imported displays.
-  foreach ($page_clone->displays as $did => $info) {
-    if (isset($info['display'])) {
-      $d = panels_save_display($info['display']);
-      $page_clone->displays[$did]['did'] = $d->did;
-      unset($page_clone->displays[$did]['display']);
+    panels_save_display($panel_page->display);
+    if ($panel_page->current != 'primary') {
+      $panel_page->displays[$panel_page->current]['did'] = $panel_page->display->did;
+      unset($panel_page->displays[$panel_page->current]['display']);
     }
   }
 
-  // If pid is set to our "magic value", this is an insert, otherwise an update.
-  $insert = $page_clone->pid && $page_clone->pid == 'new';
-
-  // Serialize the access string.
-  $page_clone->access = $page_clone->access ? implode(', ', $page_clone->access) : '';
+  panels_page_sanitize($panel_page);
 
   // Build arrays of fields and types (resp. pairs of both) and of values.
   foreach (panels_page_fields() as $field => $type) {
     // Skip empty values.
-    if (isset($page_clone->$field)) {
-      if ($insert) {
-        $fields[] = $field;
-        $types[] = $type;
-      }
-      else {
-        $pairs[] = "$field = $type";
-      }
+    if (isset($panel_page->$field)) {
+      $pairs[] = "{$field} = {$type}";
+
       // Build the $values array, serializing some fields.
       $serialize = in_array($field, array('arguments', 'displays', 'contexts', 'relationships', 'switcher_options'));
-      $values[] = $serialize ? serialize($page_clone->$field) : $page_clone->$field;
-    }
+      $values[] = $serialize ? serialize($panel_page->$field) : $panel_page->$field;
   }
+  // TODO horrible, ugly to do it this way, but we shouldn't change the value in $panel_page. Why were we storing access this way, anyway? Why not just serialize?
+  $values[array_search('access', $fields)] = implode(',', $values[array_search('access', $fields)]);
 
-  if ($insert) {
-    // Determine the new primary key.
-    $page_clone->pid = db_next_id('{panels_page}_pid');
-    // Build the query adding the new primary key and the did.
-    $sql = 'INSERT INTO {panels_page} (' . implode(', ', $fields) . ', did, pid) VALUES (' . implode(', ', $types) . ', %d, %d)';
-    $values[] = $display->did;
-  }
-  else {
-    // Build the query filtering by the primary key.
-    $sql = 'UPDATE {panels_page} SET ' . implode(', ', $pairs) . ' WHERE pid = %d';
-  }
-  $values[] = $page_clone->pid;
+  // Build the query filtering by the primary key.
+  $sql = 'UPDATE {panels_page} SET ' . implode(', ', $pairs) . ' WHERE pid = %d';
+  $values[] = $panel_page->pid;
 
   db_query($sql, $values);
-  return $page_clone->pid;
+  // Return the pid for convenience.
+  return $panel_page->pid;
 }
 
 /**
@@ -185,6 +208,8 @@ function panels_page_delete($panel_page) {
  * The code returned from can be used directly in panels_page_save().
  */
 function panels_page_export($panel_page, $prefix = '') {
+  // Make sure the primary display is the current display.
+  panels_page_fetch_primary_display($panel_page);
   $output = '';
   $fields = panels_page_fields();
   $output .= $prefix . '$page = new stdClass()' . ";\n";
@@ -200,7 +225,7 @@ function panels_page_export($panel_page, $prefix = '') {
   foreach ($panel_page->contexts as $id => $info) {
     $output .= $prefix . '  $page->contexts[\'' . $id . "'] = array(\n";
     foreach ($info as $key => $value) {
-      $output .= $prefix . "    '$key' => " . panels_var_export($value, '    ') . ";\n";
+      $output .= $prefix . "    '$key' => " . panels_var_export($value, '    ') . ",\n";
     }
     $output .= $prefix . "  );\n";
   }

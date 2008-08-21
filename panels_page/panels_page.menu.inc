@@ -42,7 +42,6 @@ function panels_page_admin_static_menu_items() {
     'title' => 'Import',
     'page callback' => 'panels_page_import_page',
     'weight' => 5,
-    'file' => 'panels_page.write.inc',
   ) + $admin;
   return $items;
 }

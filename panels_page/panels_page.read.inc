@@ -148,28 +148,11 @@ function panels_page_set_current(&$panel_page) {
 }
 
 /**
- * Internal panels_page API function; directs the current display
- * ($panel_page->display) to the primary display ($panel_page->primary),
- * loading the primary display if necessary.
- *
- * @param object $panel_page
- */
-function panels_page_fetch_primary_display(&$panel_page) {
-  // Commented out is a more precise way of telling, but it's probably moot.
-  // if (empty($panel_page->primary) || !is_a($panel_page->primary, 'panels_display')) {
-  if (empty($panel_page->primary) || !is_object($panel_page->primary)) {
-    $panel_page->primary = panels_load_display($panel_page->did);
-  }
-  $panel_page->display = &$panel_page->primary;
-  // Update the cache.
-  panels_page_loaded_cache($panel_page->name, $panel_page);
-}
-
-/**
- * Load a display based upon information from the $displays list.
+ * Load a display into the 'current display' position, $panel_page->current.
  *
  * The family of panels_page_fetch*() functions are specifically dedicated to
- * retrieving a particular display and placing them in $panels_page->display
+ * retrieving a particular display and placing them in $panels_page->display,
+ * which is the 'current' display upon which all other operations act.
  * via reference to its permanent home in the $panels_page object. The
  * permanent homes vary:
  *
@@ -178,6 +161,9 @@ function panels_page_fetch_primary_display(&$panel_page) {
  *      $panels_page->alternates['defaults'][$did]. TODO this isn't true right now
  *   -# For alternate non-default displays, that location is in
  *      $panels_page->alternates['all'][$did].
+ *
+ * The structure of this function family essentially means that no other
+ * panels_page function should ever act on anything except $panel_page->display.
  *
  * @param object $panel_page
  * @param string $id
@@ -191,49 +177,63 @@ function panels_page_fetch_primary_display(&$panel_page) {
  *   returned in its stead.
  */
 function panels_page_fetch_display(&$panel_page, $id = NULL) {
-  // No id is provided - we want the primary display. Get it and get out.
-  if (empty($id)) {
-    panels_page_fetch_primary_display($panel_page);
-    return;
-  }
+  $which = empty($id) ? 'primary' : 'alternate';
+  $function = "panels_page_fetch_{$which}_display";
+  // Redirect to the appropriate fetcher depending on whether $id is provided
+  $function($panel_page, $id);
+}
 
-  // FIXME I don't grok this part of the logic, and am assuming this is OK.
+/**
+ * Internal panels_page API function; directs the current display
+ * ($panel_page->display) to the primary display ($panel_page->primary),
+ * loading the primary display if necessary.
+ *
+ * @param object $panel_page
+ */
+function panels_page_fetch_primary_display(&$panel_page) {
+  // Commented out is a more precise way of telling, but it's probably moot.
+  // if (empty($panel_page->primary) || !is_a($panel_page->primary, 'panels_display')) {
+  if (empty($panel_page->primary) || !is_object($panel_page->primary)) {
+    $panel_page->primary = panels_load_display($panel_page->did);
+  }
+  $panel_page->display = &$panel_page->primary;
+  $panel_page->current = 'primary';
+  // Update the cache.
+  panels_page_loaded_cache($panel_page->name, $panel_page);
+}
+
+function panels_page_fetch_alternate_display(&$panel_page, $id) {
   $info = $panel_page->displays[$id];
-  if (panels_page_fetch_display_from_info($panel_page, $info)) {
-    return;
+  $requested_display_exists = panels_page_fetch_display_from_info($panel_page, $info, $id);
+  if (!$requested_display_exists) {
+    // The requested display does not exist. First, we try to fall back to the
+    // default display for the context we're switching on.
+    if (!empty($info['default']) && !empty($panel_page->displays[$info['default']])) {
+      panels_page_fetch_display_from_info($panel_page, $panel_page->displays[$info['default']], $id);
+    }
+    // Otherwise, use the primary display. Load it if it's not already loaded.
+    else {
+      panels_page_fetch_primary_display($panel_page);
+    }
   }
-
-  // The requested display does not exist. First, we try to fall back to the
-  // default display for the context we're switching on.
-  if (!empty($info['default']) && !empty($panel_page->displays[$info['default']])) {
-    panels_page_fetch_display_from_info($panel_page, $panel_page->displays[$info['default']]);
-  }
-  // Otherwise, use the primary display. Load it if it's not already loaded.
-  else {
-    panels_page_fetch_primary_display($panel_page);
-  }
-  // For callers who care that we've fallen back on a default.
   return TRUE;
 }
 
 /**
  * Get a display based on whether it's already in code or needs to be loaded.
  */
-function panels_page_fetch_display_from_info(&$panel_page, $info) {
+function panels_page_fetch_display_from_info(&$panel_page, $info, $id) {
   $ret = NULL;
   // If the 'display' is set it's the result of an export/default
   if (isset($info['display'])) {
-    $ret = $info['display'];
+    $panel_page->display = $info['display'];
+    $panel_page->current = $id;
+    return TRUE;
   }
 
   if (is_numeric($info['did'])) {
-    $ret = panels_load_display($info['did']);
-  }
-
-  if (is_object($ret)) {
-    $panel_page->alternates[$ret->name] = $ret; // By val doesn't matter here
-    $panel_page->display = &$panel_page->alternates['all'][$ret->name];
-    panels_page_loaded_cache($panel_page->name, $panel_page);
+    $panel_page->display = panels_load_display($info['did']);
+    $panel_page->current = $id;
     return TRUE;
   }
   return FALSE;
