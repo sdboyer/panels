@@ -167,7 +167,6 @@ function _panels_page_menu_alter(&$callbacks) {
   // Replace all the overridden routers with our own.
   $callbacks = array_merge($callbacks, $panels_items['menu items']);
 
-  db_query('DELETE FROM {panels_page_router_quickref}');
   foreach ($panels_items['menu items'] as $path => $item) {
     $raw_path = panels_page_get_raw_path($path);
     // Only save a router quickref if the item has metadata
