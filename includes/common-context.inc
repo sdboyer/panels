@@ -83,6 +83,8 @@ function panels_common_context_data($type, $name) {
  */
 function panels_common_add_argument_form($module, &$form, &$form_state, &$form_location, $object) {
   $form_location = array(
+    '#prefix' => '<div id="panels-arguments-table">',
+    '#suffix' => '</div>',
     '#theme' => 'panels_common_context_item_form',
     '#panel_name' => $object->name,
     '#panels_context_type' => 'argument',
@@ -304,24 +306,27 @@ function theme_panels_common_context_item_form($form) {
   $type_info = panels_common_context_info($type);
 
   if (!empty($form[$type]) && empty($form['#only_buttons'])) {
+    $count = 0;
+    $rows = '';
+    foreach (array_keys($form[$type]) as $id) {
+      if (!is_numeric($id)) {
+        continue;
+      }
+      $rows .= theme('panels_common_context_item_row', $type, $form[$type][$id], $id, $count++);
+    }
+
     $output .= '<table id="' . $type . '-table">';
     $output .= '<thead>';
     $output .= '<tr>';
     $output .= '<th class="title">' . $type_info['title'] . '</th>';
-    if (!empty($type_info['sortable'])) {
+    if (!empty($type_info['sortable']) && $count) {
       $output .= '<th class="position">' . t('Weight') . '</th>';
     }
     $output .= '<th class="operation">' . t('Operation') . '</th>';
     $output .= '</thead>';
     $output .= '<tbody>';
 
-    $count = 0;
-    foreach (array_keys($form[$type]) as $id) {
-      if (!is_numeric($id)) {
-        continue;
-      }
-      $output .= theme('panels_common_context_item_row', $type, $form[$type][$id], $id, $count++);
-    }
+    $output .= $rows;
 
     $output .= '</tbody>';
     $output .= '</table>';
@@ -391,6 +396,7 @@ function panels_ajax_context_item_add($module = NULL, $type = NULL, $panel_name 
     'identifier' => $info['title'] . ($id > 1 ? ' ' . $id : ''),
     'keyword' => panels_common_get_keyword($object, $info['keyword']),
     'id' => $id,
+    'name' => $name,
   );
 
   $contexts = panels_context_load_contexts($object);
@@ -415,6 +421,13 @@ function panels_ajax_context_item_add($module = NULL, $type = NULL, $panel_name 
     panels_cache_set("panel_object:$module", $panel_name, $object);
 
     $arg_form_state = array();
+
+    $arg_form = array(
+      '#post' => array(),
+      '#programmed' => FALSE,
+      '#tree' => FALSE,
+    );
+
     // Build a chunk of the form to merge into the displayed form
     $arg_form[$type] = array(
       '#tree' => TRUE,
@@ -434,6 +447,9 @@ function panels_ajax_context_item_add($module = NULL, $type = NULL, $panel_name 
       '#panels_context_type' => 'relationship',
       '#panels_context_module' => $module,
       '#only_buttons' => TRUE,
+      '#post' => array(),
+      '#programmed' => FALSE,
+      '#tree' => FALSE,
     );
 
     $rel_form['relationship'] = array(
@@ -490,7 +506,7 @@ function panels_ajax_context_item_edit($module = NULL, $type = NULL, $panel_name
   // load the context
   $info = panels_common_context_data($type, $name);
   if (empty($info)) {
-    panels_ajax_render();
+    panels_ajax_render(t('Invalid context type'));
   }
 
   $contexts = panels_context_load_contexts($object);
@@ -519,6 +535,12 @@ function panels_ajax_context_item_edit($module = NULL, $type = NULL, $panel_name
 
     $output = new stdClass();
     $output->type = $output->output = 'dismiss';
+
+    $arg_form = array(
+      '#post' => array(),
+      '#programmed' => FALSE,
+      '#tree' => FALSE,
+    );
 
     // Build a chunk of the form to merge into the displayed form
     $arg_form[$type] = array(
@@ -561,6 +583,11 @@ function panels_common_edit_context_form(&$form_state) {
   $form['context']['name'] = array(
     '#type' => 'hidden',
     '#value' => $context['name'],
+  );
+
+  $form['context']['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $ctext['id'],
   );
 
   $form['context']['identifier'] = array(
@@ -646,6 +673,11 @@ function panels_common_edit_requiredcontext_form(&$form_state) {
     '#value' => $context['name'],
   );
 
+  $form['requiredcontext']['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $ctext['id'],
+  );
+
   $form['requiredcontext']['identifier'] = array(
     '#type' => 'textfield',
     '#title' => t('Identifier'),
@@ -701,6 +733,11 @@ function panels_common_edit_relationship_form(&$form_state) {
   $form['relationship']['name'] = array(
     '#type' => 'hidden',
     '#value' => $relationship['name'],
+  );
+
+  $form['relationship']['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $rel['id'],
   );
 
   $form['relationship']['identifier'] = array(
@@ -771,6 +808,11 @@ function panels_common_edit_argument_form(&$form_state) {
 
   $arg = $object->arguments[$position];
 
+  if (!isset($arg['default'])) {
+    $arg['default'] = 'ignore';
+    $arg['title'] = '';
+  }
+
   $form['description'] = array(
     '#prefix' => '<div class="description">',
     '#suffix' => '</div>',
@@ -779,9 +821,15 @@ function panels_common_edit_argument_form(&$form_state) {
 
   // Basic argument values
   $form['argument']['#tree'] = TRUE;
+
   $form['argument']['name'] = array(
     '#type' => 'hidden',
     '#value' => $argument['name'],
+  );
+
+  $form['argument']['id'] = array(
+    '#type' => 'hidden',
+    '#value' => $arg['id'],
   );
 
   $form['argument']['default'] = array(
@@ -822,10 +870,11 @@ function panels_common_edit_argument_form(&$form_state) {
     $argument_settings = $arg['argument_settings'];
   }
 
+
   if (isset($argument['settings form']) && function_exists($argument['settings form'])) {
     $form['argument']['argument_settings'] = $argument['settings form']($argument_settings);
-    $form['argument']['argument_settings']['#tree'] = TRUE;
   }
+  $form['argument']['argument_settings']['#tree'] = TRUE;
 
   $form['next'] = array(
     '#type' => 'submit',
@@ -849,8 +898,12 @@ function panels_common_edit_argument_form_validate($form, &$form_state) {
 /**
  * Updates an argument edited/added via ajax
  */
-function panels_common_edit_argument_form_submit($form_id, $form_values) {
+function panels_common_edit_argument_form_submit($form, &$form_state) {
   $argument = $form_state['info'];
+
+  if (!isset($form_state['values']['argument_settings'])) {
+    $form_state['values']['argument_settings'] = array();
+  }
 
   if (isset($argument['settings form submit']) && function_exists($argument['settings form submit'])) {
     $argument['settings form submit']($form, $form_state['values']['argument_settings'], $form_state);
@@ -945,7 +998,7 @@ function panels_common_get_keyword($page, $word) {
 
   $keyword = $word;
   $count = 0;
-  while ($keywords[$keyword]) {
+  while (!empty($keywords[$keyword])) {
     $keyword = $word . '_' . ++$count;
   }
   return $keyword;

@@ -38,6 +38,7 @@ function panels_page_schema_1() {
       'access' => array(
         'type' => 'varchar',
         'length' => 128,
+        'storage_type' => 'implode',
       ),
       'path' => array(
         'type' => 'varchar',
@@ -60,18 +61,22 @@ function panels_page_schema_1() {
       'arguments' => array(
         'type' => 'text',
         'size' => 'big',
+        'storage_type' => 'serialize',
       ),
       'displays' => array(
         'type' => 'text',
         'size' => 'big',
+        'storage_type' => 'serialize',
       ),
       'contexts' => array(
         'type' => 'text',
         'size' => 'big',
+        'storage_type' => 'serialize',
       ),
       'relationships' => array(
         'type' => 'text',
         'size' => 'big',
+        'storage_type' => 'serialize',
       ),
       'no_blocks' => array(
         'type' => 'int',
@@ -82,6 +87,7 @@ function panels_page_schema_1() {
         'type' => 'text',
         'size' => 'big',
         'not null' => FALSE,
+        'storage_type' => 'serialize',
       ),
       'switcher_name' => array(
         'type' => 'varchar',

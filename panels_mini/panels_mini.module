@@ -213,7 +213,7 @@ function panels_mini_fields() {
  */
 function panels_mini_sanitize($mini) {
   foreach (array('contexts', 'relationships', 'requiredcontexts') as $id) {
-    if (!is_array($mini->$id)) {
+    if (!isset($mini->$id) || !is_array($mini->$id)) {
       $mini->$id = array();
     }
   }

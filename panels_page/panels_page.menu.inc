@@ -15,11 +15,12 @@ function panels_page_admin_static_menu_items() {
     // TODO we'll need to granulate this perm significantly in panels3.
     'access arguments' => array('create panel-pages'),
     'file' => 'panels_page.admin.inc',
+    'description' => 'Create and administer panel-pages (complex layout pages with URLs).',
     'type' => MENU_LOCAL_TASK,
   );
 
   $items['admin/panels/panel-page'] = array(
-    'title' => 'Panels Pages',
+    'title' => 'Panel pages',
     'page callback' => 'panels_page_list_page',
     'type' => MENU_NORMAL_ITEM,
   ) + $admin;
@@ -146,6 +147,11 @@ function panels_page_create_menu_structure($new_items = NULL) {
 
 function _panels_page_menu_alter(&$callbacks) {
   $panels_items = panels_page_create_menu_structure();
+  if (empty($panels_items)) {
+    // no point in trying to match when there is nothing to match...
+    return;
+  }
+
   $matches = array();
   while (list($path, $item) = each($callbacks)) {
     if (strpos($path, '%') === FALSE) {

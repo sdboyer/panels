@@ -46,6 +46,14 @@ function panels_nid_context($node = NULL, $conf = NULL, $empty = FALSE) {
  * Settings form for the argument
  */
 function panels_nid_settings_form($conf) {
+  if (empty($conf)) {
+    $conf = array(
+      'types' => array(),
+      'own_default' => FALSE,
+      'displays' => array(),
+    );
+  }
+
   $options = array();
   foreach (node_get_types() as $type => $info) {
     $options[$type] = $info->name;

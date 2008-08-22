@@ -50,8 +50,11 @@ function panels_page_save_import(&$panel_page) {
  * Main entry point for panels_page save functions.
  */
 function panels_page_save(&$panel_page) {
-  $function = '_panels_page_' . ($panel_page->pid == 'new' ? 'insert' : 'save');
-  return $function($panel_page);
+  panels_page_sanitize($panel_page);
+
+  return empty($panel_page->pid) || $panel_page->pid == 'new' ?
+    _panels_page_insert($panel_page) :
+    _panels_page_update($panel_page);
 }
 
 /**
@@ -60,28 +63,29 @@ function panels_page_save(&$panel_page) {
  */
 function _panels_page_insert(&$panel_page) {
   $fields = $types = $values = array();
-  panels_page_sanitize($panel_page);
 
   // Save the primary display, thus creating a $display->did.
   panels_save_display($panel_page->primary);
-  foreach (panels_page_fields() as $field => $type) {
+  $schema = drupal_get_schema('panels_page');
+
+  $clone = drupal_clone($panel_page);
+  $clone->did = $panel_page->primary->did;
+
+  foreach ($schema['fields'] as $field => $info) {
     if (isset($panel_page->$field)) {
       $fields[] = $field;
-      $types[] = $type;
-
-      $serialize = in_array($field, array('arguments', 'displays', 'contexts', 'relationships', 'switcher_options'));
-      $values[] = $serialize ? serialize($panel_page->$field) : $panel_page->$field;
+      $placeholders[] = db_type_placeholder($info['type']);
+      $values[] = _panels_page_save_value($info, $clone->$field);
     }
   }
-  // TODO horrible, ugly to do it this way, but we shouldn't change the value in $panel_page. Why were we storing access this way, anyway? Why not just serialize?
-  $values[array_search('access', $fields)] = implode(',', $values[array_search('access', $fields)]);
 
   // Build the query adding the new pid and did.
-  $panel_page->pid = db_next_id('{panels_page}_pid');
-  $sql = 'INSERT INTO {panels_page} (' . implode(', ', $fields) . ', did, pid) VALUES (' . implode(', ', $types) . ', %d, %d)';
-  $values[] = $panel_page->primary->did;
+  $sql = 'INSERT INTO {panels_page} (' . implode(', ', $fields) . ') VALUES (' . implode(', ', $placeholders) . ')';
 
   db_query($sql, $values);
+
+  $panel_page->pid = db_last_insert_id('panels_page', 'pid');
+
   // Return the pid for convenience.
   return $panel_page->pid;
 }
@@ -89,7 +93,7 @@ function _panels_page_insert(&$panel_page) {
 /**
  * Save an existing panel page to the database.
  */
-function _panels_page_save(&$panel_page) {
+function _panels_page_update(&$panel_page) {
   $values = $pairs = array();
 
   // Save the display if one was given to us.
@@ -101,20 +105,15 @@ function _panels_page_save(&$panel_page) {
     }
   }
 
-  panels_page_sanitize($panel_page);
-
   // Build arrays of fields and types (resp. pairs of both) and of values.
-  foreach (panels_page_fields() as $field => $type) {
+  $schema = drupal_get_schema('panels_page');
+  foreach ($schema['fields'] as $field => $info) {
     // Skip empty values.
     if (isset($panel_page->$field)) {
-      $pairs[] = "{$field} = {$type}";
-
-      // Build the $values array, serializing some fields.
-      $serialize = in_array($field, array('arguments', 'displays', 'contexts', 'relationships', 'switcher_options'));
-      $values[] = $serialize ? serialize($panel_page->$field) : $panel_page->$field;
+      $pairs[] = $field . " = " . db_type_placeholder($info['type']);
+      $values[] = _panels_page_save_value($info, $panel_page->$field);
+    }
   }
-  // TODO horrible, ugly to do it this way, but we shouldn't change the value in $panel_page. Why were we storing access this way, anyway? Why not just serialize?
-  $values[array_search('access', $fields)] = implode(',', $values[array_search('access', $fields)]);
 
   // Build the query filtering by the primary key.
   $sql = 'UPDATE {panels_page} SET ' . implode(', ', $pairs) . ' WHERE pid = %d';
@@ -124,6 +123,22 @@ function _panels_page_save(&$panel_page) {
   // Return the pid for convenience.
   return $panel_page->pid;
 }
+
+/**
+ * Process values for saving based upon data in the schema
+ */
+function _panels_page_save_value($info, $value) {
+  $storage_type = isset($info['storage_type']) ? $info['storage_type'] : 'normal';
+  switch ($storage_type) {
+    case 'serialize':
+      return serialize($value);
+    case 'implode':
+      return implode(',', (array) $value);
+    default:
+      return $value;
+  }
+}
+
 
 /**
  * Delete a panel page and its associated displays.

@@ -757,11 +757,15 @@ function panels_get_pane_title(&$pane, $context = array(), $incoming_content = N
  */
 function panels_argument_get_context($argument, $arg, $empty = FALSE) {
   if ($function = panels_plugin_get_function('arguments', $argument['name'], 'context')) {
+    if (!isset($argument['argument_settings'])) {
+      $argument['argument_settings'] = array();
+    }
+
     $context = $function($arg, $argument['argument_settings'], $empty);
 
     if ($context) {
       $context->identifier = $argument['identifier'];
-      $context->page_title = $argument['title'];
+      $context->page_title = isset($argument['title']) ? $argument['title'] : '';
       $context->keyword    = $argument['keyword'];
       return $context;
     }
@@ -939,7 +943,7 @@ function panels_relationship_get_context($relationship, $arg) {
     $context = $function($arg, $relationship['relationship_settings']);
     if ($context) {
       $context->identifier = $relationship['identifier'];
-      $context->page_title = $relationship['title'];
+      $context->page_title = isset($relationship['title']) ? $relationship['title'] : '';
       $context->keyword    = $relationship['keyword'];
       return $context;
     }
@@ -1130,6 +1134,11 @@ function panels_context_get_keywords($contexts) {
  * @todo can probably combine the various versions of this.
  */
 function panels_context_context_id($context, $type = 'context') {
+  if (empty($context['id'])) {
+    dsm($context);
+    vsm_trace();
+  }
+
   return $type . "_$context[name]_$context[id]";
 }
 
@@ -1138,10 +1147,14 @@ function panels_context_context_id($context, $type = 'context') {
  */
 function panels_context_get_context($context, $type = 'context') {
   if ($function = panels_plugin_get_function('contexts', $context['name'], 'context')) {
+    if (!isset($context['context_settings'])) {
+      $context['context_settings'] = array();
+    }
+
     $return = $function($type == 'requiredcontext', $context['context_settings'], TRUE);
     if ($return) {
       $return->identifier = $context['identifier'];
-      $return->page_title = $context['title'];
+      $return->page_title = isset($context['title']) ? $context['title'] : '';
       $return->keyword    = $context['keyword'];
       return $return;
     }
@@ -1381,7 +1394,7 @@ function panels_get_directories($plugin_type) {
   foreach (module_implements('panels_include_directory') as $module) {
     $result = module_invoke($module, 'panels_include_directory', $plugin_type);
     if (isset($result) && is_string($result)) {
-      $directories[$module] = drupal_get_path('module', $module) .'/'. $result;
+      $directories[$module] = drupal_get_path('module', $module) . '/' . $result;
     }
   }
   return $directories;

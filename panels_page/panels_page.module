@@ -76,7 +76,7 @@ function panels_page_menu() {
  * Delegates to an .inc file to reduce code load overhead.
  */
 function panels_page_menu_alter(&$callbacks) {
-  panels_page_load_include('menu');
+//  panels_page_load_include('menu');
   return _panels_page_menu_alter($callbacks);
 }
 
@@ -499,7 +499,7 @@ function panels_page_panels_exportables($op = 'list', $panels = NULL, $name = 'f
  */
 function panels_page_sanitize($page) {
   foreach (array('arguments', 'displays', 'contexts', 'relationships', 'switcher_options') as $id) {
-    if (!is_array($page->$id)) {
+    if (!isset($page->$id) || !is_array($page->$id)) {
       $page->$id = array();
     }
   }

@@ -349,6 +349,7 @@ function panels_mini_import_form_submit($form_id, $form) {
 function panels_mini_add_page($layout = NULL) {
   panels_load_include('plugins');
   $layouts = panels_get_layouts();
+  $output = '';
 
   if ($layout === NULL) {
     foreach ($layouts as $id => $layout) {
@@ -366,6 +367,11 @@ function panels_mini_add_page($layout = NULL) {
   $panel_mini->display->layout = $layout;
   $panel_mini->pid = 'new';
   $panel_mini->did = 'new';
+  $panel_mini->title = '';
+  $panel_mini->name = '';
+  $panel_mini->category = '';
+
+  drupal_set_title('Add mini panel');
   return panels_mini_edit($panel_mini);
 }
 
@@ -378,7 +384,10 @@ function panels_mini_edit($panel_mini) {
   if (!is_object($panel_mini)) {
     $panel_mini = panels_mini_load($panel_mini);
   }
-  drupal_set_title(check_plain($panel_mini->title));
+  if ($panel_mini) {
+    drupal_set_title(check_plain($panel_mini->title));
+  }
+
   return drupal_get_form('panels_mini_edit_form', $panel_mini);
 }
 
@@ -615,7 +624,7 @@ function panels_mini_context_form_submit($form, &$form_state) {
   drupal_set_message(t('Your changes have been saved.'));
   panels_mini_save($panel_mini);
   panels_cache_clear('panel_object:panel_mini', $panel_mini->name);
-  if ($form_values['submit'] == t('Save and proceed')) {
+  if ($form_state['values']['submit'] == t('Save and proceed')) {
     $form_state['redirect'] = "admin/panels/panel-mini/$panel_mini->name/edit-content";
   }
 }

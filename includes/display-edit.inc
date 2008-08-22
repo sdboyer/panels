@@ -277,14 +277,14 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
   // The delete button doesn't use panels_ajax_image_button because it doesn't
   // actually perform an ajax call.
   $alt = t('Delete pane "@pane"', array('@pane' => $title));
-  $buttons .= l(theme('image', panels_get_path("images/icon-delete.png")), $dest, array('html' => TRUE, 'attributes' => array('class' => 'pane-delete', 'id' => "pane-delete-panel-pane-$pane->pid", 'title' => $alt, 'alt' => $alt)));
+  $buttons .= l(theme('image', panels_get_path("images/icon-delete.png")), '', array('html' => TRUE, 'attributes' => array('class' => 'pane-delete', 'id' => "pane-delete-panel-pane-$pane->pid", 'title' => $alt, 'alt' => $alt)));
 
   $block = new stdClass();
   if (empty($content_type)) {
     $block->title = '<em>' . t('Missing content type') . '</em>';
     $block->content = t('This pane\'s content type is either missing or has been deleted. This pane will not render.');
   }
-  elseif (function_exists($content_type['editor render callback'])) {
+  elseif (isset($content_type['editor render callback']) && function_exists($content_type['editor render callback'])) {
     $block = $content_type['editor render callback']($display, $pane);
   }
   else {

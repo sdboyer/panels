@@ -165,7 +165,7 @@ function panels_change_layout(&$form_state) {
 
   $options = $new_layout_panels;
   $keys = array_keys($options);
-  $default = $options[0];
+  $default = current($options);
 
   $old_layout = panels_get_layout($display->layout);
 
