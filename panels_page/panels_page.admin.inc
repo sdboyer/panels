@@ -43,19 +43,19 @@ function panels_page_list_page() {
   foreach ($panel_pages as $panel_page) {
     $ops = array();
     if (empty($panel_page->disabled)) {
-      $ops[] = l(t('Edit'), "admin/panels/panel-page/{$panel_page->name}/edit");
-      $ops[] = l(t('Export'), "admin/panels/panel-page/{$panel_page->name}/edit/export");
+      $ops[] = l(t('Edit'), "admin/panels/panel-page/$panel_page->name/edit");
+      $ops[] = l(t('Export'), "admin/panels/panel-page/$panel_page->name/edit/export");
     }
     if ($panel_page->type != t('Default')) {
       $text = $panel_page->type == t('Overridden') ? t('Revert') : t('Delete');
-      $ops[] = l($text, "admin/panels/panel-page/delete/{$panel_page->name}");
+      $ops[] = l($text, "admin/panels/panel-page/delete/$panel_page->name");
     }
     else {
       if (empty($panel_page->disabled)) {
-        $ops[] = l(t('Disable'), "admin/panels/panel-page/disable/{$panel_page->name}", NULL, drupal_get_destination());
+        $ops[] = l(t('Disable'), "admin/panels/panel-page/disable/$panel_page->name", NULL, drupal_get_destination());
       }
       else {
-        $ops[] = l(t('Enable'), "admin/panels/panel-page/enable/{$panel_page->name}", NULL, drupal_get_destination());
+        $ops[] = l(t('Enable'), "admin/panels/panel-page/enable/$panel_page->name", NULL, drupal_get_destination());
       }
     }
 
@@ -597,7 +597,7 @@ function panels_page_advanced_form_submit($form, &$form_state) {
   panels_page_load_include('write');
   panels_page_save($panel_page);
   if ($form_state['next']) {
-    $form_state['redirect'] = "admin/panels/panel-page/{$panel_page->name}/edit/context/next";
+    $form_state['redirect'] = "admin/panels/panel-page/$panel_page->name/edit/context/next";
   }
   drupal_set_message(t('Your changes have been saved.'));
 }
@@ -709,7 +709,7 @@ function panels_page_context_form_submit($form, &$form_state) {
   panels_page_save($panel_page);
   panels_cache_clear('panel_object:panel_page', $panel_page->name);
   if ($form_state['next']) {
-    $form_state['redirect'] = "admin/panels/panel-page/{$panel_page->name}/edit/content";
+    $form_state['redirect'] = "admin/panels/panel-page/$panel_page->name/edit/content";
   }
 }
 
@@ -725,7 +725,7 @@ function panels_page_edit_layout($panel_page) {
     $panel_page->display = $output;
     panels_page_save_display($panel_page);
 
-    $dest = "admin/panels/panel-page/edit/{$panel_page->name}/layout";
+    $dest = "admin/panels/panel-page/edit/$panel_page->name/layout";
     if ($panel_page->display->did != $panel_page->did) {
       $dest .= "/{$panel_page->display->did}";
     }
@@ -742,14 +742,14 @@ function panels_page_edit_layout($panel_page) {
 function panels_page_edit_layout_settings($panel_page, $next = NULL) {
   if (empty($next)) {
     $button = t('Save');
-    $dest = "admin/panels/panel-page/{$panel_page->name}/edit/settings";
+    $dest = "admin/panels/panel-page/$panel_page->name/edit/settings";
     if ($panel_page->display->did != $panel_page->did) {
       $dest .= "/{$panel_page->display->did}";
     }
   }
   else {
     $button = t('Save and proceed');
-    $dest = "admin/panels/panel-page/{$panel_page->name}/edit/advanced/next";
+    $dest = "admin/panels/panel-page/$panel_page->name/edit/advanced/next";
   }
 
   // The following form will return the $display upon successful submit, if
@@ -784,7 +784,7 @@ function panels_page_edit_content($panel_page) {
     panels_page_save_display($panel_page);
 
     // And do the drupal_goto that a submit function ordinarily would have.
-    $dest = "admin/panels/panel-page/{$panel_page->name}/edit/content";
+    $dest = "admin/panels/panel-page/$panel_page->name/edit/content";
     if ($display->did != $panel_page->did) {
       $dest .= "/{$panel_page->display->did}";
     }
