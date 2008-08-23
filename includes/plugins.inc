@@ -1134,11 +1134,6 @@ function panels_context_get_keywords($contexts) {
  * @todo can probably combine the various versions of this.
  */
 function panels_context_context_id($context, $type = 'context') {
-  if (empty($context['id'])) {
-    dsm($context);
-    vsm_trace();
-  }
-
   return $type . "_$context[name]_$context[id]";
 }
 

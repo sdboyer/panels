@@ -666,7 +666,6 @@ function panels_load_display($did) {
  */
 function panels_save_display(&$display) {
   // @todo -- update all this to just use drupal_write_record or something like it.
-  if (!is_object($display)) { vsm_trace(); }
   if (!empty($display->did) && $display->did != 'new') {
     db_query("UPDATE {panels_display} SET layout = '%s', layout_settings = '%s', panel_settings = '%s', cache = '%s', title = '%s', hide_title = %d WHERE did = %d", $display->layout, serialize($display->layout_settings), serialize($display->panel_settings), serialize($display->cache), $display->title, $display->hide_title, $display->did);
     // Get a list of all panes currently in the database for this display so we can know if there
