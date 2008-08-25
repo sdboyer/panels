@@ -264,7 +264,7 @@ function panels_page_get_loader_data($pid, $args) {
   }
   // If we've determined that we're falling back, bail out.
   if ($load['fallback'] === TRUE) {
-    panels_page_prepare_fallback_render($load, $map);
+    panels_page_prepare_fallback_render($load, $map, $args);
     return $load;
   }
 
@@ -276,7 +276,7 @@ function panels_page_get_loader_data($pid, $args) {
     drupal_access_denied();
   }
   panels_page_load_include('render');
-  panels_page_prepare_panels_render($load, $panel_page);
+  panels_page_prepare_panels_render($load, $panel_page, $args);
 
   return $load;
 }

@@ -254,7 +254,7 @@ function panels_page_edit($panel_page, $next = NULL) {
 /**
  * The form to edit the page portion of a panel.
  */
-function panels_page_edit_form(&$form_state, $panel_page, $next = NULL) {
+function panels_page_edit_form(&$form_state, &$panel_page, $next = NULL) {
   panels_load_include('common');
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $layout = panels_get_layout($panel_page->display->layout);
@@ -727,7 +727,7 @@ function panels_page_edit_layout($panel_page) {
 
     $dest = "admin/panels/panel-page/edit/$panel_page->name/layout";
     if ($panel_page->display->did != $panel_page->did) {
-      $dest .= "/{$panel_page->display->did}";
+      $dest .= '/' . $panel_page->display->did;
     }
     drupal_goto($dest);
   }
@@ -744,7 +744,7 @@ function panels_page_edit_layout_settings($panel_page, $next = NULL) {
     $button = t('Save');
     $dest = "admin/panels/panel-page/$panel_page->name/edit/settings";
     if ($panel_page->display->did != $panel_page->did) {
-      $dest .= "/{$panel_page->display->did}";
+      $dest .= '/' . $panel_page->display->did;
     }
   }
   else {
@@ -785,8 +785,8 @@ function panels_page_edit_content($panel_page) {
 
     // And do the drupal_goto that a submit function ordinarily would have.
     $dest = "admin/panels/panel-page/$panel_page->name/edit/content";
-    if ($display->did != $panel_page->did) {
-      $dest .= "/{$panel_page->display->did}";
+    if ($panel_page->current != 'primary') {
+      $dest .= '/' . $panel_page->display->did;
     }
     drupal_goto($dest);
   }

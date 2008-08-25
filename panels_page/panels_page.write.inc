@@ -25,7 +25,7 @@ function panels_page_fields() {
  *
  * Wrapper for panels_page_save().
  */
-function panels_page_save_display(&$panel_page, $id) {
+function panels_page_save_display(&$panel_page) {
   if (empty($panel_page->displays[$panel_page->current]['did']) || $panel_page->displays[$panel_page->current]['did'] == 'new') {
     return panels_page_save($panel_page);
   }

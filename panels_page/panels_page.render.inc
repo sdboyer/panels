@@ -8,7 +8,7 @@
  *  absolutely verified that it's needed.
  */
 
-function panels_page_prepare_panels_render(&$loader_data, &$panel_page) {
+function panels_page_prepare_panels_render(&$loader_data, &$panel_page, $args) {
   _panels_page_prepare_panels_render($panel_page);
 
   // Store the instructions back in our load handler array.
@@ -16,7 +16,7 @@ function panels_page_prepare_panels_render(&$loader_data, &$panel_page) {
   $loader_data['title callback']  = 'panels_page_get_title';
   // Pass by ref to ENSURE php4/5 consistency and keep down static cache size.
   $loader_data['panel page']      = &$panel_page;
-  $loader_data['page arguments']  = array(&$loader_data['panel page'], FALSE);
+  $loader_data['page arguments']  = array(&$loader_data['panel page'], $args, FALSE);
   $loader_data['title arguments'] = array(&$loader_data['panel page']);
 }
 
