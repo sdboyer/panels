@@ -28,6 +28,7 @@ function panels_node_panels_contexts() {
  */
 function panels_context_create_node($empty, $data = NULL, $conf = FALSE) {
   $types = array('node');
+  // FIXME this is broken when called from panels_page's render process, through panels_context_load_contexts(); it passes in $conf as TRUE.
   if (!empty($conf['types'])) {
     foreach ($conf['types'] as $type) {
       if ($type) {
