@@ -1412,6 +1412,19 @@ function panels_get_directories($plugin_type) {
  * an error, it will undermine the Panels engine's lazy-loading logic and
  * negatively impact memory usage.
  *
+ * Note also that including a conditional on the plugin type so that you only
+ * define plugins for directories that you have actually populated with plugin
+ * include files is another small contribution to performance that you can make.
+ * For example, if you define only content_type and context plugins and don't
+ * want them at the root level of your module directory, this code would work:
+ * @code
+ *  function MYMODULE_panels_include_directory($plugin_type) {
+ *    if ($plugin_type == 'content_type' || $plugin_type == 'context') {
+ *      return 'panels_inc/' . $plugin_type;
+ *    }
+ *  }
+ * @endcode
+ *
  * @param string $plugin_type
  *    The plugin type for which the Panels engine is currently requesting the
  *    location of an include directory.
