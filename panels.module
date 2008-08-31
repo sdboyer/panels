@@ -156,7 +156,7 @@ function panels_menu() {
 
   // Non-display editor callbacks
   $items['panels/node/autocomplete'] = array(
-    'title' => t('Autocomplete node'),
+    'title' => 'Autocomplete node',
     'page callback' => 'panels_node_autocomplete',
     'file' => 'includes/callbacks.inc',
   ) + $base;
@@ -177,11 +177,11 @@ function panels_menu() {
 
   // Provide a nice location for a panels admin panel.
   $items['admin/panels'] = array(
-    'title' => t('Panels'),
+    'title' => 'Panels',
     'access arguments' => array('access administration pages'),
     'page callback' => 'panels_admin_page',
     'file' => 'includes/callbacks.inc',
-    'description' => t('Administer items related to the Panels module.'),
+    'description' => 'Administer items related to the Panels module.',
   );
 
   return $items;
@@ -826,7 +826,8 @@ function panels_var_export($object, $prefix = '') {
     $output = 'array()';
   }
   else {
-    $output = var_export($object, TRUE);
+    // Remove extra space to match Drupal coding standards.
+    $output = str_replace('array (', 'array(', var_export($object, TRUE));
   }
 
   if ($prefix) {
