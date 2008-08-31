@@ -44,9 +44,10 @@ function panels_page_schema_1() {
         'type' => 'varchar',
         'length' => 128,
       ),
-      'flags' => array(
+      'load_flags' => array(
+        'description' => t('Bitval-as-integer metadata used in determining panel_page behavior at runtime.'),
         'type' => 'int',
-        'size' => 'normal',
+        'size' => 'tiny',
         'not null' => TRUE,
         'default' => 0,
       ),
@@ -132,7 +133,7 @@ function panels_page_schema_1() {
       'menu_parent_tab_weight' => array(
         'type' => 'int',
         'size' => 'tiny',
-      )
+      ),
     ),
     'primary key' => array('pid'),
     'unique keys' => array(
@@ -152,129 +153,129 @@ function panels_page_schema_1() {
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'load_functions' => array(
         'description' => t('A serialized array of function names (like node_load) to be called to load an object corresponding to a part of the current path.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'to_arg_functions' => array(
         'description' => t('A serialized array of function names (like user_uid_optional_to_arg) to be called to replace a part of the router path with another string.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'access_callback' => array(
         'description' => t('The callback which determines the access to this router path. Defaults to user_access.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'access_arguments' => array(
         'description' => t('A serialized array of arguments for the access callback.'),
         'type' => 'text',
-        'not null' => FALSE
+        'not null' => FALSE,
       ),
       'page_callback' => array(
         'description' => t('The name of the function that renders the page.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'page_arguments' => array(
         'description' => t('A serialized array of arguments for the page callback.'),
         'type' => 'text',
-        'not null' => FALSE
+        'not null' => FALSE,
       ),
       'fit' => array(
         'description' => t('A numeric representation of how specific the path is.'),
         'type' => 'int',
         'not null' => TRUE,
-        'default' => 0
+        'default' => 0,
       ),
       'number_parts' => array(
         'description' => t('Number of parts in this router path.'),
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
-        'size' => 'small'
+        'size' => 'small',
       ),
       'tab_parent' => array(
         'description' => t('Only for local tasks (tabs) - the router path of the parent page (which may also be a local task).'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'tab_root' => array(
         'description' => t('Router path of the closest non-tab parent page. For pages that are not local tasks, this will be the same as the path.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'title' => array(
         'description' => t('The title for the current page, or the title for the tab if this is a local task.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'title_callback' => array(
         'description' => t('A function which will alter the title. Defaults to t()'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'title_arguments' => array(
         'description' => t('A serialized array of arguments for the title callback. If empty, the title will be used as the sole argument for the title callback.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'type' => array(
         'description' => t('Numeric representation of the type of the menu item, like MENU_LOCAL_TASK.'),
         'type' => 'int',
         'not null' => TRUE,
-        'default' => 0
+        'default' => 0,
       ),
       'block_callback' => array(
         'description' => t('Name of a function used to render the block on the system administration page for this item.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'description' => array(
         'description' => t('A description of this item.'),
         'type' => 'text',
-        'not null' => TRUE
+        'not null' => TRUE,
       ),
       'position' => array(
         'description' => t('The position of the block (left or right) on the system administration page for this item.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'weight' => array(
         'description' => t('Weight of the element. Lighter weights are higher up, heavier weights go down.'),
         'type' => 'int',
         'not null' => TRUE,
-        'default' => 0
+        'default' => 0,
       ),
       'file' => array(
         'description' => t('The file to include for this element, usually the page callback function lives in this file.'),
         'type' => 'text',
-        'size' => 'medium'
+        'size' => 'medium',
       ),
     ),
     'indexes' => array(
@@ -293,5 +294,11 @@ function panels_page_install() {
 
 function panels_page_uninstall() {
   drupal_uninstall_schema('panels_page');
+}
+
+function panels_page_update_6000() {
+  $ret = array();
+  db_add_field($ret, 'panels_page', 'load_flags', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
+  return $ret;
 }
 

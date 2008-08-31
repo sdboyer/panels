@@ -36,9 +36,9 @@ define('PANELS_PID_SHARES_PATH', 1 << 2 | PANELS_IS_DYNAMIC);
 /**
  * Implementation of hook_help().
  */
-function panels_page_help($section = '') {
+function panels_page_help($path, $arg) {
   $output = NULL;
-  switch ($section) {
+  switch ($path) {
     case 'admin/panels/panel-page':
     case 'admin/panels/panel-page/list':
       $output = '<p>';
@@ -53,6 +53,17 @@ function panels_page_help($section = '') {
       break;
   }
   return $output;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function panels_page_theme() {
+  $theme = array();
+  $theme['panels_page_render_form'] = array(
+    'arguments' => array('form'),
+  );
+  return $theme;
 }
 
 /**
@@ -76,7 +87,6 @@ function panels_page_menu() {
  * Delegates to an .inc file to reduce code load overhead.
  */
 function panels_page_menu_alter(&$callbacks) {
-//  panels_page_load_include('menu');
   return _panels_page_menu_alter($callbacks);
 }
 
@@ -145,16 +155,14 @@ function panels_page_admin_cache_load($name, $which = '') {
  */
 function panels_page_access_handler() {
   $args = func_get_args();
-  // Get the pid, which is passed in with a prepended string.
-  $pid = substr(array_shift($args), 4);
-  $loader_data = panels_page_get_loader_data($pid, $args);
-  return $loader_data['access'];
+  $loader_data = panels_page_master_loader('access', $args);
+  return $loader_data ? $loader_data->access : FALSE; // FIXME for now, default to restrictive
 }
 
 /**
  * Execute the active page rendering callback.
  *
- * This is the master handler through which ALL (non-admin) panels_page-touched
+ * This is the unified handler through which ALL (non-admin) panels_page-touched
  * callbacks pass. It takes the callback and arguments calculated by the main
  * brain, panels_page_get_loader_data(), and fires out the callback with its
  * arguments.
@@ -163,37 +171,43 @@ function panels_page_access_handler() {
  */
 function panels_page_render_handler() {
   $args = func_get_args();
-  // Get the pid, which is passed in with a prepended string.
-  // TODO switch to name...
-  $pid = substr(array_shift($args), 4);
-  $loader_data = panels_page_get_loader_data($pid, $args);
-
-  return call_user_func_array($loader_data['page callback'], $loader_data['page arguments']);
+  // FIXME all of these are wrapped in if statements b/c of the 404/500 possibility
+  if ($loader_data = panels_page_master_loader('render', $args)) {
+    return call_user_func_array($loader_data->page_callback, $loader_data->page_arguments);
+  }
 }
 
 function panels_page_static_render_handler() {
   $args = func_get_args();
-  // Get the pid, which is passed in with a prepended string.
-  $pid = substr(array_shift($args), 4);
-  $loader_data = panels_page_get_loader_data($pid, $args);
-  return panels_page_render_page_normal($loader_data['panel_page']);
+  if ($loader_data = panels_page_master_loader('render', $args)) {
+    return panels_page_render_page_normal($loader_data->panel_page, array());
+  }
 }
 
 function panels_page_title_handler() {
   $args = func_get_args();
-  // Get the pid, which is passed in with a prepended string.
-  $pid = substr(array_shift($args), 4);
-  $loader_data = panels_page_get_loader_data($pid, $args);
-  if ($loader_data['fallback'] === TRUE) {
-    return _menu_item_localize($loader_data['router item'], $loader_data['map']);
+  if ($loader_data = panels_page_master_loader('title', $args)) {
+    return $loader_data->fallback ? _menu_item_localize($loader_data->router_item, $loader_data->map) : $loader_data->title;
   }
-  else {
-    if (!$loader_data['panel page']->display->hide_title && $title = filter_xss_admin(panels_page_get_title($loader_data['panel page'], 'page', ''))) {
-      return $title;
-    }
-    // TODO necessary?
-    return '';
-  }
+}
+
+/**
+ * Wrapper function for the actual panels_page master loader,
+ * _panels_page_master_loader().
+ *
+ * @param string $op
+ *   Indicates the
+ * @param array $args
+ *   Any additional argument data; varies significantly from one panel_page to
+ *   the next.
+ * @return array
+ *   The $loader_data corresponding to the request data we've passed in.
+ */
+function panels_page_master_loader($op, $args) {
+  // Get the unique name of the panel_page, which is always the arg on top of
+  // the $args array stack
+  $name = array_shift($args);
+  return _panels_page_master_loader($op, $name, $args);
 }
 
 /**
@@ -201,36 +215,38 @@ function panels_page_title_handler() {
  *
  * This function is basically the brains of the dynamic override system.
  *
- * @param $pid
- * @param $args
+ * @param string $op
+ *   Which of the three possible menu callbacks (title, page, or access) is
+ *   making the current request to the master loader.
+ * @param string $name
+ * @param array $args
  * @return array $loader_data
  */
-function panels_page_get_loader_data($pid, $args) {
+function _panels_page_master_loader($op, $name, $args) {
   static $loader_data = array();
-  if (!empty($loader_data[$pid])) {
-    return $loader_data[$pid];
+  if (!empty($loader_data[$name])) {
+    return $loader_data[$name];
   }
-  $load = &$loader_data[$pid];
+  $load = &$loader_data[$name];
+  $load = new stdClass();
 
   panels_load_include('plugins');
   panels_page_load_include('read');
-  $panel_page = panels_page_load($pid);
+  $panel_page = panels_page_load($name);
   // Handle static pages then duck out early.
-  if (!($panel_page->loader_flags & PANELS_IS_DYNAMIC)) {
-    $load['access'] = (bool) panels_page_access($panel_page);
-    if ($load['access']) {
+  if (!($panel_page->load_flags & PANELS_IS_DYNAMIC)) {
+    $load->access = (bool) panels_page_access($panel_page);
+    if ($load->access) {
       panels_page_load_include('render');
       panels_page_fetch_primary_display($panel_page);
-      _panels_page_prepare_panels_render($panel_page);
-      panels_page_set_current($panel_page);
-      $load['panel_page'] = &$panel_page;
+      panels_page_prepare_panels_render($panel_page);
     }
     return $load;
   }
 
   // At this point, we know we're handling a dynamic/override panels_page.
   // Start off by assuming that we won't fall back.
-  $load['fallback'] = FALSE;
+  $load->fallback = FALSE;
   $map = explode('/', $_GET['q']);
   // TODO Multiple p-pages per path will necessitate more complex logic here
   $wildcards = array_keys(explode('/', $panel_page->path), '%');
@@ -244,8 +260,8 @@ function panels_page_get_loader_data($pid, $args) {
     $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_ARG_IS_BAD;
     if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
       if ($context & PANELS_ARG_USE_FALLBACK) {
-        if ($panel_page->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
-          $load['fallback'] = TRUE;
+        if ($panel_page->load_flags & PANELS_HAS_FALLBACK_ROUTER) {
+          $load->fallback = TRUE;
           break;
         }
         else if ($ignore) {
@@ -258,27 +274,24 @@ function panels_page_get_loader_data($pid, $args) {
       }
       // Bail out and 404 if we get this far.
       // TODO should this 'business logic' be separated out?
-      drupal_not_found();
+      return drupal_not_found();
     }
     $panel_page->context[panels_argument_context_id($argument)] = $context;
   }
   // If we've determined that we're falling back, bail out.
-  if ($load['fallback'] === TRUE) {
-    panels_page_prepare_fallback_render($load, $map, $args);
-    return $load;
+  if ($load->fallback === TRUE) {
+    return panels_page_prepare_fallback_render($load, $map, $args);
   }
 
-  // We're now 100% certain we're proceeding with a panel_page render, so first
-  // check the panels_page native access function. If that passes, then include
+  // By now we are 100% certain that a panel_page render should occur, so check
+  // the panels_page native access function. If that passes, then include the
   // the render inc file and proceed inside there.
-  $load['access'] = panels_page_access($panel_page);
-  if (empty($load['access'])) {
-    drupal_access_denied();
+  $load->access = panels_page_access($panel_page);
+  if (empty($load->access)) {
+    return drupal_access_denied();
   }
   panels_page_load_include('render');
-  panels_page_prepare_panels_render($load, $panel_page, $args);
-
-  return $load;
+  return panels_page_prepare_panels_render($load, $panel_page, $args);
 }
 
 /**
@@ -287,13 +300,15 @@ function panels_page_get_loader_data($pid, $args) {
  *
  * @param array $map
  *   A incomplete menu map - it has only $_GET['q'] data initially - that this
- *   callback will rebuild.
+ *   function will rebuild.
  * @param array $load_objects
  *   The set of menu-loader-returned objects provided by the menu system to the
  *   panels callback handlers.
  * @param array $positions
  *   The positions within the path map (i.e., arg(0), arg(1), etc...) that the
  *   loader objects correspond to.
+ * @return array $map
+ *   The rebuilt menu map.
  */
 function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
   foreach ($positions as $key => $position) {
@@ -309,16 +324,14 @@ function panels_page_prepare_fallback_render(&$load, $map) {
     // FIXME Ideally we could skip some of this, much has already been loaded.
     $map = _menu_translate($router_item, $original_map);
     if ($router_item['access']) {
-      $load['map'] = $map;
-      $load['page arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
+      $load->map = $map;
+      $load->page_arguments = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
     }
   }
 
-  $load['page callback'] = $router_item['page callback'];
-  $load['router item']     = $router_item;
-  // $load['map']             = $map;
-  // $load['title callback']  = '_menu_item_localize';
-  // $load['title arguments'] = array($router_item, $map);
+  $load->page_callback   = $router_item['page callback'];
+  $load->router_item     = $router_item;
+  return $load;
 }
 
 /**
@@ -470,6 +483,7 @@ function panels_page_panels_exportables($op = 'list', $panels = NULL, $name = 'f
   static $all_panels = NULL;
   if ($op == 'list') {
     if (empty($all_panels)) {
+      panels_page_load_include('read');
       $all_panels = panels_page_load_all();
     }
 
@@ -480,12 +494,13 @@ function panels_page_panels_exportables($op = 'list', $panels = NULL, $name = 'f
   }
 
   if ($op == 'export') {
+    panels_page_load_include('write');
     $code = "/**\n";
     $code .= " * Implementation of hook_default_panel_pages()\n";
     $code .= " */\n";
     $code .= "function " . $name . "_default_panel_pages() {\n";
     foreach ($panels as $panel => $truth) {
-      $code .= panels_page_export($all_panels[$panel], '  ');
+      $code .= panels_page_export_page($all_panels[$panel], '  ');
       $code .= '  $pages[\'' . check_plain($panel) . '\'] = $page;' . "\n\n\n";
     }
     $code .= "  return \$pages;\n";

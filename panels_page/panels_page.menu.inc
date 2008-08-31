@@ -145,6 +145,12 @@ function panels_page_create_menu_structure($new_items = NULL) {
   return $items;
 }
 
+/**
+ * Workhorse function for hook_menu_alter(); separated out here to reduce code
+ * weight.
+ *
+ * @param $callbacks
+ */
 function _panels_page_menu_alter(&$callbacks) {
   $panels_items = panels_page_create_menu_structure();
   if (empty($panels_items)) {
@@ -178,8 +184,8 @@ function _panels_page_menu_alter(&$callbacks) {
     // Only save a router quickref if the item has metadata
     if (!empty($panels_items['metadata'][$raw_path])) {
       $metadata = &$panels_items['metadata'][$raw_path];
-      $metadata->loader_flags |= isset($matches[$path]) ? PANELS_HAS_FALLBACK_ROUTER : 0;
-      db_query('UPDATE {panels_page} SET loader_flags = %d WHERE pid = %d', $metadata->loader_flags, $metadata->pid);
+      $metadata->load_flags |= isset($matches[$path]) ? PANELS_HAS_FALLBACK_ROUTER : 0;
+      db_query('UPDATE {panels_page} SET load_flags = %d WHERE pid = %d', $metadata->load_flags, $metadata->pid);
     }
   }
   // Re-call our helper function and store updated items into the static cache.
@@ -207,15 +213,12 @@ function _panels_page_create_menu_structure() {
 function panels_page_construct_dynamic_menu_link(&$items, $panel_page, $map) {
   $type = _panels_page_menu_type($panel_page);
   $primary_wildcard = array_search('%', $map);
-  // FIXME (this data) quickref should be entirely absorbed into the panels_page table itself.
   panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_IS_DYNAMIC);
+  $page_args = array($panel_page->name, $primary_wildcard);
 
   // Construct the dynamic menu router item. If/when we get to multiple
   // panels_pages per dynamic path, we needn't worry about overwriting here.
-  $items['menu items'][$panel_page->path] = _panels_page_construct_dynamic_menu_link(
-    $panel_page, array('pid-' . $panel_page->pid, $primary_wildcard),
-    array('arguments' => array('pid-' . $panel_page->pid, $primary_wildcard)),
-     $type);
+  _panels_page_construct_dynamic_menu_link($items, $panel_page, $page_args, $type);
 
   // FIXME parents are borked
   _panels_page_construct_parent_menu_item($items, $panel_page, $panel_page->path, $type);
@@ -224,10 +227,11 @@ function panels_page_construct_dynamic_menu_link(&$items, $panel_page, $map) {
 /**
  * Helper function to create a menu item for a panel.
  */
-function _panels_page_construct_dynamic_menu_link($panel_page, $page_arguments, $access, $type, $weight = 0) {
-  return array(
+function _panels_page_construct_dynamic_menu_link(&$items, $panel_page, $page_arguments, $type, $weight = 0) {
+  $items['menu items'][$panel_page->path] = array(
     'title callback'  => 'panels_page_title_handler',
     'title arguments' => $page_arguments,
+    // FIXME re-include an access callback/handler system; currently we just use the fallback's. Where there is no fallback... =)
     'page callback'   => 'panels_page_render_handler',
     'page arguments'  => $page_arguments,
     'type'            => $type,
@@ -248,7 +252,7 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
     'title'            => filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
     'access callback'  => 'panels_page_access_handler',
     'access arguments' => array('pid-' . $panel_page->pid),
-    'page callback'    => 'panels_page_static_render_handler',
+    'page callback'    => 'panels_page_render_handler',
     'page arguments'   => array($panel_page->name),
     'type'             => $type,
     'module'           => 'panels_page',
@@ -257,13 +261,13 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   _panels_page_construct_parent_menu_item($items, $panel_page, $panel_page->path, $type);
 }
 
-function panels_page_construct_menu_item_metadata(&$items, $panel_page, $flags = 0) {
+function panels_page_construct_menu_item_metadata(&$items, $panel_page, $load_flags = 0) {
   $metadata = new stdClass();
-  $metadata->pid          = $panel_page->pid;
-  $metadata->name         = $panel_page->name;
-  $metadata->type         = _panels_page_menu_type($panel_page);
-  $metadata->path         = $panel_page->path;
-  $metadata->loader_flags = $flags;
+  $metadata->pid   = $panel_page->pid;
+  $metadata->name  = $panel_page->name;
+  $metadata->type  = _panels_page_menu_type($panel_page);
+  $metadata->path  = $panel_page->path;
+  $metadata->load_flags = $load_flags;
 
   $items['metadata'][$panel_page->path] = $metadata;
 }

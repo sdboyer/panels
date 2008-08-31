@@ -37,7 +37,7 @@ function panels_page_load_all($names = array(), $page_size = 0) {
     $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
     $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
     $page->type             = t('Local');
-    $page->loader_flags     = (int) $page->loader_flags;
+    $page->load_flags     = (int) $page->load_flags;
 
     $pages[$page->name]     = panels_page_sanitize($page);
   }
@@ -99,7 +99,7 @@ function panels_page_load($id, $load_display = FALSE) {
   $page->contexts         = (!empty($page->contexts)) ? unserialize($page->contexts) : array();
   $page->relationships    = (!empty($page->relationships)) ? unserialize($page->relationships) : array();
   $page->switcher_options = (!empty($page->switcher_options)) ? unserialize($page->switcher_options) : array();
-//  $page->loader_flags     = (int) $page->loader_flags;
+  $page->load_flags     = (int) $page->load_flags;
 
   if ($load_display) {
     $page->primary = panels_load_display($page->did);

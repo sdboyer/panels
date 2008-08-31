@@ -811,7 +811,7 @@ function panels_page_preview_page(&$form_state, $panel_page) {
     $context = !empty($load_objects[$id]) ? panels_argument_get_context($argument, $load_objects[$id]) : PANELS_BAD_ARG;
     if (!is_a($context, 'panels_required_context') && !is_a($context, 'panels_context')) {
       if ($context & PANELS_USE_FALLBACK_ROUTER) {
-        if ($panel_page->loader_flags & PANELS_HAS_FALLBACK_ROUTER) {
+        if ($panel_page->load_flags & PANELS_HAS_FALLBACK_ROUTER) {
           $loader_data['fallback'] = TRUE;
           break;
         }
