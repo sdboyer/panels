@@ -148,6 +148,7 @@ class panels_allowed_layouts {
   function set_allowed($title = 'Panels: Allowed Layouts') {
     $this->sync_with_available();
     $form_id = 'panels_common_set_allowed_layouts';
+    // TODO switch to drupal_build_form(); need to pass by ref
     $form = drupal_retrieve_form($form_id, $this, $title);
 
     if ($result = drupal_process_form($form_id, $form)) {
@@ -300,7 +301,7 @@ function panels_common_settings(&$form_state, $module_name = 'panels_common') {
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Submit'),
+    '#value' => t('Save'),
   );
 
   drupal_add_css(panels_get_path('css/panels_page.css'));
@@ -367,13 +368,15 @@ function panels_common_get_allowed_types($module, $contexts = array(), $has_cont
  *  no value was provided in panels_allowed_layouts::set_allowed.
  */
 // TODO need to add something that handles $finish & $destination-type stuff.
-function panels_common_set_allowed_layouts($allowed_layouts, $title) {
+function panels_common_set_allowed_layouts(&$form_state, $allowed_layouts, $title) {
   $layouts = panels_get_layouts();
   foreach ($layouts as $id => $layout) {
     $options[$id] = panels_print_layout_icon($id, $layout, check_plain($layout['title']));
   }
 
   drupal_set_title($title);
+
+  $form_state['allowed_layouts'] = &$allowed_layouts;
 
   $form['variables'] = array('#type' => 'value', '#value' => array($allowed_layouts));
 
@@ -387,7 +390,7 @@ function panels_common_set_allowed_layouts($allowed_layouts, $title) {
   );
 
   $form['clearer'] = array(
-    // TODO: FIx this to use clear-block instead
+    // TODO: Fix this to use clear-block instead
     '#value' => '<div style="clear: both;"></div>',
   );
   $form['#redirect'] = FALSE;
@@ -400,20 +403,19 @@ function panels_common_set_allowed_layouts($allowed_layouts, $title) {
   return $form;
 }
 
-function panels_common_set_allowed_layouts_validate($form_id, $form_values, $form) {
-  $selected = array_filter($form_values['layouts']);
+function panels_common_set_allowed_layouts_validate($form, &$form_state) {
+  $selected = array_filter($form_state['values']['layouts']);
   if (empty($selected)) {
     form_set_error('layouts', 'You must choose at least one layout to allow.');
   }
 }
 
-function panels_common_set_allowed_layouts_submit($form_id, $form_values) {
-  list($allowed_layouts) = $form_values['variables'];
-  foreach ($form_values['layouts'] as $layout => $setting) {
-    $allowed_layouts->allowed_layout_settings[$layout] = $setting === 0 ? 0 : 1;
+function panels_common_set_allowed_layouts_submit($form, &$form_status) {
+  foreach ($form_state['values']['layouts'] as $layout => $setting) {
+    $form_state['allowed_layouts']->allowed_layout_settings[$layout] = $setting === 0 ? 0 : 1;
   }
-  method_exists($allowed_layouts, 'save') ? $allowed_layouts->save() : $allowed_layouts->api_save();
-  return $allowed_layouts->allowed_layout_settings;
+  method_exists($form_state['allowed_layouts'], 'save') ? $form_state['allowed_layouts']->save() : $form_state['allowed_layouts']->api_save();
+  return $form_state['allowed_layouts']->allowed_layout_settings;
 }
 
 /**
