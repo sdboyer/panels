@@ -52,10 +52,10 @@ function panels_page_list_page() {
     }
     else {
       if (empty($panel_page->disabled)) {
-        $ops[] = l(t('Disable'), "admin/panels/panel-page/disable/$panel_page->name", NULL, drupal_get_destination());
+        $ops[] = l(t('Disable'), "admin/panels/panel-page/disable/$panel_page->name", array('query' => drupal_get_destination()));
       }
       else {
-        $ops[] = l(t('Enable'), "admin/panels/panel-page/enable/$panel_page->name", NULL, drupal_get_destination());
+        $ops[] = l(t('Enable'), "admin/panels/panel-page/enable/$panel_page->name", array('query' => drupal_get_destination()));
       }
     }
 
@@ -175,11 +175,11 @@ function panels_page_delete_confirm(&$form_state, $panel_page) {
 /**
  * Handle the submit button to delete a panel page.
  */
-function panels_page_delete_confirm_submit($form_id, $form) {
-  if ($form['confirm']) {
+function panels_page_delete_confirm_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
     panels_page_delete((object) $form);
     // TODO: Is this necessary or did we feed it the location already?
-    return 'admin/panels/panel-page';
+    $form_state['redirect'] = 'admin/panels/panel-page';
   }
 }
 
@@ -921,7 +921,7 @@ function panels_page_admin_view_submit($form, &$form_state) {
   if (!empty($form_state['values']['additional'])) {
     $url .= "/" . $form_state['values']['additional'];
   }
-  return $url;
+  $form_state['redirect'] = $url;
 }
 
 
