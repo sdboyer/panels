@@ -19,7 +19,7 @@ function panels_node_content_menu() {
     'access arguments' => array('access administration pages'),
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'panels_node_content_admin',
-    'description' => t('Information about the content node content type.'),
+    'description' => 'Information about the content node content type.',
   );
   return $items;
 }
@@ -185,7 +185,8 @@ function panels_node_content_edit($id, $parents, $conf) {
 /**
  * Validate a node.
  */
-function panels_node_content_edit_validate($form, &$form_values) {
+function panels_node_content_edit_validate($form, &$form_state) {
+  $form_values = $form_state['values'];
   if (!$form_values['validate_me']) {
     return;
   }
