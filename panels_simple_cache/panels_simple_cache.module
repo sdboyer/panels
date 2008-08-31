@@ -11,21 +11,23 @@
 /**
  * Implementation of hook_menu().
  */
-/*
-function panels_simple_cache_menu($may_cache) {
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/panels/simple-cache',
-      'title' => t('Simple cache'),
-      'access' => user_access('access administration pages') && user_access('use panels caching features'),
-      'type' => MENU_NORMAL_ITEM,
-      'callback' => 'panels_simple_cache_admin',
-      'description' => t('Information about Panels simple cache.'),
-    );
-    return $items;
-  }
+function panels_simple_cache_menu() {
+  $items['admin/panels/simple-cache'] = array(
+    'title' => 'Simple cache',
+    'access' => 'panels_simple_cache_access',
+    'type' => MENU_NORMAL_ITEM,
+    'callback' => 'panels_simple_cache_admin',
+    'description' => 'Information about Panels simple cache.',
+  );
+  return $items;
 }
-*/
+
+/**
+ * Access callback for the simple_cache administration menu.
+ */
+function panels_simple_cache_access() {
+  return user_access('access administration pages') && user_access('use panels caching features');
+}
 
 /**
  * Page callback for the very short admin page.
@@ -77,7 +79,7 @@ function panels_simple_cache_get_cache($conf, $display, $args, $contexts, $pane 
  */
 function panels_simple_cache_set_cache($conf, $content, $display, $args, $contexts, $pane = NULL) {
   $cid = panels_simple_cache_get_id($conf, $display, $args, $contexts, $pane);
-  cache_set($cid, 'cache', serialize($content));
+  cache_set($cid, $content);
 }
 
 /**
