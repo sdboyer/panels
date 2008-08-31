@@ -21,7 +21,7 @@ function _panels_mini_menu() {
   $items['admin/panels/panel-mini'] = array(
     'title' => 'Mini panels',
     'page callback' => 'panels_mini_list_page',
-    'description' => t('Create and administer mini panels (panels exposed as blocks).'),
+    'description' => 'Create and administer mini panels (panels exposed as blocks).',
   ) + $base;
   $items['admin/panels/panel-mini/list'] = array(
     'title' => 'List',
@@ -324,9 +324,9 @@ function panels_mini_import_form() {
 /**
  * Handle the submit button on importing a mini panel.
  */
-function panels_mini_import_form_submit($form_id, $form) {
+function panels_mini_import_form_submit($form, &$form_state) {
   ob_start();
-  eval($form['panel_mini']);
+  eval($form_state['values']['panel_mini']);
   ob_end_clean();
 
   if (isset($mini)) {
