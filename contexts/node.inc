@@ -118,8 +118,9 @@ function panels_context_node_settings_form($conf, $external = FALSE) {
 /**
  * Validate a node.
  */
-function panels_context_node_settings_form_validate($form, &$form_values) {
+function panels_context_node_settings_form_validate($form, &$form_state) {
   // Validate the autocomplete
+  $form_values = $form_state['value'];
   if (empty($form_values['external']) && empty($form_values['nid']) && empty($form_values['node'])) {
     form_error($form['node'], t('You must select a node.'));
     return;
@@ -154,12 +155,12 @@ function panels_context_node_settings_form_validate($form, &$form_values) {
   }
 }
 
-function panels_context_node_settings_form_submit($form, &$form_values, &$form_state) {
-  if ($form_values['set_identifier']) {
+function panels_context_node_settings_form_submit($form, &$form_state) {
+  if ($form_state['values']['set_identifier']) {
     $node = node_load($form_values['nid']);
     $form_state['values']['context']['identifier'] = $node->title;
   }
 
   // Don't let this be stored.
-  unset($form_values['set_identifier']);
+  unset($form_state['values']['set_identifier']);
 }
