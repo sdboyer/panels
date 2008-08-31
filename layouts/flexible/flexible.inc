@@ -12,6 +12,7 @@ function panels_flexible_panels_layouts() {
     'css' => 'flexible.css',
     'settings form' => 'panels_flexible_settings_form',
     'settings submit' => 'panels_flexible_settings_submit',
+    'settings validate' => 'panels_flexible_settings_validate',
     'panels function' => 'panels_flexible_panels',
   );
 
