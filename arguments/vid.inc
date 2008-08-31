@@ -35,7 +35,7 @@ function panels_vid_context($arg = NULL, $conf = NULL, $empty = FALSE) {
     return PANELS_ARG_IS_BAD;
   }
 
-  $vocabulary = taxonomy_get_vocabulary($arg);
+  $vocabulary = taxonomy_vocabulary_load($arg);
   if (!$vocabulary) {
     return PANELS_ARG_IS_BAD;
   }

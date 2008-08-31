@@ -34,7 +34,7 @@ function panels_context_create_vocabulary($empty, $data = NULL, $conf = FALSE) {
   }
 
   if ($conf) {
-    $data = taxonomy_get_vocabulary($data['vid']);
+    $data = taxonomy_vocabulary_load($data['vid']);
   }
 
   if (!empty($data)) {
