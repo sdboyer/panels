@@ -25,7 +25,7 @@ function panels_views_menu() {
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_views_admin_page'),
-    'description' => t('Configure Views to be used as panes within panel displays.'),
+    'description' => 'Configure Views to be used as panes within panel displays.',
   ) + $base;
 
   return $items;
