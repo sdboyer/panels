@@ -32,8 +32,8 @@ function panels_page_prepare_panels_render(&$load, &$panel_page, $args) {
 
 function _panels_page_prepare_panels_render(&$panel_page) {
   _panels_page_check_switchers($panel_page);
-  // $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->context);
-  $panel_page->context = panels_context_load_contexts($panel_page);
+  // $panel_page->context = panels_context_load_contexts($panel_page, FALSE, $panel_page->contexts);
+  // $panel_page->context = panels_context_load_contexts($panel_page);
   // If we're wrapping FAPI with with panel, this function gets the data.
   $panel_page->form = panels_context_get_form($panel_page->context);
   // Get any keywords (for title substitution in panes)
