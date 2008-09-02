@@ -60,7 +60,7 @@ function panels_mini_schema_1() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implementation of hook_install().
  */
 function panels_mini_install() {
   drupal_install_schema('panels_mini');
@@ -86,6 +86,6 @@ function panels_mini_uninstall() {
   }
 
   // Finally, delete all mini panels.
-  drupal_install_schema('panels_mini');
+  drupal_uninstall_schema('panels_mini');
 }
 
