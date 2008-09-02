@@ -48,7 +48,7 @@ function panels_page_list_page() {
     }
     if ($panel_page->type != t('Default')) {
       $text = $panel_page->type == t('Overridden') ? t('Revert') : t('Delete');
-      $ops[] = l($text, "admin/panels/panel-page/delete/$panel_page->name");
+      $ops[] = l($text, "admin/panels/panel-page/$panel_page->name/delete");
     }
     else {
       if (empty($panel_page->disabled)) {
@@ -152,8 +152,7 @@ function panels_page_disable_page($name = NULL) {
  * Provide a form to confirm deletion of a panel page.
  */
 function panels_page_delete_confirm(&$form_state, $panel_page) {
-  $form['pid'] = array('#type' => 'value', '#value' => $panel_page->pid);
-  $form['did'] = array('#type' => 'value', '#value' => $panel_page->did);
+  $form_state['panel_page'] = $panel_page;
   if ($panel_page->type != t('Overridden')) {
     return confirm_form($form,
       t('Are you sure you want to delete "@title"?', array('@title' => panels_page_get_title($panel_page))),
@@ -164,7 +163,7 @@ function panels_page_delete_confirm(&$form_state, $panel_page) {
   }
   else {
     return confirm_form($form,
-      t('Are you sure you want to revert "@title" to its default setup?', array('@title' => panels_page_get_title($panel_page))),
+      t('Are you sure you want to revert "@title" to its default configuration?', array('@title' => panels_page_get_title($panel_page))),
       $_GET['destination'] ? $_GET['destination'] : 'admin/panels/panel-page',
       t('This action cannot be undone.'),
       t('Revert'), t('Cancel')
@@ -177,8 +176,7 @@ function panels_page_delete_confirm(&$form_state, $panel_page) {
  */
 function panels_page_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
-    panels_page_delete((object) $form);
-    // TODO: Is this necessary or did we feed it the location already?
+    panels_page_delete($form_state['panel_page']);
     $form_state['redirect'] = 'admin/panels/panel-page';
   }
 }
@@ -425,6 +423,7 @@ function panels_page_edit_form_submit($form, &$form_state) {
  * Edit advanced settings of a panel page.
  */
 function panels_page_edit_advanced($panel_page, $next = NULL) {
+  drupal_set_title(check_plain(panels_page_get_title($panel_page)));
   return drupal_get_form('panels_page_advanced_form', $panel_page, $next);
 }
 
@@ -606,6 +605,7 @@ function panels_page_advanced_form_submit($form, &$form_state) {
  * Edit advanced settings of a panel page.
  */
 function panels_page_edit_context($panel_page, $next = NULL) {
+  drupal_set_title(check_plain(panels_page_get_title($panel_page)));
   if (!empty($_POST)) {
     $panel_page = panels_cache_get('panel_object:panel_page', $panel_page->name);
   }
