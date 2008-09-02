@@ -146,7 +146,6 @@ function _panels_page_save_value($info, $value) {
 function panels_page_delete($panel_page) {
   // Delete the panel page.
   db_query("DELETE FROM {panels_page} WHERE pid = %d", $panel_page->pid);
-  menu_rebuild();
 
   // Delete the primary display.
   panels_delete_display($panel_page->did);
@@ -159,6 +158,7 @@ function panels_page_delete($panel_page) {
       }
     }
   }
+  menu_rebuild();
 }
 
 /**
