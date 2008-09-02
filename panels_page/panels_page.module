@@ -1,7 +1,6 @@
 <?php
 // $Id$
 
-
 /**
  * @file panels_page.module
  *
@@ -10,6 +9,8 @@
  * .inc files for various segments of its functionality. These includes are
  * lazy-loaded (some through the menu system, some internally) in order to keep
  * code weight to an absolute minimum.
+ *
+ * TODO Reduce the number of include loads calls...it's amateurish.
  */
 
 /**
@@ -151,12 +152,17 @@ function panels_page_admin_cache_load($name, $which = '') {
  * Note that this handler is ONLY used by static panel_pages; the rest are all
  * handled internally by the master loader.
  *
+ * TODO this is still fairly hackish, and we also really may need to add support
+ * for these checks for dynamic panels_pages...
+ *
  * @return boolean
  */
 function panels_page_access_handler() {
+  panels_page_load_include('read');
   $args = func_get_args();
-  $loader_data = panels_page_master_loader('access', $args);
-  return $loader_data ? $loader_data->access : FALSE; // FIXME for now, default to restrictive
+  $name = array_shift($args);
+  $access = panels_page_access($name);
+  return !empty($access);
 }
 
 /**
@@ -172,21 +178,21 @@ function panels_page_access_handler() {
 function panels_page_render_handler() {
   $args = func_get_args();
   // FIXME all of these are wrapped in if statements b/c of the 404/500 possibility
-  if ($loader_data = panels_page_master_loader('render', $args)) {
+  if ($loader_data = panels_page_master_loader($args)) {
     return call_user_func_array($loader_data->page_callback, $loader_data->page_arguments);
   }
 }
 
 function panels_page_static_render_handler() {
   $args = func_get_args();
-  if ($loader_data = panels_page_master_loader('render', $args)) {
+  if ($loader_data = panels_page_master_loader($args)) {
     return panels_page_render_page_normal($loader_data->panel_page, array());
   }
 }
 
 function panels_page_title_handler() {
   $args = func_get_args();
-  if ($loader_data = panels_page_master_loader('title', $args)) {
+  if ($loader_data = panels_page_master_loader($args)) {
     return $loader_data->fallback ? _menu_item_localize($loader_data->router_item, $loader_data->map) : $loader_data->title;
   }
 }
@@ -195,19 +201,17 @@ function panels_page_title_handler() {
  * Wrapper function for the actual panels_page master loader,
  * _panels_page_master_loader().
  *
- * @param string $op
- *   Indicates the
  * @param array $args
  *   Any additional argument data; varies significantly from one panel_page to
  *   the next.
  * @return array
  *   The $loader_data corresponding to the request data we've passed in.
  */
-function panels_page_master_loader($op, $args) {
+function panels_page_master_loader($args) {
   // Get the unique name of the panel_page, which is always the arg on top of
   // the $args array stack
   $name = array_shift($args);
-  return _panels_page_master_loader($op, $name, $args);
+  return _panels_page_master_loader($name, $args);
 }
 
 /**
@@ -215,43 +219,67 @@ function panels_page_master_loader($op, $args) {
  *
  * This function is basically the brains of the dynamic override system.
  *
- * @param string $op
- *   Which of the three possible menu callbacks (title, page, or access) is
- *   making the current request to the master loader.
  * @param string $name
  * @param array $args
  * @return array $loader_data
  */
-function _panels_page_master_loader($op, $name, $args) {
+function _panels_page_master_loader($name, $args) {
   static $loader_data = array();
   if (!empty($loader_data[$name])) {
     return $loader_data[$name];
   }
-  $load = &$loader_data[$name];
   $load = new stdClass();
+  $loader_data[$name] = &$load;
 
   panels_load_include('plugins');
   panels_page_load_include('read');
   $panel_page = panels_page_load($name);
   // Handle static pages then duck out early.
   if (!($panel_page->load_flags & PANELS_IS_DYNAMIC)) {
-    $load->access = (bool) panels_page_access($panel_page);
-    if ($load->access) {
+    if ((bool) panels_page_access($panel_page->name)) {
       panels_page_load_include('render');
       panels_page_fetch_primary_display($panel_page);
-      panels_page_prepare_panels_render($panel_page);
+      panels_page_prepare_panels_render($load, $panel_page, $args);
     }
     return $load;
   }
 
+  // Construct $panel_page->context and determine if we fall back.
+  _panels_page_construct_argument_contexts($load, $panel_page, $args);
+
+  // If we've determined that we're falling back, bail out and do it.
+  if ($load->fallback === TRUE) {
+    return panels_page_prepare_fallback_render($load,
+      _panels_page_rebuild_menu_map(
+        explode('/', $_GET['q']),
+        array_keys(explode('/', $panel_page->path), '%'),
+        $args_clone));
+  }
+
+  // By now we are 100% certain that a panel_page render should occur, so check
+  // the panels_page native access function. If that passes, then include the
+  // the render inc file and proceed inside there.
+  $load->access = panels_page_access($panel_page->name);
+  if (empty($load->access)) {
+    return drupal_access_denied();
+  }
+  panels_page_load_include('render');
+  return panels_page_prepare_panels_render($load, $panel_page, $args);
+}
+
+/**
+ * Extracts context data from provided URLs; helper function for
+ * _panels_page_master_loader().
+ *
+ * @param object $load
+ * @param object $panel_page
+ * @param array $args
+ */
+function _panels_page_construct_argument_contexts(&$load, &$panel_page, $args) {
   // At this point, we know we're handling a dynamic/override panels_page.
   // Start off by assuming that we won't fall back.
   $load->fallback = FALSE;
-  $map = explode('/', $_GET['q']);
   // TODO Multiple p-pages per path will necessitate more complex logic here
-  $wildcards = array_keys(explode('/', $panel_page->path), '%');
-  $map = _panels_page_rebuild_menu_map($map, $args, $wildcards);
-
   $load_objects = array();
   foreach ($panel_page->arguments as $id => $argument) {
     $ignore = ($argument['default'] == 'ignore');
@@ -272,26 +300,13 @@ function _panels_page_master_loader($op, $name, $args) {
       else if ($context & PANELS_ARG_IS_BAD && $ignore) {
         continue;
       }
-      // Bail out and 404 if we get this far.
-      // TODO should this 'business logic' be separated out?
-      return drupal_not_found();
+      // Prep a 404 and bail out if we get this far.
+      $load->page_callback = 'drupal_not_found';
+      $load->page_arguments = array();
+      return FALSE;
     }
     $panel_page->context[panels_argument_context_id($argument)] = $context;
   }
-  // If we've determined that we're falling back, bail out.
-  if ($load->fallback === TRUE) {
-    return panels_page_prepare_fallback_render($load, $map, $args);
-  }
-
-  // By now we are 100% certain that a panel_page render should occur, so check
-  // the panels_page native access function. If that passes, then include the
-  // the render inc file and proceed inside there.
-  $load->access = panels_page_access($panel_page);
-  if (empty($load->access)) {
-    return drupal_access_denied();
-  }
-  panels_page_load_include('render');
-  return panels_page_prepare_panels_render($load, $panel_page, $args);
 }
 
 /**
@@ -329,66 +344,9 @@ function panels_page_prepare_fallback_render(&$load, $map) {
     }
   }
 
-  $load->page_callback   = $router_item['page callback'];
-  $load->router_item     = $router_item;
+  $load->page_callback = $router_item['page callback'];
+  $load->router_item   = $router_item;
   return $load;
-}
-
-/**
- * Get the title for a panel page, given a context.
- *
- */
-function panels_page_get_title($panel_page, $context = 'page', $default_title = NULL) {
-  $title = _panels_page_get_title($panel_page, $context, $default_title);
-  if (!empty($panel_page->keywords)) {
-    $title = strtr($title, $panel_page->keywords);
-  }
-  return $title;
-}
-
-function _panels_page_get_title($panel_page, $op, $default_title) {
-  if ($op == 'menu-parent' && $panel_page->menu_parent_title) {
-    return $panel_page->menu_parent_title;
-  }
-
-  if (in_array($op, array('menu', 'menu-parent')) && $panel_page->menu_title) {
-    return $panel_page->menu_title;
-  }
-
-  // Context has the highest priority
-  if (!empty($panel_page->context)) {
-    $title = NULL;
-    foreach ($panel_page->context as $context) {
-      if (empty($context->data)) {
-        // Empty contexts can't provide titles
-        continue;
-      }
-      if ($page_title = $context->get_page_title()) {
-        $title = $page_title;
-      }
-    }
-    if ($title) {
-      return $title;
-    }
-  }
-
-  // If no context returned a title use the display title configured in layout
-  // settings
-  if (!empty($panel_page->display->title)) {
-    return $panel_page->display->title;
-  }
-
-  // Fall back on the panel default title
-  if (!empty($panel_page->title)) {
-    return $panel_page->title;
-  }
-
-  if (is_null($default_title)) {
-    return t('No title');
-  }
-  else {
-    return $default_title;
-  }
 }
 
 /**
@@ -399,60 +357,12 @@ function _panels_page_get_title($panel_page, $op, $default_title) {
  */
 function panels_page_get_current() {
   // Take advantage of our .inc organization to know if it's at all possible
-  // that a current page has been loaded.
-  if (function_exists('panels_page_set_current')) {
-    $fubar = NULL; // PHP4 compatibility
-    return panels_page_set_current($fubar);
+  // that there's a current page to be retrieved.
+  if (!function_exists('panels_page_set_current')) {
+    return FALSE;
   }
-  return FALSE;
-}
-
-// ---------------------------------------------------------------------------
-// panel page administrative pages
-
-function panels_move_menu_tabs($path, $tab) {
-  global $_menu;
-
-  // Get my menu item.
-  $my_mid = menu_get_active_item();
-
-  // Get my parent menu item.
-  $my_parent = $_menu['items'][$my_mid]['pid'];
-
-  // Check the existing children to see if there is a default local task
-  // already.
-  if (!isset($_menu['items'][$my_parent]['children'])) {
-    $_menu['items'][$my_parent]['children'] = array();
-  }
-  $local_tasks = FALSE;
-
-  if ($my_parent != 1) {
-    // We do not run this loop if the parent is the top level menu item
-    // since that way lies madness.
-    foreach ($_menu['items'][$my_parent]['children'] as $child_mid) {
-      if ($_menu['items'][$child_mid]['type'] & MENU_IS_LOCAL_TASK) {
-        $local_tasks = TRUE;
-        break;
-      }
-    }
-  }
-
-  if (!$local_tasks) {
-    // Move the administrative items from the admin menu to here.
-    $admin_item = $_menu['path index'][$path];
-    $_menu['items'][$my_mid]['children'] = $_menu['items'][$admin_item]['children'];
-  }
-  else {
-    // But if we do have tabs, just add the admin item itself to the tabs.
-    // Get the menu item we want to move us to.
-    $path .= $tab;
-    $admin_item = $_menu['path index'][$path];
-
-    $_menu['items'][$my_parent]['children'][] = $admin_item;
-    $_menu['items'][$admin_item]['title'] = t('Edit panel');
-    $_menu['items'][$admin_item]['weight'] += 50;
-    $_menu['items'][$admin_item]['type'] = MENU_LOCAL_TASK;
-  }
+  $fubar = NULL; // PHP4 compatibility
+  return panels_page_set_current($fubar);
 }
 
 /**
