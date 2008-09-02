@@ -199,7 +199,11 @@ function panels_init() {
  * Load a panels include file.
  */
 function panels_load_include($include, $path = 'includes/') {
-  require_once './' . panels_get_path("$path$include.inc");
+  static $loaded = array();
+  if (empty($loaded["$path$include.inc"])) {
+    require_once './' . panels_get_path("$path$include.inc");
+    $loaded["$path$include.inc"] = TRUE;
+  }
 }
 
 /**
