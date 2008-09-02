@@ -242,7 +242,17 @@ function panels_page_fetch_display_from_info(&$panel_page, $info, $id) {
 /**
  * Determine if the specified user has access to a panel.
  */
-function panels_page_access($panel_page, $account = NULL) {
+function panels_page_access($id, $account = NULL) {
+  // FIXME this is a horrible lazy hack, but works until we REALLY solve it.
+  static $access_data = NULL;
+  if (is_null($access_data)) {
+    $result = db_query('SELECT pid, name, access FROM {panels_page}');
+    while ($row = db_fetch_object($result)) {
+      $access_data[$row->pid] = explode(', ', $row->access);
+      $access_data[$row->name] = &$access_data[$row->pid];
+    }
+  }
+
   if (!$account) {
     global $user;
     $account = $user;
@@ -254,7 +264,7 @@ function panels_page_access($panel_page, $account = NULL) {
   }
 
   // All panels displays with an empty access setting are available to all roles.
-  if (empty($panel_page->access) || !is_array($panel_page->access)) {
+  if (empty($access_data[$id]) || !is_array($access_data[$id])) {
     return TRUE;
   }
 
@@ -265,6 +275,62 @@ function panels_page_access($panel_page, $account = NULL) {
     $roles[$account->uid][] = $account->uid ? DRUPAL_AUTHENTICATED_RID : DRUPAL_ANONYMOUS_RID;
   }
 
-  return array_intersect($panel_page->access, $roles[$account->uid]);
+  return array_intersect($access_data[$id], $roles[$account->uid]);
 }
 
+/**
+ * Get the title for a panel page, given a context.
+ *
+ */
+function panels_page_get_title($panel_page, $context = 'page', $default_title = NULL) {
+  $title = _panels_page_get_title($panel_page, $context, $default_title);
+  if (!empty($panel_page->keywords)) {
+    $title = strtr($title, $panel_page->keywords);
+  }
+  return $title;
+}
+
+function _panels_page_get_title($panel_page, $op, $default_title) {
+  if ($op == 'menu-parent' && $panel_page->menu_parent_title) {
+    return $panel_page->menu_parent_title;
+  }
+
+  if (in_array($op, array('menu', 'menu-parent')) && $panel_page->menu_title) {
+    return $panel_page->menu_title;
+  }
+
+  // Context has the highest priority
+  if (!empty($panel_page->context)) {
+    $title = NULL;
+    foreach ($panel_page->context as $context) {
+      if (empty($context->data)) {
+        // Empty contexts can't provide titles
+        continue;
+      }
+      if ($page_title = $context->get_page_title()) {
+        $title = $page_title;
+      }
+    }
+    if ($title) {
+      return $title;
+    }
+  }
+
+  // If no context returned a title use the display title configured in layout
+  // settings
+  if (!empty($panel_page->display->title)) {
+    return $panel_page->display->title;
+  }
+
+  // Fall back on the panel default title
+  if (!empty($panel_page->title)) {
+    return $panel_page->title;
+  }
+
+  if (is_null($default_title)) {
+    return t('No title');
+  }
+  else {
+    return $default_title;
+  }
+}
