@@ -72,24 +72,19 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   ) + $admin;
-
-// Alternate method for organizing the settings/advanced tabs. I think this is more
-// intuitive; commenting for now until the menu work is done.
+// Alternate method for organizing the settings/advanced tabs. I think this is
+// ultimately more sensible/intuitive. We'll see...
 /*
-  $items['admin/panels/panel-page/%panels_page_admin/settings/general'] = array(
-    'title' => 'General Settings',
-    'page callback' => 'panels_page_edit',
-    'page arguments' => array(3),
+  $items[$path_prefix . '%panels_page_admin/edit/settings/general'] = array(
+    'title' => 'General',
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/panels/panel-page/%panels_page_admin/settings/advanced'] = array(
-    'title' => 'Settings',
+  $items[$path_prefix . '%panels_page_admin/edit/settings/advanced'] = array(
+    'title' => 'Advanced',
     'page callback' => 'panels_page_edit_advanced',
-    'page arguments' => array(3),
     'weight' => -8,
-  );
-*/
+  ) + $admin;*/
   $items[$path_prefix . '%panels_page_admin/edit/advanced'] = array(
     'title' => 'Advanced',
     'page callback' => 'panels_page_edit_advanced',
@@ -129,6 +124,12 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_page_export_page', $loader_arg),
     'weight' => 4,
+  ) + $admin;
+  $items[$path_prefix . '%panels_page_admin/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('panels_page_delete_confirm', $loader_arg),
+    'type' => MENU_CALLBACK,
   ) + $admin;
   return $items;
 }
@@ -251,7 +252,7 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   $items['menu items'][$panel_page->path] = array(
     'title'            => filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
     'access callback'  => 'panels_page_access_handler',
-    'access arguments' => array('pid-' . $panel_page->pid),
+    'access arguments' => array($panel_page->name),
     'page callback'    => 'panels_page_render_handler',
     'page arguments'   => array($panel_page->name),
     'type'             => $type,
