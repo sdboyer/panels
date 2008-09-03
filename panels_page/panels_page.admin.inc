@@ -601,6 +601,20 @@ function panels_page_advanced_form_submit($form, &$form_state) {
   drupal_set_message(t('Your changes have been saved.'));
 }
 
+function panels_page_export_page(&$form_state, $panel_page) {
+  drupal_set_title(check_plain(panels_page_get_title($panel_page)));
+  panels_page_load_include('write');
+  $code = panels_page_export($panel_page);
+  $lines = substr_count($code, "\n");
+  $form = array('output' => array(
+    '#title' => t("Export of '@title' ", array('@title' => $panel_page->title)),
+    '#type' => 'textarea',
+    '#default_value' => $code,
+    '#rows' => $lines,
+  ));
+  return $form;
+}
+
 /**
  * Edit advanced settings of a panel page.
  */
@@ -798,12 +812,30 @@ function panels_page_edit_content($panel_page) {
   print theme('page', $output, FALSE);
 }
 
+function panels_page_preview($panel_page) {
+  $form_state = array(
+    'panel_page' => $panel_page,
+    'args' => func_get_args(),
+  );
+
+}
+
 function panels_page_preview_page(&$form_state, $panel_page) {
   panels_page_load_include('render');
+  $form = array();
+  $form['notyet'] = array(
+    '#value' => t('Dynamic previews have not yet been ported to Drupal 6. Expect them soon.'),
+  );
+
+  return $form;
+
   $args = func_get_args();
   $panel_page = array_shift($args);
-  return t('The Preview function has not yet been ported; expect it in a later alpha release.');
-  $load_objects = array();
+  $load = new stdClass();
+  _panels_page_construct_argument_contexts($load, $panel_page, $args);
+
+
+
   // FIXME copied from the master loader; this NEEDS to be retooled for previews.
 /*  foreach ($panel_page->arguments as $id => $argument) {
     $ignore = $argument['default'] == 'ignore';
