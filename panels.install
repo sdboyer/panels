@@ -138,6 +138,9 @@ function panels_schema_1() {
  */
 function panels_install() {
   db_query("UPDATE {system} SET weight = 10 WHERE name = 'panels'");
+  drupal_set_message(t('Please keep in mind that this is an Alpha release of Panels for Drupal 6, and is NOT intended for use on production sites.'));
+  drupal_set_message(t('Additionally, the upgrade path from Drupal 5 has NOT been resolved, and should not be attempted.'));
+  drupal_set_message(t('Bug reports are encouraged, especially when they come with patches! The !link has details on filing issues.', array('!link' => l('Panels project page', 'http://drupal.org/project/panels'))));
   drupal_install_schema('panels');
 }
 
