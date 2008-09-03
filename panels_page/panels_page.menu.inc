@@ -113,6 +113,11 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
     'load arguments' => array($loader_arg + 4),
     'weight' => 0,
   ) + $admin;
+/*  $items[$path_prefix . '%panels_page_admin/edit/preview'] = array(
+    'title' => 'Preview',
+    'page callback' => 'panels_page_preview',
+    'weight' => 2,
+  ) + $admin;*/
   $items[$path_prefix . '%panels_page_admin/edit/preview'] = array(
     'title' => 'Preview',
     'page callback' => 'drupal_get_form',
