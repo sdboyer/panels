@@ -763,12 +763,12 @@ function panels_argument_get_context($argument, $arg, $empty = FALSE) {
 
     $context = $function($arg, $argument['argument_settings'], $empty);
 
-    if ($context) {
+    if (is_object($context)) {
       $context->identifier = $argument['identifier'];
       $context->page_title = isset($argument['title']) ? $argument['title'] : '';
       $context->keyword    = $argument['keyword'];
-      return $context;
     }
+    return $context;
   }
 }
 
