@@ -296,9 +296,3 @@ function panels_page_uninstall() {
   drupal_uninstall_schema('panels_page');
 }
 
-function panels_page_update_6000() {
-  $ret = array();
-  db_add_field($ret, 'panels_page', 'load_flags', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
-  return $ret;
-}
-
