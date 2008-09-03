@@ -247,13 +247,11 @@ function _panels_page_master_loader($name, $args) {
   // Construct $panel_page->context and determine if we fall back.
   _panels_page_construct_argument_contexts($load, $panel_page, $args);
 
-  // If we've determined that we're falling back, bail out and do it.
+  // If we've determined that we're falling back...
   if ($load->fallback === TRUE) {
+    // ...then bail out and do it.
     return panels_page_prepare_fallback_render($load,
-      _panels_page_rebuild_menu_map(
-        explode('/', $_GET['q']),
-        array_keys(explode('/', $panel_page->path), '%'),
-        $args_clone));
+      _panels_page_rebuild_menu_map($args, array_keys(explode('/', $panel_page->path), '%')));
   }
 
   // By now we are 100% certain that a panel_page render should occur, so check
@@ -301,12 +299,16 @@ function _panels_page_construct_argument_contexts(&$load, &$panel_page, $args) {
         continue;
       }
       // Prep a 404 and bail out if we get this far.
-      $load->page_callback = 'drupal_not_found';
-      $load->page_arguments = array();
-      return FALSE;
+      return _panels_page_not_found($load);
     }
     $panel_page->context[panels_argument_context_id($argument)] = $context;
   }
+}
+
+function _panels_page_not_found(&$load) {
+  $load->page_callback = 'drupal_not_found';
+  $load->page_arguments = array();
+  return FALSE;
 }
 
 /**
@@ -325,27 +327,39 @@ function _panels_page_construct_argument_contexts(&$load, &$panel_page, $args) {
  * @return array $map
  *   The rebuilt menu map.
  */
-function _panels_page_rebuild_menu_map($map, $load_objects, $positions) {
+function _panels_page_rebuild_menu_map($load_objects, $positions) {
+  $map = explode('/', $_GET['q']);
   foreach ($positions as $key => $position) {
     $map[$position] = $load_objects[$key];
   }
   return $map;
 }
 
+/**
+ * Prepare the fallback router, update the menu cache with it, then load up
+ * our loader item and initiate fallback.
+ *
+ * Mostly lifted from menu_get_item().
+ *
+ * @param $load
+ * @param $map
+ * @return unknown_type
+ */
 function panels_page_prepare_fallback_render(&$load, $map) {
-  // Lifted from menu_get_item().
-  list($ancestors, $placeholders) = menu_get_ancestors(explode('/', $quickref->path));
-  if ($router_item = db_fetch_array(db_query_range('SELECT * FROM {panels_page_menu_store} WHERE path IN ('. implode (',', $placeholders) .') ORDER BY fit DESC', $ancestors, 0, 1))) {
-    // FIXME Ideally we could skip some of this, much has already been loaded.
-    $map = _menu_translate($router_item, $original_map);
-    if ($router_item['access']) {
-      $load->map = $map;
-      $load->page_arguments = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
-    }
+  $original_map = arg(NULL, $_GET['q']);
+  $parts = array_slice($original_map, 0, MENU_MAX_PARTS);
+  list($ancestors, $placeholders) = menu_get_ancestors($parts);
+  if (!$router_item = db_fetch_array(db_query_range('SELECT * FROM {panels_page_router_store} WHERE path IN ('. implode (',', $placeholders) .') ORDER BY fit DESC', $ancestors, 0, 1))) {
+    return _panels_page_not_found($load);
   }
+  // FIXME calling _menu_translate would result in an incomplete load
+  // $map = _menu_translate($router_item, $original_map);
 
-  $load->page_callback = $router_item['page callback'];
-  $load->router_item   = $router_item;
+  $load->map            = $map;
+  $load->page_arguments = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
+  $load->page_callback  = $router_item['page_callback'];
+  $load->router_item    = $router_item;
+  menu_set_item($_GET['q'], $router_item);
   return $load;
 }
 
@@ -410,7 +424,7 @@ function panels_page_panels_exportables($op = 'list', $panels = NULL, $name = 'f
     $code .= " */\n";
     $code .= "function " . $name . "_default_panel_pages() {\n";
     foreach ($panels as $panel => $truth) {
-      $code .= panels_page_export_page($all_panels[$panel], '  ');
+      $code .= panels_page_export($all_panels[$panel], '  ');
       $code .= '  $pages[\'' . check_plain($panel) . '\'] = $page;' . "\n\n\n";
     }
     $code .= "  return \$pages;\n";
