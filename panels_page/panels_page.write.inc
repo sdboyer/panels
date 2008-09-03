@@ -166,9 +166,9 @@ function panels_page_delete($panel_page) {
  *
  * The code returned from can be used directly in panels_page_save().
  */
-function panels_page_export_page($panel_page, $prefix = '') {
+function panels_page_export($panel_page, $prefix = '') {
   // Make sure the primary display is the current display.
-  panels_page_fetch_primary_display($panel_page);
+  panels_page_fetch_display($panel_page);
   $output = '';
   $fields = panels_page_fields();
   $output .= $prefix . '$page = new stdClass()' . ";\n";
@@ -195,12 +195,23 @@ function panels_page_export_page($panel_page, $prefix = '') {
 
   // Export all secondary displays
   $output .= $prefix . '$page->displays = array()' . ";\n";
-  foreach ($panel_page->displays as $did => $info) {
-    $output .= $prefix . '  $page->displays[\'' . $did . "']['title'] = '" . check_plain($info['title']) . "';\n";
-    $output .= $prefix . '  $page->displays[\'' . $did . "']['argument_id'] = '" . check_plain($info['argument_id']) . "';\n";
-    $display = !empty($info['display']) ? $info['display'] : panels_load_display($info['did']);
-    $output .= panels_export_display($display, $prefix . '    ');
-    $output .= $prefix . '  $page->displays[\'' . $did . "']['display'] =  \$display;\n";
+  foreach ($panel_page->displays as $id => $info) {
+    $output .= $prefix . '  $page->displays[\'' . $id . "']['title'] = '" . check_plain($info['title']) . "';\n";
+    $output .= $prefix . '  $page->displays[\'' . $id . "']['argument_id'] = '" . check_plain($info['argument_id']) . "';\n";
+    if (!empty($info['display'])) {
+      $display = $info['display'];
+    }
+    else if (panels_page_fetch_display($panel_page, $id)) {
+      $display = $panel_page->display;
+    }
+    if (is_object($display)) {
+      $output .= panels_export_display($display, $prefix . '    ');
+      $output .= $prefix . '  $page->displays[\'' . $id . "']['display'] =  \$display;\n";
+      unset($display);
+    }
+    else {
+      $output .= $prefix . '  $page->displays[\'' . $id . "']['display'] =  \NULL;\n";
+    }
   }
   return $output;
 }
