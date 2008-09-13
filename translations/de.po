@@ -1,0 +1,3346 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  panels.module,v 1.10.2.9 2007/03/15 23:13:41 merlinofchaos
+#  fourcol_25_25_25_25.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  threecol_33_33_33.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  twocol_25_75.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  twocol_33_66.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  twocol_38_62.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  twocol_50_50.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  twocol_62_38.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  twocol_66_33.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  twocol_75_25.inc,v 1.0 2006/09/02 11:47:00 alexander.hass
+#  threecol_25_50_25_stacked.inc,v 1.5 2006/08/22 23:54:20 merlinofchaos
+#  threecol_33_34_33.inc,v 1.5 2006/08/22 23:54:20 merlinofchaos
+#  threecol_33_34_33_stacked.inc,v 1.5 2006/08/22 23:54:20 merlinofchaos
+#  twocol.inc,v 1.6 2006/08/22 23:54:20 merlinofchaos
+#  twocol_stacked.inc,v 1.5 2006/08/22 23:54:20 merlinofchaos
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: panels 5.x\n"
+"POT-Creation-Date: 2008-09-13 18:05+0200\n"
+"PO-Revision-Date: 2008-09-13 19:22+0100\n"
+"Last-Translator: Alexander Hass\n"
+"Language-Team: Alexander Hass\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: panels.module:14
+msgid " Panels module is the core engine for a number of sub-modules, including Panels pages, Panels nodes, Mini panels, and Views panes. Panels module allows the website adminstrator (or sometimes the end-user) to manipulate the layout of individual pages, sidebars, and content pieces, as well as easily dictate what content is displayed in the layout."
+msgstr ""
+
+#: panels.module:15
+msgid "Most Drupal users are familiar with the block to region layout mechanism in which you can assign a block to any region defined in your theme.  Panels takes this concept a massive step forward.  Through the panels interface you can start by creating a layout with any number of columns, headers, and footer, and control the width of those areas."
+msgstr ""
+
+#: panels.module:16
+msgid "After creating your layout, you can assign pieces of content to those areas in an easy drag and drop interface.  Content is not limited to blocks, but can be nodes, views, or other types of content that expose themselves to panels."
+msgstr ""
+
+#: panels.module:17
+#: panels_page/panels_page.module:52
+#: panels_page/panels_page.info:0
+msgid "Panel pages"
+msgstr "Panelseiten"
+
+#: panels.module:17
+msgid " are the the primary panels module, you can use this for creating single full page layouts.  This replaces the standard panel that existed in the earlier versions of panels. If you are upgrading your site from Panels 1, and you cannot find where your panels went, be sure to enable the panel pages module!"
+msgstr ""
+
+#: panels.module:18
+#: panels_node/panels_node.module:36
+#: panels_node/panels_node.info:0
+msgid "Panel nodes"
+msgstr "Panelbeiträge"
+
+#: panels.module:18
+msgid " are useful for creating layouts that only occupy the content area of your pages.  Frequently, it is desirable to add an area to a node layout, such as a pull quote for a newspaper or a photo block, that you don't necessarily want on every node.  Panels Nodes lets you control the layout of a single node at a time and place content such as blog posts, images, blogs in and around the post."
+msgstr ""
+
+#: panels.module:19
+#: panels_mini/panels_mini.module:48;842
+#: panels_mini/panels_mini.info:0
+msgid "Mini panels"
+msgstr "Mini-Panels"
+
+#: panels.module:19
+msgid " are a layout mechanism for blocks.  It won't take long using panels before you get to a point when you want a panel inside of a panel.  Or a panel that can be used as a block.  That is exactly what mini-panels does. You can create a small panel here with various pieces of content and then put it inside of a panels-page or panels-node."
+msgstr ""
+
+#: panels.module:20
+#: panels_views/panels_views.module:23
+#: panels_views/panels_views.info:0
+msgid "Views panes"
+msgstr ""
+
+#: panels.module:20
+msgid " expose views so they may be added to panels. Panels will automatically detect block views without this module; however, page and embedded views will <strong>not be</strong> selectable from Panels by default. If you enable the <strong>Views panes</strong> module, you may expose individual views to Panels. The <strong>Legacy views panes</strong> module will simply expose all views, so that you may add them in any panel. Both modules provide options for customization of the views' settings on a per-Panel basis. This is useful if you have multiple administrators or want to use panels for something other than just panel pages."
+msgstr ""
+
+#: panels.module:21
+msgid "If you do not see the above items in the list below, you may need to activate them on the <a href=\"!url\">module administration</a> page."
+msgstr ""
+
+#: panels.module:43
+#: panels.info:0;0
+#: panels_export/panels_export.info:0
+#: panels_mini/panels_mini.info:0
+#: panels_node/panels_node.info:0
+#: panels_node_legacy/panels_node_legacy.info:0
+#: panels_page/panels_page.info:0
+#: panels_simple_cache/panels_simple_cache.info:0
+#: panels_views/panels_views.info:0
+#: panels_views_legacy/panels_views_legacy.info:0
+msgid "Panels"
+msgstr "Panels"
+
+#: panels.module:46
+msgid "Administer items related to the Panels module."
+msgstr ""
+
+#: panels.module:50
+msgid "Autocomplete node"
+msgstr "Beitrag automatisch vervollständigen"
+
+#: panels.module:58;66;74;82;90;98;106;114;122
+msgid "ajax"
+msgstr "Ajax"
+
+#: panels.module:183
+msgid "The input was invalid"
+msgstr "Die Eingabe war ungültig"
+
+#: panels.module:185
+#: includes/common.inc:1465
+msgid "Error"
+msgstr "Fehler"
+
+#: panels.module:1294
+msgid "more"
+msgstr "Weiter"
+
+#: panels.module:1367
+msgid "Anonymous"
+msgstr "Gast"
+
+#: panels.module:1368
+msgid "by @user"
+msgstr "von @user"
+
+#: panels.module:242
+#, fuzzy
+msgid "view all panes"
+msgstr "Alle Ausschnitte anzeigen"
+
+#: panels.module:242
+msgid "view pane admin links"
+msgstr ""
+
+#: panels.module:242
+msgid "administer pane visibility"
+msgstr "Sichtbarkeit von Ausschnitten verwalten"
+
+#: panels.module:242
+msgid "administer pane access"
+msgstr "Zugriff auf Ausschnitte verwalten"
+
+#: panels.module:242
+msgid "administer advanced pane settings"
+msgstr "Erweiterte Einstellungen von Ausschnitten verwalten"
+
+#: panels.module:242
+msgid "use panels caching features"
+msgstr ""
+
+#: panels.module:0
+msgid "panels"
+msgstr "panels"
+
+#: panels.install:176
+msgid "If you have not already enabled the Panel pages module, you are encouraged to do so."
+msgstr ""
+
+#: panels.install:585
+msgid "Update #5218 only has changes for PostgreSQL. There are no updates for MySQL databases - since you're running MySQL, you should consider this update successful."
+msgstr ""
+
+#: panels.install:591
+msgid "You can disregard failed attempts to add new columns in update #5216 as long as the two queries preceding this text were successful."
+msgstr ""
+
+#: panels.info:0
+msgid "Core Panels display functions"
+msgstr ""
+
+#: arguments/nid.inc:12
+msgid "Node ID"
+msgstr "Node ID"
+
+#: arguments/nid.inc:15
+msgid "Restricts the argument to a node id."
+msgstr ""
+
+#: arguments/nid.inc:60
+#: arguments/node_add.inc:50
+#: arguments/node_edit.inc:60
+msgid "Node types"
+msgstr "Beitragstypen"
+
+#: arguments/nid.inc:63
+#: arguments/node_add.inc:53
+#: arguments/node_edit.inc:63
+msgid "You can restrict this argument to use the checked node types. Arguments from non-conforming node types will be ignored, and Panels will behave as if no argument were given. Leave all unchecked to impose no restriction."
+msgstr ""
+
+#: arguments/nid.inc:70
+#: arguments/node_add.inc:60
+#: arguments/node_edit.inc:70
+#: arguments/term.inc:108
+msgid "Use different default display"
+msgstr ""
+
+#: arguments/nid.inc:72
+#: arguments/node_add.inc:62
+#: arguments/node_edit.inc:72
+msgid "If checked, when this argument is present it will use its own display rather than the default. Node types not selected in the \"Own display\" field will use this one."
+msgstr ""
+
+#: arguments/nid.inc:77
+#: arguments/node_add.inc:67
+#: arguments/node_edit.inc:77
+#: arguments/term.inc:115
+#: arguments/vid.inc:56
+#, fuzzy
+msgid "Own display"
+msgstr "Eigene Anzeige"
+
+#: arguments/nid.inc:81
+#: arguments/node_add.inc:71
+#: arguments/node_edit.inc:81
+msgid "Each checked node type will get its own special display to layout its content. Only node types set above should be set here. Node types not set here will use the default display."
+msgstr ""
+
+#: arguments/nid.inc:119
+msgid "Node ID @id Default"
+msgstr ""
+
+#: arguments/nid.inc:131
+msgid "Node ID @id @type"
+msgstr ""
+
+#: arguments/node_add.inc:12
+#: contexts/node_add_form.inc:13
+msgid "Node add form"
+msgstr "Formular: Beitrag erstellen"
+
+#: arguments/node_add.inc:15
+msgid "Displays the node add form for a content type."
+msgstr ""
+
+#: arguments/node_add.inc:130
+msgid "Node add form @id Default"
+msgstr ""
+
+#: arguments/node_add.inc:143
+msgid "Node add form @id @type"
+msgstr ""
+
+#: arguments/node_edit.inc:12
+#: contexts/node_edit_form.inc:13
+msgid "Node edit form"
+msgstr "Formular: Beitrag bearbeiten"
+
+#: arguments/node_edit.inc:15
+msgid "Displays the node edit form for a node."
+msgstr ""
+
+#: arguments/node_edit.inc:119
+msgid "Node edit form @id Default"
+msgstr ""
+
+#: arguments/node_edit.inc:131
+msgid "Node edit form @id @type"
+msgstr ""
+
+#: arguments/term.inc:12
+#: contexts/term.inc:13
+msgid "Taxonomy term"
+msgstr "Taxonomie-Begriff"
+
+#: arguments/term.inc:15
+msgid "Restricts the argument to a taxonomy term."
+msgstr ""
+
+#: arguments/term.inc:88
+msgid "Argument type"
+msgstr "Argumenttyp"
+
+#: arguments/term.inc:90
+msgid "Term ID"
+msgstr "Begriff ID"
+
+#: arguments/term.inc:90
+msgid "Term name"
+msgstr "Begriffsname"
+
+#: arguments/term.inc:98
+msgid "Vocabularies"
+msgstr "Vokabulare"
+
+#: arguments/term.inc:101
+msgid "You can restrict this argument to use the checked vocabularies. Arguments from non-conforming vocabularies will be ignored, and Panels will behave as if no argument were given. Leave all unchecked to impose no restriction."
+msgstr ""
+
+#: arguments/term.inc:110
+msgid "If checked, when this argument is present it will use its own display rather than the default. Vocabularies not selected in the \"Own display\" field will use this one."
+msgstr ""
+
+#: arguments/term.inc:119
+msgid "Each checked vocabulary will get its own special display to layout its content. Only vocabularies set above should be set here. Vocabularies not set here will use the default display."
+msgstr ""
+
+#: arguments/term.inc:157
+msgid "Taxonomy term @id Default"
+msgstr ""
+
+#: arguments/term.inc:169
+msgid "Taxonomy term @id @vocabulary"
+msgstr ""
+
+#: arguments/uid.inc:12
+msgid "User ID"
+msgstr "Benutzer-ID"
+
+#: arguments/uid.inc:15
+msgid "Creates a user object from the argument."
+msgstr ""
+
+#: arguments/vid.inc:12
+msgid "Vocabulary ID"
+msgstr "Vokabular-ID"
+
+#: arguments/vid.inc:15
+msgid "Loads a vocabulary object from the argument."
+msgstr ""
+
+#: arguments/vid.inc:60
+msgid "Each checked vocabulary will get its own special display to layout its content."
+msgstr ""
+
+#: arguments/vid.inc:97
+msgid "vocabulary ID @id @type"
+msgstr ""
+
+#: content_types/block.inc:10
+#: panels_views/panels_views.module:301;963
+#: panels_views_legacy/panels_views_legacy.module:243
+msgid "Block"
+msgstr "Block"
+
+#: content_types/block.inc:39
+msgid "Configure block"
+msgstr "Block einstellen"
+
+#: content_types/block.inc:40
+msgid "Configure this pane's 'block settings' in administer >> site building >> blocks"
+msgstr ""
+
+#: content_types/block.inc:146
+msgid "Use block visibility settings (see block config)"
+msgstr ""
+
+#: content_types/block.inc:148
+msgid "If checked, the block visibility settings for this block will apply to this block."
+msgstr ""
+
+#: content_types/block.inc:161
+msgid "Block settings"
+msgstr "Blockeinstellungen"
+
+#: content_types/block.inc:162
+msgid "Settings in this section are global and are for all blocks of this type, anywhere in the system."
+msgstr ""
+
+#: content_types/block.inc:209
+msgid "Deleted/missing block @module-@delta"
+msgstr ""
+
+#: content_types/block.inc:221;237;255;260;265;270;275;280;285;299
+msgid "Core blocks"
+msgstr "Kern-Blöcke"
+
+#: content_types/block.inc:225
+msgid "Contributed blocks"
+msgstr ""
+
+#: content_types/block.inc:233;307
+msgid "Menus"
+msgstr "Menüs"
+
+#: content_types/block.inc:290
+msgid "Syndicated Feeds"
+msgstr ""
+
+#: content_types/block.inc:295
+#: content_types/custom.inc:10;76;108
+#: content_types/custom_php.inc:82
+#: panels_node_legacy/panels_node_legacy.module:127
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+#: content_types/custom.inc:72
+msgid "New custom content"
+msgstr ""
+
+#: content_types/custom.inc:75
+msgid "Create a completely custom piece of HTML content."
+msgstr ""
+
+#: content_types/custom.inc:91
+#: content_types/custom_php.inc:99
+#: content_types/node_meta.inc:133
+#: includes/common.inc:1356
+#: includes/display_edit.inc:512
+#: panels_mini/panels_mini.module:219
+#: panels_views/panels_views.module:111
+msgid "Title"
+msgstr "Titel"
+
+#: content_types/custom.inc:94
+#: content_types/custom_php.inc:106
+msgid "Body"
+msgstr "Textkörper"
+
+#: content_types/custom_php.inc:10
+msgid "Custom PHP"
+msgstr ""
+
+#: content_types/custom_php.inc:78
+msgid "Custom PHP content"
+msgstr ""
+
+#: content_types/custom_php.inc:81
+msgid "Custom PHP block with access to Panels context data. Use sparingly, and with caution!"
+msgstr ""
+
+#: content_types/custom_php.inc:83
+#: includes/plugins.inc:1034
+#: panels_mini/panels_mini.module:161
+#: panels_page/panels_page.module:257
+#: panels_simple_cache/panels_simple_cache.module:152
+msgid "Context"
+msgstr "Kontext"
+
+#: content_types/custom_php.inc:101
+msgid "Any content you want to have passed along to theme function for displaying MUST be stored in $block->content."
+msgstr ""
+
+#: content_types/custom_php.inc:102
+msgid "MAKE SURE YOU ERASE ALL OF THIS HELP TEXT. Only error-free php code should be saved in this field."
+msgstr ""
+
+#: content_types/custom_php.inc:103
+msgid "Do NOT use php tags."
+msgstr ""
+
+#: content_types/custom_php.inc:110
+msgid "The PHP code you enter here will be evaluated at render-time. Any context data present in the display will be available to this code in the $context variable. <strong>DO NOT</strong> include <em>@php</em> tags."
+msgstr ""
+
+#: content_types/custom_php.inc:120
+msgid "Custom PHP with context"
+msgstr ""
+
+#: content_types/form.inc:10
+msgid "Generic form"
+msgstr "Allgemeines Formular"
+
+#: content_types/form.inc:29
+msgid "General form"
+msgstr "Allgemeines Formular"
+
+#: content_types/form.inc:32
+msgid "The general parts of a form."
+msgstr ""
+
+#: content_types/form.inc:33;34;61
+#: content_types/node_form.inc:30;31;38;39;46;47;54;55;64;65;74;75;84;85;94;95;104;105;114;115
+msgid "Form"
+msgstr "Formular"
+
+#: content_types/form.inc:62
+msgid "Form goes here."
+msgstr ""
+
+#: content_types/form.inc:70
+msgid "\"@s\" base form"
+msgstr ""
+
+#: content_types/node_attachments.inc:10
+#: content_types/node_type_desc.inc:10;38;52
+msgid "Node type description"
+msgstr "Beschreibung des Beitragtyps"
+
+#: content_types/node_attachments.inc:31;50
+msgid "Attached files"
+msgstr "Angehängte Dateien"
+
+#: content_types/node_attachments.inc:37
+msgid "Attached files go here."
+msgstr ""
+
+#: content_types/node_attachments.inc:53
+#: content_types/node_book_nav.inc:53
+msgid "A list of files attached to the node."
+msgstr ""
+
+#: content_types/node_attachments.inc:54
+#: content_types/node_book_nav.inc:54
+#: content_types/node_comment_form.inc:63
+#: content_types/node_comments.inc:57
+#: content_types/node_content.inc:33
+#: content_types/node_meta.inc:30
+#: content_types/node_type_desc.inc:56
+#: contexts/node.inc:13
+#: panels_node_legacy/panels_node_legacy.module:46
+#: relationships/book_parent.inc:16
+#: relationships/term_from_node.inc:16
+#: relationships/user_from_node.inc:13
+msgid "Node"
+msgstr "Beitrag"
+
+#: content_types/node_attachments.inc:55
+#: content_types/node_book_nav.inc:55
+#: content_types/node_comment_form.inc:64
+#: content_types/node_comments.inc:58
+#: content_types/node_content.inc:34
+#: content_types/node_meta.inc:31
+#: content_types/node_type_desc.inc:57
+msgid "Node context"
+msgstr "Beitragszusammenhang"
+
+#: content_types/node_attachments.inc:61
+msgid "\"@s\" attachments"
+msgstr "Anhänge von „@s“"
+
+#: content_types/node_book_nav.inc:11
+msgid "Node book navigation"
+msgstr ""
+
+#: content_types/node_book_nav.inc:31;50
+msgid "Book navigation"
+msgstr "Buchnavigation"
+
+#: content_types/node_book_nav.inc:37
+msgid "Book navigation goes here."
+msgstr ""
+
+#: content_types/node_book_nav.inc:61
+msgid "\"@s\" book navigation"
+msgstr "Buchnavigation von „@s“"
+
+#: content_types/node_comment_form.inc:11
+msgid "Node comment form"
+msgstr ""
+
+#: content_types/node_comment_form.inc:34
+msgid "Add comment"
+msgstr "Kommentar hinzufügen"
+
+#: content_types/node_comment_form.inc:37
+msgid "Comment form here."
+msgstr ""
+
+#: content_types/node_comment_form.inc:59
+msgid "Comment form"
+msgstr "Kommentarformular"
+
+#: content_types/node_comment_form.inc:62
+msgid "A form to add a new comment."
+msgstr "Ein Formular zum Hinzufügen eines neuen Kommentars."
+
+#: content_types/node_comment_form.inc:70
+msgid "\"@s\" comment form"
+msgstr "Kommentarformular von „@s“"
+
+#: content_types/node_comments.inc:12;53
+msgid "Node comments"
+msgstr ""
+
+#: content_types/node_comments.inc:34
+msgid "Comments"
+msgstr "Kommentare"
+
+#: content_types/node_comments.inc:36
+msgid "Node comments go here."
+msgstr ""
+
+#: content_types/node_comments.inc:56
+msgid "The comments of the referenced node."
+msgstr ""
+
+#: content_types/node_comments.inc:74
+msgid "Mode"
+msgstr "Modus"
+
+#: content_types/node_comments.inc:81
+msgid "Sort"
+msgstr "Sortieren"
+
+#: content_types/node_comments.inc:87
+msgid "!a comments per page"
+msgstr "!a Kommentare pro Seite"
+
+#: content_types/node_comments.inc:90
+#, fuzzy
+msgid "Pager"
+msgstr "Seitennavigation"
+
+#: content_types/node_comments.inc:99
+msgid "\"@s\" comments"
+msgstr "Kommentare von „@s“"
+
+#: content_types/node_content.inc:10;29
+#: panels_node_legacy/panels_node_legacy.module:124
+msgid "Node content"
+msgstr ""
+
+#: content_types/node_content.inc:32
+msgid "The content of the referenced node."
+msgstr ""
+
+#: content_types/node_content.inc:55
+#: content_types/node_meta.inc:48
+msgid "Node title."
+msgstr "Titel des Beitrags."
+
+#: content_types/node_content.inc:56
+msgid "Node content goes here."
+msgstr ""
+
+#: content_types/node_content.inc:71
+#: content_types/node_meta.inc:60
+#: panels_node_legacy/panels_node_legacy.module:95
+msgid "Edit node"
+msgstr "Beitrag bearbeiten"
+
+#: content_types/node_content.inc:72
+#: content_types/node_meta.inc:61
+#: panels_node_legacy/panels_node_legacy.module:96
+msgid "Edit this node"
+msgstr "Diesen Beitrag bearbeiten"
+
+#: content_types/node_content.inc:148
+#: content_types/node_meta.inc:120
+#: includes/plugins.inc:292
+msgid "Override title"
+msgstr "Titel überschreiben"
+
+#: content_types/node_content.inc:161
+msgid "Link title to node"
+msgstr "Den Titel mit dem Beitrag verlinken"
+
+#: content_types/node_content.inc:164
+msgid "Check here to make the title link to the node."
+msgstr "Aktivieren, damit der Titel auf den Beitrag verlinkt."
+
+#: content_types/node_content.inc:167
+#: panels_node/panels_node.module:140
+#: panels_node_legacy/panels_node_legacy.module:160
+msgid "Teaser"
+msgstr "Anrisstext"
+
+#: content_types/node_content.inc:170
+msgid "Check here to show only the node teaser."
+msgstr "Aktivieren, um nur den Anrisstext des Beitrages anzuzeigen."
+
+#: content_types/node_content.inc:175
+msgid "Node page"
+msgstr "Beitragseite"
+
+#: content_types/node_content.inc:176
+msgid "Check here if the node is being displayed on a page by itself."
+msgstr ""
+
+#: content_types/node_content.inc:181
+#: panels_node_legacy/panels_node_legacy.module:168
+msgid "Display links"
+msgstr "Links anzeigen"
+
+#: content_types/node_content.inc:182
+#: panels_node_legacy/panels_node_legacy.module:169
+msgid "Check here to display the links with the post."
+msgstr "Aktivieren, um die Links mit dem Beitrag anzuzeigen."
+
+#: content_types/node_content.inc:188
+msgid "No extras"
+msgstr ""
+
+#: content_types/node_content.inc:189
+msgid "Check here to disable additions that modules might make to the node, such as file attachments and CCK fields; this should just display the basic teaser or body."
+msgstr ""
+
+#: content_types/node_content.inc:195
+#: includes/common.inc:1091;1186;1255;1368
+#: panels_node_legacy/panels_node_legacy.module:181
+msgid "Identifier"
+msgstr "Bezeichner"
+
+#: content_types/node_content.inc:196
+#: panels_node_legacy/panels_node_legacy.module:182
+msgid "Whatever is placed here will appear in $node->panel_identifier to make it easier to theme a node or part of a node as necessary."
+msgstr ""
+
+#: content_types/node_content.inc:203
+msgid "\"@s\" content"
+msgstr "Inhalt von „@s“"
+
+#: content_types/node_form.inc:10
+msgid "Node form"
+msgstr "Beitragsformular"
+
+#: content_types/node_form.inc:26
+msgid "Node form publishing options"
+msgstr ""
+
+#: content_types/node_form.inc:29;83
+msgid "Publishing options on the Node form."
+msgstr ""
+
+#: content_types/node_form.inc:34
+msgid "Node form author information"
+msgstr ""
+
+#: content_types/node_form.inc:37
+msgid "Author information on the Node form."
+msgstr ""
+
+#: content_types/node_form.inc:42
+msgid "Node form input format"
+msgstr ""
+
+#: content_types/node_form.inc:45
+msgid "Input format for the body field on a node."
+msgstr ""
+
+#: content_types/node_form.inc:50
+msgid "Node form log message"
+msgstr ""
+
+#: content_types/node_form.inc:53
+msgid "Log message for the node."
+msgstr ""
+
+#: content_types/node_form.inc:60
+msgid "Node form comment settings"
+msgstr ""
+
+#: content_types/node_form.inc:63
+msgid "Comment settings on the Node form."
+msgstr ""
+
+#: content_types/node_form.inc:70
+msgid "Node form menu settings"
+msgstr ""
+
+#: content_types/node_form.inc:73
+msgid "menu settings on the Node form."
+msgstr ""
+
+#: content_types/node_form.inc:80
+msgid "URL Path settings"
+msgstr "URL-Alias-Einstellungen"
+
+#: content_types/node_form.inc:90
+msgid "Node form file attachments"
+msgstr ""
+
+#: content_types/node_form.inc:93
+msgid "File attachments on the Node form."
+msgstr ""
+
+#: content_types/node_form.inc:100
+msgid "Node form categories"
+msgstr ""
+
+#: content_types/node_form.inc:103
+msgid "Taxonomy categories for the node."
+msgstr ""
+
+#: content_types/node_form.inc:110
+msgid "Node form book options"
+msgstr ""
+
+#: content_types/node_form.inc:113
+msgid "Book options for the node."
+msgstr ""
+
+#: content_types/node_form.inc:131
+msgid "Publishing options"
+msgstr "Veröffentlichungseinstellungen"
+
+#: content_types/node_form.inc:142
+msgid "Publishing options."
+msgstr "Veröffentlichungseinstellungen."
+
+#: content_types/node_form.inc:147
+msgid "Comment options"
+msgstr ""
+
+#: content_types/node_form.inc:158
+msgid "Comment options."
+msgstr ""
+
+#: content_types/node_form.inc:163
+msgid "Authoring information"
+msgstr "Informationen zum Autor"
+
+#: content_types/node_form.inc:176
+msgid "Authoring information."
+msgstr "Informationen zum Autor."
+
+#: content_types/node_form.inc:181
+msgid "Menu options"
+msgstr ""
+
+#: content_types/node_form.inc:194
+msgid "Menu options."
+msgstr ""
+
+#: content_types/node_form.inc:199
+msgid "URL path options"
+msgstr ""
+
+#: content_types/node_form.inc:211
+msgid "URL Path options."
+msgstr ""
+
+#: content_types/node_form.inc:216
+msgid "Attach files"
+msgstr "Dateien anhängen"
+
+#: content_types/node_form.inc:227
+msgid "Attach files."
+msgstr "Dateien anhängen."
+
+#: content_types/node_form.inc:232
+msgid "Categories"
+msgstr "Kategorien"
+
+#: content_types/node_form.inc:243
+msgid "Categories."
+msgstr "Kategorien."
+
+#: content_types/node_form.inc:248
+msgid "Book options"
+msgstr "Buchoptionen"
+
+#: content_types/node_form.inc:263
+msgid "Book options."
+msgstr ""
+
+#: content_types/node_form.inc:268
+msgid "Input format"
+msgstr "Eingabeformat"
+
+#: content_types/node_form.inc:279
+msgid "Input format."
+msgstr "Eingabeformat."
+
+#: content_types/node_form.inc:301
+#: content_types/term_list.inc:132
+msgid "\"@s\" @type"
+msgstr "„@s“-@type"
+
+#: content_types/node_meta.inc:26
+msgid "Node meta data"
+msgstr ""
+
+#: content_types/node_meta.inc:29
+msgid "Meta data of the referenced node."
+msgstr ""
+
+#: content_types/node_meta.inc:49
+msgid "Node meta content goes here."
+msgstr ""
+
+#: content_types/node_meta.inc:136
+msgid "Check here to display the title of the node."
+msgstr "Aktivieren, um den Titel des Beitrags anzuzeigen."
+
+#: content_types/node_meta.inc:139
+msgid "Author"
+msgstr "Autor"
+
+#: content_types/node_meta.inc:142
+msgid "Check here to display the author of the node."
+msgstr "Aktivieren, um den Author des Beitrags anzuzeigen."
+
+#: content_types/node_meta.inc:145
+msgid "Created date"
+msgstr "Erstellungsdatum"
+
+#: content_types/node_meta.inc:148
+msgid "Check here to display the creation date of the node."
+msgstr "Aktivieren, um den Erstellungsdatum des Beitrags anzuzeigen."
+
+#: content_types/node_meta.inc:151
+msgid "Modified date"
+msgstr ""
+
+# not literally
+#: content_types/node_meta.inc:154
+msgid "Check here to display the modification date of the node."
+msgstr "Aktivieren, um das letzte Änderungsdatum des Beitrags anzuzeigen."
+
+#: content_types/node_meta.inc:160
+msgid "\"@s\" meta content"
+msgstr ""
+
+#: content_types/node_type_desc.inc:39
+msgid "Node type description goes here."
+msgstr ""
+
+#: content_types/node_type_desc.inc:55
+msgid "Node type description."
+msgstr ""
+
+#: content_types/node_type_desc.inc:63
+msgid "\"@s\" type description"
+msgstr "Typbeschreibung von „@s“"
+
+#: content_types/profile_fields.inc:12
+msgid "Profile Fields"
+msgstr "Profilfelder"
+
+#: content_types/profile_fields.inc:63
+msgid "Profile content goes here."
+msgstr "Inhalt der Profile kommt hier rein."
+
+#: content_types/profile_fields.inc:92
+msgid "Profile Category"
+msgstr "Profilkategorie"
+
+#: content_types/profile_fields.inc:95
+msgid "Profile category contents."
+msgstr "Inhalte der Profilkategorie."
+
+#: content_types/profile_fields.inc:96
+#: content_types/user_picture.inc:48
+#: content_types/user_profile.inc:68
+#: contexts/user.inc:13
+msgid "User"
+msgstr "Benutzer"
+
+#: content_types/profile_fields.inc:97
+#: content_types/user_picture.inc:49
+#: content_types/user_profile.inc:69
+msgid "User context"
+msgstr "Benutzerzusammenhang"
+
+# Kontext sensitive
+#: content_types/profile_fields.inc:127
+#, fuzzy
+msgid "Which category"
+msgstr "Die Kategorie"
+
+#: content_types/profile_fields.inc:137
+msgid "Text to display if category has no data. Note that title will not display unless overridden."
+msgstr ""
+
+#: content_types/profile_fields.inc:151
+msgid "\"@s\" profile fields"
+msgstr ""
+
+#: content_types/term_description.inc:10;59
+#: content_types/vocabulary_terms.inc:11
+msgid "Term description"
+msgstr "Begriffsbeschreibung"
+
+#: content_types/term_description.inc:38
+msgid "Edit term"
+msgstr "Begriff bearbeiten"
+
+#: content_types/term_description.inc:39
+msgid "Edit this term"
+msgstr "Diesen Begriff bearbeiten"
+
+#: content_types/term_description.inc:46
+#: content_types/term_list.inc:69
+msgid "Term description goes here."
+msgstr ""
+
+#: content_types/term_description.inc:62
+msgid "Term description."
+msgstr "Beschreibung des Begriffs."
+
+#: content_types/term_description.inc:63
+#: content_types/term_list.inc:86
+#: relationships/term_parent.inc:16
+msgid "Term"
+msgstr "Begriff"
+
+#: content_types/term_description.inc:64
+#: content_types/term_list.inc:87
+msgid "Term context"
+msgstr "Begriffszusammenhang"
+
+#: content_types/term_description.inc:70
+msgid "\"@s\" term description"
+msgstr "Beschreibung des Begriffs „@s“"
+
+#: content_types/term_list.inc:10;82
+msgid "List of related terms"
+msgstr ""
+
+#: content_types/term_list.inc:85
+msgid "Terms related to an existing term; may be child, siblings or top level."
+msgstr ""
+
+#: content_types/term_list.inc:94
+msgid "Child terms"
+msgstr ""
+
+#: content_types/term_list.inc:95
+msgid "Related terms"
+msgstr "Verwandte Begriffe"
+
+#: content_types/term_list.inc:96
+msgid "Sibling terms"
+msgstr ""
+
+#: content_types/term_list.inc:97
+msgid "Top level terms"
+msgstr ""
+
+#: content_types/term_list.inc:98
+msgid "Term synonyms"
+msgstr ""
+
+# Kontext sensitive
+#: content_types/term_list.inc:113
+#, fuzzy
+msgid "Which terms"
+msgstr "Die Begriffe"
+
+#: content_types/term_list.inc:122
+#: styles/list.inc:53
+msgid "List type"
+msgstr "Listentyp"
+
+#: content_types/term_list.inc:123
+#: styles/list.inc:55
+msgid "Unordered"
+msgstr "Unsortiert"
+
+#: content_types/term_list.inc:123
+#: styles/list.inc:56
+msgid "Ordered"
+msgstr "Sortiert"
+
+#: content_types/user_picture.inc:10;44
+msgid "User picture"
+msgstr "Benutzerbild"
+
+#: content_types/user_picture.inc:47
+msgid "The picture of a user."
+msgstr "Das Bild von einem Benutzer."
+
+#: content_types/user_picture.inc:58
+msgid "\"@s\" user picture"
+msgstr "Benutzerbild von „@s“"
+
+#: content_types/user_profile.inc:10;64
+msgid "User profile"
+msgstr "Benutzerprofil"
+
+#: content_types/user_profile.inc:67
+msgid "The profile of a user."
+msgstr "Das Profil eines Benutzers."
+
+#: content_types/user_profile.inc:78
+msgid "\"@s\" user profile"
+msgstr "„@s“-Benutzerprofil"
+
+#: content_types/vocabulary_terms.inc:73
+msgid "Vocabulary terms"
+msgstr "Vokabularbegriff"
+
+#: content_types/vocabulary_terms.inc:76
+msgid "All the terms in a vocabulary."
+msgstr "Alle Begriffe in einem Vokabular."
+
+#: content_types/vocabulary_terms.inc:77
+#: contexts/vocabulary.inc:59
+#: relationships/term_from_node.inc:51
+msgid "Vocabulary"
+msgstr "Vokabular"
+
+#: content_types/vocabulary_terms.inc:78
+msgid "Vocabulary context"
+msgstr "Vokabularzusammenhang"
+
+#: content_types/vocabulary_terms.inc:84
+msgid "\"@s\" terms"
+msgstr "„@s“-Begriffe"
+
+#: content_types/vocabulary_terms.inc:95
+msgid "Maximum depth"
+msgstr ""
+
+#: content_types/vocabulary_terms.inc:96
+msgid "unlimited"
+msgstr "Unbegrenzt"
+
+#: content_types/vocabulary_terms.inc:98
+msgid "Define the maximum depth of terms being displayed."
+msgstr ""
+
+#: content_types/vocabulary_terms.inc:103
+msgid "Display as tree"
+msgstr "Als Baum anzeigen"
+
+#: content_types/vocabulary_terms.inc:105
+msgid "If checked, the terms are displayed in a tree, otherwise in a flat list."
+msgstr ""
+
+#: contexts/node.inc:14
+msgid "A node object."
+msgstr "Ein Beitragsobjekt."
+
+#: contexts/node.inc:78
+#: contexts/node_edit_form.inc:72
+#: contexts/term.inc:55
+msgid "Require this context from an external source (such as a containing panel page)."
+msgstr ""
+
+#: contexts/node.inc:79
+#: contexts/node_edit_form.inc:73
+msgid "If selected, node selection (below) will be ignored."
+msgstr ""
+
+#: contexts/node.inc:87
+#: contexts/node_edit_form.inc:80
+#: panels_node_legacy/panels_node_legacy.module:140
+msgid "Enter the title or NID of a post"
+msgstr "Den Titel oder die NID des Beitrages eingeben"
+
+#: contexts/node.inc:97
+#: contexts/node_edit_form.inc:90
+msgid "Open in new window"
+msgstr "In neuem Fenster öffnen"
+
+#: contexts/node.inc:98
+#: contexts/node_edit_form.inc:91
+msgid "Currently set to !link"
+msgstr "Derzeit auf !link eingestellt"
+
+#: contexts/node.inc:116
+#: contexts/node_edit_form.inc:113
+msgid "You must select a node."
+msgstr "Ein Beitrag muss ausgewählt werden."
+
+#: contexts/node.inc:128
+#: contexts/node_edit_form.inc:125
+msgid "Invalid node selected."
+msgstr "Ein ungültiger Beitrag wurde ausgewählt."
+
+#: contexts/node_add_form.inc:14
+msgid "A node add form."
+msgstr "Ein Formular zum Erstellen eines Beitrages."
+
+#: contexts/node_add_form.inc:60
+msgid "Submit @name"
+msgstr "@name speichern"
+
+#: contexts/node_add_form.inc:69
+#: contexts/vocabulary.inc:51
+msgid "External source"
+msgstr "Externe Quelle"
+
+#: contexts/node_add_form.inc:77
+msgid "Node type"
+msgstr "Beitragstyp"
+
+#: contexts/node_add_form.inc:81
+msgid "Select the node type for this form."
+msgstr ""
+
+#: contexts/node_add_form.inc:85
+#: contexts/vocabulary.inc:68
+msgid "Select external to require this from an external source (such as a containing panel page)."
+msgstr ""
+
+#: contexts/node_edit_form.inc:14
+msgid "A node edit form."
+msgstr "Ein Formular zum Bearbeiten eines Beitrages."
+
+#: contexts/node_edit_form.inc:43
+#: includes/display_edit.inc:123;1162
+#: panels_mini/panels_mini.module:243;314
+#: panels_page/panels_page.admin.inc:45;152
+#: panels_views/panels_views.module:53;125;569
+msgid "Delete"
+msgstr "Löschen"
+
+#: contexts/term.inc:14
+msgid "A single taxonomy term object."
+msgstr ""
+
+#: contexts/term.inc:56
+msgid "If selected, term selection (below) will be ignored"
+msgstr ""
+
+#: contexts/user.inc:14
+msgid "A single user object."
+msgstr "Ein einzelnes Benutzerobjekt."
+
+#: contexts/vocabulary.inc:13
+msgid "Taxonomy vocabulary"
+msgstr "Taxonomie-Vokabular"
+
+#: contexts/vocabulary.inc:14
+msgid "A single taxonomy vocabulary object."
+msgstr "Ein einzelnes Taxonomie-Vokabular-Objekt."
+
+#: contexts/vocabulary.inc:65
+msgid "Select the vocabulary for this form."
+msgstr ""
+
+#: includes/common.inc:237
+msgid "New @s"
+msgstr "Neu @s"
+
+#: includes/common.inc:241
+msgid "New content of other types"
+msgstr ""
+
+#: includes/common.inc:244
+msgid "New content behavior"
+msgstr ""
+
+#: includes/common.inc:245
+msgid "Select the default behavior of new content added to the system. If checked, new content will automatically be immediately available to be added to Panels pages. If not checked, new content will not be available until specifically allowed here."
+msgstr ""
+
+#: includes/common.inc:251
+msgid "<p>Click Submit to be presented with a complete list of available content types set to the defaults you selected.</p>"
+msgstr ""
+
+#: includes/common.inc:277
+msgid "Other"
+msgstr "Andere"
+
+#: includes/common.inc:284
+msgid "Allowed @s content"
+msgstr ""
+
+#: includes/common.inc:299
+msgid "Submit"
+msgstr "Speichern"
+
+#: includes/common.inc:316
+#: panels_mini/panels_mini.module:613;688
+#: panels_page/panels_page.admin.inc:387;568;679
+msgid "Your changes have been saved."
+msgstr "Die Änderungen wurden gespeichert."
+
+#: includes/common.inc:379
+msgid "Select allowed layouts"
+msgstr "Zulässiges Layout auswählen."
+
+#: includes/common.inc:381
+msgid "Check the boxes for all layouts you want to allow users choose from when picking a layout. You must allow at least one layout."
+msgstr ""
+
+#: includes/common.inc:392;1123;1207;1287;1400
+#: includes/display_edit.inc:143;226;546;549;585;1060;1343;1631
+#: panels_mini/panels_mini.module:543;668;760;780
+#: panels_node/panels_node.module:331;340
+#: panels_page/panels_page.admin.inc:321;540;620;700;727
+#: panels_views/panels_views.module:511
+msgid "Save"
+msgstr "Speichern"
+
+#: includes/common.inc:425
+#: panels_mini/panels_mini.module:133;222;515
+#: panels_page/panels_page.admin.inc:23;258
+#: panels_page/panels_page.module:217
+msgid "Layout"
+msgstr "Layout"
+
+#: includes/common.inc:447;1519
+msgid "Empty"
+msgstr "Leer"
+
+#: includes/common.inc:472
+#: panels_simple_cache/panels_simple_cache.module:151
+#: panels_views_legacy/panels_views_legacy.module:313
+msgid "Arguments"
+msgstr "Argumente"
+
+#: includes/common.inc:473;1369
+msgid "argument"
+msgstr "Argument"
+
+#: includes/common.inc:474
+msgid "Arguments are parsed from the URL and translated into contexts that may be added to the display via the 'content' tab. These arguments are parsed in the order received, and you may use % in your URL to hold the place of an object; the rest of the arguments will come after the URL. For example, if the URL is node/%/panel and your user visits node/1/panel/foo, the first argument will be 1, and the second argument will be foo."
+msgstr ""
+
+#: includes/common.inc:475
+msgid "Add argument"
+msgstr "Argument hinzufügen"
+
+#: includes/common.inc:480
+#, fuzzy
+msgid "Relationships"
+msgstr "Beziehungen"
+
+#: includes/common.inc:481;1256
+#, fuzzy
+msgid "relationship"
+msgstr "Beziehung"
+
+#: includes/common.inc:482
+msgid "Relationships are contexts that are created from already existing contexts; the add relationship button will only appear once there is another context available. Relationships can load objects based upon how they are related to each other; for example, the author of a node, or a taxonomy term attached to a node, or the vocabulary of a taxonomy term."
+msgstr ""
+
+#: includes/common.inc:483
+msgid "Add relationship"
+msgstr "Beziehung hinzufügen"
+
+#: includes/common.inc:488
+#: panels_mini/panels_mini.module:535
+#: panels_page/panels_page.admin.inc:279
+msgid "Contexts"
+msgstr "Zusammenhänge"
+
+#: includes/common.inc:489;1092
+msgid "context"
+msgstr "Zusammenhang"
+
+#: includes/common.inc:490
+msgid "Contexts are embedded directly into the panel; you generally must select an object in the panel. For example, you could select node 5, or the term \"animals\" or the user \"administrator\""
+msgstr ""
+
+#: includes/common.inc:491
+msgid "Add context"
+msgstr "Zusammenhang hinzufügen"
+
+#: includes/common.inc:496
+msgid "Required contexts"
+msgstr "Erforderliche Zusammenhänge"
+
+# English: uppercase first
+#: includes/common.inc:497;1187
+#, fuzzy
+msgid "required context"
+msgstr "Erforderlicher Zusammenhang"
+
+#: includes/common.inc:498
+msgid "Required contexts are passed in from some external source, such as a containing panel. If a mini panel has required contexts, it can only appear when that context is available, and therefore will not show up as a standard Drupal block."
+msgstr ""
+
+#: includes/common.inc:499
+msgid "Add required context"
+msgstr "Erforderlichen Zusammenhang hinzufügen"
+
+#: includes/common.inc:698
+#: includes/display_edit.inc:1530;1728
+msgid "Close Window"
+msgstr "Fenster schließen"
+
+#: includes/common.inc:699;699
+#: includes/display_edit.inc:1531;1531;1729;1729
+msgid "Close window"
+msgstr "Fenster schließen"
+
+#: includes/common.inc:700
+#: includes/display_edit.inc:1532;1730
+msgid "Loading..."
+msgstr "Laden..."
+
+#: includes/common.inc:700
+#: includes/display_edit.inc:1532;1730
+msgid "Loading"
+msgstr "Laden"
+
+#: includes/common.inc:775
+msgid "Up"
+msgstr "nach oben"
+
+#: includes/common.inc:776
+msgid "Move this item up"
+msgstr "Dieses Element nach oben verschieben"
+
+#: includes/common.inc:781
+msgid "Down"
+msgstr "Herunter"
+
+#: includes/common.inc:782
+msgid "Move this item down"
+msgstr "Dieses Element nach unten verschieben"
+
+#: includes/common.inc:788
+msgid "Remove"
+msgstr "Entfernen"
+
+#: includes/common.inc:789
+msgid "Remove this item"
+msgstr "Diesen Beitrag löschen"
+
+#: includes/common.inc:794
+#: includes/display_edit.inc:122;1151
+msgid "Configure"
+msgstr "Konfigurieren"
+
+#: includes/common.inc:795
+msgid "Configure this item"
+msgstr "Diesen Beitrag konfigurieren"
+
+#: includes/common.inc:835
+msgid "Operation"
+msgstr "Operation"
+
+#: includes/common.inc:968
+msgid "Add @type \"@context\""
+msgstr "@type „@context“ hinzufügen"
+
+#: includes/common.inc:1011
+msgid "Edit @type \"@context\""
+msgstr "@type „@context“ bearbeiten"
+
+#: includes/common.inc:1092;1187;1256;1369
+msgid "Enter a name to identify this !type on administrative screens."
+msgstr ""
+
+#: includes/common.inc:1098;1193;1262;1375
+msgid "Keyword"
+msgstr "Schlüsselwort"
+
+#: includes/common.inc:1099;1194;1263;1376
+msgid "Enter a keyword to use for substitution in titles."
+msgstr ""
+
+#: includes/common.inc:1345
+#: includes/plugins.inc:261
+#: panels_mini/panels_mini.module:242;1043
+#: panels_page/panels_page.admin.inc:44
+#: panels_page/panels_page.module:277;287;297;931
+#: panels_views/panels_views.module:124;1427
+#: styles/default.inc:18
+msgid "Default"
+msgstr "Standard"
+
+#: includes/common.inc:1347
+msgid "Ignore it; content that requires this context will not be available."
+msgstr ""
+
+#: includes/common.inc:1348
+msgid "Display page not found."
+msgstr "Die Anzeigeseite wurde nicht gefunden."
+
+#: includes/common.inc:1351
+msgid "If the argument is missing or is not valid, select how this should behave."
+msgstr ""
+
+#: includes/common.inc:1358
+msgid "Enter a title to use when this argument is present. You may use %KEYWORD substitution, where the keyword is specified by the administrator."
+msgstr ""
+
+#: includes/common.inc:1465
+msgid "An error occurred"
+msgstr "Es ist ein Fehler aufgetreten."
+
+#: includes/common.inc:1541
+msgid "Argument @count"
+msgstr "Argument @count"
+
+#: includes/common.inc:1553
+msgid "Context @count"
+msgstr "Kontext @count"
+
+#: includes/common.inc:1564
+msgid "From @title"
+msgstr "von @title"
+
+#: includes/common.inc:0
+msgid "1 year"
+msgid_plural "@count years"
+msgstr[0] "1 Jahr"
+msgstr[1] ""
+
+#: includes/common.inc:0
+msgid "1 week"
+msgid_plural "@count weeks"
+msgstr[0] "1 Woche"
+msgstr[1] ""
+
+#: includes/common.inc:0
+msgid "1 day"
+msgid_plural "@count days"
+msgstr[0] "1 Tag"
+msgstr[1] ""
+
+#: includes/common.inc:0
+msgid "1 hour"
+msgid_plural "@count hours"
+msgstr[0] "1 Stunde"
+msgstr[1] ""
+
+#: includes/common.inc:0
+msgid "1 min"
+msgid_plural "@count min"
+msgstr[0] "1 Minute"
+msgstr[1] ""
+
+#: includes/common.inc:0
+msgid "1 sec"
+msgid_plural "@count sec"
+msgstr[0] "1 Sekunde"
+msgstr[1] ""
+
+#: includes/display_edit.inc:92
+msgid "Grab the title bar of any pane to drag-and-drop it into another panel. Click the add pane button (!addicon) in any panel to add more content. Click the configure (!configicon) button on any pane to re-configure that pane. Click the cache (!cacheicon) button to configure caching for that pane specifically. Click the show/hide (!showicon/!hideicon) toggle button to show or hide that pane. Panes hidden in this way will be hidden from <em>everyone</em> until the hidden status is toggled off."
+msgstr ""
+
+#: includes/display_edit.inc:94;94;128
+msgid "Add content to this panel"
+msgstr "Inhalt zu diesem Panel hinzufügen"
+
+#: includes/display_edit.inc:95;95;122;1151
+msgid "Configure this pane"
+msgstr "Diesen Ausschnitt konfigurieren"
+
+#: includes/display_edit.inc:96;96;119;1155
+msgid "Control caching"
+msgstr "Caching beeinflussen"
+
+#: includes/display_edit.inc:97;97;121
+msgid "Show this pane"
+msgstr "Diesen Ausschnitt anzeigen"
+
+#: includes/display_edit.inc:98;98;121;1159
+msgid "Hide this pane"
+msgstr "Diesen Ausschnitt ausblenden"
+
+#: includes/display_edit.inc:119;1155
+msgid "Caching"
+msgstr "Caching"
+
+#: includes/display_edit.inc:121;1159
+msgid "Show/Hide Toggle"
+msgstr "Umschalter anzeigen/ausblenden"
+
+#: includes/display_edit.inc:123;1162
+msgid "Remove this pane"
+msgstr "Diesen Ausschnitt entfernen"
+
+#: includes/display_edit.inc:128
+msgid "Add content"
+msgstr "Inhalt hinzufügen"
+
+#: includes/display_edit.inc:148
+#: panels_mini/panels_mini.module:314
+#: panels_page/panels_page.admin.inc:152;160
+#: panels_views/panels_views.module:569
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: includes/display_edit.inc:158
+msgid "Hide all"
+msgstr "Alle ausblenden"
+
+#: includes/display_edit.inc:164
+msgid "Show all"
+msgstr "Alle anzeigen"
+
+#: includes/display_edit.inc:170
+msgid "Cache settings"
+msgstr "Cacheeinstellungen"
+
+#: includes/display_edit.inc:244
+msgid "Panel content has been updated."
+msgstr "Panelinhalt wurde aktualisiert."
+
+#: includes/display_edit.inc:312
+msgid "Choose layout"
+msgstr "Layout wählen"
+
+#: includes/display_edit.inc:327;335;460
+msgid "Back"
+msgstr "Zurück"
+
+#: includes/display_edit.inc:344;1247
+msgid "Next"
+msgstr "nächste Seite"
+
+#: includes/display_edit.inc:452
+msgid "Move content in @layout to"
+msgstr ""
+
+#: includes/display_edit.inc:504
+msgid "Panel Title"
+msgstr "Paneltitel"
+
+#: includes/display_edit.inc:513
+msgid "The title of this panel. Your theme will render this text as the main page title when a user views this panel. Note that there are some circumstances in which this title can be overridden elsewhere."
+msgstr ""
+
+#: includes/display_edit.inc:518
+#, fuzzy
+msgid "Hide Title?"
+msgstr "Titel ausblenden?"
+
+#: includes/display_edit.inc:520
+msgid "Check this box to hide the main page title for this panel."
+msgstr ""
+
+#: includes/display_edit.inc:524
+msgid " If you leave this field blank, then the default title, '@title', will be used instead."
+msgstr ""
+
+#: includes/display_edit.inc:632
+msgid "Missing content type"
+msgstr "Fehlender Inhaltstyp"
+
+#: includes/display_edit.inc:633
+msgid "This pane's content type is either missing or has been deleted. This pane will not render."
+msgstr ""
+
+#: includes/display_edit.inc:663
+msgid "Dynamic content previews have been disabled to improve performance and stability for this editing screen."
+msgstr ""
+
+#: includes/display_edit.inc:714
+msgid "Add content to !s"
+msgstr "Inhalt zu !s hinzufügen"
+
+#: includes/display_edit.inc:726
+msgid "Choose type"
+msgstr "Typ auswählen"
+
+#: includes/display_edit.inc:734
+msgid "Contributed modules"
+msgstr ""
+
+#: includes/display_edit.inc:766
+msgid "Contrib modules"
+msgstr ""
+
+#: includes/display_edit.inc:785
+msgid "There are no content types you may add to this display."
+msgstr ""
+
+#: includes/display_edit.inc:913;952
+msgid "Configure !subtype_title"
+msgstr "!subtype_title Konfigurieren"
+
+#: includes/display_edit.inc:1038
+#: panels_page/panels_page.admin.inc:444
+msgid "Access"
+msgstr "Zugriff"
+
+#: includes/display_edit.inc:1041
+msgid "Only the checked roles will be able to see this pane; if no roles are checked, access will not be restricted."
+msgstr "Nur die aktivierten Rollen können diesen Ausschnitt sehen. Sollten keine Rollen aktiviert sein, wird der Zugriff nicht beschränkt."
+
+#: includes/display_edit.inc:1060
+msgid "Add pane"
+msgstr "Ausschnitt hinzufügen"
+
+#: includes/display_edit.inc:1207
+msgid "Select cache method"
+msgstr "Cachingmethode auswählen"
+
+#: includes/display_edit.inc:1227
+msgid "No caching options are available at this time. Please enable a panels caching module in order to use caching options."
+msgstr ""
+
+#: includes/display_edit.inc:1231
+msgid "No caching"
+msgstr "Kein Caching"
+
+#: includes/display_edit.inc:1240
+msgid "Method"
+msgstr "Methode"
+
+#: includes/display_edit.inc:1277
+msgid "Configure cache settings"
+msgstr "Cacheeinstellungen konfigurieren"
+
+#: includes/display_edit.inc:1438
+msgid "Panel settings"
+msgstr "Paneleinstellungen"
+
+#: includes/display_edit.inc:1443
+msgid "Default panel style"
+msgstr "Standardmäßiges Paneldesign"
+
+#: includes/display_edit.inc:1472;1513
+msgid "Edit style settings"
+msgstr ""
+
+#: includes/display_edit.inc:1484
+msgid "Per panel settings"
+msgstr "Einstellungen pro Panel"
+
+#: includes/display_edit.inc:1486
+msgid "If this is checked, each region in the display can have its own style."
+msgstr ""
+
+#: includes/display_edit.inc:1490
+msgid "Use the default panel style"
+msgstr ""
+
+#: includes/display_edit.inc:1573
+msgid "There are no style settings to edit."
+msgstr ""
+
+#: includes/display_edit.inc:1573
+msgid "Edit default style settings"
+msgstr ""
+
+#: includes/display_edit.inc:1585
+msgid "Edit style settings for @style"
+msgstr ""
+
+#: includes/display_edit.inc:1613
+msgid "This style does not have any settings."
+msgstr ""
+
+#: includes/display_edit.inc:1698
+#: panels_page/panels_page.module:508
+msgid "No title"
+msgstr "Kein Seitentitel"
+
+#: includes/plugins.inc:30
+msgid "Unknown context"
+msgstr "Unbekannter Kontext"
+
+#: includes/plugins.inc:111;112
+msgid "No context"
+msgstr "Kein Kontext"
+
+#: includes/plugins.inc:245
+msgid "Deleted/missing content type @type"
+msgstr ""
+
+#: includes/plugins.inc:277
+msgid "Pane style"
+msgstr "Paneldesign"
+
+#: includes/plugins.inc:307
+msgid "You may use %keywords from contexts, as well as %title to contain the original title."
+msgstr ""
+
+#: includes/plugins.inc:316
+#: panels_node/panels_node.module:223
+#: panels_page/panels_page.admin.inc:308
+msgid "CSS ID"
+msgstr "CSS ID"
+
+#: includes/plugins.inc:317
+msgid "CSS ID to apply to this content. This may be blank."
+msgstr "Die für diesen Inhalt zu verwendende CSS-ID. Dies kann leer gelassen werden."
+
+#: includes/plugins.inc:324
+msgid "CSS class"
+msgstr "CSS Klasse"
+
+#: includes/plugins.inc:325
+msgid "CSS class to apply to this content. This may be blank."
+msgstr ""
+
+#: includes/plugins.inc:529
+msgid "Incoming content will be displayed here."
+msgstr "Eingehender Inhalt wird hier angezeigt."
+
+#: includes/plugins.inc:744
+msgid "Does not meet context requirements"
+msgstr ""
+
+#: includes/plugins.inc:1034
+msgid "Context %count"
+msgstr "Kontext %count"
+
+#: includes/plugins.inc:1041
+msgid "Multiple contexts are valid for this pane; one must be chosen."
+msgstr "Dieser Ausschnitt ist in mehreren Zusammenhängen gültig. Einer muss ausgewählt werden."
+
+#: layouts/flexible.inc:10
+msgid "Flexible"
+msgstr "Flexibel"
+
+#: layouts/flexible.inc:30
+#: layouts/threecol_25_50_25_stacked.inc:14
+#: layouts/threecol_33_34_33_stacked.inc:14
+#: layouts/twocol_bricks.inc:21
+#: layouts/twocol_stacked.inc:14
+msgid "Top"
+msgstr "Oben"
+
+#: layouts/flexible.inc:37
+msgid "Left"
+msgstr "Links"
+
+#: layouts/flexible.inc:37
+#: layouts/twocol_bricks.inc:24
+msgid "Middle"
+msgstr "Mitte"
+
+#: layouts/flexible.inc:37
+msgid "Right"
+msgstr "Rechts"
+
+#: layouts/flexible.inc:43
+#: layouts/threecol_25_50_25_stacked.inc:18
+#: layouts/threecol_33_34_33_stacked.inc:18
+#: layouts/twocol_bricks.inc:27
+#: layouts/twocol_stacked.inc:17
+msgid "Bottom"
+msgstr "Unten"
+
+#: layouts/flexible.inc:73
+msgid "<p>Here you may determine the number of rows and columns your layout may have. Each row can have its own number of columns, and each column can have its width set independently. When changing the number of rows or columns, click Save to update the form so you can set the widths for new cells properly.</p><p><strong>Note: Removing cells which contain panes will cause those panes to be disappear. Please move any content you wish to keep.</strong></p>"
+msgstr ""
+
+#: layouts/flexible.inc:78;190
+msgid "Width unit type"
+msgstr "Maßeinheit der Beitenangabe"
+
+#: layouts/flexible.inc:79;191
+msgid "% (percentage)"
+msgstr "% (Prozentsatz)"
+
+#: layouts/flexible.inc:79;191
+msgid "px (pixels)"
+msgstr "px (Pixel)"
+
+#: layouts/flexible.inc:79;191
+msgid "em (current)"
+msgstr "em (Aktuell)"
+
+#: layouts/flexible.inc:80
+msgid "The width unit type this layout can have: %, px or em. When using percentage, your layout will be fluid; when using px or em, your layout will be fixed."
+msgstr ""
+
+#: layouts/flexible.inc:88
+msgid "Total width"
+msgstr "Gesamtbreite"
+
+#: layouts/flexible.inc:89
+msgid "If using the percentage width, choose the total width that this layout must add up to; if you are having problems with your flexible layout having columns fall off, try lowering this number and adjusting the width of individual columns to match."
+msgstr ""
+
+#: layouts/flexible.inc:97
+msgid "Rows"
+msgstr "Zeilen"
+
+#: layouts/flexible.inc:98
+msgid "The number of rows this layout can have."
+msgstr ""
+
+#: layouts/flexible.inc:105
+msgid "Row @d"
+msgstr "Zeile @d"
+
+#: layouts/flexible.inc:113
+msgid "Columns"
+msgstr "Spalten"
+
+#: layouts/flexible.inc:124
+msgid "Width @d"
+msgstr "Breite @d"
+
+#: layouts/flexible.inc:138
+msgid "Column titles, separated by commas"
+msgstr "Titel der Spalten, getrennt nach Kommas"
+
+#: layouts/flexible.inc:145
+msgid "Sidebars"
+msgstr "Seitenleisten"
+
+#: layouts/flexible.inc:155
+msgid "Sidebar left"
+msgstr "linke Seitenleiste"
+
+#: layouts/flexible.inc:168
+msgid "Sidebar right"
+msgstr "rechte Seitenleiste"
+
+#: layouts/flexible.inc:185
+msgid "If a sidebar is selected, enter the width of the sidebar."
+msgstr ""
+
+#: layouts/flexible.inc:192
+msgid "The width unit type activated sidebars will have: %, px or em. When using percentage, your sidebars will be fluid; when using px or em, your sidebars will be fixed."
+msgstr ""
+
+#: layouts/flexible.inc:207
+msgid "Rows must be a positive integer."
+msgstr "„Zeilen“ muss eine positive Zahl sein."
+
+#: layouts/flexible.inc:217
+msgid "Columns must be a positive integer."
+msgstr "Spalten müssen eine positive Zahl sein."
+
+#: layouts/flexible.inc:225
+msgid "Column widths must add up to 100."
+msgstr "Die Spaltenbreiten müssen zusammen 100 ergeben."
+
+#: layouts/flexible.inc:258
+msgid "Left sidebar"
+msgstr "linke Seitenleiste"
+
+#: layouts/flexible.inc:262
+msgid "Right sidebar"
+msgstr "rechte Seitenleiste"
+
+#: layouts/flexible.inc:271
+msgid "Row @row, Column @col"
+msgstr "Zeile @row, Spalte @col"
+
+#: layouts/onecol.inc:10
+msgid "Single column"
+msgstr "Eine Spalte"
+
+#: layouts/onecol.inc:14
+#: layouts/threecol_25_50_25.inc:13
+#: layouts/threecol_25_50_25_stacked.inc:16
+#: layouts/threecol_33_34_33.inc:14
+#: layouts/threecol_33_34_33_stacked.inc:16
+msgid "Middle column"
+msgstr "Mittlere Spalte"
+
+#: layouts/onecol.inc:24
+msgid "Use minimalistic (plain) output"
+msgstr ""
+
+#: layouts/onecol.inc:26
+msgid "Enable this option to output minimal panels display HTML markup."
+msgstr ""
+
+#: layouts/threecol_25_50_25.inc:7
+msgid "Three column 25/50/25"
+msgstr "Drei Spalten 25/50/25"
+
+#: layouts/threecol_25_50_25.inc:12
+#: layouts/threecol_25_50_25_stacked.inc:15
+#: layouts/threecol_33_34_33.inc:13
+#: layouts/threecol_33_34_33_stacked.inc:15
+#: layouts/twocol.inc:14
+#: layouts/twocol_stacked.inc:15
+msgid "Left side"
+msgstr "Linke Spalte"
+
+#: layouts/threecol_25_50_25.inc:14
+#: layouts/threecol_25_50_25_stacked.inc:17
+#: layouts/threecol_33_34_33.inc:15
+#: layouts/threecol_33_34_33_stacked.inc:17
+#: layouts/twocol.inc:15
+#: layouts/twocol_stacked.inc:16
+msgid "Right side"
+msgstr "Rechte Spalte"
+
+#: layouts/threecol_25_50_25_stacked.inc:9
+msgid "Three column 25/50/25 stacked"
+msgstr "Drei Spalten 25/50/25 gestapelt"
+
+#: layouts/threecol_33_34_33.inc:8
+msgid "Three column 33/34/33"
+msgstr "Drei Spalten 33/34/33"
+
+#: layouts/threecol_33_34_33_stacked.inc:9
+msgid "Three column 33/34/33 stacked"
+msgstr "Drei Spalten 33/34/33 gestapelt"
+
+#: layouts/twocol.inc:9
+msgid "Two column"
+msgstr "Zwei Spalten"
+
+#: layouts/twocol_bricks.inc:16
+#, fuzzy
+msgid "Two column bricks"
+msgstr "Zwei Spalten gestapelt"
+
+#: layouts/twocol_bricks.inc:22
+msgid "Left above"
+msgstr "Links oben"
+
+#: layouts/twocol_bricks.inc:23
+msgid "Right above"
+msgstr "Rechts oben"
+
+#: layouts/twocol_bricks.inc:25
+msgid "Left below"
+msgstr "Links unten"
+
+#: layouts/twocol_bricks.inc:26
+msgid "Right below"
+msgstr "Rechts unten"
+
+#: layouts/twocol_stacked.inc:9
+msgid "Two column stacked"
+msgstr "Zwei Spalten gestapelt"
+
+#: panels_export/panels_export.module:20
+msgid "Export panels"
+msgstr "Panels exportieren"
+
+#: panels_export/panels_export.module:23
+msgid "Export panels in bulk."
+msgstr ""
+
+#: panels_export/panels_export.module:64
+msgid "There are no panels to be exported at this time."
+msgstr "Derzeit gibt es keine zu exportierenden Panels."
+
+#: panels_export/panels_export.module:83
+msgid "Module name"
+msgstr "Modulname"
+
+#: panels_export/panels_export.module:84
+msgid "Enter the module name to export code to."
+msgstr ""
+
+#: panels_export/panels_export.module:89
+#: panels_mini/panels_mini.module:180;240
+#: panels_page/panels_page.admin.inc:42
+#: panels_page/panels_page.module:338
+#: panels_views/panels_views.module:68;122
+msgid "Export"
+msgstr "Exportieren"
+
+#: panels_export/panels_export.module:39
+msgid "use panels exporter"
+msgstr ""
+
+#: panels_export/panels_export.module:0
+msgid "panels_export"
+msgstr "panels_export"
+
+#: panels_export/panels_export.info:0
+msgid "Panels exporter"
+msgstr ""
+
+#: panels_export/panels_export.info:0
+msgid "Allows exporting multiple panel pages, mini panels and other types at once."
+msgstr ""
+
+#: panels_mini/panels_mini.module:19
+msgid "You can edit existing mini panels, or click add to create a new one."
+msgstr "Vohandene Mini-Panels können bearbeitet werden oder mit Hinzufügen ein Neues erstellt werden."
+
+#: panels_mini/panels_mini.module:25
+msgid "Mini panels are the small variants of panel pages. Instead of pages, they define blocks."
+msgstr "Mini-Panels sind die kleine Variante von Panelseiten. Dies sind Blöcke im Gegensatz zu Seiten."
+
+#: panels_mini/panels_mini.module:51
+msgid "Create and administer mini panels (panels exposed as blocks)."
+msgstr ""
+
+#: panels_mini/panels_mini.module:55
+#: panels_page/panels_page.module:60
+#: panels_views/panels_views.module:31
+#: styles/list.inc:20
+msgid "List"
+msgstr "Alle anzeigen"
+
+#: panels_mini/panels_mini.module:63
+#: panels_page/panels_page.module:69
+#: panels_views/panels_views.module:39
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: panels_mini/panels_mini.module:70;389
+#: panels_page/panels_page.admin.inc:837
+#: panels_page/panels_page.module:77
+#: panels_views/panels_views.module:61;611
+msgid "Import"
+msgstr "Importieren"
+
+#: panels_mini/panels_mini.module:77;142;484
+#: panels_node/panels_node.module:52
+#: panels_page/panels_page.module:85;227
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: panels_mini/panels_mini.module:115;124
+#: panels_page/panels_page.module:196;206
+msgid "Preview"
+msgstr "Vorschau"
+
+#: panels_mini/panels_mini.module:151
+#: panels_page/panels_page.module:237
+msgid "Layout settings"
+msgstr "Layouteinstellungen"
+
+#: panels_mini/panels_mini.module:171
+#: panels_page/panels_page.module:267
+msgid "Content"
+msgstr "Inhalt"
+
+#: panels_mini/panels_mini.module:189
+msgid "Delete mini panel"
+msgstr "Mini-Panel löschen"
+
+#: panels_mini/panels_mini.module:220
+#: panels_page/panels_page.admin.inc:21
+#: panels_views/panels_views.module:112
+msgid "Name"
+msgstr "Name"
+
+#: panels_mini/panels_mini.module:221
+#: panels_page/panels_page.admin.inc:22
+#: panels_views/panels_views.module:113
+msgid "Type"
+msgstr "Typ"
+
+#: panels_mini/panels_mini.module:223
+#: panels_page/panels_page.admin.inc:25
+#: panels_views/panels_views.module:115
+msgid "Operations"
+msgstr "Operationen"
+
+#: panels_mini/panels_mini.module:239
+#: panels_page/panels_page.admin.inc:41
+#: panels_views/panels_views.module:46;121
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: panels_mini/panels_mini.module:243;1040
+#: panels_page/panels_page.admin.inc:45;147
+#: panels_page/panels_page.module:928
+#: panels_views/panels_views.module:125;1424
+msgid "Overridden"
+msgstr "Übersschrieben"
+
+#: panels_mini/panels_mini.module:243
+#: panels_page/panels_page.admin.inc:45;160
+#: panels_views/panels_views.module:125
+msgid "Revert"
+msgstr "Zurücksetzen"
+
+#: panels_mini/panels_mini.module:248
+#: panels_page/panels_page.admin.inc:50
+#: panels_views/panels_views.module:130
+msgid "Disable"
+msgstr "Deaktivieren"
+
+#: panels_mini/panels_mini.module:251
+#: panels_page/panels_page.admin.inc:53
+#: panels_views/panels_views.module:133
+msgid "Enable"
+msgstr "Aktivieren"
+
+#: panels_mini/panels_mini.module:311
+msgid "Are you sure you want to delete the mini panel \"@title\"?"
+msgstr "Soll das Mini-Panel „@title“ wirklich gelöscht werden?"
+
+#: panels_mini/panels_mini.module:313
+#: panels_page/panels_page.admin.inc:151;159
+#: panels_views/panels_views.module:568
+msgid "This action cannot be undone."
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden."
+
+#: panels_mini/panels_mini.module:368
+msgid "Import panel mini \"@s\""
+msgstr "Mini-Panel „@s“ importieren"
+
+#: panels_mini/panels_mini.module:381
+msgid "Panel mini code"
+msgstr ""
+
+#: panels_mini/panels_mini.module:384
+msgid "Cut and paste the results of an exported mini panel here."
+msgstr ""
+
+#: panels_mini/panels_mini.module:405
+msgid "Import mini panel \"@s\""
+msgstr "Mini-Panel „@s“ importieren"
+
+#: panels_mini/panels_mini.module:414
+msgid "Unable to get a mini panel out of that."
+msgstr ""
+
+#: panels_mini/panels_mini.module:490
+msgid "Mini panel title"
+msgstr "Titel des Mini-Panels"
+
+#: panels_mini/panels_mini.module:491
+msgid "The title for this mini panel. It can be overridden in the block configuration."
+msgstr "Der Titel für dieses Mini-Panel. Dieser kann in der Blockkonfiguration überschrieben werden."
+
+#: panels_mini/panels_mini.module:498
+msgid "Mini panel name"
+msgstr "Name des Mini-Panels"
+
+# alpha?
+#: panels_mini/panels_mini.module:499
+#: panels_page/panels_page.admin.inc:292
+#, fuzzy
+msgid "A unique name used to identify this panel page internally. It must be only be alpha characters and underscores. No spaces, numbers or uppercase characters."
+msgstr "Ein eindeutliger Name der Intern zur Identifizierung dieses Panelseite genutzt wird. Dieser darf nur Alpha-Zeichen und Unterstriche enthalten. Keine Leerzeichen, Zahlen oder Großbuchstaben."
+
+#: panels_mini/panels_mini.module:506
+msgid "Mini panel category"
+msgstr ""
+
+#: panels_mini/panels_mini.module:507
+msgid "The category that this mini-panel will be grouped into on the Add Content form. Only upper and lower-case alphanumeric characters are allowed. If left blank, defaults to 'Mini panels'."
+msgstr ""
+
+#: panels_mini/panels_mini.module:543;668;691;784
+#: panels_page/panels_page.admin.inc:321;540;570;620;682;734
+msgid "Save and proceed"
+msgstr "Speichern und fortfahren"
+
+#: panels_mini/panels_mini.module:558
+msgid "Panel mini name is required."
+msgstr ""
+
+#: panels_mini/panels_mini.module:561
+#: panels_page/panels_page.admin.inc:340
+#: panels_views/panels_views.module:526
+msgid "Name must be alphanumeric or underscores only."
+msgstr "Der Name darf nur alphanumerische Zeichen oder Unterstriche enthalten."
+
+# not literally: alphanumerics chars
+#: panels_mini/panels_mini.module:564
+msgid "Categories may contain only alphanumerics or spaces."
+msgstr "Kategorien dürfen nur alphanumerische Zeichen oder Leerzeichen enthalten."
+
+#: panels_mini/panels_mini.module:572
+#: panels_page/panels_page.admin.inc:344
+#: panels_views/panels_views.module:534
+msgid "Panel name must be unique."
+msgstr "Der Panelname muss eindeutig sein."
+
+#: panels_mini/panels_mini.module:601
+msgid "Your new mini panel %title has been saved."
+msgstr "Das neue Mini-Panel „%title“ wurde gespeichert."
+
+#: panels_mini/panels_mini.module:705
+msgid "Panel mini enabled"
+msgstr "Mini-Panel wurde aktiviert"
+
+#: panels_mini/panels_mini.module:719
+msgid "Panel mini disabled"
+msgstr "Mini-Panel wurde deaktiviert"
+
+#: panels_mini/panels_mini.module:816
+msgid "Mini panel: %title (Title will be hidden)"
+msgstr "Mini-Panel: %titel (Titel wird versteckt)"
+
+#: panels_mini/panels_mini.module:816
+msgid "Mini panel: %title"
+msgstr "Mini-Panel: %title"
+
+#: panels_mini/panels_mini.module:868
+msgid "Mini panel"
+msgstr "Mini-Panel"
+
+#: panels_mini/panels_mini.module:959
+msgid "Deleted/missing mini panel @name"
+msgstr "Gelöschtes/Fehlendes Mini-Panel @name"
+
+#: panels_mini/panels_mini.module:964
+msgid "Untitled mini panel"
+msgstr "Mini-Panel ohne Titel"
+
+#: panels_mini/panels_mini.module:1028
+#: panels_page/panels_page.module:916
+#: panels_views/panels_views.module:1410
+msgid "Local"
+msgstr "Lokal"
+
+#: panels_mini/panels_mini.module:36
+msgid "create mini panels"
+msgstr "Mini-Panels erstellen"
+
+#: panels_mini/panels_mini.module:36
+msgid "administer mini panels"
+msgstr "Mini-Panels bearbeiten"
+
+#: panels_mini/panels_mini.module:0
+msgid "panels_mini"
+msgstr "panels_mini"
+
+#: panels_mini/panels_mini.install:156
+msgid "It does NOT matter if the following query fails. If it fails, it means you did not have a duplicate 'name_2' index, and trying to remove a non-existent index does not harm, alter, or otherwise affect your database in any way. If it succeeds, then the duplicate index is gone, and your table is as it should be."
+msgstr ""
+
+#: panels_mini/panels_mini.info:0
+msgid "Create mini panels that can be used as blocks."
+msgstr "Erstelle Mini-Panels, die als Blöcke verwendet werden können."
+
+#: panels_node/panels_node.module:30;99;138
+msgid "Panel"
+msgstr "Panel"
+
+#: panels_node/panels_node.module:40
+msgid "Information about panel nodes."
+msgstr "Informationen zu Panelbeiträgen."
+
+#: panels_node/panels_node.module:45
+msgid "Information"
+msgstr "Information"
+
+#: panels_node/panels_node.module:53
+msgid "Configure panel node content availability."
+msgstr ""
+
+#: panels_node/panels_node.module:66
+msgid "Panel layout"
+msgstr "Panellayout"
+
+#: panels_node/panels_node.module:76
+msgid "Panel layout settings"
+msgstr "Einstellungen für Panellayout"
+
+#: panels_node/panels_node.module:86
+msgid "Panel content"
+msgstr "Panelinhalt"
+
+#: panels_node/panels_node.module:114
+msgid "Panel nodes do not have a normal administrative UI, such as panels pages or mini panels. With this module, a new node type is created: a \"panel\" node. These are nodes that have panel layouts, but do not have the breadth of features that panel pages do; these features are sacrificed so that you gain all the capabilities of nodes."
+msgstr ""
+
+#: panels_node/panels_node.module:116
+msgid "You may create a !panel_node using the normal !create_content menu, and you can administer your panel nodes under the normal !administer_nodes menu (administrative permission required)."
+msgstr ""
+
+#: panels_node/panels_node.module:117
+msgid "panel node"
+msgstr "Panelbeitrag"
+
+#: panels_node/panels_node.module:118
+msgid "create content"
+msgstr "Inhalt erstellen"
+
+#: panels_node/panels_node.module:119
+msgid "administer nodes"
+msgstr "Inhalt verwalten"
+
+#: panels_node/panels_node.module:122
+msgid "On the !settings page, you may control which panes may be added to panel nodes; this can be very valuable to limit what content is available if your users who can create panel nodes are not administrators."
+msgstr ""
+
+#: panels_node/panels_node.module:123
+msgid "settings"
+msgstr "Einstellungen"
+
+#: panels_node/panels_node.module:141
+msgid "A panel a page layout broken up into rows and columns."
+msgstr ""
+
+#: panels_node/panels_node.module:210
+msgid "The teaser is a piece of text to describe when the panel is listed (such as when promoted to front page); the actual content will only be displayed on the full node view."
+msgstr ""
+
+#: panels_node/panels_node.module:225
+msgid "An ID that can be used by CSS to style the panel."
+msgstr "Eine im CSS zu verwendende ID zum Designen des Panel."
+
+#: panels_node/panels_node.module:236
+msgid "Please select a layout."
+msgstr "Ein Layout auswählen."
+
+#: panels_node/panels_node.module:20
+msgid "create panel-nodes"
+msgstr "Panelbeiträge erstellen"
+
+#: panels_node/panels_node.module:20
+msgid "edit own panel-nodes"
+msgstr "Eigene Panelbeiträge bearbeiten"
+
+#: panels_node/panels_node.module:20
+msgid "administer panel-nodes"
+msgstr "Panelbeiträge verwalten"
+
+#: panels_node/panels_node.module:0
+msgid "panels_node"
+msgstr "panels_node"
+
+#: panels_node/panels_node.info:0
+msgid "Create nodes that are divided into areas with selectable content."
+msgstr "Erstelle Beiträge, welche in Bereiche mit auswählbarem Inhalt unterteilt sind."
+
+#: panels_node_legacy/panels_node_legacy.module:20
+#: panels_node_legacy/panels_node_legacy.info:0
+msgid "Legacy node panes"
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:24
+msgid "Information about the legacy node content type."
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:35
+msgid "Panels legacy nodes does not have a normal administrative UI, such as panels pages or mini panels. With this module, users may add a node directly to a panel via the add content interface. They may then select this node using an auto-complete field. In general, this method of adding nodes to panes should be considered deprecated (especially by module developers implementing the Panels API) and is only retained to support updating sites that use this older method. Moving forward, it is recommended that the context system be used to embed nodes, as that is far more powerful and interesting."
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:36
+msgid "However, certain modules which make use of Panels are dependent on this method of getting node context (often without the developer even being aware of it), so it is important to emphasize that you CAN leave this module enabled without negatively impacting your site."
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:126
+msgid "Add a node from your site as content."
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:141
+msgid "To use a NID from the URL, you may use %0, %1, ..., %N to get URL arguments. Or use @0, @1, @2, ..., @N to use arguments passed into the panel."
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:163
+msgid "Check here to show only the node teaser"
+msgstr "Aktivieren, um nur den Anrisstext des Beitrages anzuzeigen."
+
+#: panels_node_legacy/panels_node_legacy.module:175
+msgid "Leave node title"
+msgstr "Beitragstitel beibehalten"
+
+#: panels_node_legacy/panels_node_legacy.module:176
+msgid "Advanced: if checked, do not touch the node title; this can cause the node title to appear twice unless your theme is aware of this."
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:200
+msgid "Invalid node"
+msgstr "Ungültiger Beitrag"
+
+#: panels_node_legacy/panels_node_legacy.module:210
+msgid "Node loaded from @var"
+msgstr "Beitrag wurde von @var geladen"
+
+#: panels_node_legacy/panels_node_legacy.module:218
+msgid "Deleted/missing node @nid"
+msgstr ""
+
+#: panels_node_legacy/panels_node_legacy.module:0
+msgid "panels_node_legacy"
+msgstr "panels_node_legacy"
+
+#: panels_node_legacy/panels_node_legacy.info:0
+msgid "Allows embedding specific nodes into panes without using contexts. This module provides backwards compatibility for older Panels API implementations; you should only enable it if your Panels editor is mysteriously without node-related data."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:20;300
+msgid "Page title"
+msgstr "Seitentitel"
+
+#: panels_page/panels_page.admin.inc:24
+msgid "URL"
+msgstr "URL"
+
+#: panels_page/panels_page.admin.inc:118
+msgid "Panel page enabled"
+msgstr "Panelseite wurde aktiviert"
+
+#: panels_page/panels_page.admin.inc:132
+msgid "Panel page disabled"
+msgstr "Panelseite wurde deaktiviert"
+
+#: panels_page/panels_page.admin.inc:149
+msgid "Are you sure you want to delete \"@title\"?"
+msgstr "Soll „@title“ wirklich gelöscht werden?"
+
+#: panels_page/panels_page.admin.inc:157
+msgid "Are you sure you want to revert \"@title\" to its default setup?"
+msgstr "Soll „@title“ wirklich auf die Standardkonfiguration zurückgesetzt werden?"
+
+#: panels_page/panels_page.admin.inc:184
+msgid "The chosen layout %layout is invalid. Please select a new one."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:201
+msgid "Add panel page"
+msgstr "Panelseite hinzufügen"
+
+#: panels_page/panels_page.admin.inc:253
+msgid "Page settings"
+msgstr "Seiteneinstellungen"
+
+#: panels_page/panels_page.admin.inc:291
+msgid "Panel name"
+msgstr "Panelname"
+
+#: panels_page/panels_page.admin.inc:301
+msgid "The page title for this panels layout. It will be used as the main title on this panel page, unless it is overriden later."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:309
+msgid "The CSS ID to apply to this page"
+msgstr "Die CSS ID, welche auf diese Seite angewendet werden soll"
+
+#: panels_page/panels_page.admin.inc:316
+msgid "Path"
+msgstr "Pfad"
+
+#: panels_page/panels_page.admin.inc:317
+msgid "The URL path to give this page, i.e, path/to/page. You may use \"%\" as an argument placeholder: i.e, node/%/panel"
+msgstr "Der URL Pfad den diese Seite erhalten soll, z.b.: pfad/zu/seite. Als Argumentplatzhalter kann „%“ verwendet werden, z.b.: node/%/panel"
+
+#: panels_page/panels_page.admin.inc:337
+msgid "Panel name is required."
+msgstr "Ein Panelname ist erforderlich."
+
+#: panels_page/panels_page.admin.inc:351
+msgid "Path is required."
+msgstr "Der Pfad ist erforderlich."
+
+#: panels_page/panels_page.admin.inc:355
+msgid "Path may not be the same as another panel page path."
+msgstr "Der Pfad sollte nicht gleich sein mit dem Pfad einer anderen Panelseite."
+
+#: panels_page/panels_page.admin.inc:358
+msgid "The path you have chosen is already aliased to @src."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:376
+msgid "Your new panel page %title has been saved."
+msgstr "Die neue Panelseite „%title“ wurde gespeichert."
+
+#: panels_page/panels_page.admin.inc:426
+msgid "Advanced settings"
+msgstr "Erweiterte Einstellungen"
+
+#: panels_page/panels_page.admin.inc:432
+msgid "Disable Drupal blocks/regions"
+msgstr "Drupal-Blöcke/Regionen deaktivieren"
+
+#: panels_page/panels_page.admin.inc:433
+msgid "Check this to have the panel page disable all regions displayed in the theme."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:447
+msgid "Only the checked roles will be able to see this panel in any form; if no roles are checked, access will not be restricted."
+msgstr "Nur die aktivierten Rollen können dieses Panel in jeglicher Art sehen; Wenn keine Rollen aktiviert sind, wird der Zugriff nicht beschränkt."
+
+#: panels_page/panels_page.admin.inc:452
+msgid "CSS code"
+msgstr "CSS Code"
+
+#: panels_page/panels_page.admin.inc:453
+msgid "Enter well-formed CSS code here; this code will be embedded into the page, and should only be used for minor adjustments; it is usually better to try to put CSS for the page into the theme if possible."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:460
+msgid "Menu"
+msgstr "Menü"
+
+#: panels_page/panels_page.admin.inc:465
+msgid "Provide Menu"
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:468
+msgid "If checked this panel be given a menu entry in the Drupal menu system. If not checked the data in this group will be ignored."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:473
+msgid "Provide Menu as Tab"
+msgstr "Menü als Karteireiter bereitstellen"
+
+#: panels_page/panels_page.admin.inc:476
+msgid "If checked this panel's menu entry will be provided as a tab rather than in the main menu system."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:481;525
+msgid "Tab Weight"
+msgstr "Karteireitergewichtung"
+
+#: panels_page/panels_page.admin.inc:484
+msgid "If this is a menu tab, select the weight; lower numbers will be further to the left."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:489
+msgid "Menu Title"
+msgstr "Menütitel"
+
+#: panels_page/panels_page.admin.inc:493
+msgid "Enter the title to use for the menu entry or tab. If blank, the page title will be used."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:500
+msgid "Default Menu Tab"
+msgstr "Standardmäßiger Menüreiter"
+
+#: panels_page/panels_page.admin.inc:505
+msgid "Make Default Menu Tab"
+msgstr "Standard Menü als Karteireiter bereitstellen"
+
+#: panels_page/panels_page.admin.inc:508
+msgid "If checked this panel's menu entry will be provided as a tab, and will be the default tab for that URL path. For example, if the URL is 'tracker/all' and it is set as the default menu tab, it will be put into the menu as 'tracker' and 'tracker/all' will be the default tab. The following settings allow you to customize the parent item, for example 'tracker'. For tabs to work properly, one tab in the group must be set as the default."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:513;537
+msgid "Parent Menu Item Type"
+msgstr "Übergeordneter Menüpunkttyp"
+
+#: panels_page/panels_page.admin.inc:516;537
+msgid "Tab"
+msgstr "Tabulator"
+
+#: panels_page/panels_page.admin.inc:517;537
+msgid "Normal menu item"
+msgstr "Normaler Menüpunkt"
+
+#: panels_page/panels_page.admin.inc:518
+msgid "Already exists (don't create)"
+msgstr "Schon vorhanden (nicht erstellen)"
+
+#: panels_page/panels_page.admin.inc:520
+msgid "Select type of parent item to use for this default menu tab. You can either specify the parent should be a tab (the default), a normal menu item, or to use the menu item that already exists at the specified URL. For example, if the URL for the default tab is 'tracker/all', then 'tracker' would already have to be a valid menu item to use this final choice."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:528
+msgid "If the parent menu item is a tab, select the weight; lower numbers will be further to the left."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:533
+msgid "Parent Menu Item Title"
+msgstr "Titel des übergeordneten Menüpunktes"
+
+#: panels_page/panels_page.admin.inc:537
+msgid "If the Parent Menu Item is being defined by this panel (if you set the %type_field to either %tab or %menu), you can specify its title here.  If blank, the menu title will be used if that is defined, or the page title if not."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:675
+msgid "Removed unused display @title"
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:816;853
+msgid "Import panel page \"@s\""
+msgstr "Panelseite „@s“ importieren"
+
+#: panels_page/panels_page.admin.inc:829
+msgid "Panel page code"
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:832
+msgid "Cut and paste the results of an exported panel page here."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:862
+msgid "Unable to get a panel page out of that."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:871
+msgid "Administrative view: enter arguments"
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:887
+msgid "Click to see the real panel page."
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:891
+msgid "Real panel URL"
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:901
+msgid "Required argument (occupies %-placeholder number !position)"
+msgstr ""
+
+#: panels_page/panels_page.admin.inc:901
+msgid "Optional argument"
+msgstr "Optionales Argument"
+
+#: panels_page/panels_page.admin.inc:922
+msgid "Additional arguments"
+msgstr "Weitere Argumente"
+
+#: panels_page/panels_page.admin.inc:923
+msgid "Separated by /"
+msgstr "Abgetrennt mit /"
+
+#: panels_page/panels_page.admin.inc:929
+msgid "Change arguments"
+msgstr "Argumente ändern"
+
+#: panels_page/panels_page.admin.inc:880
+msgid "1 argument is missing to generate a valid URL."
+msgid_plural "@count arguments are missing to generate a valid URL."
+msgstr[0] "1 Argument zum Erstellen einer gültigen URL ist nicht vorhanden."
+msgstr[1] "@count Argumente zum Erstellen einer gültigen URL sind nicht vorhanden."
+
+#: panels_page/panels_page.module:22
+msgid "You may peruse a list of your current panels layouts and edit them, or click add to create a new page."
+msgstr "Die Liste der aktuellen Panel-Layouts kann überprüft, bearbeitet oder eine neue Seite erstellt werden."
+
+#: panels_page/panels_page.module:28
+msgid "Choose a layout for your new page from the list below."
+msgstr "Ein Layout für die neue Seite von der unten aufgeführten Liste auswählen."
+
+#: panels_page/panels_page.module:56
+msgid "Create and administer panel-pages (complex layout pages with URLs)."
+msgstr ""
+
+#: panels_page/panels_page.module:247
+msgid "Advanced"
+msgstr "Erweitert"
+
+#: panels_page/panels_page.module:347
+msgid "Delete panel page"
+msgstr "Panelseite löschen"
+
+#: panels_page/panels_page.module:610
+msgid "Edit panel"
+msgstr "Panel bearbeiten"
+
+#: panels_page/panels_page.module:696
+msgid "Page reports \"Page not found\" due to argument restrictions"
+msgstr ""
+
+#: panels_page/panels_page.module:39
+msgid "create panel-pages"
+msgstr "Panelseite erstellen"
+
+#: panels_page/panels_page.module:39
+msgid "access all panel-pages"
+msgstr "Zugriff auf alle Panelseiten"
+
+#: panels_page/panels_page.module:0
+msgid "panels_page"
+msgstr "panels_page"
+
+#: panels_page/panels_page.info:0
+msgid "Create pages that are divided into areas of the page."
+msgstr "Erstelle Seiten, welche in Bereiche der Seite unterteilt sind."
+
+#: panels_simple_cache/panels_simple_cache.module:18;45
+msgid "Simple cache"
+msgstr "Einfacher Cache"
+
+#: panels_simple_cache/panels_simple_cache.module:22
+msgid "Information about Panels simple cache."
+msgstr ""
+
+#: panels_simple_cache/panels_simple_cache.module:33
+msgid "Panels simple cache does not have a normal administrative UI, such as panels pages or mini panels. With this module, you are given the option to add caching features to any panel display in panel pages, mini panels, panel nodes or any other displays provided by other modules or plugins. These options are available as an icon on each pane of the edit content pane."
+msgstr ""
+
+#: panels_simple_cache/panels_simple_cache.module:35
+msgid "This module provides only very simple, time-based caching; it is not at all suitable if your content will change at all per user (and this can mean administrative additions that are just visible to you) as all users will see the same content; it is provided mostly as a reference implementation for other, smarter caching modules."
+msgstr ""
+
+#: panels_simple_cache/panels_simple_cache.module:46
+msgid "Simple caching is a time-based cache. This is a hard limit, and once cached it will remain that way until the time limit expires."
+msgstr ""
+
+#: panels_simple_cache/panels_simple_cache.module:141
+msgid "Lifetime"
+msgstr "Lebensdauer"
+
+#: panels_simple_cache/panels_simple_cache.module:148
+msgid "Granularity"
+msgstr "Beschaffenheit"
+
+#: panels_simple_cache/panels_simple_cache.module:149
+msgid "select"
+msgstr "Auswählen"
+
+#: panels_simple_cache/panels_simple_cache.module:153
+msgid "None"
+msgstr "Keines"
+
+#: panels_simple_cache/panels_simple_cache.module:155
+msgid "If \"arguments\" are selected, this content will be cached per individual argument to the entire display; if \"contexts\" are selected, this content will be cached per unique context in the pane or display; if \"neither\" there will be only one cache for this pane."
+msgstr ""
+
+#: panels_simple_cache/panels_simple_cache.module:0
+msgid "panels_simple_cache"
+msgstr "panels_simple_cache"
+
+#: panels_simple_cache/panels_simple_cache.info:0
+msgid "Panels simple cache"
+msgstr "Einfacher Panelcache"
+
+#: panels_simple_cache/panels_simple_cache.info:0
+msgid "Adds the simple cache as an option when configuring panel panes."
+msgstr ""
+
+#: panels_views/panels_views.module:27
+msgid "Configure Views to be used as panes within panel displays."
+msgstr ""
+
+#: panels_views/panels_views.module:114;704
+msgid "View"
+msgstr "Anzeigen"
+
+#: panels_views/panels_views.module:196
+msgid "Create panel view"
+msgstr "Panelansicht erstellen"
+
+#: panels_views/panels_views.module:232
+msgid "Edit '@title'"
+msgstr "„@title“ bearbeiten"
+
+#: panels_views/panels_views.module:245
+msgid "Basic information"
+msgstr "Basisinformation"
+
+#: panels_views/panels_views.module:262
+msgid "Panel view name"
+msgstr ""
+
+#: panels_views/panels_views.module:263
+msgid "Enter a unique name for this view pane. It must contain only letters and numbers."
+msgstr ""
+
+#: panels_views/panels_views.module:269
+msgid "Panel view title"
+msgstr ""
+
+#: panels_views/panels_views.module:270
+msgid "The title of the pane; this will appear in the add content dialog."
+msgstr ""
+
+#: panels_views/panels_views.module:276
+msgid "Description"
+msgstr "Beschreibung"
+
+#: panels_views/panels_views.module:277
+msgid "This description will be shown to the user when as a hover tip when adding this pane."
+msgstr ""
+
+#: panels_views/panels_views.module:283
+msgid "Category"
+msgstr "Kategorie"
+
+#: panels_views/panels_views.module:284
+msgid "The category this view will appear in using the add content dialog."
+msgstr ""
+
+#: panels_views/panels_views.module:291
+msgid "Category weight"
+msgstr "Kategoriereihenfolge"
+
+#: panels_views/panels_views.module:292
+msgid "The weight of the category; lower numbers will appear closer to the top of the dialog."
+msgstr ""
+
+#: panels_views/panels_views.module:299;961
+#: panels_views_legacy/panels_views_legacy.module:241
+msgid "View type"
+msgstr "Ansichtstyp"
+
+#: panels_views/panels_views.module:300;962
+#: panels_views_legacy/panels_views_legacy.module:242
+#, fuzzy
+msgid "Select which type of the view to display."
+msgstr "Den Typ einer Ansicht auswählen, der angezeigt werden soll."
+
+#: panels_views/panels_views.module:301;963
+#: panels_views_legacy/panels_views_legacy.module:243
+msgid "Page"
+msgstr "Seite"
+
+#: panels_views/panels_views.module:301;963
+#: panels_views_legacy/panels_views_legacy.module:243
+msgid "Embedded"
+msgstr "Eingebettet"
+
+#: panels_views/panels_views.module:314
+msgid "Any context"
+msgstr "Jeder Zusammenhang"
+
+#: panels_views/panels_views.module:324
+msgid "Argument: @arg"
+msgstr "Argument: @arg"
+
+#: panels_views/panels_views.module:331
+msgid "Argument wildcard"
+msgstr "Argumentplatzhalter"
+
+#: panels_views/panels_views.module:332
+msgid "No argument"
+msgstr "Kein Argument"
+
+#: panels_views/panels_views.module:333
+msgid "From context"
+msgstr "Aus dem Zusammenhang"
+
+#: panels_views/panels_views.module:334
+msgid "From panel argument"
+msgstr "Aus dem Panelargument"
+
+#: panels_views/panels_views.module:335
+msgid "Fixed"
+msgstr "Fixiert"
+
+#: panels_views/panels_views.module:336
+msgid "Input on pane config"
+msgstr ""
+
+#: panels_views/panels_views.module:338
+msgid "Argument source"
+msgstr "Argumentquelle"
+
+#: panels_views/panels_views.module:343
+msgid "Required context"
+msgstr "Zusammenhang erforderlich"
+
+#: panels_views/panels_views.module:344
+msgid "If \"From context\" is selected, which context to require."
+msgstr ""
+
+#: panels_views/panels_views.module:350
+msgid "Panel argument"
+msgstr "Panelargument"
+
+#: panels_views/panels_views.module:351
+msgid "If \"From panel argument\" is selected, which panel argument to use."
+msgstr ""
+
+#: panels_views/panels_views.module:353
+msgid "First"
+msgstr "Erstes"
+
+#: panels_views/panels_views.module:353
+msgid "Second"
+msgstr "Zweites"
+
+#: panels_views/panels_views.module:353
+msgid "Third"
+msgstr "Drittes"
+
+#: panels_views/panels_views.module:353
+msgid "Fourth"
+msgstr "Viertes"
+
+#: panels_views/panels_views.module:353
+msgid "Fifth"
+msgstr "Fünftes"
+
+#: panels_views/panels_views.module:353
+msgid "Sixth"
+msgstr "Sechstes"
+
+#: panels_views/panels_views.module:357
+msgid "Fixed argument"
+msgstr "Fixiertes Argument"
+
+#: panels_views/panels_views.module:358
+msgid "If \"Fixed\" is selected, what to use as an argument."
+msgstr ""
+
+#: panels_views/panels_views.module:363
+msgid "Label"
+msgstr "Bezeichnung"
+
+#: panels_views/panels_views.module:364
+msgid "If this argument is presented to the panels user, what label to apply to it."
+msgstr ""
+
+#: panels_views/panels_views.module:371
+msgid "Paging information"
+msgstr ""
+
+#: panels_views/panels_views.module:376;1004
+#: panels_views_legacy/panels_views_legacy.module:272
+msgid "Use pager"
+msgstr "Seitennavigation verwenden"
+
+#: panels_views/panels_views.module:377
+#, fuzzy
+msgid "Use a pager with this view"
+msgstr "Eine Seitennavigation bei dieser Ansicht verwenden"
+
+#: panels_views/panels_views.module:383;1011
+#: panels_views_legacy/panels_views_legacy.module:279
+msgid "Pager ID"
+msgstr "Pager ID"
+
+#: panels_views/panels_views.module:384
+msgid "If using a pager, what pager ID to use; every pager on the page should be unique and you should always use the lowest pager ID available. Use 0 if at all possible."
+msgstr ""
+
+#: panels_views/panels_views.module:390
+msgid "Allow the pane configuration to modify the use pager setting."
+msgstr ""
+
+#: panels_views/panels_views.module:396
+msgid "Items to display"
+msgstr "Anzuzeigende Einträge"
+
+#: panels_views/panels_views.module:397
+msgid "The maximum number of nodes to display."
+msgstr "Die maximale Anzahl der anzuzeigenden Beiträge."
+
+#: panels_views/panels_views.module:403
+msgid "Allow the pane configuration to modify the items to display setting"
+msgstr ""
+
+#: panels_views/panels_views.module:409;1032
+#: panels_views_legacy/panels_views_legacy.module:298
+msgid "Offset"
+msgstr "Offset"
+
+#: panels_views/panels_views.module:410;1034
+msgid "Enter the item number to start at; this option only works if \"use pager\" is not checked. Enter 0 to start at the first item, 1 to start at the second, etc."
+msgstr ""
+
+#: panels_views/panels_views.module:416
+msgid "Allow the pane configuration to modify the offset setting"
+msgstr ""
+
+#: panels_views/panels_views.module:422
+msgid "Pane decorations"
+msgstr "Ausschnittsausstattung"
+
+#: panels_views/panels_views.module:427
+msgid "Link to view"
+msgstr "Zur Ansicht verlinken"
+
+#: panels_views/panels_views.module:428
+msgid "If checked, link the title of the pane to the view."
+msgstr "Sobald aktiviert, wird der Titel des Ausschnitts zur Ansicht verlinken."
+
+#: panels_views/panels_views.module:434
+msgid "Allow the pane configuration to modify the link to view setting."
+msgstr ""
+
+#: panels_views/panels_views.module:440
+msgid "More link"
+msgstr "„Mehr“-Link?"
+
+#: panels_views/panels_views.module:441
+msgid "If checked, Panels will provide a \"more\" link that links to the view URL; this is different from the view's \"more\" link which will automatically be disabled."
+msgstr ""
+
+#: panels_views/panels_views.module:447
+msgid "Allow the pane configuration to modify the \"more\" link setting."
+msgstr ""
+
+#: panels_views/panels_views.module:453
+msgid "More link text"
+msgstr "Text des „Mehr“-Links"
+
+#: panels_views/panels_views.module:454
+msgid "If you checked the above box allowing Panels to provide its own \"more\" link, Panels will render that link using the text you enter here. If left blank, defaults to \"more\"."
+msgstr ""
+
+#: panels_views/panels_views.module:460
+msgid "Allow the pane configuration to modify the \"more\" link text."
+msgstr ""
+
+#: panels_views/panels_views.module:466
+msgid "Show feed icons"
+msgstr "Feed-Icons anzeigen"
+
+#: panels_views/panels_views.module:467
+msgid "If checked, any feed icons provided by the view will be visible in the pane."
+msgstr ""
+
+#: panels_views/panels_views.module:473
+msgid "Allow the pane configuration to modify the feed icon setting."
+msgstr ""
+
+#: panels_views/panels_views.module:479
+msgid "Override the panel URL with a manually set URL."
+msgstr ""
+
+#: panels_views/panels_views.module:485
+msgid "Override view URL"
+msgstr "URL der Ansicht übersteuern"
+
+#: panels_views/panels_views.module:486
+msgid "If override URL is set, the URL the view thinks it is using; all \"more\", \"exposed filters\", \"summary\" and \"feed\" type links will use this URL."
+msgstr ""
+
+#: panels_views/panels_views.module:486;1045
+msgid "You may use $arg to pass panel arguments to the view."
+msgstr ""
+
+#: panels_views/panels_views.module:492
+msgid "Allow the pane configuration to modify the URL override setting."
+msgstr ""
+
+#: panels_views/panels_views.module:498;1051
+msgid "Set view URL to panel URL"
+msgstr ""
+
+#: panels_views/panels_views.module:499
+msgid "If checked, the URL of the view will be changed to the URL of the panel; this setting is ignored if the \"Override view URL\" setting, above, is set or allowed."
+msgstr ""
+
+#: panels_views/panels_views.module:505
+msgid "Allow the pane configuration to modify the \"set view URL to panel URL\" setting."
+msgstr ""
+
+#: panels_views/panels_views.module:523
+msgid "Panel view name is required."
+msgstr "Der Name der Panelansicht ist erforderlich."
+
+#: panels_views/panels_views.module:549
+msgid "The panel view has been saved."
+msgstr "Die Panelansicht wurde gespeichert."
+
+#: panels_views/panels_views.module:566
+msgid "Are you sure you want to delete the panel view \"@title\"?"
+msgstr "Soll die Panelansicht „@title“ wirklich gelöscht werden?"
+
+#: panels_views/panels_views.module:589;633
+msgid "Import panel view \"@s\""
+msgstr "Panelansicht „@s“ importieren"
+
+#: panels_views/panels_views.module:603
+msgid "Panel view code"
+msgstr "Code der Panelansicht"
+
+#: panels_views/panels_views.module:606
+msgid "Cut and paste the results of an exported panel view here."
+msgstr ""
+
+#: panels_views/panels_views.module:629
+msgid "Unable to load the view for that import. Be sure the view already exists in your system."
+msgstr ""
+
+#: panels_views/panels_views.module:640
+msgid "Unable to get a panel view out of that."
+msgstr ""
+
+#: panels_views/panels_views.module:677
+msgid "Panel view enabled"
+msgstr "Panelansicht wurde aktiviert"
+
+#: panels_views/panels_views.module:691
+msgid "Panel view disabled"
+msgstr "Panelansicht wurde deaktiviert"
+
+#: panels_views/panels_views.module:742
+#: panels_views_legacy/panels_views_legacy.module:176;200
+msgid "Views"
+msgstr "Ansichten"
+
+#: panels_views/panels_views.module:881
+#: panels_views_legacy/panels_views_legacy.module:134
+msgid "Edit view"
+msgstr "Ansicht bearbeiten"
+
+#: panels_views/panels_views.module:882
+#: panels_views_legacy/panels_views_legacy.module:135
+msgid "Edit this view"
+msgstr "Diese Ansicht bearbeiten"
+
+#: panels_views/panels_views.module:898
+msgid "The view for this pane is not valid or has been deleted from the system. This pane cannot render; you must either delete this pane or restore the panel view. If you save this pane and then restore the panel view, your settings may be lost."
+msgstr ""
+
+#: panels_views/panels_views.module:970
+#: panels_views_legacy/panels_views_legacy.module:249
+msgid "Link title to view"
+msgstr "Titel zur Ansicht verlinken"
+
+#: panels_views/panels_views.module:971
+#: panels_views_legacy/panels_views_legacy.module:250
+msgid "If checked, the title will be a link to the view."
+msgstr "Sobald aktiviert, wird der Titel ein Link zur Ansicht."
+
+#: panels_views/panels_views.module:978
+#: panels_views_legacy/panels_views_legacy.module:256
+msgid "Provide a \"more\" link that links to the view"
+msgstr "Einen „Mehr“-Link bereitstellen, der zur Ansicht verlinkt"
+
+#: panels_views/panels_views.module:979
+#: panels_views_legacy/panels_views_legacy.module:257
+msgid "This is independent of any more link that may be provided by the view itself; if you see two more links, turn this one off. Views will only provide a more link if using the \"block\" type, however, so if using embed, use this one."
+msgstr ""
+
+#: panels_views/panels_views.module:985
+msgid "\"More\" link text"
+msgstr "„Mehr“-Linktext"
+
+#: panels_views/panels_views.module:986
+msgid "If you activated panels own \"more\" link above, this allows you to customize the text to display."
+msgstr ""
+
+#: panels_views/panels_views.module:994
+#: panels_views_legacy/panels_views_legacy.module:263
+msgid "Display feed icons"
+msgstr "Feed-Icons anzeigen"
+
+#: panels_views/panels_views.module:995
+#: panels_views_legacy/panels_views_legacy.module:264
+msgid "If checked, any feed icons provided by this view will be displayed."
+msgstr "Sobald aktiviert, werden alle von der Ansicht bereitgestellten Feed-Icons angezeigt."
+
+#: panels_views/panels_views.module:1023
+#: panels_views_legacy/panels_views_legacy.module:290
+msgid "Num posts"
+msgstr "Anzahl Beiträge"
+
+#: panels_views/panels_views.module:1025
+#: panels_views_legacy/panels_views_legacy.module:292
+msgid "Select the number of posts to display, or 0 to display all results."
+msgstr "Die Anzahl der anzuzeigenden Beiträge auswählen, oder 0 um alle Ergebnisse anzuzeigen."
+
+#: panels_views/panels_views.module:1043
+#: panels_views_legacy/panels_views_legacy.module:321
+msgid "Override URL"
+msgstr "URL überschreiben"
+
+#: panels_views/panels_views.module:1045
+msgid "If this is set, override the View URL; this can sometimes be useful to set to the panel URL."
+msgstr "Sobald aktiviert, wird die Ansichten-URL überschrieben; Manchmal kann es sinnvoll sein, die Panel-URL einzusetzten."
+
+#: panels_views/panels_views.module:97
+msgid "administer panel views"
+msgstr "Panelansichten verwalten"
+
+#: panels_views/panels_views.module:0
+msgid "panels_views"
+msgstr "panels_views"
+
+#: panels_views/panels_views.info:0
+msgid "Creates views as content types that can be added to displays"
+msgstr "Erstellt Ansichten als Inhaltstypen, welche zu Anzeigen hinzugefügt werden können."
+
+#: panels_views_legacy/panels_views_legacy.module:20;46
+msgid "Legacy views"
+msgstr ""
+
+#: panels_views_legacy/panels_views_legacy.module:24
+msgid "Information about the legacy views content type."
+msgstr ""
+
+#: panels_views_legacy/panels_views_legacy.module:35
+msgid "Panels legacy views does not have a normal administrative UI, such as panels pages or mini panels. With this module, all of your views are provided as panes that can be added to any panel display; these panes have many options; because of all of these options, these panes are generally unsuitable for non administrative users. It is recommended that you only use panels views legacy if 1) you are upgrading a site that already uses this kind of view or 2) you do not want the extra work of having to determine which views are available as content. Otherwise, it is recommended you use the normal \"Panels views content\" module."
+msgstr ""
+
+#: panels_views_legacy/panels_views_legacy.module:300
+msgid "Offset in the node list or 0 to start at 1st item."
+msgstr ""
+
+#: panels_views_legacy/panels_views_legacy.module:305
+msgid "Send arguments"
+msgstr ""
+
+#: panels_views_legacy/panels_views_legacy.module:307
+msgid "Select this to send all arguments from the panel directly to the view. If checked, the panel arguments will come after any context arguments above and precede any additional arguments passed in through the Arguments field below."
+msgstr ""
+
+# Argumente an die Ansicht übergeben, als wenn diese Teil der URL sind, in Form von arg1/arg2/arg3. Um Argumente von der aktuellen URL zu verwenden, kann %0, %1, %2, usw. verwendet werden. Sollte die Panel URL foo/bar lauten und jemand greift auf foo/bar/5 zu, kann %2 verwendet werden, um die 5 zu erhalten.
+#: panels_views_legacy/panels_views_legacy.module:315
+msgid "Additional arguments to send to the view as if they were part of the URL in the form of arg1/arg2/arg3. You may use %0, %1, ..., %N to grab arguments from the URL. Or use @0, @1, @2, ..., @N to use arguments passed into the panel."
+msgstr ""
+
+#: panels_views_legacy/panels_views_legacy.module:323
+msgid "If this is set, override the View URL; this can sometimes be useful to set to the panel URL"
+msgstr "Sobald aktiviert, wird die Ansichten URL überschrieben; Manchmal kann es sinnvoll sein, die Panel URL einzusetzten."
+
+#: panels_views_legacy/panels_views_legacy.module:335
+msgid "Deleted/missing view @view"
+msgstr "Gelöschte/Fehlende Ansicht @view"
+
+#: panels_views_legacy/panels_views_legacy.module:0
+msgid "panels_views_legacy"
+msgstr "panels_views_legacy"
+
+#: panels_views_legacy/panels_views_legacy.info:0
+msgid "Legacy views panes"
+msgstr ""
+
+#: panels_views_legacy/panels_views_legacy.info:0
+msgid "Provides all views as panes to be added to displays; this is provided for legacy use and should not be used in new installations."
+msgstr ""
+
+#: relationships/book_parent.inc:13
+msgid "Book parent"
+msgstr "Übergeordnetes Buch"
+
+#: relationships/book_parent.inc:15
+msgid "Adds a book parent from a node context."
+msgstr ""
+
+#: relationships/book_parent.inc:62
+#: relationships/term_parent.inc:62
+msgid "Relationship type"
+msgstr "Beziehungstyp"
+
+#: relationships/book_parent.inc:63
+#: relationships/term_parent.inc:63
+msgid "Immediate parent"
+msgstr ""
+
+#: relationships/book_parent.inc:63
+#, fuzzy
+msgid "Top level book"
+msgstr "Hauptbuch"
+
+#: relationships/term_from_node.inc:13
+msgid "Term from node"
+msgstr "Begriff des Beitrags"
+
+#: relationships/term_from_node.inc:15
+msgid "Adds a taxonomy term from a node context; if multiple terms are selected, this will get the \"first\" term only."
+msgstr ""
+
+#: relationships/term_parent.inc:13
+msgid "Term parent"
+msgstr "Übergeordneter Begriff"
+
+#: relationships/term_parent.inc:15
+msgid "Adds a taxonomy term parent from a term context."
+msgstr ""
+
+#: relationships/term_parent.inc:63
+msgid "Top level term"
+msgstr ""
+
+#: relationships/user_from_node.inc:10
+msgid "User from node"
+msgstr "Benutzer des Beitrags"
+
+#: relationships/user_from_node.inc:12
+msgid "Adds a user from node author context"
+msgstr ""
+
+#: styles/block.inc:18
+msgid "System block"
+msgstr "System-Block"
+
+#: styles/block.inc:19
+msgid "Display the pane as a system block; this is more restrictive than the default."
+msgstr ""
+
+#: styles/default.inc:19
+msgid "The default panel rendering style; displays each pane with a separator."
+msgstr ""
+
+#: styles/list.inc:21
+msgid "Presents the panes in the form of an HTML list."
+msgstr ""
+
+#: styles/rounded_corners.inc:18
+msgid "Rounded corners"
+msgstr "Abgerundete Ecken"
+
+#: styles/rounded_corners.inc:19
+msgid "Presents the panes or panels with a rounded corner box around them"
+msgstr ""
+
+#: styles/rounded_corners.inc:91
+msgid "Box around"
+msgstr ""
+
+#: styles/rounded_corners.inc:93
+msgid "Each pane"
+msgstr "Jeder Ausschnitt"
+
+#: styles/rounded_corners.inc:94
+msgid "Each panel"
+msgstr "Jedes Panel"
+
+#: styles/rounded_corners.inc:97
+msgid "Choose whether to include the box around each pane (piece of content) or panel (each column or region)"
+msgstr ""
+
