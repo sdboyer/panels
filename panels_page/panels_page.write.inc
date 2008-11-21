@@ -27,6 +27,11 @@ function panels_page_fields() {
  */
 function panels_page_save_display(&$panel_page) {
   if (empty($panel_page->displays[$panel_page->current]['did']) || $panel_page->displays[$panel_page->current]['did'] == 'new') {
+    if (!empty($panel_page->export)) {
+      $code = panels_export_display($panel_page->display);
+      eval($code);
+      $panel_page->display =& $display;
+    }
     return panels_page_save($panel_page);
   }
 }
@@ -72,7 +77,7 @@ function _panels_page_insert(&$panel_page) {
   $clone->did = $panel_page->primary->did;
 
   foreach ($schema['fields'] as $field => $info) {
-    if (isset($panel_page->$field)) {
+    if (isset($panel_page->$field) && $info['type'] != 'serial') {
       $fields[] = $field;
       $placeholders[] = db_type_placeholder($info['type']);
       $values[] = _panels_page_save_value($info, $clone->$field);
@@ -99,9 +104,9 @@ function _panels_page_update(&$panel_page) {
   // Save the display if one was given to us.
   if (!empty($panel_page->display)) {
     panels_save_display($panel_page->display);
-    if ($panel_page->current != 'primary') {
-      $panel_page->displays[$panel_page->current]['did'] = $panel_page->display->did;
-      unset($panel_page->displays[$panel_page->current]['display']);
+    if (!empty($panel_page->export)) {
+      $panel_page->displays[$panel_page->export]['did'] = $panel_page->display->did;
+      unset($panel_page->displays[$panel_page->export]['display']);
     }
   }
 
@@ -172,9 +177,10 @@ function panels_page_export($panel_page, $prefix = '') {
   $output = '';
   $fields = panels_page_fields();
   $output .= $prefix . '$page = new stdClass()' . ";\n";
-  $output .= $prefix . '$page->pid = \'new\'' . ";\n";
+  $output .= $prefix . '  $page->pid = \'new\'' . ";\n";
+  $output .= $prefix . '  $page->did = \'new\'' . ";\n";
   foreach (array_keys($fields) as $field) {
-    if (isset($panel_page->$field) && !in_array($field, array('displays', 'contexts', 'display'))) {
+    if (isset($panel_page->$field) && !in_array($field, array('displays', 'contexts', 'display', 'pid', 'did'))) {
       $output .= $prefix . '  $page->' . $field . ' = ' . panels_var_export($panel_page->$field, '  ') . ";\n";
     }
   }

@@ -53,7 +53,7 @@ function panels_admin_content_types_node_attachments() {
   );
 }
 
-function panels_admin_title_node_attachments($conf, $context) {
+function panels_admin_title_node_attachments($subtype, $conf, $context) {
   return t('"@s" attachments', array('@s' => $context->identifier));
 }
 

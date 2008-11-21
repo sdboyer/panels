@@ -18,6 +18,8 @@ function panels_vid_panels_arguments() {
     'settings form submit' => 'panels_vid_settings_form_submit',
     'displays' => 'panels_vid_displays',
     'choose display' => 'panels_vid_choose_display',
+    'menu data' => 'panels_vid_menu_data',
+    'load function' => 'taxonomy_vocabulary',
   );
   return $args;
 }
@@ -121,3 +123,11 @@ function panels_vid_choose_display($conf, $context) {
   return;
 }
 
+function panels_vid_menu_data() {
+  return array(
+    'native path'      => FALSE,
+    'loader'           => 'taxonomy_vocabulary',
+    // FIXME This is a toughie. How do we safely figure out access from here?
+    // 'access arguments' => array('administer taxonomy'),
+  );
+}

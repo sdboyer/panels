@@ -27,6 +27,7 @@ function panels_modal_js_includes($modals = array()) {
   drupal_add_js(panels_get_path('js/lib/mc.js'));
   drupal_add_js('misc/jquery.form.js');
   drupal_add_js('misc/autocomplete.js');
+  drupal_add_js('misc/collapse.js');
   drupal_add_js(panels_get_path('js/modal_forms.js'));
   drupal_add_js(panels_get_path('js/checkboxes.js'));
 }

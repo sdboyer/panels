@@ -1,6 +1,15 @@
 <?php
 // $Id$
 
+/**
+ * @file panels.module
+ *
+ * Core functionality for the Panels engine.
+ */
+
+/**
+ * Error code bitmask used for identifying argument behavior at runtime.
+ */
 define('PANELS_ARG_IS_BAD', 1);
 define('PANELS_ARG_USE_FALLBACK', 1 << 1);
 
@@ -69,6 +78,10 @@ function panels_theme() {
   $theme['panels_pane_collapsible'] = array(
     'arguments' => array('block'),
     'file' => 'includes/display-edit.inc',
+  );
+  $theme['profile_fields_pane'] = array(
+    'arguments' => array('category' => NULL, 'vars' => NULL),
+    'template' => 'content_types/profile_fields_pane',
   );
 
   // Register layout and style themes on behalf of all of these items.
@@ -460,6 +473,7 @@ class panels_display {
   var $cache = array();
   var $title = '';
   var $hide_title = 0;
+  var $layout = '';
 
   function add_pane($pane, $location = FALSE) {
     $pane->pid = $this->next_new_pid();
@@ -579,9 +593,7 @@ function panels_load_displays($dids) {
     return $displays;
   }
 
-  $subs = implode(', ', array_fill(0, count($dids), '%d'));
-
-  $result = db_query("SELECT * FROM {panels_display} WHERE did IN ($subs)", $dids);
+  $result = db_query("SELECT * FROM {panels_display} WHERE did IN (".  db_placeholders($dids) .")", $dids);
 
   while ($obj = db_fetch_array($result)) {
     $display = new panels_display();
@@ -604,7 +616,7 @@ function panels_load_displays($dids) {
     $function($content, $layout, $settings);
   }
 
-  $result = db_query("SELECT * FROM {panels_pane} WHERE did IN ($subs) ORDER BY did, panel, position", $dids);
+  $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (". db_placeholders($dids) .") ORDER BY did, panel, position", $dids);
 
   while ($pane = db_fetch_object($result)) {
     $pane->configuration = unserialize($pane->configuration);
@@ -818,7 +830,7 @@ function panels_export_display($display, $prefix = '') {
 function panels_export_pane($pane, $prefix = '') {
   $output = '';
   $output = $prefix . '$pane = new stdClass()'  . ";\n";
-  $fields = array('pid', 'panel', 'type', 'subtype', 'access', 'configuration');
+  $fields = array('pid', 'panel', 'type', 'shown', 'subtype', 'access', 'configuration', 'cache');
   foreach ($fields as $field) {
     $output .= "$prefix  " . '$pane->' . $field . ' = ' . panels_var_export($pane->$field, "$prefix  ") . ";\n";
   }
@@ -915,3 +927,12 @@ function panels_print_layout_link($id, $layout, $link) {
   return theme('panels_layout_link', $title, $id, $image, $link);
 }
 
+/**
+ * Implementation of hook_ctools_plugin_directory() to let the system know
+ * we implement task and task_handler plugins.
+ */
+function panels_ctools_plugin_directory($plugin) {
+  if ($plugin == 'tasks' || $plugin == 'task_handlers') {
+    return 'plugins/' . $plugin;
+  }
+}

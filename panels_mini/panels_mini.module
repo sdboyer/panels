@@ -91,7 +91,7 @@ function panels_mini_content_types() {
       'icon' => 'icon_contrib_block.png',
       'path' => panels_get_path("content_types/block"),
       'description' => filter_xss_admin($mini->title),
-      'category' => array(t(!empty($mini->category) ? $mini->category : 'Mini panel'), -8),
+      'category' => array(!empty($mini->category) ? filter_xss_admin($mini->category) : t('Mini panel'), -8),
     );
     if (!empty($mini->requiredcontexts)) {
       $types[$mini->name]['required context'] = array();
@@ -125,7 +125,7 @@ function panels_mini_get_id($name) {
 /**
  * Render a mini panel called from a panels display.
  */
-function panels_mini_content($conf, $panel_args, &$contexts) {
+function panels_mini_content($subtype, $conf, $panel_args, &$contexts) {
   $mini = panels_mini_load($conf['name']);
   if (!$mini) {
     return FALSE;
@@ -177,7 +177,7 @@ function panels_mini_edit_mini_panel($id, $parents, $conf) {
   return $form;
 }
 
-function panels_mini_title_mini_panel($conf) {
+function panels_mini_title_mini_panel($subtype, $conf) {
   $mini = panels_mini_load($conf['name']);
   if (!$mini) {
     return t('Deleted/missing mini panel @name', array('@name' => $conf['name']));
@@ -282,13 +282,9 @@ function panels_mini_load($pid) {
     return $cache[$pid];
   }
 
-  if (!is_numeric($pid)) {
-    $where = "name = '%s'";
-  }
-  else {
-    $where = 'pid = %d';
-  }
+  $where = is_numeric($pid) ? 'pid = %d' : "name = '%s'";
   $panel_mini = db_fetch_object(db_query("SELECT * FROM {panels_mini} WHERE $where", $pid));
+
   if (!$panel_mini) {
     $defaults = panels_mini_default_panels();
     if (isset($defaults[$pid])) {

@@ -115,7 +115,7 @@ function panels_flexible_settings_form($display, $layout, $settings) {
       '#default_value' => $settings["row_$row"]["columns"],
     );
     for ($col = 1; $col <= intval($settings["row_$row"]["columns"]); $col++) {
-      $form["row_$row"]["width_$row_$col"] = array(
+      $form["row_$row"]["width_$col"] = array(
         '#prefix' => '<div style="float: left; padding-right: 2em">',
         '#suffix' => '</div>',
         '#type' => 'textfield',
@@ -197,19 +197,24 @@ function panels_flexible_settings_form($display, $layout, $settings) {
     '#sidebar-left-checkbox' => array('#sidebar-left-width'),
     '#sidebar-right-checkbox' => array('#sidebar-right-width'),
   )));
-  drupal_add_js(panels_get_path('js/checkboxes.js'));
+  // not needed, automatically happens on the layout settings page.
+//  drupal_add_js(panels_get_path('js/checkboxes.js'));
   drupal_add_js($js_settings, 'setting');
   return $form;
 }
 
 function panels_flexible_settings_validate($values, $form, $display, $layout, $settings) {
+  if (empty($settings)) {
+    $settings = panels_flexible_default_panels();
+  }
+
   if ($values['rows'] < 1) {
     form_error($form['rows'], t('Rows must be a positive integer.'));
     return;
   }
 
   // Validate that percentages add up to the stated maximum.
-  if ($settings['width_type'] == '%') {
+  if ($values['width_type'] == '%') {
     for ($row = 1; $row <= intval($values['rows']); $row++) {
       // This takes into account whether or even had a previous setting here.
       if ($settings['rows'] >= $row) {
@@ -221,8 +226,8 @@ function panels_flexible_settings_validate($values, $form, $display, $layout, $s
         for ($col = 1; $col <= intval($values["row_$row"]["columns"]); $col++) {
           $total += $values["row_$row"]["width_$col"];
         }
-        if ($total != $settings['percent_width']) {
-          form_error($form["row_$row"]['columns'], t('Column widths must add up to 100.'));
+        if ($total != $values['percent_width']) {
+          form_error($form["row_$row"]['columns'], t('Column widths must add up to @count.', array('@count' => $values['percent_width'])));
         }
       }
     }
@@ -230,6 +235,10 @@ function panels_flexible_settings_validate($values, $form, $display, $layout, $s
 }
 
 function panels_flexible_settings_submit(&$values, $display, $layout, $settings) {
+  if (empty($settings)) {
+    $settings = panels_flexible_default_panels();
+  }
+
   for ($row = 1; $row <= $values['rows']; $row++) {
     if ($row > $settings['rows'] && empty($values["row_$row"]['columns'])) {
       $values["row_$row"]['columns'] = 1;
@@ -295,6 +304,7 @@ function theme_panels_flexible($id, $content, $settings) {
     $idcss = "#$id";
   }
   else {
+    $idstr = '';
     $idcss = "div.panel-flexible";
   }
 

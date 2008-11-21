@@ -18,6 +18,7 @@ function panels_node_add_panels_arguments() {
     'settings form submit' => 'panels_node_add_settings_form_submit',
     'displays' => 'panels_node_add_displays',
     'choose display' => 'panels_node_add_choose_display',
+    'menu builder' => 'panels_node_add_menu_builder',
   );
   return $args;
 }
@@ -152,3 +153,29 @@ function panels_node_add_displays($conf, $id) {
   return $displays;
 }
 
+function panels_node_add_menu_builder(&$items, $metadata) {
+  // Assume that this is the only argument present, as a use case where that's
+  // not true is simply beyond the pale
+  list($path_prefix, $path_suffix) = explode('%', $metadata->path);
+
+  $types = array_filter($metadata->arg_data['argument_settings']['types']);
+  $types = array_keys(empty($types) ? $metadata->arg_data['argument_settings']['types'] : $types);
+
+  foreach (node_get_types('types', NULL, TRUE) as $type) {
+    if (in_array($type->type, $types)) {
+      $type_url_str = str_replace('_', '-', $type->type);
+      $items[$path_prefix . $type_url_str . $path_suffix] = array(
+        'title' => drupal_ucfirst($type->name),
+        'title callback' => 'check_plain',
+        'page callback' => 'node_add',
+        'page arguments' => array(2),
+        'access callback' => 'node_access',
+        'access arguments' => array('create', $type->type),
+        'description' => $type->description,
+        'file' => 'node.pages.inc',
+      );
+    }
+  }
+  // Indicate that the original path should be scrubbed
+  return TRUE;
+}

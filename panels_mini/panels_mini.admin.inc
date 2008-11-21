@@ -371,7 +371,7 @@ function panels_mini_add_page($layout = NULL) {
   $panel_mini->name = '';
   $panel_mini->category = '';
 
-  drupal_set_title('Add mini panel');
+  drupal_set_title(t('Add mini panel'));
   return panels_mini_edit($panel_mini);
 }
 
@@ -490,24 +490,22 @@ function panels_mini_edit_form(&$form_state, $panel_mini) {
  * Validate submission of the mini panel edit form.
  */
 function panels_mini_edit_form_validate($form, &$form_state) {
-  $form_values = &$form_state['values'];
-
   // Test uniqueness of name:
-  if (!$form_values['name']) {
+  if (!$form_state['values']['name']) {
     form_error($form['left']['settings']['name'], t('Panel mini name is required.'));
   }
-  else if (preg_match("/[^A-Za-z0-9_]/", $form_values['name'])) {
+  else if (preg_match("/[^A-Za-z0-9_]/", $form_state['values']['name'])) {
     form_error($form['left']['settings']['name'], t('Name must be alphanumeric or underscores only.'));
   }
-  else if (preg_match("/[^A-Za-z0-9 ]/", $form_values['category'])) {
+  else if (preg_match("/[^A-Za-z0-9 ]/", $form_state['values']['category'])) {
     form_error($form['left']['settings']['category'], t('Categories may contain only alphanumerics or spaces.'));
   }
   else {
     $query = "SELECT pid FROM {panels_mini} WHERE name = '%s'";
-    if (!empty($form_values['pid']) && is_numeric($form_values['pid'])) {
-      $query .= " AND pid != $form_values[pid]";
+    if (!empty($form_state['values']['pid']) && is_numeric($form_state['values']['pid'])) {
+      $query .= ' AND pid != ' . $form_state['values']['pid'];
     }
-    if (db_result(db_query($query, $form_values['name']))) {
+    if (db_result(db_query($query, $form_state['values']['name']))) {
       form_error($form['left']['settings']['name'], t('Panel name must be unique.'));
     }
   }
@@ -517,30 +515,29 @@ function panels_mini_edit_form_validate($form, &$form_state) {
  * Process submission of the mini panel edit form.
  */
 function panels_mini_edit_form_submit($form, &$form_state) {
-  $form_values = &$form_state['values'];
-  $panel_mini = $form_values['panel_mini'];
-  if ($panel_mini->pid != 'new' && $panel_mini->name != $form_values['name']) {
+  $panel_mini = $form_state['values']['panel_mini'];
+  if ($panel_mini->pid != 'new' && $panel_mini->name != $form_state['values']['name']) {
     // update all existing mini panels to point to this one appropriately.
-    db_query("UPDATE {blocks} b SET delta = '%s' WHERE b.module = 'panels_mini' AND b.delta = '%s'", $form_values['name'], $panel_mini->name);
+    db_query("UPDATE {blocks} b SET delta = '%s' WHERE b.module = 'panels_mini' AND b.delta = '%s'", $form_state['values']['name'], $panel_mini->name);
 
     // Above was blocks; these are actual panel panes.
     $result = db_query("SELECT * FROM {panels_pane} WHERE type = 'panels_mini' and subtype = '%s'", $panel_mini->name);
     while ($pane = db_fetch_object($result)) {
       $conf = unserialize($pane->configuration);
-      $conf['name'] = $form_values['name'];
+      $conf['name'] = $form_state['values']['name'];
       db_query("UPDATE {panels_pane} SET configuration = '%s', subtype = '%s' WHERE pid = %d", serialize($conf), $conf['name'], $pane->pid);
     }
   }
 
-  $panel_mini->title = $form_values['title'];
-  $panel_mini->name = $form_values['name'];
-  $panel_mini->category = empty($form_values['category']) ? '' : $form_values['category'];
+  $panel_mini->title = $form_state['values']['title'];
+  $panel_mini->name = $form_state['values']['name'];
+  $panel_mini->category = empty($form_state['values']['category']) ? '' : $form_state['values']['category'];
 
   if ($panel_mini->pid == 'new') {
     unset($_SESSION['pm_import']);
     drupal_set_message(t('Your new mini panel %title has been saved.', array('%title' => $panel_mini->title)));
     panels_mini_save($panel_mini);
-    $form_values['pid'] = $panel_mini->pid;
+    $form_state['values']['pid'] = $panel_mini->pid;
 
     $layout = panels_get_layout($panel_mini->display->layout);
 

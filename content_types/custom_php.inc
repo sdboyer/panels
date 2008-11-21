@@ -115,7 +115,7 @@ function panels_admin_edit_custom_php($id, $parents, $conf = NULL) {
 /**
  * Returns the administrative title for a type.
  */
-function panels_admin_title_custom_php($conf) {
+function panels_admin_title_custom_php($subtype, $conf) {
   $output = t('Custom');
   if ($conf['title']) {
     $output .= " (" . filter_xss_admin($conf['title']) . ")";

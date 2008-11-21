@@ -494,18 +494,41 @@ function theme_panels_common_content_list($display) {
  *
  * Contexts must be preloaded.
  */
-function theme_panels_common_context_list($object) {
+function theme_panels_common_context_list($object, $header = '') {
   $titles = array();
   $output = '';
   $count  = 1;
+  // Describe 'built in' contexts.
+  if (!empty($object->base_contexts)) {
+    foreach ($object->base_contexts as $id => $context) {
+      $output .= '<tr>';
+      $output .= '<td valign="top"><em>' . t('Built in context') . '</em></td>';
+      $desc = check_plain($context->identifier);
+      if (isset($context->keyword)) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $context->keyword)) . '</div>';
+      }
+      if (isset($context->description)) {
+        $desc .= '<div class="description">' . filter_xss_admin($context->description) . '</div>';
+      }
+      $output .= '<td>' . $desc . '</td>';
+      $output .= '</tr>';
+      $titles[$id] = $context->identifier;
+      $count++;
+    }
+  }
+
   // First, make a list of arguments. Arguments are pretty simple.
   if (!empty($object->arguments)) {
     foreach ($object->arguments as $argument) {
       $output .= '<tr>';
-      $output .= '<td><em>' . t('Argument @count', array('@count' => $count)) . '</em></td>';
-      $output .= '<td>' . check_plain($argument['identifier']) . '</td>';
+      $output .= '<td valign="top"><em>' . t('Argument @count', array('@count' => $count)) . '</em></td>';
+      $desc = check_plain($argument['identifier']);
+      if (isset($argument['keyword'])) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $argument['keyword'])) . '</div>';
+      }
+      $output .= '<td>' . $desc . '</td>';
       $output .= '</tr>';
-      $titles[panels_argument_context_id($argument)] = $argument['identifier'];
+      $titles[panels_context_id($argument, 'argument')] = $argument['identifier'];
       $count++;
     }
   }
@@ -515,9 +538,13 @@ function theme_panels_common_context_list($object) {
     foreach ($object->contexts as $context) {
       $output .= '<tr>';
       $output .= '<td><em>' . t('Context @count', array('@count' => $count)) . '</em></td>';
-      $output .= '<td>' . check_plain($context['identifier']) . '</td>';
+      $desc = check_plain($context['identifier']);
+      if (isset($context['keyword'])) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $context['keyword'])) . '</div>';
+      }
+      $output .= '<td>' . $desc . '</td>';
       $output .= '</tr>';
-      $titles[panels_context_context_id($context)] = $context['identifier'];
+      $titles[panels_context_id($context)] = $context['identifier'];
       $count++;
     }
   }
@@ -525,15 +552,25 @@ function theme_panels_common_context_list($object) {
   if (!empty($object->relationships)) {
     foreach ($object->relationships as $relationship) {
       $output .= '<tr>';
-      $output .= '<td><em>' . t('From @title', array('@title' => $titles[$relationship['context']])) . '</em></td>';
-      $output .= '<td>' . check_plain($relationship['identifier']) . '</td>';
+      $output .= '<td valign="top"><em>' . t('From "@title"', array('@title' => $titles[$relationship['context']])) . '</em></td>';
+      $desc = check_plain($relationship['identifier']);
+      if (isset($relationship['keyword'])) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $relationship['keyword'])) . '</div>';
+      }
+      $output .= '<td>' . $desc . '</td>';
       $output .= '</tr>';
-      $titles[panels_relationship_context_id($relationship)] = $relationship['identifier'];
+      $titles[panels_context_id($relationship, 'relationship')] = $relationship['identifier'];
       $count++;
     }
   }
   if ($output) {
-    return "<table><tbody>$output</tbody></table>\n";
+    $head = '';
+    if ($header) {
+      $head .= '<thead><tr>';
+      $head .= '<th colspan="2">' . $header . '</th>';
+      $head .= '</tr></thead>';
+    }
+    return "<table>$head<tbody>$output</tbody></table>\n";
   }
 }
 

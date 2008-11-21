@@ -59,9 +59,9 @@ function panels_admin_content_types_node_comments() {
 function panels_admin_edit_node_comments($id, $parents, $conf = array()) {
   if (empty($conf)) {
     $conf = array(
-      'mode' => _comment_get_display_setting('mode'),
-      'order' => _comment_get_display_setting('sort'),
-      'comments_per_page' => _comment_get_display_setting('comments_per_page'),
+      'mode' => variable_get('comment_default_mode', COMMENT_MODE_THREADED_EXPANDED),
+      'order' => variable_get('comment_default_order', COMMENT_ORDER_NEWEST_FIRST),
+      'comments_per_page' => variable_get('comment_default_per_page', '50'),
     );
   }
 
@@ -91,7 +91,7 @@ function panels_admin_edit_node_comments($id, $parents, $conf = array()) {
   return $form;
 }
 
-function panels_admin_title_node_comments($conf, $context) {
+function panels_admin_title_node_comments($subtype, $conf, $context) {
   return t('"@s" comments', array('@s' => $context->identifier));
 }
 
@@ -101,6 +101,7 @@ function panels_admin_title_node_comments($conf, $context) {
  * difficult to modify this.
  */
 function panels_comment_render($node, $conf) {
+  $output = '';
   if (!user_access('access comments')) {
     return;
   }
@@ -111,7 +112,7 @@ function panels_comment_render($node, $conf) {
 
   // Multiple comment view
   $query_count = 'SELECT COUNT(*) FROM {comments} WHERE nid = %d';
-  $query = 'SELECT c.cid as cid, c.pid, c.nid, c.subject, c.comment, c.format, c.timestamp, c.name, c.mail, c.homepage, u.uid, u.name AS registered_name, u.picture, u.data, c.score, c.users, c.thread, c.status FROM {comments} c INNER JOIN {users} u ON c.uid = u.uid WHERE c.nid = %d';
+  $query = 'SELECT c.cid as cid, c.pid, c.nid, c.subject, c.comment, c.format, c.timestamp, c.name, c.mail, c.homepage, u.uid, u.name AS registered_name, u.picture, u.data, c.thread, c.status FROM {comments} c INNER JOIN {users} u ON c.uid = u.uid WHERE c.nid = %d';
 
   $query_args = array($node->nid);
   if (!user_access('administer comments')) {
@@ -164,16 +165,16 @@ function panels_comment_render($node, $conf) {
     }
 
     if ($mode == COMMENT_MODE_FLAT_COLLAPSED) {
-      $output .= theme('comment_flat_collapsed', $comment);
+      $output .= theme('comment_flat_collapsed', $comment, $node);
     }
     else if ($mode == COMMENT_MODE_FLAT_EXPANDED) {
-      $output .= theme('comment_flat_expanded', $comment);
+      $output .= theme('comment_flat_expanded', $comment, $node);
     }
     else if ($mode == COMMENT_MODE_THREADED_COLLAPSED) {
-      $output .= theme('comment_thread_collapsed', $comment);
+      $output .= theme('comment_thread_collapsed', $comment, $node);
     }
     else if ($mode == COMMENT_MODE_THREADED_EXPANDED) {
-      $output .= theme('comment_thread_expanded', $comment);
+      $output .= theme('comment_thread_expanded', $comment, $node);
     }
   }
   for ($i = 0; $i < $divs; $i++) {

@@ -59,7 +59,7 @@ function panels_admin_content_types_node_type_desc() {
   );
 }
 
-function panels_admin_title_node_type_desc($conf, $context) {
+function panels_admin_title_node_type_desc($subtype, $conf, $context) {
   return t('"@s" type description', array('@s' => $context->identifier));
 }
 

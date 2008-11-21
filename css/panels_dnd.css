@@ -177,6 +177,7 @@ div.panels-display .pane-add-link * {
   margin: 2px;
   border: 1px solid #000;
   width: 600px;
+  text-align: left;
 } 
 
 .panels-modal-content .modal-title {

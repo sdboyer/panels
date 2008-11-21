@@ -66,7 +66,7 @@ function panels_content_form($subtype, $conf, $panel_args, &$context) {
   return $block;
 }
 
-function panels_admin_title_form($conf, $context) {
+function panels_admin_title_form($subtype, $conf, $context) {
   return t('"@s" base form', array('@s' => $context->identifier));
 }
 

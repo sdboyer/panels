@@ -35,6 +35,17 @@ define('PANELS_HAS_FALLBACK_ROUTER', 1 << 1 | PANELS_IS_DYNAMIC);
 define('PANELS_PID_SHARES_PATH', 1 << 2 | PANELS_IS_DYNAMIC);
 
 /**
+ * Indicates that the panel page is being loaded from code (i.e., from
+ * hook_default_panel_pages).
+ */
+define('PANELS_DEFAULT', 1 << 3);
+
+/**
+ * Indicates that the panel_page is an overridden default.
+ */
+define('PANELS_OVERRIDDEN', 1 << 4 | PANELS_DEFAULT);
+
+/**
  * Implementation of hook_help().
  */
 function panels_page_help($path, $arg) {
@@ -221,7 +232,7 @@ function panels_page_master_loader($args) {
  *
  * @param string $name
  * @param array $args
- * @return array $loader_data
+ * @return array $load
  */
 function _panels_page_master_loader($name, $args) {
   static $loader_data = array();
@@ -230,16 +241,18 @@ function _panels_page_master_loader($name, $args) {
   }
   $load = new stdClass();
   $loader_data[$name] = &$load;
+  $load->panel_args = array();
 
   panels_load_include('plugins');
   panels_page_load_include('read');
   $panel_page = panels_page_load($name);
+  $panel_page->context = array();
   // Handle static pages then duck out early.
   if (!($panel_page->load_flags & PANELS_IS_DYNAMIC)) {
     if ((bool) panels_page_access($panel_page->name)) {
       panels_page_load_include('render');
       panels_page_fetch_primary_display($panel_page);
-      panels_page_prepare_panels_render($load, $panel_page, $args);
+      panels_page_prepare_panels_render($load, $panel_page);
     }
     return $load;
   }
@@ -262,7 +275,7 @@ function _panels_page_master_loader($name, $args) {
     return drupal_access_denied();
   }
   panels_page_load_include('render');
-  return panels_page_prepare_panels_render($load, $panel_page, $args);
+  return panels_page_prepare_panels_render($load, $panel_page);
 }
 
 /**
@@ -301,7 +314,8 @@ function _panels_page_construct_argument_contexts(&$load, &$panel_page, $args) {
       // Prep a 404 and bail out if we get this far.
       return _panels_page_not_found($load);
     }
-    $panel_page->context[panels_argument_context_id($argument)] = $context;
+    $panel_page->context[panels_context_id($argument, 'argument')] = $context;
+    $load->panel_args[] = $context->get_original_argument();
   }
 }
 
@@ -339,11 +353,11 @@ function _panels_page_rebuild_menu_map($load_objects, $positions) {
  * Prepare the fallback router, update the menu cache with it, then load up
  * our loader item and initiate fallback.
  *
- * Mostly lifted from menu_get_item().
+ * Partially lifted from menu_get_item().
  *
- * @param $load
- * @param $map
- * @return unknown_type
+ * @param object $load
+ * @param array $map
+ * @return object $load
  */
 function panels_page_prepare_fallback_render(&$load, $map) {
   $original_map = arg(NULL, $_GET['q']);
@@ -367,7 +381,7 @@ function panels_page_prepare_fallback_render(&$load, $map) {
  * Figure out if a panel is the current page; mostly useful in theming.
  *
  * This function will return NULL until panels_page_set_current() has been
- * properly called and loaded.
+ * called and loaded with data.
  */
 function panels_page_get_current() {
   // Take advantage of our .inc organization to know if it's at all possible

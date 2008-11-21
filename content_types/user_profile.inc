@@ -70,7 +70,7 @@ function panels_admin_content_types_user_profile() {
 /**
  * Display the administrative title for a panel pane in the drag & drop UI
  */
-function panels_admin_title_user_profile($conf, $context) {
+function panels_admin_title_user_profile($subtype, $conf, $context) {
   return t('"@s" user profile', array('@s' => $context->identifier));
 }
 

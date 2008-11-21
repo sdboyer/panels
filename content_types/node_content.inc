@@ -61,7 +61,7 @@ function panels_content_node_content($subtype, $conf, $panel_args, $context) {
 
     $block->subject = $node->title;
 
-    unset($node->title);
+//    unset($node->title);
     $block->content = panels_admin_node_content($node, $conf);
   }
 
@@ -135,6 +135,11 @@ function panels_admin_edit_node_content($id, $parents, $conf = array()) {
       'links' => TRUE,
       'page' => TRUE,
       'no_extras' => TRUE,
+      'override_title' => FALSE,
+      'override_title_text' => '',
+      'teaser' => TRUE,
+      'identifier' => '',
+      'link' => TRUE,
     );
   }
 
@@ -198,7 +203,7 @@ function panels_admin_edit_node_content($id, $parents, $conf = array()) {
   return $form;
 }
 
-function panels_admin_title_node_content($conf, $context) {
+function panels_admin_title_node_content($subtype, $conf, $context) {
   return t('"@s" content', array('@s' => $context->identifier));
 }
 

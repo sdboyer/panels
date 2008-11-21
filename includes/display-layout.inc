@@ -17,33 +17,11 @@
 function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) {
   panels_load_include('common');
 
-  // @todo -- refactor the allowed layouts stuff for better code encapsulation.
-  // module_name has been provided; the data was saved by the api_save() method.
-  if (is_string($allowed_layouts)) {
-    $allowed_layouts = unserialize(variable_get($allowed_layouts . "_allowed_layouts", serialize('')));
-  }
-
-  // if no parameter was provided, or the variable_get failed
-  if (!$allowed_layouts) {
-    // tries to load the common panels allowed layouts
-    $allowed_layouts = unserialize(variable_get('panels_common_allowed_layouts', serialize('')));
-    if (!$allowed_layouts) {
-      // still no dice. simply creates a dummy version where all layouts
-      // are allowed.
-      $allowed_layouts = new panels_allowed_layouts();
-      $allowed_layouts->allow_new = TRUE;
-    }
-  }
-
-  // sanitize allowed layout listing; this is redundant if the
-  // $allowed_layouts param was null, but the data is cached anyway
-  $allowed_layouts->sync_with_available();
-
   $form_state = array(
     'display' => &$display,
     'finish' => $finish,
     'destination' => $destination,
-    'layouts' => array_filter($allowed_layouts->allowed_layout_settings),
+    'allowed_layouts' => $allowed_layouts,
     're_render' => FALSE,
     'no_redirect' => TRUE,
   );
@@ -95,12 +73,34 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
  */
 function panels_choose_layout(&$form_state) {
   $display = &$form_state['display'];
-  $allowed_layouts = $form_state['layouts'];
+  $allowed_layouts = $form_state['allowed_layouts'];
+  // @todo -- refactor the allowed layouts stuff for better code encapsulation.
+  // module_name has been provided; the data was saved by the api_save() method.
+  if (is_string($allowed_layouts)) {
+    $allowed_layouts = unserialize(variable_get($allowed_layouts . "_allowed_layouts", serialize('')));
+  }
+
+  // if no parameter was provided, or the variable_get failed
+  if (!$allowed_layouts) {
+    // tries to load the common panels allowed layouts
+    $allowed_layouts = unserialize(variable_get('panels_common_allowed_layouts', serialize('')));
+    if (!$allowed_layouts) {
+      // still no dice. simply creates a dummy version where all layouts
+      // are allowed.
+      $allowed_layouts = new panels_allowed_layouts();
+      $allowed_layouts->allow_new = TRUE;
+    }
+  }
+
+  // sanitize allowed layout listing; this is redundant if the
+  // $allowed_layouts param was null, but the data is cached anyway
+  $allowed_layouts->sync_with_available();
+  $allowed = array_filter($allowed_layouts->allowed_layout_settings);
 
   $layouts = array();
   $available_layouts = panels_get_layouts();
   foreach ($available_layouts as $layout_key => $layout_settings) {
-    if (!empty($allowed_layouts[$layout_key])) {
+    if (!empty($allowed[$layout_key])) {
       $layouts[$layout_key] = $layout_settings;
     }
   }
@@ -121,10 +121,12 @@ function panels_choose_layout(&$form_state) {
     '#value' => '<div style="clear: both;"></div>',
   );
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Next'),
-  );
+  if (empty($form_state['no buttons'])) {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+  }
 
   return $form;
 }
@@ -197,6 +199,14 @@ function panels_change_layout(&$form_state) {
   );
 
   $old_layout_panels = panels_get_panels($old_layout, $display);
+  if (empty($display->panels)) {
+    $form['old'] = array(
+      '#prefix' => '<div>',
+      '#value' => t('There is no content in the panel display. If there were content, you would be given an opportunity to select where in the new layout the old content would be placed. Select "Save" or "Continue" to proceed. This change will not be processed if you do not continue.'),
+      '#suffix' => '</div>',
+    );
+  }
+
   foreach ($display->panels as $id => $content) {
     $form['old'][$id] = array(
       '#type' => 'select',
@@ -206,18 +216,20 @@ function panels_change_layout(&$form_state) {
     );
   }
 
-  $form['back'] = array(
-    '#type' => 'submit',
-    '#value' => t('Back'),
-    '#submit' => array('panels_choose_layout_back'),
-  );
+    $form['back'] = array(
+      '#type' => 'submit',
+      '#value' => t('Back'),
+      '#submit' => array('panels_choose_layout_back'),
+    );
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => $form_state['finish'],
-    '#submit' => array('panels_change_layout_submit'),
-    '#save-display' => TRUE,
-  );
+  if (empty($form_state['no buttons'])) {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => $form_state['finish'],
+      '#submit' => array('panels_change_layout_submit'),
+      '#save-display' => TRUE,
+    );
+  }
   return $form;
 }
 
@@ -231,7 +243,12 @@ function panels_change_layout_submit($form, &$form_state) {
 
   if (!empty($form_state['values']['old'])) {
     foreach ($form_state['values']['old'] as $id => $new_id) {
-      $content[$new_id] = array_merge((array) $content[$new_id], $display->panels[$id]);
+      if (isset($display->panels[$id])) {
+        if (!isset($content[$new_id])) {
+          $content[$new_id] = array();
+        }
+        $content[$new_id] = array_merge($content[$new_id], $display->panels[$id]);
+      }
       foreach ($content[$new_id] as $pid) {
         $display->content[$pid]->panel = $new_id;
       }

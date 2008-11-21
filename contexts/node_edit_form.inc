@@ -87,7 +87,7 @@ function panels_context_node_edit_form_settings_form($conf, $external = FALSE) {
   if (!empty($conf['nid'])) {
     $info = db_fetch_object(db_query("SELECT * FROM {node} WHERE nid = %d", $conf['nid']));
     if ($info) {
-      $link = l("'$info->title' [node id: $info->nid]", "node/$info->nid", array('target' => '_blank', 'title' => t('Open in new window')));
+      $link = l(t("'%title' [node id %nid]", array('%title' => $info->title, '%nid' => $info->nid)), "node/$info->nid", array('target' => '_blank', 'title' => t('Open in new window')));
       $form['node']['#description'] = t('Currently set to !link', array('!link' => $link));
     }
   }
@@ -108,7 +108,7 @@ function panels_context_node_edit_form_settings_form($conf, $external = FALSE) {
 /**
  * Validate a node.
  */
-function panels_context_node_edit_form_settings_form_validate($form, $form_values) {
+function panels_context_node_edit_form_settings_form_validate($form, &$form_values, &$form_state) {
   if (empty($form_values['external']) && empty($form_values['nid']) && empty($form_values['node'])) {
     form_error($form['node'], t('You must select a node.'));
     return;
@@ -125,7 +125,7 @@ function panels_context_node_edit_form_settings_form_validate($form, $form_value
   else {
     $node = db_fetch_object(db_query(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE LOWER(n.title) = LOWER('%s')"), $nid));
     if ($node) {
-      form_set_value($form['nid'], $node->nid);
+      form_set_value($form['nid'], $node->nid, $form_state);
     }
   }
 

@@ -12,7 +12,7 @@
  *
  * For the moment, this function does not cache. It may be integrated into the
  * panels_page_loaded_cache() caching mechanism at some point, but its utility
- * in D6 is significantly lessened vs. D5, so there is much less need to do so.
+ * in D6 is significantly less vs. D5, so the need is less compelling.
  */
 function panels_page_load_all($names = array(), $page_size = 0) {
   $pages = $dids = array();
@@ -54,6 +54,9 @@ function panels_page_load_all($names = array(), $page_size = 0) {
     }
     else {
       $page->type = t('Default');
+      // move the 'display' to the new 'primary' location.
+      $page->primary = $page->display;
+      unset($page->display);
       $pages[$page->name] = $page;
     }
   }
@@ -67,30 +70,33 @@ function panels_page_load($id, $load_display = FALSE) {
   $cache = panels_page_loaded_cache($id);
 
   if ($cache) {
-    // This is deprecated; ideally the fetcher should be called directly
+    // TODO This is deprecated. The fetcher should always be called directly
     if ($load_display && empty($cache->primary)) {
       panels_page_fetch_primary_display($cache);
     }
     return $cache;
   }
 
-  if (!is_numeric($id)) {
-    $where = "name = '%s'";
-  }
-  else {
-    $where = 'pid = %d';
-  }
+  $where = is_numeric($id) ? 'pid = %d' : "name = '%s'";
   $page = db_fetch_object(db_query("SELECT * FROM {panels_page} WHERE $where", $id));
+
+  $defaults = panels_page_default_panels();
   if (!$page) {
-    $defaults = panels_page_default_panels();
     if (isset($defaults[$id])) {
       // Default panel pages will always only be identified by name, so no need
-      // for the both-ids-point-to-same-object trick. And, they're in code, so
-      // no real need to statically cache them, either.
+      // for the both-ids-point-to-same-object trick.
       $page = $defaults[$id];
+      $page->type = t('Default');
+      // move the 'display' to the new 'primary' location.
+      $page->primary = $page->display;
+      unset($page->display);
+      panels_page_loaded_cache($id, $page);
       return $page;
     }
     return;
+  }
+  else {
+    $page->type = isset($defaults[$id]) ? t('Overridden') : t('Local');
   }
 
   $page->access           = ($page->access ? explode(', ', $page->access) : array());
@@ -130,11 +136,13 @@ function panels_page_loaded_cache($id, $panel_page = NULL) {
  */
 function panels_page_default_panels() {
   $panels = module_invoke_all('default_panel_pages');
-  if (!is_array($panels)) {
-    $panels = array();
+  $return = array();
+  if (is_array($panels)) {
+    foreach ($panels as $panel_page) {
+      $return[$panel_page->name] = $panel_page;
+    }
   }
-
-  return $panels;
+  return $return;
 }
 
 
@@ -142,7 +150,15 @@ function panels_page_set_current(&$panel_page) {
   static $cache = NULL;
   // Only allow it to be set once per request.
   if (!isset($cache) && isset($panel_page)) {
-    $cache = &$panel_page;
+    // In PHP5 if we actually set a reference here, the panel page will get destroyed
+    // when the original reference is destroyed, but in PHP4 we need a reference
+    // to prevent copying it.
+    if (version_compare(PHP_VERSION, '5', '>=')) {
+      $cache =  $panel_page;
+    }
+    else {
+      $cache =  &$panel_page;
+    }
   }
   return $cache;
 }
@@ -194,7 +210,9 @@ function panels_page_fetch_primary_display(&$panel_page) {
   // Commented out is a more precise way of telling, but it's probably moot.
   // if (empty($panel_page->primary) || !is_a($panel_page->primary, 'panels_display')) {
   if (empty($panel_page->primary) || !is_object($panel_page->primary)) {
-    $panel_page->primary = panels_load_display($panel_page->did);
+    if ($panel_page->type != t('Default')) {
+      $panel_page->primary = panels_load_display($panel_page->did);
+    }
   }
   $panel_page->display = &$panel_page->primary;
   $panel_page->current = 'primary';
@@ -203,39 +221,54 @@ function panels_page_fetch_primary_display(&$panel_page) {
 }
 
 function panels_page_fetch_alternate_display(&$panel_page, $id) {
+  // Get the metadata about the requested display.
   $info = $panel_page->displays[$id];
+  // Using the metadata, determine if the desired display exists.
   $requested_display_exists = panels_page_fetch_display_from_info($panel_page, $info, $id);
-  if (!$requested_display_exists) {
-    // The requested display does not exist. First, we try to fall back to the
-    // default display for the context we're switching on.
-    if (!empty($info['default']) && !empty($panel_page->displays[$info['default']])) {
-      panels_page_fetch_display_from_info($panel_page, $panel_page->displays[$info['default']], $id);
-    }
-    // Otherwise, use the primary display. Load it if it's not already loaded.
-    else {
+  if ($requested_display_exists) {
+    // The requested display exists. Drop the $id into $current and bug out.
+    $panel_page->current = $id;
+    return;
+  }
+
+  // The requested display does not exist - determine the fallback display. We
+  // save the $id into the object because we'll need it later for updating
+  // the metadata if we export & save the default we fetch here.
+  $panel_page->export = $id;
+  // First, check for a default display for the context we're switching on,
+  // and try to load that.
+  if (!empty($info['default']) && !empty($panel_page->displays[$info['default']])) {
+    // A default has been defined - figure out if it actually has a display
+    // associated with it.
+    if (!panels_page_fetch_display_from_info($panel_page, $panel_page->displays[$info['default']], $id)) {
+      // No display is associated with the switched default either, so double
+      // fall back to the primary display. Load it if it's not already.
       panels_page_fetch_primary_display($panel_page);
     }
   }
-  return TRUE;
+  // There's no default display defined for the context we're switching on, so
+  // just use the primary display as the default. Load it if it's not already.
+  else {
+    panels_page_fetch_primary_display($panel_page);
+  }
 }
 
 /**
  * Get a display based on whether it's already in code or needs to be loaded.
  */
 function panels_page_fetch_display_from_info(&$panel_page, $info, $id) {
-  $ret = NULL;
   // If the 'display' is set it's the result of an export/default
   if (isset($info['display'])) {
     $panel_page->display = $info['display'];
-    $panel_page->current = $id;
     return TRUE;
   }
 
+  // If the $did is numeric, it corresponds to an existing display - load it.
   if (is_numeric($info['did'])) {
     $panel_page->display = panels_load_display($info['did']);
-    $panel_page->current = $id;
     return TRUE;
   }
+
   return FALSE;
 }
 

@@ -8,6 +8,9 @@
  * overriding system.
  */
 
+/**
+ * Define and return all the static administrative pages for hook_menu().
+ */
 function panels_page_admin_static_menu_items() {
   $items = array();
   $admin = array(
@@ -120,8 +123,8 @@ function panels_page_admin_dynamic_menu_items($items = array(), $path_prefix = N
   ) + $admin;*/
   $items[$path_prefix . '%panels_page_admin/edit/preview'] = array(
     'title' => 'Preview',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('panels_page_preview_page', $loader_arg),
+    'page callback' => 'panels_page_preview_page',
+    'page arguments' => array($loader_arg),
     'weight' => 2,
   ) + $admin;
   $items[$path_prefix . '%panels_page_admin/edit/export'] = array(
@@ -155,7 +158,7 @@ function panels_page_create_menu_structure($new_items = NULL) {
  * Workhorse function for hook_menu_alter(); separated out here to reduce code
  * weight.
  *
- * @param $callbacks
+ * @param array $callbacks
  */
 function _panels_page_menu_alter(&$callbacks) {
   $panels_items = panels_page_create_menu_structure();
@@ -164,38 +167,80 @@ function _panels_page_menu_alter(&$callbacks) {
     return;
   }
 
+  // Build up an array with ONLY the items with args on native paths (overrides)
+  $overrides = array_keys(array_filter($panels_items['metadata'], '_panels_page_menu_item_filter'));
+
   $matches = array();
-  while (list($path, $item) = each($callbacks)) {
-    if (strpos($path, '%') === FALSE) {
+  foreach ($panels_items['metadata'] as $raw_path => $metadata) {
+    // Skip static panel_pages.
+    if (!($metadata->load_flags & PANELS_IS_DYNAMIC)) {
       continue;
     }
-    $raw_path = panels_page_get_raw_path($path);
-    if (isset($panels_items['menu items'][$raw_path])) {
-      $panels_items['menu items'][$path] = array_merge($item, $panels_items['menu items'][$raw_path]);
-      $matches[$path] = TRUE;
-      // TODO this is another point that hardcodes one item per path.
-      // Only unset if the raw path is different (e.g. taxonomy isn't)
+    // Ensure that the path var is properly initialized on each iteration.
+    $path = $raw_path;
+
+    // Presence of a native path indicates that there are menu item properties
+    // that need to be inherited.
+    if (isset($metadata->native_path)) {
+      if (in_array($raw_path, $overrides)) {
+        // Use the native path because it will always match the overridden path
+        // exactly (that is, it will always include the load function name).
+        $path = $metadata->native_path;
+        $matches[$path] = TRUE;
+      }
+      else {
+        $map = explode('/', $raw_path);
+        foreach ($map as $i => $arg) {
+          if ($arg === '%') {
+            $map[$i] = '%' . array_shift($metadata->load_functions);
+          }
+        }
+        $path = implode('/', $map);
+      }
+      $panels_items['menu items'][$path] = array_merge($callbacks[$metadata->native_path], $panels_items['menu items'][$raw_path]);
+      $panels_items['metadata'][$path] = $panels_items['metadata'][$raw_path];
+      // Only unset if the original path  is different (e.g. taxonomy isn't)
       if ($raw_path != $path) {
-        unset($panels_items['menu items'][$raw_path]);
+        unset($panels_items['menu items'][$raw_path], $panels_items['metadata'][$raw_path]);
       }
     }
-  }
-  // Insert all the overridden routers into our separate table.
-  _panels_page_menu_router_build($callbacks, $matches);
-  // Replace all the overridden routers with our own.
-  $callbacks = array_merge($callbacks, $panels_items['menu items']);
+    // Update the load flags to reflect the status of a fallback router. It's
+    // fine that static panel_pages miss this, they never have fallback routers.
+    $metadata->load_flags |= (!empty($matches[$path])) ? PANELS_HAS_FALLBACK_ROUTER : 0;
+    db_query('UPDATE {panels_page} SET load_flags = %d WHERE pid = %d', $metadata->load_flags, $metadata->pid);
 
-  foreach ($panels_items['menu items'] as $path => $item) {
-    $raw_path = panels_page_get_raw_path($path);
-    // Only save a router quickref if the item has metadata
-    if (!empty($panels_items['metadata'][$raw_path])) {
-      $metadata = &$panels_items['metadata'][$raw_path];
-      $metadata->load_flags |= isset($matches[$path]) ? PANELS_HAS_FALLBACK_ROUTER : 0;
-      db_query('UPDATE {panels_page} SET load_flags = %d WHERE pid = %d', $metadata->load_flags, $metadata->pid);
+    // If a special menu builder function has been defined, fire it. Mostly an
+    // edge case atm, node/add is the only existing argument plugin using this
+    if (isset($metadata->menu_builder)) {
+      $builder_items = array();
+      $func = $metadata->menu_builder;
+      if ($func($builder_items, $metadata)) {
+        unset($panels_items['menu items'][$metadata->path]);
+      }
+      while (list($key,) = each($builder_items)) {
+        $builder_items[$key]['module'] = 'panels_page';
+      }
+      $panels_items['menu items'] = array_merge($builder_items, $panels_items['menu items']);
     }
   }
-  // Re-call our helper function and store updated items into the static cache.
+
+  // Insert all overridden routers into our separate router storage table, merge
+  // all the panels menu items into the callback stack, then tuck the menu data
+  // back into the static cache for hook_menu_link_alter() to get at later.
+  _panels_page_menu_router_build($callbacks, $matches);
+  $callbacks = array_merge($callbacks, $panels_items['menu items']);
   panels_page_create_menu_structure($panels_items);
+}
+
+function _panels_page_menu_item_filter($metadata) {
+  if (!isset($metadata->native_path)) {
+    return FALSE;
+  }
+
+  if ($metadata->path == panels_page_get_raw_path($metadata->native_path)) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 function _panels_page_create_menu_structure() {
@@ -219,6 +264,7 @@ function _panels_page_create_menu_structure() {
 function panels_page_construct_dynamic_menu_link(&$items, $panel_page, $map) {
   $type = _panels_page_menu_type($panel_page);
   $primary_wildcard = array_search('%', $map);
+  // panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_IS_DYNAMIC | $panel_page->load_flags);
   panels_page_construct_menu_item_metadata($items, $panel_page, PANELS_IS_DYNAMIC);
   $page_args = array($panel_page->name, $primary_wildcard);
 
@@ -255,7 +301,7 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
   panels_page_construct_menu_item_metadata($items, $panel_page);
 
   $items['menu items'][$panel_page->path] = array(
-    'title'            => filter_xss_admin(panels_page_get_title($panel_page, 'menu')),
+    'title'            => filter_xss_admin(panels_page_get_title($panel_page, 'menu', '')),
     'access callback'  => 'panels_page_access_handler',
     'access arguments' => array($panel_page->name),
     'page callback'    => 'panels_page_render_handler',
@@ -269,11 +315,30 @@ function panels_page_construct_static_menu_link(&$items, $panel_page, $map) {
 
 function panels_page_construct_menu_item_metadata(&$items, $panel_page, $load_flags = 0) {
   $metadata = new stdClass();
-  $metadata->pid   = $panel_page->pid;
-  $metadata->name  = $panel_page->name;
-  $metadata->type  = _panels_page_menu_type($panel_page);
-  $metadata->path  = $panel_page->path;
+  $metadata->pid        = $panel_page->pid;
+  $metadata->name       = $panel_page->name;
+  $metadata->type       = _panels_page_menu_type($panel_page);
+  $metadata->path       = $panel_page->path;
   $metadata->load_flags = $load_flags;
+
+  if (!empty($panel_page->arguments)) {
+    $metadata->load_functions = array();
+    // @TODO This code assumes that the first argument in the stack is the one
+    // we want to inherit from. This may or may not be a valid assumption.
+    while (list($i, $arg_data) = each($panel_page->arguments)) {
+      if ($i == 0) {
+        $argument = panels_get_argument($arg_data['name']);
+        if (!empty($argument['native path'])) {
+          $metadata->native_path = $argument['native path'];
+        }
+        if ($function = panels_plugin_get_function('arguments', $argument['name'], 'menu builder')) {
+          $metadata->menu_builder = $function;
+          $metadata->arg_data = $arg_data;
+        }
+      }
+      $metadata->load_functions[] = !empty($argument['load function']) ? $argument['load function'] : '';
+    }
+  }
 
   $items['metadata'][$panel_page->path] = $metadata;
 }
@@ -348,10 +413,10 @@ function panels_page_get_raw_path($path) {
 /**
  * Modified version of _menu_router_build();
  */
-function _panels_page_menu_router_build($callbacks, $matches) {
+function _panels_page_menu_router_build($callbacks, $panels_matches) {
   $menu = array();
   $sort = array();
-  foreach ($matches as $path => $match) {
+  foreach ($panels_matches as $path => $match) {
     $item = $callbacks[$path];
     $load_functions = array();
     $to_arg_functions = array();

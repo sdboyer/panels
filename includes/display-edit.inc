@@ -111,18 +111,22 @@ function panels_edit_display_form(&$form_state) {
       '#default_value' => implode(',', (array) $display->panels[$panel_id]),
     );
   }
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-    '#id' => 'panels-dnd-save',
-    '#submit' => array('panels_edit_display_form_submit'),
-    '#save-display' => TRUE,
-  );
-  $form['cancel'] = array(
-    '#type' => 'submit',
-    '#value' => t('Cancel'),
-  );
 
+  if (empty($form_state['no buttons'])) {
+    $form['buttons']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save'),
+      '#id' => 'panels-dnd-save',
+      '#submit' => array('panels_edit_display_form_submit'),
+      '#save-display' => TRUE,
+    );
+    $form['buttons']['cancel'] = array(
+      '#type' => 'submit',
+      '#value' => t('Cancel'),
+    );
+  }
+
+/* -- disabled, these buttons aren't useful right now
   $form['hide'] = array(
     '#prefix' => '<span id="panels-js-only">',
     '#suffix' => '</span>',
@@ -139,7 +143,7 @@ function panels_edit_display_form(&$form_state) {
     '#value' => t('Show all'),
     '#id' => 'panels-show-all',
   );
-
+*/
 
   if (user_access('use panels caching features')) {
     $form['hide']['cache-settings-url'] = array(
@@ -178,7 +182,7 @@ function theme_panels_edit_display_form($form) {
 
   $layout = panels_get_layout($display->layout);
   $layout_panels = panels_get_panels($layout, $display);
-  $save_buttons = drupal_render($form['submit']) . drupal_render($form['cancel']);
+  $save_buttons = drupal_render($form['buttons']);
 
   foreach ($layout_panels as $panel_id => $title) {
     if (empty($content[$panel_id])) {
@@ -264,7 +268,7 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
   }
 
   // Next to it the show or hide pane link
-  if ($pane->shown) {
+  if (!empty($pane->shown)) {
     $buttons .= panels_ajax_image_button('icon-hidepane.png', "panels/ajax/hide/$display->did/$pane->pid", t('Hide "@pane"', array('@pane' => $title)), "pane-toggle-shown-link panels-no-modal");
   }
   else {
@@ -533,7 +537,7 @@ function panels_ajax_configure_pane($did = NULL, $pid = NULL) {
     'ajax' => TRUE,
     'title' => t('Configure !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title'])),
     'type' => panels_get_content_type($pane->type),
-    'subtype' => $subtype[$pane->subtype],
+    'subtype' => $subtypes[$pane->subtype],
     'op' => 'edit',
   );
 
@@ -697,6 +701,7 @@ function panels_ajax_toggle_shown($op, $did = NULL, $pid = NULL) {
   $pane = &$cache->display->content[$pid];
 
   $pane->shown = ($op == 'show');
+  panels_cache_set('display', $did, $cache);
 
   $output = new stdClass();
   $output->type = 'replace';

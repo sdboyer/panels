@@ -18,6 +18,8 @@ function panels_node_edit_panels_arguments() {
     'settings form submit' => 'panels_node_edit_settings_form_submit',
     'displays' => 'panels_node_edit_displays',
     'choose display' => 'panels_node_edit_choose_display',
+    'native path' => 'node/%node/edit',
+    'load function' => 'node',
   );
   return $args;
 }

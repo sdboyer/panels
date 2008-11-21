@@ -45,7 +45,7 @@ function panels_views_panels_content_types() {
     'title callback' => 'panels_views_all_views_title',
   );
   $items['views_panes'] = array(
-    'title' => t('All views'),
+    'title' => t('Views panes'),
     'content_types' => 'panels_views_panes_content_types',
     'render callback' => 'panels_views_panes_render',
     'add callback' => 'panels_views_panes_edit',
@@ -73,7 +73,7 @@ function panels_views_all_views_content_types() {
 
       $contexts = array();
 
-      if ($arguments = $display->handler->get_handlers('argument')) {
+      if (isset($display->handler) && $arguments = $display->handler->get_handlers('argument')) {
         foreach ($arguments as $arg) {
           $contexts[] = new panels_optional_context($arg->ui_name(), 'any');
         }
@@ -619,4 +619,16 @@ function panels_views_panes_title($subtype, $conf) {
   $view->set_display($display);
   $title = $view->display_handler->get_option('pane_title');
   return check_plain($title ? $title : $view->name);
+}
+
+/**
+ * Implementation of hook_views_api().
+ *
+ * This one is used as the base to reduce errors when updating.
+ */
+function panels_views_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'panels_views'),
+  );
 }

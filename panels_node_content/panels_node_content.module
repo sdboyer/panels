@@ -73,8 +73,11 @@ function panels_node_content_render($subtype, $conf, $panel_args) {
 
   // Support node translation
   if (module_exists('translation')) {
-    if ($translation = module_invoke('translation', 'node_nid', $nid, $GLOBALS['locale'])) {
-      $nid = $translation;
+    if ($translations = module_invoke('translation', 'node_get_translations', $nid )) {
+	  if( $translations[$GLOBALS['language']->language] )
+	  {
+		$nid = $translations[$GLOBALS['language']->language]->nid;
+	  }
     }
   }
 
@@ -186,12 +189,11 @@ function panels_node_content_edit($id, $parents, $conf) {
  * Validate a node.
  */
 function panels_node_content_edit_validate($form, &$form_state) {
-  $form_values = $form_state['values'];
-  if (!$form_values['validate_me']) {
+  if (!$form_state['values']['validate_me']) {
     return;
   }
 
-  $nid = $form_values['nid'];
+  $nid = $form_state['values']['nid'];
   $preg_matches = array();
   $match = preg_match('/\[nid: (\d+)\]/', $nid, $preg_matches);
   if (!$match) {
@@ -208,7 +210,7 @@ function panels_node_content_edit_validate($form, &$form_state) {
     $node = db_fetch_object(db_query(db_rewrite_sql("SELECT n.nid FROM {node} n WHERE LOWER(n.title) = LOWER('%s')"), $nid));
   }
   if ($node) {
-    $form_values['nid'] = $node->nid;
+    $form_state['values']['nid'] = $node->nid;
   }
 
   if (!($node || preg_match('/^[@%]\d+$/', $nid))) {

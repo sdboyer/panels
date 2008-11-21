@@ -66,7 +66,10 @@ function panels_page_list_page() {
     // this is safe as it's always programmatic
     $item[] = $panel_page->type;
 
-    if (empty($panel_page->display)) {
+    if ($panel_page->type == t('Default')) {
+      $panel_page->display = &$panel_page->primary;
+    }
+    else {
       $panel_page->display = $displays[$panel_page->did];
     }
     $item[] = check_plain($layouts[$panel_page->display->layout]['title']);
@@ -153,10 +156,11 @@ function panels_page_disable_page($name = NULL) {
  */
 function panels_page_delete_confirm(&$form_state, $panel_page) {
   $form_state['panel_page'] = $panel_page;
+  $form = array();
   if ($panel_page->type != t('Overridden')) {
     return confirm_form($form,
       t('Are you sure you want to delete "@title"?', array('@title' => panels_page_get_title($panel_page))),
-      $_GET['destination'] ? $_GET['destination'] : 'admin/panels/panel-page',
+      isset($_GET['destination']) ? $_GET['destination'] : 'admin/panels/panel-page',
       t('This action cannot be undone.'),
       t('Delete'), t('Cancel')
     );
@@ -164,7 +168,7 @@ function panels_page_delete_confirm(&$form_state, $panel_page) {
   else {
     return confirm_form($form,
       t('Are you sure you want to revert "@title" to its default configuration?', array('@title' => panels_page_get_title($panel_page))),
-      $_GET['destination'] ? $_GET['destination'] : 'admin/panels/panel-page',
+      isset($_GET['destination']) ? $_GET['destination'] : 'admin/panels/panel-page',
       t('This action cannot be undone.'),
       t('Revert'), t('Cancel')
     );
@@ -254,6 +258,7 @@ function panels_page_edit($panel_page, $next = NULL) {
  */
 function panels_page_edit_form(&$form_state, &$panel_page, $next = NULL) {
   panels_load_include('common');
+  panels_load_include('plugins');
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $layout = panels_get_layout($panel_page->display->layout);
 
@@ -361,6 +366,9 @@ function panels_page_edit_form_validate($form, &$form_state) {
   else if (preg_match("/[^A-Za-z0-9_]/", $form_state['values']['name'])) {
     form_error($form['left']['info']['name'], t('Panel name must be alphanumeric or underscores only.'));
   }
+  else if (!preg_match("/[A-Za-z_]/", $form_state['values']['name'])) {
+    form_error($form['left']['info']['name'], t('Panel name must not consist exclusively of numbers.'));
+  }
   else {
     if (db_result(db_query("SELECT pid FROM {panels_page} WHERE name = '%s' AND pid <> %d", $form_state['values']['name'], $form_state['pid']))) {
       form_error($form['left']['info']['name'], t('Panel name must be unique.'));
@@ -403,7 +411,7 @@ function panels_page_edit_form_submit($form, &$form_state) {
     $layout = panels_get_layout($panel_page->display->layout);
 
     if (!empty($layout['settings form'])) {
-      $form_state['redirect'] =  "admin/panels/panel-page/$panel_page->name/edit/settings/next";
+      $form_state['redirect'] =  "admin/panels/panel-page/$panel_page->name/edit/layout-settings/next";
     }
     else {
       $form_state['redirect'] = "admin/panels/panel-page/$panel_page->name/edit/advanced/next";
@@ -431,7 +439,6 @@ function panels_page_edit_advanced($panel_page, $next = NULL) {
  * The form to edit the advanced settings of a panel page.
  */
 function panels_page_advanced_form(&$form_state, $panel_page, $next) {
-  drupal_add_css(panels_get_path('css/panels_admin.css'));
   $form_state['panel_page'] = &$panel_page;
   $form_state['next'] = $next;
 
@@ -607,7 +614,7 @@ function panels_page_export_page(&$form_state, $panel_page) {
   $code = panels_page_export($panel_page);
   $lines = substr_count($code, "\n");
   $form = array('output' => array(
-    '#title' => t("Export of '@title' ", array('@title' => $panel_page->title)),
+    '#title' => t("Export of '@title'", array('@title' => $panel_page->title)),
     '#type' => 'textarea',
     '#default_value' => $code,
     '#rows' => $lines,
@@ -640,7 +647,6 @@ function panels_page_context_form(&$form_state, $panel_page, $next) {
   $form_state['next'] = $next;
 
   drupal_add_css(panels_get_path('css/panels_admin.css'));
-  $layout = panels_get_layout($panel_page->display->layout);
 
   $form['right'] = array(
     '#prefix' => '<div class="right-container">',
@@ -812,29 +818,34 @@ function panels_page_edit_content($panel_page) {
   print theme('page', $output, FALSE);
 }
 
-function panels_page_preview($panel_page) {
-  $form_state = array(
-    'panel_page' => $panel_page,
-    'args' => func_get_args(),
-  );
-
-}
-
-function panels_page_preview_page(&$form_state, $panel_page) {
-  panels_page_load_include('render');
-  $form = array();
-  $form['notyet'] = array(
-    '#value' => t('Dynamic previews have not yet been ported to Drupal 6. Expect them soon.'),
-  );
-
-  return $form;
+function panels_page_preview_page($panel_page) {
+  return t('Dynamic previews have not yet been ported to Drupal 6. Expect them in a later alpha release.');
 
   $args = func_get_args();
   $panel_page = array_shift($args);
+
   $load = new stdClass();
-  _panels_page_construct_argument_contexts($load, $panel_page, $args);
+  panels_page_load_include('render');
 
+  if (!($panel_page->load_flags & PANELS_IS_DYNAMIC)) {
+    if ((bool) panels_page_access($panel_page->name)) {
+      panels_page_fetch_primary_display($panel_page);
+    }
+  }
+  else {
+    $form_state = array(
+      'panel_page' => $panel_page,
+      'args' => $args,
+    );
 
+    $form_output = drupal_build_form('panels_page_admin_view_form', $form_state);
+
+    _panels_page_construct_argument_contexts($load, $panel_page, $form_state['args']);
+  }
+
+  panels_page_prepare_panels_render($load, $panel_page, $args);
+
+  // Render or provide an error based upon information in load?
 
   // FIXME copied from the master loader; this NEEDS to be retooled for previews.
 /*  foreach ($panel_page->arguments as $id => $argument) {
@@ -859,13 +870,16 @@ function panels_page_preview_page(&$form_state, $panel_page) {
       // TODO should this 'business logic' be separated out?
       drupal_not_found();
     }
-    $panel_page->context[panels_argument_context_id($argument)] = $context;
+    $panel_page->context[panels_context_id($argument, 'argument')] = $context;
   }
   _panels_page_prepare_render($panel_page);
   */
 }
 
-function panels_page_admin_view(&$form_state, $panel_page, $args) {
+function panels_page_admin_view(&$form_state) {
+  $panel_page = &$form_state['panel_page'];
+  $args = $form_state['args'];
+
   $form = array();
 
   $form['fieldset'] = array(
@@ -880,8 +894,8 @@ function panels_page_admin_view(&$form_state, $panel_page, $args) {
   if ($args_missing = max($required_args - count($args), 0)) {
     $value = $url;
     $description = format_plural($args_missing,
-      t('1 argument is missing to generate a valid URL.'),
-      t('%count arguments are missing to generate a valid URL.', array('%count' => $args_missing))
+      '1 argument is missing to generate a valid URL.',
+      '@count arguments are missing to generate a valid URL.'
     );
   }
   else {
@@ -935,18 +949,16 @@ function panels_page_admin_view(&$form_state, $panel_page, $args) {
     '#type' => 'value',
     '#value' => $panel_page,
   );
-  $form['contexts'] = array(
-    '#type' => 'value',
-    '#value' => $contexts,
-  );
+
+  $form_state['contexts'] = $contexts;
 
   return $form;
 }
 
 function panels_page_admin_view_submit($form, &$form_state) {
   $count = 0;
-  $url = "admin/panels/panel-page/" . $form_state['values']['panel_page']->name . '/edit/preview';
-  foreach ($form_state['values']['contexts'] as $context) {
+  $url = "admin/panels/panel-page/" . $form_state['panel_page']->name . '/edit/preview';
+  foreach ($form_state['contexts'] as $context) {
     $url .= "/" . $form_state['values']["arg$count"];
     $count++;
   }

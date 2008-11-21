@@ -154,6 +154,15 @@ function panels_render_panes($display) {
     $content[$panel_name] = panels_render_panel($display, $panel_name, $panel);
   }
 
+  // Prevent notices by making sure that all panels at least have an entry:
+  $layout = panels_get_layout($display->layout);
+  $panels = panels_get_panels($layout, $display);
+  foreach ($panels as $id => $panel) {
+    if (!isset($content[$id])) {
+      $content[$id] = NULL;
+    }
+  }
+
   return $content;
 }
 
@@ -207,13 +216,8 @@ function panels_render_pane_content(&$display, &$pane) {
         $url = $content->title_link;
       }
       // set defaults so we don't bring up notices
-      $url += array('href' => '', 'attributes' => NULL, 'query' => NULL, 'fragment' => NULL, 'absolute' => NULL);
-      $content->title = l($content->title,
-        $url['href'],
-        $url['attributes'],
-        $url['query'],
-        $url['fragment'],
-        $url['absolute'], TRUE);
+      $url += array('href' => '', 'attributes' => NULL, 'query' => NULL, 'fragment' => NULL, 'absolute' => NULL, 'html' => TRUE);
+      $content->title = l($content->title, $url['href'], $url);
     }
   }
   return $content;
@@ -233,7 +237,7 @@ function panels_render_pane($content, $pane, $display) {
   if (!empty($pane->configuration['style'])) {
     $style = panels_get_style($pane->configuration['style']);
 
-    if (isset($style)) {
+    if (isset($style) && isset($style['render pane'])) {
       $output = theme($style['render pane'], $content, $pane, $display);
 
       // This could be null if no theme function existed.
@@ -243,8 +247,10 @@ function panels_render_pane($content, $pane, $display) {
     }
   }
 
-  // fallback
-  return theme('panels_pane', $content, $pane, $display);
+  if (!empty($content)) {
+    // fallback
+    return theme('panels_pane', $content, $pane, $display);
+  }
 }
 
 /**
@@ -258,11 +264,11 @@ function panels_get_panel_style_and_settings($panel_settings, $panel) {
 
   if (empty($panel_settings['individual']) || empty($panel_settings['panel'][$panel]['style'])) {
     $style = panels_get_style($panel_settings['style']);
-    $style_settings = $panel_settings['style_settings']['default'];
+    $style_settings = isset($panel_settings['style_settings']['default']) ? $panel_settings['style_settings']['default'] : array();
   }
   else {
     $style = panels_get_style($panel_settings['panel'][$panel]['style']);
-    $style_settings = $panel_settings['style_settings'][$panel];
+    $style_settings = isset($panel_settings['style_settings'][$panel]) ? $panel_settings['style_settings'][$panel] : array();
   }
 
   return array($style, $style_settings);

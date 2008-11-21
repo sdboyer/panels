@@ -55,11 +55,12 @@ function panels_node_menu() {
 
   // Avoid some repetition on these:
   $base = array(
-    'access callback' => 'node_access',
-    'access arguments' => array('update', 1),
+    'access callback' => 'panels_node_edit_node',
+    'access arguments' => array(1),
     'page arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
   );
+
   $items['node/%node/panel_layout'] = array(
     'path' => $base . 'layout',
     'title' => 'Panel layout',
@@ -73,7 +74,7 @@ function panels_node_menu() {
     'weight' => 2,
   ) + $base;
 
-  $items['node/%node/panel_layout'] = array(
+  $items['node/%node/panel_content'] = array(
     'title' => 'Panel content',
     'page callback' => 'panels_node_edit_content',
     'weight' => 3,
@@ -87,6 +88,14 @@ function panels_node_menu() {
   );
 
   return $items;
+}
+
+function panels_node_edit_node($node) {
+  if (!isset($node->panels_node)) {
+    return FALSE;
+  }
+
+  return node_access('update', $node);
 }
 
 /**
@@ -280,7 +289,7 @@ function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
   }
   else {
     $display = panels_load_display($node->panels_node['did']);
-    $display->css_id = $node->panel_node['css_id'];
+    $display->css_id = $node->panels_node['css_id'];
     // TODO: Find a way to make sure this can't node_view.
     $display->context = array('panel-node' => panels_context_create('node', $node));
 

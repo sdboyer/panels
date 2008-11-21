@@ -2,7 +2,7 @@
 /* $Id$ */
 
 /*
- * @file panels_page/panels_page.css_filter.inc
+ * @file
  * CSS filtering functions. Contains a disassembler, filter, compressor, and
  * decompressor. Separated out into this file for cleanliness, as it's likely
  * that these won't live in panels_page for long.
@@ -93,7 +93,7 @@ function panels_page_disassemble_css($css) {
     foreach ($statements as $statement) {
       // Get the selector(s) and declaration.
       list($selector_str, $declaration) = explode('{', $statement);
-      
+
       // If the selector exists, then disassemble it, check it, and regenerate
       // the selector string.
       $selector_str = empty($selector_str) ? FALSE : panels_page_disassemble_css_selector($selector_str);
@@ -101,7 +101,7 @@ function panels_page_disassemble_css($css) {
         // No valid selectors. Bomb out and start the next item.
         continue;
       }
-      
+
       // Disassemble the declaration, check it and tuck it into an array.
       $disassembled_css[$selector_str] = panels_page_disassemble_css_declaration(strtolower($declaration));
     }
@@ -173,7 +173,7 @@ function panels_page_filter_css($css, $allowed_properties = array(), $allowed_va
   // Define disallowed url() value contents, if none is provided.
   // $disallowed_values_regex = !empty($disallowed_values_regex) ? $disallowed_values_regex : '/[url|expression]\s*\(\s*[^\s)]+?\s*\)\s*/';
   $disallowed_values_regex = !empty($disallowed_values_regex) ? $disallowed_values_regex : '/(url|expression)/';
-  
+
   foreach ($css as $selector_str => $declaration) {
     foreach ($declaration as $property => $value) {
       if (!in_array($property, $allowed_properties)) {

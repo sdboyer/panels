@@ -50,7 +50,7 @@ function panels_admin_content_types_user_picture() {
 /**
  * Display the administrative title for a panel pane in the drag & drop UI
  */
-function panels_admin_title_user_picture($conf, $context) {
+function panels_admin_title_user_picture($subtype, $conf, $context) {
   return t('"@s" user picture', array('@s' => $context->identifier));
 }
 

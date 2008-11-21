@@ -62,5 +62,5 @@ function panels_context_term_settings_form($conf, $external = FALSE) {
 /**
  * Validate a term.
  */
-function panels_context_term_settings_form_validate($form, $form_values) {
+function panels_context_term_settings_form_validate($form, &$form_values, &$form_state) {
 }

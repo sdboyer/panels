@@ -38,11 +38,14 @@ function panels_profile_fields_content($subtype, $conf, $panel_args, $context) {
     $block->subject = $category;
 
     // Put all the fields in the category into an array
-    $profile = profile_view_profile($account);
-    if (is_array($profile[$category])) {
-      foreach ($profile[$category] as $field) {
-        $vars[$field['class']]['title'] = $field['title'];
-        $vars[$field['class']]['value'] = $field['value'];
+    profile_view_profile($account);
+
+    if (is_array($account->content[$category])) {
+      foreach ($account->content[$category] as $field) {
+        if (is_array($field['#attributes'])) {
+          $vars[$field['#attributes']['class']]['title'] = $field['#title'];
+          $vars[$field['#attributes']['class']]['value'] = $field['#value'];
+        }
       }
     }
 
@@ -65,22 +68,6 @@ function panels_profile_fields_content($subtype, $conf, $panel_args, $context) {
   }
 
   return $block;
-}
-
-/**
- * Theme the profile fields retrieved in panels_profile_fields_content
- */
-function theme_profile_fields_pane($category, $vars) {
-  if (is_array($vars)) {
-    foreach ($vars as $class => $field) {
-      $output .= '<dl class="profile-category">';
-      $output .= '<dt class="profile-' . $class . '">' . $field['title'] . '</dt>';
-      $output .= '<dd class="profile-' . $class . '">' . $field['value'] . '</dd>';
-      $output .= '</dl>';
-    }
-  }
-
-  return $output;
 }
 
 /**
@@ -147,7 +134,7 @@ function panels_profile_fields_configure($id, $parents, $conf = array()) {
 /**
  * 'Title' callback for the 'profile fields' content type.
  */
-function panels_profile_fields_configure_title($conf, $context) {
+function panels_profile_fields_configure_title($subtype, $conf, $context) {
   return t('"@s" profile fields', array('@s' => $conf['category']));
 }
 

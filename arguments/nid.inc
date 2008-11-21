@@ -18,6 +18,8 @@ function panels_nid_panels_arguments() {
     'settings form submit' => 'panels_nid_settings_form_submit',
     'displays' => 'panels_nid_displays',
     'choose display' => 'panels_nid_choose_display',
+    'native path' => 'node/%node',
+    'load function' => 'node',
   );
   return $args;
 }
