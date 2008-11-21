@@ -1,0 +1,153 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_schema().
+ */
+function panels_schema() {
+  // This should always point to our 'current' schema. This makes it relatively easy
+  // to keep a record of schema as we make changes to it.
+  return panels_schema_1();
+}
+
+/**
+ * Schema version 1 for Panels in D6.
+ */
+function panels_schema_1() {
+  $schema = array();
+
+  $schema['panels_display'] = array(
+    'fields' => array(
+      'did' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'layout' => array(
+        'type' => 'varchar',
+        'length' => '32',
+      ),
+      'layout_settings' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'panel_settings' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'cache' => array(
+        'type' => 'text',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'hide_title' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+      ),
+    ),
+    'primary key' => array('did'),
+  );
+
+  $schema['panels_pane'] = array(
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'did' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'panel' => array(
+        'type' => 'varchar',
+        'length' => '32',
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => '32',
+      ),
+      'subtype' => array(
+        'type' => 'varchar',
+        'length' => '64',
+      ),
+      'shown' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 1,
+      ),
+      'access' => array(
+        'type' => 'varchar',
+        'length' => '128',
+      ),
+      'visibility' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'configuration' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'cache' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'position' => array(
+        'type' => 'int',
+        'size' => 'small',
+      ),
+    ),
+    'primary key' => array('pid'),
+    'indexes' => array(
+      'did_idx' => array('did')
+    ),
+  );
+
+  $schema['panels_object_cache'] = array(
+    'fields' => array(
+      'sid' => array(
+        'type' => 'varchar',
+        'length' => '64',
+      ),
+      'did' => array(
+        'type' => 'int',
+      ),
+      'obj' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'data' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'timestamp' => array(
+        'type' => 'int',
+      ),
+    ),
+    'indexes' => array(
+      'idx' => array('sid', 'obj', 'did'),
+      'time_idx' => array('timestamp')
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function panels_install() {
+  db_query("UPDATE {system} SET weight = 10 WHERE name = 'panels'");
+  drupal_set_message(st('Please keep in mind that this is an Alpha release of Panels for Drupal 6, and is NOT intended for use on production sites.'));
+  drupal_set_message(st('Additionally, the upgrade path from Drupal 5 has NOT been resolved, and should not be attempted.'));
+  drupal_set_message(st('Bug reports are encouraged, especially when they come with patches! The <a href="@link">Panels project page</a> has details on filing issues.', array('@link' => 'http://drupal.org/project/panels')));
+  drupal_install_schema('panels');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function panels_uninstall() {
+  drupal_uninstall_schema('panels');
+}
+

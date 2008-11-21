@@ -1,0 +1,7 @@
+; $Id$
+name = Panel nodes
+description = Create nodes that are divided into areas with selectable content.
+package = "Panels"
+dependencies[] = panels
+core = 6.x
+

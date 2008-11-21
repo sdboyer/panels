@@ -1,0 +1,7 @@
+; $Id$
+
+name = Panels exporter
+description = Allows exporting multiple panel pages, mini panels and other types at once.
+package = "Panels"
+dependencies[] = panels
+core = 6.x

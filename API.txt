@@ -1,0 +1,4 @@
+# $Id$
+
+The most current (usually -dev) version of the Panels 2 API Documentation can be
+found online at http://doxy.samboyer.org/panels2/. 

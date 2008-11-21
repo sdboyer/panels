@@ -1,0 +1,7 @@
+; $Id$
+name = Views panes
+description = Integrates Views as Panel panes (content types).
+package = "Panels"
+dependencies[] = panels
+dependencies[] = views
+core = 6.x
