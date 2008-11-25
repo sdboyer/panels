@@ -31,8 +31,6 @@ function panels_delegator_save(&$handler, $update) {
   }
 }
 
-
-
 /**
  * Choose a layout for this panel.
  */
@@ -318,4 +316,16 @@ function panels_delegator_edit_context(&$form, &$form_state) {
 function panels_delegator_edit_context_submit(&$form, &$form_state) {
   $form_state['handler']->conf['contexts'] = $form_state['cache']->contexts;
   $form_state['handler']->conf['relationships'] = $form_state['cache']->relationships;
+}
+
+/**
+ * Special handling for exporting a panel task handler.
+ */
+function panels_delegator_export(&$handler, $indent) {
+  $display = $handler->conf['display'];
+  unset($handler->conf['display']);
+
+  $output = panels_export_display($display, $indent);
+  $output .= $indent . '$handler->conf[\'display\'] = $display' . ";\n";
+  return $output;
 }

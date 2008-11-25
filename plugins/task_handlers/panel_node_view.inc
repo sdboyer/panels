@@ -10,12 +10,12 @@ function panels_panel_node_view_delegator_task_handlers() {
       'render' => 'panels_panel_node_view_render',
       'add forms' => array(
         'node_type' => t('Select node type'),
-        'settings' => t('General settings'),
         'choose' => t('Choose layout'),
         'layout-settings' => t('Configure layout'),
-        'context' => t('Select additional contexts'),
         'content' => t('Panel content'),
       ),
+      'save' => 'panels_panel_node_view_save',
+      'export' => 'panels_panel_node_view_export',
       'edit forms' => array(
         'content' => t('Panel content'),
         'settings' => t('General'),
@@ -25,7 +25,6 @@ function panels_panel_node_view_delegator_task_handlers() {
         'layout-settings' => t('Layout settings'),
         'node_type' => t('Node type'),
       ),
-      'save' => 'panels_panel_node_view_save',
       'forms' => array(
         'node_type' => array(
           'form' => 'panels_panel_node_view_edit_node_type',
@@ -150,6 +149,14 @@ function panels_panel_node_view_render($handler, $node) {
 function panels_panel_node_view_save(&$handler, $update) {
   panels_load_include('delegator');
   return panels_delegator_save($handler, $update);
+}
+
+/**
+ * Call through to the delegator function for this.
+ */
+function panels_panel_node_view_export(&$handler, $indent) {
+  panels_load_include('delegator');
+  return panels_delegator_export($handler, $indent);
 }
 
 /**

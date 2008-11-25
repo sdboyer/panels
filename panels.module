@@ -832,7 +832,9 @@ function panels_export_pane($pane, $prefix = '') {
   $output = $prefix . '$pane = new stdClass()'  . ";\n";
   $fields = array('pid', 'panel', 'type', 'shown', 'subtype', 'access', 'configuration', 'cache');
   foreach ($fields as $field) {
-    $output .= "$prefix  " . '$pane->' . $field . ' = ' . panels_var_export($pane->$field, "$prefix  ") . ";\n";
+    if (isset($pane->$field)) {
+      $output .= "$prefix  " . '$pane->' . $field . ' = ' . panels_var_export($pane->$field, "$prefix  ") . ";\n";
+    }
   }
   return $output;
 }
