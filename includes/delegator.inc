@@ -10,6 +10,101 @@
  */
 
 /**
+ * Get the default configuration for a delegator panel. The caller will
+ * need to expand upon this a little bit, but not very much. See
+ * panel_node_view.inc for an example.
+ *
+ * Needed expansions:
+ *   - task type
+ *   - admin title
+ *   - render
+ *
+ *   - add/edit forms for items specific to that handler
+ *   - get context -- Panels specific callback to get contexts for the
+ *     system.
+ */
+function panels_delegator_get_config() {
+  return array(
+    'title' => t('Panel'),
+    'admin summary' =>'panels_delegator_admin_summary',
+    'save' => 'panels_delegator_save',
+    'export' => 'panels_delegator_export',
+    'add forms' => array(
+      'choose' => t('Choose layout'),
+      'layout-settings' => t('Configure layout'),
+      'content' => t('Panel content'),
+    ),
+    'edit forms' => array(
+      'content' => t('Panel content'),
+      'settings' => t('General'),
+      'context' => t('Contexts'),
+      'layout' => t('Change layout'),
+      'move' => '', // no title makes it a 'hidden' edit form.
+      'layout-settings' => t('Layout settings'),
+    ),
+    'forms' => array(
+      'settings' => array(
+        'include' => drupal_get_path('module', 'panels') . '/includes/delegator.inc',
+        'form' => 'panels_delegator_edit_settings',
+      ),
+      'choose' => array(
+        'include' => drupal_get_path('module', 'panels') . '/includes/delegator.inc',
+        'form' => 'panels_delegator_edit_choose',
+        'validate' => 'panels_delegator_edit_choose_validate',
+        'submit' => 'panels_delegator_edit_choose_submit',
+      ),
+      'layout' => array(
+        'include' => drupal_get_path('module', 'panels') . '/includes/delegator.inc',
+        'no return' => TRUE,
+        'alternate next' => 'move',
+        'form' => 'panels_delegator_edit_layout',
+        'validate' => 'panels_delegator_edit_layout_validate',
+        'submit' => 'panels_delegator_edit_layout_submit',
+      ),
+      'move' => array(
+        'include' => array(
+          drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
+          drupal_get_path('module', 'panels') . '/includes/delegator.inc',
+        ),
+        'form' => 'panels_delegator_edit_move',
+        'submit' => 'panels_change_layout_submit',
+      ),
+      'layout-settings' => array(
+        'include' => array(
+          drupal_get_path('module', 'panels') . '/includes/display-layout-settings.inc',
+          drupal_get_path('module', 'panels') . '/includes/delegator.inc',
+        ),
+        'form' => 'panels_delegator_edit_layout_settings',
+        'validate' => 'panels_edit_layout_settings_form_validate',
+        'submit' => 'panels_edit_layout_settings_form_submit',
+      ),
+      'content' => array(
+        'include' => array(
+          drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
+          drupal_get_path('module', 'panels') . '/includes/delegator.inc',
+        ),
+        'form' => 'panels_delegator_edit_content',
+        'submit' => 'panels_edit_display_form_submit',
+        'no blocks' => TRUE,
+      ),
+      'context' => array(
+        'include' => drupal_get_path('module', 'panels') . '/includes/delegator.inc',
+        'form' => 'panels_delegator_edit_context',
+        'submit' => 'panels_delegator_edit_context_submit',
+      ),
+    ),
+    'default conf' => array(
+      'no_blocks' => FALSE,
+      'css_id' => '',
+      'css' => '',
+      'css_cache_file' => '',
+      'contexts' => array(),
+      'relationships' => array(),
+    ),
+  );
+}
+
+/**
  * Callback to allow the handler to react to being saved.
  */
 function panels_delegator_save(&$handler, $update) {
@@ -189,10 +284,9 @@ function panels_delegator_get_context($plugin, $handler, $base_only = FALSE) {
     $contexts = array();
   }
 
-  $object = $base_only ? new stdClass : (object) $handler->conf;
-
   // This function expects the contexts to be on an object, but our conf
   // is an array, so we have to convert.
+  $object = $base_only ? new stdClass : (object) $handler->conf;
 
   return panels_context_load_contexts($object, TRUE, $contexts);
 }
@@ -327,5 +421,42 @@ function panels_delegator_export(&$handler, $indent) {
 
   $output = panels_export_display($display, $indent);
   $output .= $indent . '$handler->conf[\'display\'] = $display' . ";\n";
+  return $output;
+}
+
+/**
+ * Provide a nice little summary of what's in a panel.
+ */
+function panels_delegator_admin_summary($handler, $task, $subtask_id) {
+  $output = '';
+  $display = $handler->conf['display'];
+
+  panels_load_include('plugins');
+  $layout = panels_get_layout($display->layout);
+  $icon = panels_print_layout_icon($display->layout, $layout);
+  $title = check_plain($layout['title']);
+
+  $plugin = delegator_get_task_handler($handler->handler);
+
+  // Create an object suitable for use with the context list.
+  $cache = new stdClass;
+  $cache->name = $handler->name;
+  $cache->base_contexts = panels_delegator_get_context($plugin, $handler, TRUE);
+  $cache->contexts = isset($handler->conf['contexts']) ? $handler->conf['contexts'] : array();
+  $cache->relationships = isset($handler->conf['relationships']) ? $handler->conf['relationships'] : array();
+
+  $display->context = panels_context_load_contexts($cache, TRUE, $cache->base_contexts);
+
+  $content = theme('panels_common_content_list', $display);
+  $contexts = theme('panels_common_context_list_no_table', $cache);
+
+  $output .= '<div class="right-container">';
+  $output .= $contexts;
+  $output .= '</div>';
+
+  $output .= '<div class="left-container">';
+  $output .= $icon . $title . $content;
+  $output .= '</div>';
+
   return $output;
 }

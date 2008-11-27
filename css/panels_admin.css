@@ -47,7 +47,8 @@
   margin-top: 1em;
 }
 
-.layout-container .layout-icon {
+.layout-container .layout-icon,
+.left-container .layout-icon {
   float: right;
   margin-left: .5em;
 }

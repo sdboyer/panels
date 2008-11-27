@@ -574,3 +574,79 @@ function theme_panels_common_context_list($object, $header = '') {
   }
 }
 
+/**
+ * panels_common_context_list() but not in a table format because tabledrag
+ * won't let us have tables within tables and still drag.
+ */
+function theme_panels_common_context_list_no_table($object) {
+  $titles = array();
+  $output = '';
+  $count  = 1;
+  // Describe 'built in' contexts.
+  if (!empty($object->base_contexts)) {
+    foreach ($object->base_contexts as $id => $context) {
+      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-title">' . t('Built in context') . '</div>';
+      $desc = check_plain($context->identifier);
+      if (isset($context->keyword)) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $context->keyword)) . '</div>';
+      }
+      if (isset($context->description)) {
+        $desc .= '<div class="description">' . filter_xss_admin($context->description) . '</div>';
+      }
+      $output .= '<div class="panels-context-content">' . $desc . '</div>';
+      $output .= '</div>';
+      $titles[$id] = $context->identifier;
+      $count++;
+    }
+  }
+
+  // First, make a list of arguments. Arguments are pretty simple.
+  if (!empty($object->arguments)) {
+    foreach ($object->arguments as $argument) {
+      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-title">' . t('Argument @count', array('@count' => $count)) . '</div>';
+      $desc = check_plain($argument['identifier']);
+      if (isset($argument['keyword'])) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $argument['keyword'])) . '</div>';
+      }
+      $output .= '<div class="panels-context-content">' . $desc . '</div>';
+      $output .= '</div>';
+      $titles[panels_context_id($argument, 'argument')] = $argument['identifier'];
+      $count++;
+    }
+  }
+  $count = 1;
+  // Then, make a nice list of contexts.
+  if (!empty($object->contexts)) {
+    foreach ($object->contexts as $context) {
+      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-title">' . t('Context @count', array('@count' => $count)) . '</div>';
+      $desc = check_plain($context['identifier']);
+      if (isset($context['keyword'])) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $context['keyword'])) . '</div>';
+      }
+      $output .= '<div class="panels-context-content">' . $desc . '</div>';
+      $output .= '</div>';
+      $titles[panels_context_id($context)] = $context['identifier'];
+      $count++;
+    }
+  }
+  // And relationships
+  if (!empty($object->relationships)) {
+    foreach ($object->relationships as $relationship) {
+      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-title">' . t('From "@title"', array('@title' => $titles[$relationship['context']])) . '</div>';
+      $desc = check_plain($relationship['identifier']);
+      if (isset($relationship['keyword'])) {
+        $desc .= '<div class="description">' . t('Keyword: %@keyword', array('@keyword' => $relationship['keyword'])) . '</div>';
+      }
+      $output .= '<div class="panels-context-content">' . $desc . '</div>';
+      $output .= '</div>';
+      $titles[panels_context_id($relationship, 'relationship')] = $relationship['identifier'];
+      $count++;
+    }
+  }
+
+  return $output;
+}

@@ -53,6 +53,10 @@ function panels_theme() {
     'arguments' => array('object'),
     'file' => 'includes/common.inc',
   );
+  $theme['panels_common_context_list_no_table'] = array(
+    'arguments' => array('object'),
+    'file' => 'includes/common.inc',
+  );
   $theme['panels_common_context_item_form'] = array(
     'arguments' => array('form'),
     'file' => 'includes/common.inc',
