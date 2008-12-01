@@ -401,15 +401,15 @@ function panels_delegator_edit_context(&$form, &$form_state) {
   );
 
   drupal_add_css(panels_get_path('css/panels_admin.css'));
-  $form_state['cache'] = &$cache;
+  $form_state['panel_object'] = &$cache;
 }
 
 /**
  * Process submission of the context edit form.
  */
 function panels_delegator_edit_context_submit(&$form, &$form_state) {
-  $form_state['handler']->conf['contexts'] = $form_state['cache']->contexts;
-  $form_state['handler']->conf['relationships'] = $form_state['cache']->relationships;
+  $form_state['handler']->conf['contexts'] = $form_state['panel_object']->contexts;
+  $form_state['handler']->conf['relationships'] = $form_state['panel_object']->relationships;
 }
 
 /**
@@ -434,7 +434,6 @@ function panels_delegator_admin_summary($handler, $task, $subtask_id) {
   panels_load_include('plugins');
   $layout = panels_get_layout($display->layout);
   $icon = panels_print_layout_icon($display->layout, $layout);
-  $title = check_plain($layout['title']);
 
   $plugin = delegator_get_task_handler($handler->handler);
 
@@ -450,7 +449,10 @@ function panels_delegator_admin_summary($handler, $task, $subtask_id) {
   $content = theme('panels_common_content_list', $display);
   $contexts = theme('panels_common_context_list_no_table', $cache);
 
+  $title = '<h2 class="content-title">' . check_plain($layout['title']) . '</h2>';
+
   $output .= '<div class="right-container">';
+  $output .= '<h2 class="context-title">' . t('Contexts') . '</h2>';
   $output .= $contexts;
   $output .= '</div>';
 

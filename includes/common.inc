@@ -585,7 +585,7 @@ function theme_panels_common_context_list_no_table($object) {
   // Describe 'built in' contexts.
   if (!empty($object->base_contexts)) {
     foreach ($object->base_contexts as $id => $context) {
-      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-holder clear-block">';
       $output .= '<div class="panels-context-title">' . t('Built in context') . '</div>';
       $desc = check_plain($context->identifier);
       if (isset($context->keyword)) {
@@ -604,7 +604,7 @@ function theme_panels_common_context_list_no_table($object) {
   // First, make a list of arguments. Arguments are pretty simple.
   if (!empty($object->arguments)) {
     foreach ($object->arguments as $argument) {
-      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-holder clear-block">';
       $output .= '<div class="panels-context-title">' . t('Argument @count', array('@count' => $count)) . '</div>';
       $desc = check_plain($argument['identifier']);
       if (isset($argument['keyword'])) {
@@ -620,7 +620,7 @@ function theme_panels_common_context_list_no_table($object) {
   // Then, make a nice list of contexts.
   if (!empty($object->contexts)) {
     foreach ($object->contexts as $context) {
-      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-holder clear-block">';
       $output .= '<div class="panels-context-title">' . t('Context @count', array('@count' => $count)) . '</div>';
       $desc = check_plain($context['identifier']);
       if (isset($context['keyword'])) {
@@ -635,7 +635,7 @@ function theme_panels_common_context_list_no_table($object) {
   // And relationships
   if (!empty($object->relationships)) {
     foreach ($object->relationships as $relationship) {
-      $output .= '<div class="panels-context-holder">';
+      $output .= '<div class="panels-context-holder clear-block">';
       $output .= '<div class="panels-context-title">' . t('From "@title"', array('@title' => $titles[$relationship['context']])) . '</div>';
       $desc = check_plain($relationship['identifier']);
       if (isset($relationship['keyword'])) {
