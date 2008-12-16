@@ -48,8 +48,8 @@ function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
   }
   elseif ($op == 'view') {
     $panel_mini = panels_mini_load($delta);
-    panels_load_include('plugins');
-    $panel_mini->context = $panel_mini->display->context = panels_context_load_contexts($panel_mini);
+    ctools_include('context');
+    $panel_mini->context = $panel_mini->display->context = ctools_context_load_contexts($panel_mini);
     $panel_mini->display->css_id = panels_mini_get_id($panel_mini->name);
 
     $block = array(
@@ -80,6 +80,7 @@ function panels_mini_panels_content_types() {
  */
 function panels_mini_content_types() {
   $types = array();
+  ctools_include('context');
   foreach (panels_mini_load_all() as $mini) {
     if (!empty($mini->disabled)) {
       continue;
@@ -96,9 +97,9 @@ function panels_mini_content_types() {
     if (!empty($mini->requiredcontexts)) {
       $types[$mini->name]['required context'] = array();
       foreach ($mini->requiredcontexts as $context) {
-        $info = panels_get_context($context['name']);
+        $info = ctools_get_context($context['name']);
         // TODO: allow an optional setting
-        $types[$mini->name]['required context'][] = new panels_required_context($context['identifier'], $info['context name']);
+        $types[$mini->name]['required context'][] = new ctools_context_required($context['identifier'], $info['context name']);
       }
     }
   }
@@ -131,11 +132,9 @@ function panels_mini_content($subtype, $conf, $panel_args, &$contexts) {
     return FALSE;
   }
 
-  panels_load_include('plugins');
-
   // Load up any contexts we might be using.
-  $context = panels_context_match_required_contexts($mini->requiredcontexts, $contexts);
-  $mini->context = $mini->display->context = panels_context_load_contexts($mini, FALSE, $context);
+  $context = ctools_context_match_required_contexts($mini->requiredcontexts, $contexts);
+  $mini->context = $mini->display->context = ctools_context_load_contexts($mini, FALSE, $context);
 
   if (empty($mini) || !empty($mini->disabled)) {
     return;

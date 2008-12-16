@@ -49,22 +49,6 @@ function panels_theme() {
     'arguments' => array('display'),
     'file' => 'includes/common.inc',
   );
-  $theme['panels_common_context_list'] = array(
-    'arguments' => array('object'),
-    'file' => 'includes/common.inc',
-  );
-  $theme['panels_common_context_list_no_table'] = array(
-    'arguments' => array('object'),
-    'file' => 'includes/common.inc',
-  );
-  $theme['panels_common_context_item_form'] = array(
-    'arguments' => array('form'),
-    'file' => 'includes/common.inc',
-  );
-  $theme['panels_common_context_item_row'] = array(
-    'arguments' => array('type', 'form', 'position', 'count', 'with_tr' => TRUE),
-    'file' => 'includes/common.inc',
-  );
   $theme['panels_dnd'] = array(
     'arguments' => array('content'),
     'file' => 'includes/display-edit.inc',
@@ -176,20 +160,6 @@ function panels_menu() {
     'title' => 'Autocomplete node',
     'page callback' => 'panels_node_autocomplete',
     'file' => 'includes/callbacks.inc',
-  ) + $base;
-
-  // For context add/configure calls in common-context.inc
-  $items['panels/ajax/context-add'] = array(
-    'page callback' => 'panels_ajax_context_item_add',
-    'file' => 'includes/common-context.inc',
-  ) + $base;
-  $items['panels/ajax/context-configure'] = array(
-    'page callback' => 'panels_ajax_context_item_edit',
-    'file' => 'includes/common-context.inc',
-  ) + $base;
-  $items['panels/ajax/context-delete'] = array(
-    'page callback' => 'panels_ajax_context_item_delete',
-    'file' => 'includes/common-context.inc',
   ) + $base;
 
   // Provide a nice location for a panels admin panel.
@@ -659,7 +629,7 @@ function panels_load_displays($dids) {
  *    - $display->incoming_content
  *
  * While all of these members are defined, $display->context is NEVER defined in the returned $display;
- * it must be set using one of the panels_context_create() functions.
+ * it must be set using one of the ctools_context_create() functions.
  */
 function panels_load_display($did) {
   $displays = panels_load_displays(array($did));
@@ -937,8 +907,8 @@ function panels_print_layout_link($id, $layout, $link) {
  * Implementation of hook_ctools_plugin_directory() to let the system know
  * we implement task and task_handler plugins.
  */
-function panels_ctools_plugin_directory($plugin) {
-  if ($plugin == 'tasks' || $plugin == 'task_handlers') {
+function panels_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'delegator' || $module == 'panels') {
     return 'plugins/' . $plugin;
   }
 }

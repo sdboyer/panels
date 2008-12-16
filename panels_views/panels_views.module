@@ -75,7 +75,7 @@ function panels_views_all_views_content_types() {
 
       if (isset($display->handler) && $arguments = $display->handler->get_handlers('argument')) {
         foreach ($arguments as $arg) {
-          $contexts[] = new panels_optional_context($arg->ui_name(), 'any');
+          $contexts[] = new ctools_context_optional($arg->ui_name(), 'any');
         }
       }
 
@@ -354,7 +354,7 @@ function panels_views_panes_content_types() {
       $arguments = $display->handler->get_argument_input();
       foreach ($arguments as $argument) {
         if ($argument['type'] == 'context') {
-          $contexts[] = new panels_required_context($argument['label'], $argument['context']);
+          $contexts[] = new ctools_context_required($argument['label'], $argument['context']);
         }
       }
 

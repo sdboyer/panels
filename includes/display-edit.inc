@@ -76,7 +76,7 @@ function panels_edit_display_form(&$form_state) {
 
   // Annoyingly, theme doesn't have access to form_state so we have to do this.
   $form['#display'] = $display;
-
+/*
   $explanation_text = '<p>';
   $explanation_text .= t('Grab the title bar of any pane to drag-and-drop it into another panel. Click the add pane button (!addicon) in any panel to add more content. Click the configure (!configicon) button on any pane to re-configure that pane. Click the cache (!cacheicon) button to configure caching for that pane specifically. Click the show/hide (!showicon/!hideicon) toggle button to show or hide that pane. Panes hidden in this way will be hidden from <em>everyone</em> until the hidden status is toggled off.',
     array(
@@ -92,7 +92,7 @@ function panels_edit_display_form(&$form_state) {
   $form['explanation'] = array(
     '#value' => $explanation_text,
   );
-
+*/
   $layout = panels_get_layout($display->layout);
   $layout_panels = panels_get_panels($layout, $display);
 
@@ -473,6 +473,7 @@ function panels_add_content($cache, $panel_id) {
 function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL, $subtype = NULL) {
   panels_load_include('plugins');
   panels_load_include('ajax');
+  ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
     panels_ajax_render(t('Invalid display id.'));

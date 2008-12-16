@@ -41,8 +41,9 @@ function panels_panel_node_view_render($handler, $node) {
   }
 
   // Load the node into a context
-  panels_load_include('plugins');
-  $context = panels_context_create('node', $node);
+//  panels_load_include('plugins');
+  ctools_include('context');
+  $context = ctools_context_create('node', $node);
   $context->identifier = t('Node being viewed');
   $context->keyword = 'node';
 
@@ -80,7 +81,8 @@ function panels_panel_node_view_render($handler, $node) {
  * Get empty contexts for use with the delegator panels pages.
  */
 function panels_panel_node_view_get_context() {
-  $context = panels_context_create_empty('node');
+  ctools_include('context');
+  $context = ctools_context_create_empty('node');
   $context->identifier = t('Node being viewed');
   $context->keyword = 'node';
 

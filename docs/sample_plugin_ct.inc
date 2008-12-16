@@ -19,7 +19,7 @@ Content type plugins define the content you can put into panes for display; If y
 @SECplug{content_types,pdfunc,Content Type Plugin Declaration}
 <p>This sample \pdfunc returns a definition array containing ALL of the \plugprops that Panels currently allows. The string used for the array key is significant: it determines the 'type' that panes which are created by this plugin will be assigned.</p>
 <p>Keep in mind when choosing a type name that namespace collisions are both silent and destructive (the Panels engine will not emit any errors, it will simply overwrite data). Such collisions will always be decided in favor of the last plugin processed; processing order order is generally determined by the weight of the module (in the system table) defining the plugin.</p>
-<p>All the plugins that come packaged with Panels necessarily obey a strict naming convention: the array key used for $items is the same as the name of the file itself, as well as being the same as the string prefixed by the module name (in this case, 'panels_'), and affixed by a string that indicates the type of plugin (in this case, 'panels_content_types'). Your modules need not follow the same conventions, although it is recommended that you do if possible; again, refer to panels_get_directories().</p> 
+<p>All the plugins that come packaged with Panels necessarily obey a strict naming convention: the array key used for $items is the same as the name of the file itself, as well as being the same as the string prefixed by the module name (in this case, 'panels_'), and affixed by a string that indicates the type of plugin (in this case, 'panels_content_types'). Your modules need not follow the same conventions, although it is recommended that you do if possible; again, refer to panels_get_directories().</p>
 @code
 function panels_SAMPLE_CT_panels_content_types() {
   $items['SAMPLE_CT'] = array(
@@ -260,7 +260,7 @@ form control is the most subject to change.
 @SSECplug{content_types,callbacks,content_types,Callback Property: 'content_types'}
 Callback function set by the @LAP{content_types,t-content_types,content_types} property. Returns an array of data that Panels uses to determine:
     - Whether or not the content type can be added to this display, based on
-      what context(s) are available. 
+      what context(s) are available.
     - If context requirements are met, the remainder of the array's data
       defines the icon, title, and description that the content type will
       be rendered with on the the Add Content @LGt{modal,modal}.\n\n
@@ -283,15 +283,15 @@ function panels_admin_content_types_SAMPLE_CT() {
       'description' => t('Descriptive text for the SAMPLE CONTENT TYPE, to be used in the tooltip.'),
       // This property indicates which contexts are prerequisites for the content
       // type to be used. If a display lacks a context required by this content
-      // type, then it simply will not be displayed. Multiple required contexts 
-      // can be declared by placing each context into an indexed array. 
-      'required context' => new panels_required_context(t('Sample Required Context'), 'sample_context_required'),
+      // type, then it simply will not be displayed. Multiple required contexts
+      // can be declared by placing each context into an indexed array.
+      'required context' => new ctools_context_required(t('Sample Required Context'), 'sample_context_required'),
       // This property has the same syntax as 'required context', but if optional
       // context requirements are not met, the content type will still be usable,
       // simply in a reduced form. It's up to the plugin author to define just how
       // different that functionality by writing varying the behavior of this plugin's
       // other callbacks according to the presence/absence of the context.
-      'optional context' => new panels_optional_context(t('Sample Optional Context'), 'sample_context_optional'),
+      'optional context' => new ctools_context_optional(t('Sample Optional Context'), 'sample_context_optional'),
       // Category is the group this subtype's icon will be placed in. The first
       // item in the array is the category name, and the second is the subtype's
       // weight in that category (used for ordering the subtypes in the category
@@ -391,7 +391,7 @@ function panels_content_SAMPLE_CT($conf, $panel_args, $context) {
   }
 
   // If the user has the necessary permissions, an 'admin link' is generated.
-  // Admin links are the special links that appear above the pane's title when 
+  // Admin links are the special links that appear above the pane's title when
   // you mouse over the pane.
   if (node_access('update', $node)) {
     $block->admin_links['update'] = array(
@@ -411,7 +411,7 @@ function panels_content_SAMPLE_CT($conf, $panel_args, $context) {
 @endcode
 
 Probably the most important thing to be noted about this helper function is
-just how similar it is to node.module's routine for node rendering. 
+just how similar it is to node.module's routine for node rendering.
 In fact, it's little more than a minor rewrite of
 <a href="http://api.drupal.org/api/function/node_view/5">node_view()</a>; the first lines are lifted directly from <a href="http://api.drupal.org/api/function/node_build_content/5">node_build_content()</a>,
 and the latter half from node_view().
@@ -507,10 +507,10 @@ the appropriate visibility callbacks. They're here now because the block content
 plugin was written long before the visibility system was introduced.
 
 Some of the techniques used in this edit callback are pretty advanced. For a more basic
-but quite thorough implementation of this callback, see panels_admin_edit_node_content(). 
+but quite thorough implementation of this callback, see panels_admin_edit_node_content().
 
 @param string $id
- The subtype of the pane being edited. The block panels content type plugin calls this 
+ The subtype of the pane being edited. The block panels content type plugin calls this
  variable '$id' for legacy reasons; we recommend you call this variable $subtype if you
  want your variable names to be optimally descriptive of their values.
 @param array $parents
@@ -629,7 +629,7 @@ function panels_admin_title_SAMPLE_CT($conf, $context) {
 Callback function set by the @LAP{content_types,t-editor-render-callback,editor render callback} property in the plugin definition array.
 
 Returns object used to populate the content area of the pane in the display
-editor ONLY. 
+editor ONLY.
 
 @param object $display
  The full display object being edited.
@@ -725,18 +725,18 @@ This function takes advantage of cached static variables to increase performance
 given page request, we know that only ONE group is going to be accessed, and only ONE user
 is going to be doing the accessing. Since the static keyword only lasts through a single page
 request, and nid and uid are the two variables that visibility depends upon in this case,
-we only have to query the database and build the $visibility array once, no matter how many 
+we only have to query the database and build the $visibility array once, no matter how many
 panes fire this callback to determine visibility during this page request.
 
 @param object $pane
- The fully-loaded $pane object that we're running the visibility check against. The 
- value set by the widget defined in the @LAP{content_types,callbacks_visibility-control,visibility control} callback is contained 
+ The fully-loaded $pane object that we're running the visibility check against. The
+ value set by the widget defined in the @LAP{content_types,callbacks_visibility-control,visibility control} callback is contained
  in $pane->visibility.
 @param object $display
  The fully-loaded display object that's currently being rendered. If you need $context
  to figure out what action to take, you'll find it/them in $display->context.
 @param object $user
- The current $user - the same as what you'd get from <var>global $user</var>. 
+ The current $user - the same as what you'd get from <var>global $user</var>.
  Passed for convenience, since visibility is often dependent on the $user.
 @return bool
  A boolean indicating if the pane should (TRUE) or should not (FALSE) be visible.
@@ -752,8 +752,8 @@ function panels_content_visibility_check_SAMPLE_CT($pane, $display, $user) {
   }
   if (!isset($visible[$pane->visibility])) {
     $members = array();
-    $sql = "SELECT u.uid AS uid, ogu.is_admin AS admin FROM {og_uid} ogu 
-            INNER JOIN {users} u ON ogu.uid = u.uid WHERE ogu.nid = %d 
+    $sql = "SELECT u.uid AS uid, ogu.is_admin AS admin FROM {og_uid} ogu
+            INNER JOIN {users} u ON ogu.uid = u.uid WHERE ogu.nid = %d
             AND ogu.is_active = 1 AND u.status = 1 ORDER BY ogu.created DESC";
     // $display holds the context; the $data element of $context holds a node object,
     // and we want the nid of that node.
@@ -766,7 +766,7 @@ function panels_content_visibility_check_SAMPLE_CT($pane, $display, $user) {
     $visible['admin'] = $visible['member'] ? $members[$user->uid] : FALSE;
   }
   return $visible[$pane->visibility];
-}  
+}
 @endcode
 
 
@@ -792,15 +792,15 @@ visibility setting, then you should do so here.
 Whatever you return from this callback will be saved as the value of
 <var>$pane->visibility</var>. If it is a data type that must be serialized before being
 put in the database (arrays and objects), then make sure to set the 'visibility
-serialize' property to TRUE for this content type. 
+serialize' property to TRUE for this content type.
 
 Note that in this particular sample implementation, the 'visibility serialize'
-property should be set to FALSE, as the value produced by the widget in the 
+property should be set to FALSE, as the value produced by the widget in the
 sample @LAP{content_types,callbacks_visibility-control,visibility control} function returns a simple string. Because 'visibility
 serialize' is FALSE by default, you can also simply not set the property.
 
 Note also that the visibility field in the panels_pane table is the standard
-'text' field. The save routines in panels_save_display() will always 
+'text' field. The save routines in panels_save_display() will always
 convert the value to a string, so bear in mind: even if you send an integer
 in, you'll get a string of that number back out on the other end.
 
@@ -840,7 +840,7 @@ they will be passed by reference whether or not you prefix the parameters with
 the reference operator; it is included in the below parameters purely for
 explanatory purposes. See panels_content_config_form() for the context.
 
-The callback is fired after all other form operations have been performed 
+The callback is fired after all other form operations have been performed
 immediately, before the fully-built $form is sent back to FAPI for handling.
 Changes you make to the $pane and $display objects will also be preserved, as
 a call to panels_cache_set() is made. The TRULY intrepid can extract the $cache
@@ -849,12 +849,12 @@ object from the value property in <var>$form['vars']</var> and play with that.
 This property is provided primarily as a means of allowing significant control
 over the innerworkings of the Panels content editing API, without necessitating
 direct hacks of the API itself. Probably the most common use case is hiding
-some/all of the form widgets that the Panels API adds to all content forms - 
+some/all of the form widgets that the Panels API adds to all content forms -
 the sample function contains a technique for doing just that.
 
 CAUTION: This is an advanced, dangerous feature. Improper use of it can severely
-break your content type, and even has the potential to wreak havoc with your 
-permanent Panels data. Be sure to test implementations of it thoroughly before 
+break your content type, and even has the potential to wreak havoc with your
+permanent Panels data. Be sure to test implementations of it thoroughly before
 putting them in a production environment.
 
 @param array $form

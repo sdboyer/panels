@@ -260,8 +260,8 @@ function panels_mini_preview_panel($mini) {
   $mini->display->args = array();
   $mini->display->css_id = panels_mini_get_id($mini->name);
 
-  panels_load_include('plugins');
-  $mini->context = $mini->display->context = panels_context_load_contexts($mini);
+  ctools_include('context');
+  $mini->context = $mini->display->context = ctools_context_load_contexts($mini);
 
   drupal_set_title(filter_xss_admin($mini->title));
   return panels_render_display($mini->display);
@@ -396,6 +396,7 @@ function panels_mini_edit($panel_mini) {
  */
 function panels_mini_edit_form(&$form_state, $panel_mini) {
   panels_load_include('common');
+  panels_load_include('plugins');
   drupal_add_css(panels_get_path('css/panels_admin.css'));
 
   $form['pid'] = array(
@@ -444,8 +445,8 @@ function panels_mini_edit_form(&$form_state, $panel_mini) {
     '#description' => t("The category that this mini-panel will be grouped into on the Add Content form. Only upper and lower-case alphanumeric characters are allowed. If left blank, defaults to 'Mini panels'."),
   );
 
-  panels_load_include('plugins');
-  $panel_mini->context = $panel_mini->display->context = panels_context_load_contexts($panel_mini);
+  ctools_include('context');
+  $panel_mini->context = $panel_mini->display->context = ctools_context_load_contexts($panel_mini);
 
   $form['right']['layout'] = array(
     '#type' => 'fieldset',
@@ -556,11 +557,14 @@ function panels_mini_edit_form_submit($form, &$form_state) {
  * Form to edit context features of a mini panel.
  */
 function panels_mini_edit_context($panel_mini, $next = NULL) {
+  ctools_include('context-admin');
+  ctools_context_admin_includes();
+
   if (!empty($_POST)) {
-    $panel_mini = panels_cache_get('panel_object:panel_mini', $panel_mini->name);
+    $panel_mini = ctools_object_cache_get('context_object:panel_mini', $panel_mini->name);
   }
   else {
-    panels_cache_set('panel_object:panel_mini', $panel_mini->name, $panel_mini);
+    ctools_object_cache_set('context_object:panel_mini', $panel_mini->name, $panel_mini);
   }
 
   drupal_set_title(check_plain($panel_mini->title));
@@ -592,13 +596,9 @@ function panels_mini_context_form(&$form_state, $panel_mini, $next = NULL) {
     '#suffix' => '</div>',
   );
 
-  panels_load_include('common-context');
-  panels_load_include('ajax');
-
-  $settings = panels_common_add_context_form('panel_mini', $form, $form_state, $form['right']['contexts_table'], $panel_mini);
-  $settings += panels_common_add_required_context_form('panel_mini', $form, $form_state, $form['left']['required_contexts_table'], $panel_mini);
-  $settings += panels_common_add_relationship_form('panel_mini', $form, $form_state, $form['right']['relationships_table'], $panel_mini);
-  panels_common_add_context_js($settings);
+  ctools_context_add_context_form('panel_mini', $form, $form_state, $form['right']['contexts_table'], $panel_mini);
+  ctools_context_add_required_context_form('panel_mini', $form, $form_state, $form['left']['required_contexts_table'], $panel_mini);
+  ctools_context_add_relationship_form('panel_mini', $form, $form_state, $form['right']['relationships_table'], $panel_mini);
 
   $label = $next ? t('Save and proceed') : t('Save');
   $form['submit'] = array(
@@ -615,12 +615,9 @@ function panels_mini_context_form(&$form_state, $panel_mini, $next = NULL) {
 function panels_mini_context_form_submit($form, &$form_state) {
   $panel_mini = $form_state['panel_mini'];
 
-  // Organize these from the common form.
-  panels_common_save_context('requiredcontext', $panel_mini->requiredcontexts, $form_state['values']);
-
   drupal_set_message(t('Your changes have been saved.'));
   panels_mini_save($panel_mini);
-  panels_cache_clear('panel_object:panel_mini', $panel_mini->name);
+  ctools_object_cache_clear('context_object:panel_mini', $panel_mini->name);
   if ($form_state['values']['submit'] == t('Save and proceed')) {
     $form_state['redirect'] = "admin/panels/panel-mini/$panel_mini->name/edit-content";
   }
@@ -661,9 +658,9 @@ function panels_mini_edit_content($panel_mini) {
   if (!is_object($panel_mini)) {
     $panel_mini = panels_mini_load($panel_mini);
   }
-  panels_load_include('plugins');
+  ctools_include('context');
   // Collect a list of contexts required by the arguments on this page.
-  $panel_mini->display->context = $contexts = panels_context_load_contexts($panel_mini);
+  $panel_mini->display->context = $contexts = ctools_context_load_contexts($panel_mini);
 
   panels_load_include('common');
   $content_types = panels_common_get_allowed_types('panels_mini', $contexts);

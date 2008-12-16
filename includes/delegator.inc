@@ -288,7 +288,7 @@ function panels_delegator_get_context($plugin, $handler, $base_only = FALSE) {
   // is an array, so we have to convert.
   $object = $base_only ? new stdClass : (object) $handler->conf;
 
-  return panels_context_load_contexts($object, TRUE, $contexts);
+  return ctools_context_load_contexts($object, TRUE, $contexts);
 }
 
 /**
@@ -359,14 +359,13 @@ function panels_delegator_edit_settings(&$form, &$form_state) {
  * Edit contexts that go with this panel.
  */
 function panels_delegator_edit_context(&$form, &$form_state) {
-  panels_load_include('common-context');
-  panels_load_include('ajax');
-  panels_load_include('plugins');
+  ctools_include('context-admin');
+  ctools_context_admin_includes();
 
   $handler = $form_state['handler'];
   // Check our context object cache.
   if (!empty($_POST)) {
-    $cache = panels_cache_get('panel_object:delegator', $handler->name);
+    $cache = ctools_object_cache_get('context_object:delegator', $handler->name);
   }
   else {
     $cache = new stdClass;
@@ -374,10 +373,8 @@ function panels_delegator_edit_context(&$form, &$form_state) {
     $cache->base_contexts = panels_delegator_get_context($form_state['plugin'], $form_state['handler'], TRUE);
     $cache->contexts = isset($handler->conf['contexts']) ? $handler->conf['contexts'] : array();
     $cache->relationships = isset($handler->conf['relationships']) ? $handler->conf['relationships'] : array();
-    panels_cache_set('panel_object:delegator', $handler->name, $cache);
+    ctools_object_cache_set('context_object:delegator', $handler->name, $cache);
   }
-
-  drupal_add_css(panels_get_path('css/panels_admin.css'));
 
   $form['right'] = array(
     '#prefix' => '<div class="clear-block"><div class="right-container">',
@@ -389,27 +386,28 @@ function panels_delegator_edit_context(&$form, &$form_state) {
     '#suffix' => '</div></div>',
   );
 
-  // Load proper contexts so your relationships can work from the right base.
-  $settings = panels_common_add_context_form('delegator', $form, $form_state, $form['right']['contexts_table'], $cache);
-  $settings += panels_common_add_relationship_form('delegator', $form, $form_state, $form['right']['relationships_table'], $cache);
-  panels_common_add_context_js($settings);
+  ctools_context_add_context_form('delegator', $form, $form_state, $form['right']['contexts_table'], $cache);
+  ctools_context_add_relationship_form('delegator', $form, $form_state, $form['right']['relationships_table'], $cache);
 
   $form['left']['summary'] = array(
     '#prefix' => '<div class="delegator-contexts">',
     '#suffix' => '</div>',
-    '#value' => theme('panels_common_context_list', $cache, t('Summary of contexts')),
+    '#value' => theme('ctools_context_list', $cache, t('Summary of contexts')),
   );
 
+  // @todo -- this CSS is actually dependent upon the plugins which means
+  // the plugins need to be able to add it.
   drupal_add_css(panels_get_path('css/panels_admin.css'));
-  $form_state['panel_object'] = &$cache;
+  $form_state['context_object'] = &$cache;
 }
 
 /**
  * Process submission of the context edit form.
  */
 function panels_delegator_edit_context_submit(&$form, &$form_state) {
-  $form_state['handler']->conf['contexts'] = $form_state['panel_object']->contexts;
-  $form_state['handler']->conf['relationships'] = $form_state['panel_object']->relationships;
+  $form_state['handler']->conf['contexts'] = $form_state['context_object']->contexts;
+  $form_state['handler']->conf['relationships'] = $form_state['context_object']->relationships;
+  ctools_object_cache_clear('context_object:delegator', $form_state['handler']->name);
 }
 
 /**
@@ -432,6 +430,7 @@ function panels_delegator_admin_summary($handler, $task, $subtask_id) {
   $display = $handler->conf['display'];
 
   panels_load_include('plugins');
+  ctools_include('context');
   $layout = panels_get_layout($display->layout);
   $icon = panels_print_layout_icon($display->layout, $layout);
 
@@ -444,10 +443,10 @@ function panels_delegator_admin_summary($handler, $task, $subtask_id) {
   $cache->contexts = isset($handler->conf['contexts']) ? $handler->conf['contexts'] : array();
   $cache->relationships = isset($handler->conf['relationships']) ? $handler->conf['relationships'] : array();
 
-  $display->context = panels_context_load_contexts($cache, TRUE, $cache->base_contexts);
+  $display->context = ctools_context_load_contexts($cache, TRUE, $cache->base_contexts);
 
   $content = theme('panels_common_content_list', $display);
-  $contexts = theme('panels_common_context_list_no_table', $cache);
+  $contexts = theme('ctools_context_list_no_table', $cache);
 
   $title = '<h2 class="content-title">' . check_plain($layout['title']) . '</h2>';
 

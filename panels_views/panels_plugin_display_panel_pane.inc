@@ -221,8 +221,8 @@ class panels_plugin_display_panel_pane extends views_plugin_display {
         $form['#title'] .= t('Choose the data source for view arguments');
         $argument_input = $this->get_argument_input();
 
-        panels_load_include('plugins');
-        $contexts = panels_get_contexts();
+        ctools_include('context');
+        $contexts = ctools_get_contexts();
         $context_options = array('any' => t('Any context'));
         foreach ($contexts as $name => $context) {
           $context_options[$name] = $context['title'];
