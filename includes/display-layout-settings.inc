@@ -220,7 +220,7 @@ function panels_edit_layout_settings_form(&$form_state) {
   if ($form_state['finish'] !== t('Save')) {
     $form['save'] = array(
       '#type' => 'submit',
-      '#value' => t('Save'),
+      '#value' => t('Save and edit again'),
       '#return_here' => TRUE,
     );
   }

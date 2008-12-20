@@ -6,6 +6,7 @@
  * to customize it a little bit to match what we're doing with this task.
  */
 function panels_panel_node_view_delegator_task_handlers() {
+  return;
   panels_load_include('delegator');
   $conf = panels_delegator_get_config();
 
@@ -62,10 +63,6 @@ function panels_panel_node_view_render($handler, $node) {
     }
     drupal_add_css($handler->conf['css_cache']);
   }
-
-  // Since we're not using node_show() we need to emulate what it used to do.
-  // Update the history table, stating that this user viewed this node.
-  node_tag_new($node->nid);
 
   $output = panels_render_display($display);
   if (!empty($handler->conf['no_blocks'])) {

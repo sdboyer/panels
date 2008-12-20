@@ -216,13 +216,13 @@ function panels_change_layout(&$form_state) {
     );
   }
 
+  if (empty($form_state['no buttons'])) {
     $form['back'] = array(
       '#type' => 'submit',
       '#value' => t('Back'),
       '#submit' => array('panels_choose_layout_back'),
     );
 
-  if (empty($form_state['no buttons'])) {
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => $form_state['finish'],
