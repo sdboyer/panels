@@ -22,7 +22,7 @@ function panels_panel_context_delegator_task_handlers() {
       'title' => t('Panel'),
       'admin summary' =>'panels_panel_context_admin_summary',
       'admin title' => 'panels_panel_context_title',
-      'render' => 'render',
+      'render' => 'panels_panel_context_render',
       'save' => 'panels_panel_context_save',
       'export' => 'panels_panel_context_export',
 
@@ -102,12 +102,10 @@ function panels_panel_context_delegator_task_handlers() {
  * We must first check to ensure the node is of a type we're allowed
  * to render. If not, decline to render it by returning NULL.
  */
-function panels_panel_context_render($handler, $page, $contexts) {
-  $task = delegator_get_task('page');
+function panels_panel_context_render($handler, $contexts) {
   // Go through arguments and see if they match.
-
   ctools_include('context-task-handler');
-  if (!ctools_context_handler_select($task, $page->name, $contexts)) {
+  if (!ctools_context_handler_select($handler, $contexts)) {
     return;
   }
 

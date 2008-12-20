@@ -229,7 +229,6 @@ function panels_ct_pane_config_form($pane, $contexts, $parents, $op, $content_ty
   if ($function = panels_plugin_get_function($content_type, $pane->type, "$op callback")) {
     return $function($pane->subtype, $parents, $pane->configuration);
   }
-  dsm($function);
 }
 
 /**
