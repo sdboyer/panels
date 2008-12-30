@@ -18,7 +18,7 @@
 function panels_panel_context_delegator_task_handlers() {
   return array(
     'panel_context' => array(
-      'task type' => 'context', // is a 'context' handler type
+      'handler type' => 'context', // is a 'context' handler type
       'title' => t('Panel'),
       'admin summary' =>'panels_panel_context_admin_summary',
       'admin title' => 'panels_panel_context_title',
@@ -76,8 +76,8 @@ function panels_panel_context_delegator_task_handlers() {
           'no blocks' => TRUE,
         ),
         'context' => array(
-          'include' => drupal_get_path('module', 'panels') . '/includes/delegator.inc',
-          'form id' => 'panels_panel_context_edit_context',
+          'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+          'form id' => 'ctools_context_handler_edit_context',
         ),
         'criteria' => array(
           'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
@@ -85,6 +85,8 @@ function panels_panel_context_delegator_task_handlers() {
         ),
       ),
       'default conf' => array(
+        'autogenerate_title' => TRUE,
+        'title' => t('Panel'),
         'no_blocks' => FALSE,
         'css_id' => '',
         'css' => '',
@@ -102,9 +104,13 @@ function panels_panel_context_delegator_task_handlers() {
  * We must first check to ensure the node is of a type we're allowed
  * to render. If not, decline to render it by returning NULL.
  */
-function panels_panel_context_render($handler, $contexts) {
+function panels_panel_context_render($handler, $base_contexts) {
   // Go through arguments and see if they match.
   ctools_include('context-task-handler');
+  // Add my contexts
+  $contexts = ctools_context_handler_get_handler_contexts($base_contexts, $handler);
+
+  // Test.
   if (!ctools_context_handler_select($handler, $contexts)) {
     return;
   }
@@ -134,16 +140,14 @@ function panels_panel_context_render($handler, $contexts) {
 }
 
 /**
- * Set up a title for the panel based upon the node types selected.
+ * Set up a title for the panel based upon the selection criteria.
  */
 function panels_panel_context_title($handler, $task, $subtask_id) {
-  ctools_include('context-task-handler');
-  $strings = ctools_context_handler_summary($task, $subtask_id, $handler->conf);
-  if (!$strings) {
-    return t('Panel');
+  if (isset($handler->conf['title'])) {
+    return $handler->conf['title'];
   }
   else {
-    return t('Panel: @criteria', array('@criteria' => implode(', ', $strings)));
+    return t('Panel');
   }
 }
 
@@ -217,22 +221,18 @@ function panels_panel_context_admin_summary($handler, $task, $subtask_id) {
 
   panels_load_include('plugins');
   ctools_include('context');
+  ctools_include('context-task-handler');
+
   $layout = panels_get_layout($display->layout);
   $icon = panels_print_layout_icon($display->layout, $layout);
 
   $plugin = delegator_get_task_handler($handler->handler);
 
-  // Create an object suitable for use with the context list.
-  $cache = new stdClass;
-  $cache->name = $handler->name;
-  $cache->base_contexts = panels_panel_context_get_context($task, $subtask_id, $plugin, $handler, TRUE);
-  $cache->contexts = isset($handler->conf['contexts']) ? $handler->conf['contexts'] : array();
-  $cache->relationships = isset($handler->conf['relationships']) ? $handler->conf['relationships'] : array();
-
-  $display->context = ctools_context_load_contexts($cache, TRUE, $cache->base_contexts);
+  $object = ctools_context_handler_get_task_object($task, $subtask_id, $handler);
+  $display->context = ctools_context_load_contexts($object, TRUE);
 
   $content = theme('panels_common_content_list', $display);
-  $contexts = theme('ctools_context_list_no_table', $cache);
+  $contexts = theme('ctools_context_list_no_table', $object);
 
   $title = '<h2 class="content-title">' . check_plain($layout['title']) . '</h2>';
 
@@ -246,24 +246,6 @@ function panels_panel_context_admin_summary($handler, $task, $subtask_id) {
   $output .= '</div>';
 
   return $output;
-}
-
-/**
- * Get the contexts associated with a delegator task handler.
- *
- * This gets the contexts passed in by the task and aggregates those
- * with the contexts added on the handler itself, such as relationships
- * and pure contexts.
- */
-function panels_panel_context_get_context($task, $subtask_id, $plugin, $handler, $base_only = FALSE) {
-  ctools_include('context-task-handler');
-  $contexts = ctools_context_handler_placeholders($task, $subtask_id);
-
-  // This function expects the contexts to be on an object, but our conf
-  // is an array, so we have to convert.
-  $object = $base_only ? new stdClass : (object) $handler->conf;
-
-  return ctools_context_load_contexts($object, TRUE, $contexts);
 }
 
 // --------------------------------------------------------------------------
@@ -412,7 +394,7 @@ function panels_panel_context_edit_layout_settings(&$form, &$form_state) {
   panels_load_include('plugins');
 
   $form_state['display'] = &$form_state['handler']->conf['display'];
-//  $form_state['display']->context = panels_panel_context_get_context($form_state['plugin'], $form_state['handler']);
+//  $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask_id'], $form_state['handler']);
 
   // Allow setting of the 'display title'
   $form_state['display_title'] = TRUE;
@@ -441,10 +423,12 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   panels_load_include('ajax');
   panels_load_include('plugins');
   panels_load_include('common');
+  ctools_include('context');
+  ctools_include('context-task-handler');
 
   $display = &$form_state['handler']->conf['display'];
 
-  $display->context = panels_panel_context_get_context($form_state['task'], $form_state['subtask_id'], $form_state['plugin'], $form_state['handler']);
+  $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask_id'], $form_state['handler']);
   $content_types = panels_common_get_allowed_types('delegator', $display->context);
 
   // Load the display being edited from cache, if possible.
@@ -474,6 +458,20 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
  */
 function panels_panel_context_edit_settings(&$form, &$form_state) {
   $conf = $form_state['handler']->conf;
+  $form['conf']['autogenerate_title'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Automatically generate title'),
+    '#description' => t('If checked, the administrative title will be automatically regenerated whenever the selection criteria changes. If you change the title and leave this check, your changes may disappear.'),
+    '#default_value' => $conf['autogenerate_title'],
+  );
+
+  $form['conf']['title'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $conf['title'],
+    '#title' => t('Administrative title'),
+    '#description' => t('Administrative title of this task handler.'),
+  );
+
   $form['conf']['no_blocks'] = array(
     '#type' => 'checkbox',
     '#default_value' => $conf['no_blocks'],
@@ -506,57 +504,3 @@ function panels_panel_context_edit_settings_submit(&$form, &$form_state) {
   $form_state['handler']->conf['css'] = $form_state['values']['css'];
 }
 
-/**
- * Edit contexts that go with this panel.
- */
-function panels_panel_context_edit_context(&$form, &$form_state) {
-  ctools_include('context-admin');
-  ctools_context_admin_includes();
-
-  $handler = $form_state['handler'];
-  // Check our context object cache.
-  if (!empty($_POST)) {
-    $cache = ctools_object_cache_get('context_object:delegator', $handler->name);
-  }
-  else {
-    $cache = new stdClass;
-    $cache->name = $handler->name;
-    $cache->base_contexts = panels_panel_context_get_context($form_state['task'], $form_state['subtask_id'], $form_state['plugin'], $form_state['handler'], TRUE);
-    $cache->contexts = isset($handler->conf['contexts']) ? $handler->conf['contexts'] : array();
-    $cache->relationships = isset($handler->conf['relationships']) ? $handler->conf['relationships'] : array();
-    ctools_object_cache_set('context_object:delegator', $handler->name, $cache);
-  }
-
-  $form['right'] = array(
-    '#prefix' => '<div class="clear-block"><div class="right-container">',
-    '#suffix' => '</div>',
-  );
-
-  $form['left'] = array(
-    '#prefix' => '<div class="left-container">',
-    '#suffix' => '</div></div>',
-  );
-
-  ctools_context_add_context_form('delegator', $form, $form_state, $form['right']['contexts_table'], $cache);
-  ctools_context_add_relationship_form('delegator', $form, $form_state, $form['right']['relationships_table'], $cache);
-
-  $form['left']['summary'] = array(
-    '#prefix' => '<div class="delegator-contexts">',
-    '#suffix' => '</div>',
-    '#value' => theme('ctools_context_list', $cache, t('Summary of contexts')),
-  );
-
-  // @todo -- this CSS is actually dependent upon the plugins which means
-  // the plugins need to be able to add it.
-  drupal_add_css(panels_get_path('css/panels_admin.css'));
-  $form_state['context_object'] = &$cache;
-}
-
-/**
- * Process submission of the context edit form.
- */
-function panels_panel_context_edit_context_submit(&$form, &$form_state) {
-  $form_state['handler']->conf['contexts'] = $form_state['context_object']->contexts;
-  $form_state['handler']->conf['relationships'] = $form_state['context_object']->relationships;
-  ctools_object_cache_clear('context_object:delegator', $form_state['handler']->name);
-}
