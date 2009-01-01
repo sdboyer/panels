@@ -334,6 +334,7 @@ function _panels_render_preview_pane_disabled($pane, $context) {
 function panels_ajax_add_pane_choose($did = NULL, $panel_id = NULL) {
   panels_load_include('plugins');
   panels_load_include('ajax');
+  ctools_include('context');
 
   $output = new stdClass();
   if ((is_numeric($did) || $did == 'new') && $cache = panels_cache_get('display', $did)) {
@@ -520,6 +521,7 @@ function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL
 function panels_ajax_configure_pane($did = NULL, $pid = NULL) {
   panels_load_include('plugins');
   panels_load_include('ajax');
+  ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
     panels_ajax_render(t('Invalid display id.'));
@@ -690,6 +692,7 @@ function panels_content_config_form_submit($form, &$form_state) {
 function panels_ajax_toggle_shown($op, $did = NULL, $pid = NULL) {
   panels_load_include('plugins');
   panels_load_include('ajax');
+  ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
     panels_ajax_render(t('Invalid display id.'));
@@ -718,6 +721,7 @@ function panels_ajax_toggle_shown($op, $did = NULL, $pid = NULL) {
 function panels_ajax_cache_method($did = NULL, $pid = NULL) {
   panels_load_include('plugins');
   panels_load_include('ajax');
+  ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
     panels_ajax_render(t('Invalid display id.'));
@@ -828,6 +832,7 @@ function panels_edit_cache_method_form_submit($form, &$form_state) {
 function panels_ajax_cache_settings($did, $pid) {
   panels_load_include('plugins');
   panels_load_include('ajax');
+  ctools_include('context');
 
   if (is_object($did)) {
     // This is safe: Objects cannot be passed via URL.
