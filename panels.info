@@ -3,4 +3,5 @@ name = Panels
 description = Core Panels display functions; provides no external UI, at least one other module (such as Panel pages) should be enabled.
 core = 6.x
 package = "Panels"
-dependencies[] = views ctools
+dependencies[] = views
+dependencies[] = ctools
