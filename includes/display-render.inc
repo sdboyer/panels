@@ -105,7 +105,7 @@ function panels_render_layout($layout, $content, $css_id = NULL, $settings = arr
  * Render all the panes in a display into a $content array to be used by
  * the display theme function.
  */
-function panels_render_panes($display) {
+function panels_render_panes(&$display) {
   // Safety check.
   if (empty($display->content)) {
     return array();

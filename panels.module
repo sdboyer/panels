@@ -71,6 +71,9 @@ function panels_theme() {
     'arguments' => array('category' => NULL, 'vars' => NULL),
     'template' => 'content_types/profile_fields_pane',
   );
+  $theme['panels_render_display_form'] = array(
+    'arguments' => array('form' => NULL),
+  );
 
   // Register layout and style themes on behalf of all of these items.
   panels_load_include('plugins');
@@ -840,8 +843,33 @@ function panels_var_export($object, $prefix = '') {
 function panels_render_display(&$display) {
   panels_load_include('display-render');
   panels_load_include('plugins');
+  ctools_include('context');
+
+  if (!empty($display->context)) {
+    if ($form_context = ctools_context_get_form($display->context)) {
+      $form_context->form['#theme'] = 'panels_render_display_form';
+      $form_context->form['#display'] = &$display;
+      $form_context->form['#form_context_id'] = $form_context->id;
+      return drupal_render_form($form_context->form_id, $form_context->form);
+    }
+  }
   return _panels_render_display($display);
 }
+
+/**
+ * Theme function to render our panel as a form.
+ *
+ * When rendering a display as a form, the entire display needs to be
+ * inside the <form> tag so that the form can be spread across the
+ * panes. This sets up the form system to be the main caller and we
+ * then operate as a theme function of the form.
+ */
+function theme_panels_render_display_form($form) {
+  $form['#children'] = _panels_render_display($form['#display']);
+  drupal_render($form);
+  return theme('form', $form);
+}
+
 
 /**
  * For external use: Given a layout ID and a $content array, return the

@@ -54,6 +54,14 @@ function panels_admin_content_types_node_form() {
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
     ),
+    'buttons' => array(
+      'title' => t('Node form submit buttons'),
+      'icon' => 'icon_node.png',
+      'path' => panels_get_path('content_types/node'),
+      'description' => t('Submit buttons for the node form.'),
+      'required context' => new ctools_context_required(t('Form'), 'node_form'),
+      'category' => array(t('Form'), -9),
+    ),
   );
   if (module_exists('comment')) {
     $content['comment'] = array(
@@ -181,8 +189,7 @@ function panels_content_node_form($subtype, $conf, $panel_args, &$context) {
         if (!empty($context->form->form_id) && !empty($context->form['menu']['#access'])) {
           // remove the fieldset
           unset($context->form['menu']['#type']);
-          $context->form['menu']['title']['#size'] /= 2;
-          $context->form['menu']['description']['#size'] /= 2;
+          $context->form['menu']['link_title']['#size'] /= 2;
           $block->content = drupal_render($context->form['menu']);
         }
       }
@@ -257,6 +264,18 @@ function panels_content_node_form($subtype, $conf, $panel_args, &$context) {
       }
       else {
         $block->content = t('Book options.');
+      }
+      break;
+
+    case 'buttons':
+      $block->subject = t('Buttons');
+      $block->delta = 'buttons';
+
+      if (isset($context->form)) {
+        $block->content = drupal_render($context->form['buttons']);
+      }
+      else {
+        $block->content = t('Node form buttons.');
       }
       break;
 
