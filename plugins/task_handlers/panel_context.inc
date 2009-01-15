@@ -389,7 +389,7 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
  * Proxy the layout settings form.
  */
 function panels_panel_context_edit_layout_settings(&$form, &$form_state) {
-  panels_load_include('ajax');
+  ctools_include('ajax');
   panels_load_include('display-layout-settings');
   panels_load_include('plugins');
 
@@ -420,7 +420,7 @@ function panels_panel_context_edit_layout_settings(&$form, &$form_state) {
  * to the task handler.
  */
 function panels_panel_context_edit_content(&$form, &$form_state) {
-  panels_load_include('ajax');
+  ctools_include('ajax');
   panels_load_include('plugins');
   panels_load_include('common');
   ctools_include('context');

@@ -304,7 +304,7 @@ function panels_cache_clear($obj, $did) {
  */
 function panels_edit($display, $destination = NULL, $content_types = NULL) {
   panels_load_include('display-edit');
-  panels_load_include('ajax');
+  ctools_include('ajax');
   panels_load_include('plugins');
   return _panels_edit($display, $destination, $content_types);
 }
@@ -401,7 +401,7 @@ function panels_edit_layout($display, $finish, $destination = NULL, $allowed_lay
  */
 function panels_edit_layout_settings($display, $finish, $destination = NULL, $title = FALSE) {
   panels_load_include('display-layout-settings');
-  panels_load_include('ajax');
+  ctools_include('ajax');
   panels_load_include('plugins');
   return _panels_edit_layout_settings($display, $finish, $destination, $title);
 }
