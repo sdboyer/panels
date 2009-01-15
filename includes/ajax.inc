@@ -5,6 +5,7 @@
  * @file
  *
  * Miscellaneous AJAX helper routines
+ * @todo deprecate all this with ctools ajax
  */
 
 /**

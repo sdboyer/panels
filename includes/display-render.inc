@@ -306,11 +306,6 @@ function panels_render_panel($display, $panel, $panes) {
 }
 
 /**
- * @file panels.theme.inc
- * Core theme functions for Panels.
- */
-
-/**
  * Render a panel pane like a block.
  *
  * A panel pane can have the following fields:

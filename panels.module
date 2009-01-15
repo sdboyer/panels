@@ -8,20 +8,17 @@
  */
 
 /**
- * Error code bitmask used for identifying argument behavior at runtime.
- */
-define('PANELS_ARG_IS_BAD', 1);
-define('PANELS_ARG_USE_FALLBACK', 1 << 1);
-
-/**
  * Returns the API version of Panels. This didn't exist in 1.
  *
  * @return An array with the major and minor versions
  */
 function panels_api_version() {
-  return array(2, 0);
+  return array(3, 0);
 }
 
+/**
+ * Implementation of hook_theme()
+ */
 function panels_theme() {
   $theme = array();
   $theme['panels_layout_link'] = array(
@@ -29,9 +26,6 @@ function panels_theme() {
   );
   $theme['panels_layout_icon'] = array(
     'arguments' => array('id', 'image', 'title' => NULL),
-  );
-  $theme['panels_imagebutton'] = array(
-    'arguments' => array('element'),
   );
   $theme['panels_edit_display_form'] = array(
     'arguments' => array('form'),
@@ -222,42 +216,24 @@ function panels_perm() {
  * Get an object from cache.
  */
 function panels_cache_get($obj, $did, $skip_cache = FALSE) {
-  static $cache = array();
-  $key = "$obj:$did";
-  if ($skip_cache) {
-    unset($cache[$key]);
-  }
-
-  if (!array_key_exists($key, $cache)) {
-    $data = db_fetch_object(db_query("SELECT * FROM {panels_object_cache} WHERE sid = '%s' AND obj = '%s' AND did = %d", session_id(), $obj, $did));
-    if ($data) {
-      $cache[$key] = unserialize($data->data);
-    }
-  }
-  return isset($cache[$key]) ? $cache[$key] : NULL;
+  ctools_include('object-cache');
+  return ctools_object_cache_get($obj, $did, $skip_cache);
 }
 
 /**
  * Save the edited object into the cache.
  */
 function panels_cache_set($obj, $did, $cache) {
-  panels_cache_clear($obj, $did);
-  db_query("INSERT INTO {panels_object_cache} (sid, obj, did, data, timestamp) VALUES ('%s', '%s', %d, '%s', %d)", session_id(), $obj, $did, serialize($cache), time());
+  ctools_include('object-cache');
+  return ctools_object_cache_set($obj, $did, $cache);
 }
 
 /**
  * Clear a object from the cache; used if the editing is aborted.
  */
 function panels_cache_clear($obj, $did) {
-  db_query("DELETE FROM {panels_object_cache} WHERE sid = '%s' AND obj = '%s' AND did = %d", session_id(), $obj, $did);
-}
-
-/**
- * Implementation of hook_cron. Clean up old caches.
- */
-function panels_cron() {
-  // delete anything 7 days old or more.
-  db_query("DELETE FROM {panels_object_cache} WHERE timestamp < %d", time() - (86400 * 7));
+  ctools_include('object-cache');
+  return ctools_object_cache_clear($obj, $did);
 }
 
 // ---------------------------------------------------------------------------
@@ -498,11 +474,6 @@ class panels_display {
  * }@ End of 'defgroup mainapi', although other functions are specifically added later
  */
 
-function panels_export_pane_across_displays($source_display, &$target_display, $pid, $location = FALSE) {
-  $pane = $source_display->clone_pane($pid);
-  $target_display->add_pane($pane, $location);
-}
-
 /**
  * Clean up a display object and add some required information, if missing.
  *
@@ -541,6 +512,11 @@ function panels_new_display() {
   return $display;
 }
 
+/**
+ * Create a new pane.
+ *
+ * @todo -- use schema API for some of this?
+ */
 function panels_new_pane($type, $subtype) {
   $pane = new stdClass();
   $pane->pid = 'new';
@@ -563,6 +539,8 @@ function panels_new_pane($type, $subtype) {
  *
  * @return $displays
  *  An array of displays, keyed by their display dids.
+ *
+ * @todo schema API can drasticly simplify this code.
  */
 function panels_load_displays($dids) {
   $displays = array();
@@ -570,7 +548,7 @@ function panels_load_displays($dids) {
     return $displays;
   }
 
-  $result = db_query("SELECT * FROM {panels_display} WHERE did IN (".  db_placeholders($dids) .")", $dids);
+  $result = db_query("SELECT * FROM {panels_display} WHERE did IN (" .  db_placeholders($dids) . ")", $dids);
 
   while ($obj = db_fetch_array($result)) {
     $display = new panels_display();
@@ -593,7 +571,7 @@ function panels_load_displays($dids) {
     $function($content, $layout, $settings);
   }
 
-  $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (". db_placeholders($dids) .") ORDER BY did, panel, position", $dids);
+  $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (" . db_placeholders($dids) . ") ORDER BY did, panel, position", $dids);
 
   while ($pane = db_fetch_object($result)) {
     $pane->configuration = unserialize($pane->configuration);

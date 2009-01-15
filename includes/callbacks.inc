@@ -7,7 +7,6 @@
 
 /**
  * Helper function for autocompletion of node titles.
- * This is mostly stolen from clipper.
  */
 function panels_node_autocomplete($string) {
   if ($string != '') { // if there are node_types passed, we'll use those in a MySQL IN query.
