@@ -33,13 +33,14 @@ function _panels_edit($display, $destination, $content_types) {
     panels_cache_set('display', $did, $cache);
   }
 
+  ctools_include('form');
   $form_state = array(
     'display' => &$display,
     're_render' => FALSE,
     'no_redirect' => TRUE,
   );
 
-  $output = drupal_build_form('panels_edit_display_form', $form_state);
+  $output = ctools_build_form('panels_edit_display_form', $form_state);
   // no output == submit
   if (!$output) {
     if (!empty($form_state['clicked_button']['#save-display'])) {
@@ -157,12 +158,18 @@ function panels_edit_display_form(&$form_state) {
       '#type' => 'submit',
       '#value' => t('Cache settings'),
       '#id' => 'panels-cache-settings',
-      '#attributes' => array('class' => 'panels-ajax-link'),
+      '#attributes' => array('class' => 'ctools-use-modal'),
     );
   }
 
-  panels_modal_js_includes();
+  ctools_include('ajax');
+  ctools_include('modal');
+  ctools_modal_add_js();
+
+//  panels_modal_js_includes();
+  drupal_add_js(panels_get_path('js/panels-base.js'));
   drupal_add_js(panels_get_path('js/display_editor.js'));
+//  drupal_add_js(panels_get_path('js/panels-base.js'));
   drupal_add_css(panels_get_path('css/panels_dnd.css'));
   drupal_add_css(panels_get_path('css/panels_admin.css'));
 
@@ -196,7 +203,13 @@ function theme_panels_edit_display_form($form) {
       $content[$pane->panel] .= panels_show_pane($display, $pane);
     }
 
-    $panel_buttons = panels_ajax_image_button('icon-addcontent.png', "panels/ajax/add-pane/$display->did/$panel_id", t('Add a pane to "@panel"', array('@panel' => $title)), "pane-add-link");
+    $panel_buttons = ctools_modal_image_button(
+      panels_get_path('images/icon-addcontent.png'),
+      "panels/ajax/add-pane/$display->did/$panel_id",
+      t('Add a pane to "@panel"', array('@panel' => $title)),
+      "pane-add-link"
+    );
+
     $content[$panel_id] = theme('panels_panel_dnd', $content[$panel_id], $panel_id, $title, $panel_buttons);
    }
 
@@ -265,23 +278,44 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
 
   // On the left we have the 'caching' link.
   if (panels_get_caches() && user_access('use panels caching features')) {
-    $buttons .= panels_ajax_image_button('icon-cache.png', "panels/ajax/cache-method/$display->did/$pane->pid", t('Set caching options for "@pane"', array('@pane' => $title)), "pane-cache-link");
+    $buttons .= ctools_modal_image_button(
+      panels_get_path('images/icon-cache.png'),
+      "panels/ajax/cache-method/$display->did/$pane->pid",
+      t('Set caching options for "@pane"',
+      array('@pane' => $title)), "pane-cache-link"
+    );
   }
 
   // Next to it the show or hide pane link
   if (!empty($pane->shown)) {
-    $buttons .= panels_ajax_image_button('icon-hidepane.png', "panels/ajax/hide/$display->did/$pane->pid", t('Hide "@pane"', array('@pane' => $title)), "pane-toggle-shown-link panels-no-modal");
+    $buttons .= ctools_ajax_image_button(
+      panels_get_path('images/icon-hidepane.png'),
+      "panels/ajax/hide/$display->did/$pane->pid",
+      t('Hide "@pane"', array('@pane' => $title)),
+      "pane-toggle-shown-link"
+    );
   }
   else {
-    $buttons .= panels_ajax_image_button('icon-showpane.png', "panels/ajax/show/$display->did/$pane->pid", t('Show "@pane"', array('@pane' => $title)), "pane-toggle-shown-link panels-no-modal");
+    $buttons .= ctools_ajax_image_button(
+      panels_get_path('images/icon-showpane.png'),
+      "panels/ajax/show/$display->did/$pane->pid",
+      t('Show "@pane"', array('@pane' => $title)),
+      "pane-toggle-shown-link"
+    );
   }
 
   // And the configure settings link
-  $buttons .= panels_ajax_image_button('icon-configure.png', "panels/ajax/configure/$display->did/$pane->pid", t('Configure settings for "@pane"', array('@pane' => $title)), "pane-configure-link");
+  $buttons .= ctools_modal_image_button(
+    panels_get_path('images/icon-configure.png'),
+    "panels/ajax/configure/$display->did/$pane->pid",
+    t('Configure settings for "@pane"',
+    array('@pane' => $title)), "pane-configure-link"
+  );
 
-  // The delete button doesn't use panels_ajax_image_button because it doesn't
+  // The delete button doesn't use ctools_ajax_image_button because it doesn't
   // actually perform an ajax call.
   $alt = t('Delete pane "@pane"', array('@pane' => $title));
+
   $buttons .= l(theme('image', panels_get_path("images/icon-delete.png")), '', array('html' => TRUE, 'attributes' => array('class' => 'pane-delete', 'id' => "pane-delete-panel-pane-$pane->pid", 'title' => $alt, 'alt' => $alt)));
 
   $block = new stdClass();
@@ -334,22 +368,23 @@ function _panels_render_preview_pane_disabled($pane, $context) {
  */
 function panels_ajax_add_pane_choose($did = NULL, $panel_id = NULL) {
   panels_load_include('plugins');
-  panels_load_include('ajax');
+  ctools_include('ajax');
+  ctools_include('modal');
   ctools_include('context');
 
-  $output = new stdClass();
   if ((is_numeric($did) || $did == 'new') && $cache = panels_cache_get('display', $did)) {
     $display = $cache->display;
     $layout = panels_get_layout($display->layout);
     $layout_panels = panels_get_panels($layout, $display);
 
     if ($layout && array_key_exists($panel_id, $layout_panels)) {
-      $output->output = panels_add_content($cache, $panel_id);
-      $output->type   = 'display';
-      $output->title  = t('Add content to !s', array('!s' => $layout_panels[$panel_id]));
+      ctools_modal_render(
+        t('Add content to !s', array('!s' => $layout_panels[$panel_id])),
+        panels_add_content($cache, $panel_id)
+      );
     }
   }
-  panels_ajax_render($output);
+  ctools_modal_render(t('Error'), t('Invalid input'));
 }
 
 function panels_add_content($cache, $panel_id) {
@@ -370,6 +405,7 @@ function panels_add_content($cache, $panel_id) {
         $title = filter_xss_admin($subtype_info['title']);
         $description = isset($subtype_info['description']) ? $subtype_info['description'] : $title;
 
+        // @todo Icon finding code for this needs to be abstracted.
         $icon = '';
 
         if (isset($subtype_info['icon'])) {
@@ -380,8 +416,8 @@ function panels_add_content($cache, $panel_id) {
           else if (isset($content_type['path']) && file_exists($content_type['path'] . '/' . $icon)) {
             $path = $content_type['path'];
           }
-          else if (file_exists(panels_get_path("content_types/$type_name") . '/' . $icon)) {
-            $path = panels_get_path("content_types/$type_name");
+          else if (file_exists(panels_get_path("plugins/content_types/$type_name") . '/' . $icon)) {
+            $path = panels_get_path("plugins/content_types/$type_name");
           }
         }
 
@@ -407,10 +443,9 @@ function panels_add_content($cache, $panel_id) {
         }
 
         $output = '<div class="content-type-button clear-block">';
-        $link_image = theme('image', $path . '/' . $icon, $description, $description);
         $url = "panels/ajax/add-pane-config/$did/$panel_id/$type_name/$subtype_name";
-        $output .= panels_ajax_text_button($link_image, $url, $description, 'panels-modal-add-config');
-        $output .= '<div>' . panels_ajax_text_button($title, $url, $description, 'panels-modal-add-config') . '</div>';
+        $output .= ctools_ajax_image_button($path . '/' . $icon, $url, $description, 'panels-modal-add-config');
+        $output .= '<div>' . ctools_ajax_text_button($title, $url, $description, 'panels-modal-add-config') . '</div>';
         $output .= '</div>';
         if (!isset($categories[$category])) {
           $categories[$category] = array();
@@ -474,11 +509,12 @@ function panels_add_content($cache, $panel_id) {
  */
 function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL, $subtype = NULL) {
   panels_load_include('plugins');
-  panels_load_include('ajax');
+  ctools_include('ajax');
+  ctools_include('modal');
   ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
-    panels_ajax_render(t('Invalid display id.'));
+    ctools_modal_render(t('Error'), t('Invalid display id.'));
   }
 
   $pane = panels_new_pane($type, $subtype);
@@ -494,7 +530,7 @@ function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL
     'op' => 'add',
   );
 
-  $output = panels_ajax_form_wrapper('panels_content_config_form', $form_state);
+  $output = ctools_modal_form_wrapper('panels_content_config_form', $form_state);
   if (empty($output)) {
     // Get a real pid for this pane.
     $pane->pid = "new-" . $cache->display->next_new_pid();
@@ -505,15 +541,13 @@ function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL
 
     panels_cache_set('display', $did, $cache);
 
-    $output = new stdClass();
-    $output->type = 'add';
-    $output->region = "#panel-pane-$panel_id";
-    $output->id = "#panel-pane-$pane->pid";
-
-    $output->output = panels_show_pane($cache->display, $pane, TRUE);
+    $output = array();
+    $output[] = ctools_ajax_command_append("#panel-pane-$panel_id", panels_show_pane($cache->display, $pane, TRUE));
+    $output[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+    $output[] = ctools_modal_command_dismiss();
   }
 
-  panels_ajax_render($output);
+  ctools_ajax_render($output);
 }
 
 /**
@@ -521,15 +555,16 @@ function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL
  */
 function panels_ajax_configure_pane($did = NULL, $pid = NULL) {
   panels_load_include('plugins');
-  panels_load_include('ajax');
+  ctools_include('ajax');
+  ctools_include('modal');
   ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
-    panels_ajax_render(t('Invalid display id.'));
+    ctools_modal_render(t('Error'), t('Invalid display id.'));
   }
 
   if (empty($cache->display->content[$pid])) {
-    panels_ajax_render(t('Invalid pane id.'));
+    ctools_modal_render(t('Error'), t('Invalid pane id.'));
   }
 
   $pane = &$cache->display->content[$pid];
@@ -545,17 +580,16 @@ function panels_ajax_configure_pane($did = NULL, $pid = NULL) {
     'op' => 'edit',
   );
 
-  $output = panels_ajax_form_wrapper('panels_content_config_form', $form_state);
+  $output = ctools_modal_form_wrapper('panels_content_config_form', $form_state);
   if (empty($output)) {
     panels_cache_set('display', $did, $cache);
-
-    $output = new stdClass();
-    $output->type = 'replace';
-    $output->id = "#panel-pane-$pane->pid";
-    $output->output = panels_show_pane($cache->display, $pane, TRUE);
+    $output = array();
+    $output[] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
+    $output[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+    $output[] = ctools_modal_command_dismiss();
   }
 
-  panels_ajax_render($output);
+  ctools_ajax_render($output);
 }
 
 
@@ -692,15 +726,16 @@ function panels_content_config_form_submit($form, &$form_state) {
  */
 function panels_ajax_toggle_shown($op, $did = NULL, $pid = NULL) {
   panels_load_include('plugins');
-  panels_load_include('ajax');
+  ctools_include('ajax');
+  ctools_include('modal'); // panels_show_pane relies on this.
   ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
-    panels_ajax_render(t('Invalid display id.'));
+    ctools_ajax_render_error(t('Invalid display id.'));
   }
 
   if (empty($cache->display->content[$pid])) {
-    panels_ajax_render(t('Invalid pane id.'));
+    ctools_ajax_render_error(t('Invalid pane id.'));
   }
 
   $pane = &$cache->display->content[$pid];
@@ -708,12 +743,11 @@ function panels_ajax_toggle_shown($op, $did = NULL, $pid = NULL) {
   $pane->shown = ($op == 'show');
   panels_cache_set('display', $did, $cache);
 
-  $output = new stdClass();
-  $output->type = 'replace';
-  $output->id = "#panel-pane-$pane->pid";
-  $output->output = panels_show_pane($cache->display, $pane, TRUE);
+  $output = array();
+  $output[] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
+  $output[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
 
-  panels_ajax_render($output);
+  ctools_ajax_render($output);
 }
 
 /**
@@ -721,11 +755,12 @@ function panels_ajax_toggle_shown($op, $did = NULL, $pid = NULL) {
  */
 function panels_ajax_cache_method($did = NULL, $pid = NULL) {
   panels_load_include('plugins');
-  panels_load_include('ajax');
+  ctools_include('ajax');
+  ctools_include('modal');
   ctools_include('context');
 
   if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
-    panels_ajax_render(t('Invalid display id.'));
+    ctools_modal_render(t('Error'), t('Invalid display id.'));
   }
   // This lets us choose whether we're doing the display's cache or
   // a pane's.
@@ -740,7 +775,7 @@ function panels_ajax_cache_method($did = NULL, $pid = NULL) {
     $title = t('Cache method for !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title']));
   }
   else {
-    panels_ajax_render(t('Invalid pane id.'));
+    ctools_modal_render(t('Error'), t('Invalid pane id.'));
   }
 
   $form_state = array(
@@ -750,7 +785,7 @@ function panels_ajax_cache_method($did = NULL, $pid = NULL) {
     'ajax' => TRUE,
   );
 
-  $output = panels_ajax_form_wrapper('panels_edit_cache_method_form', $form_state);
+  $output = ctools_modal_form_wrapper('panels_edit_cache_method_form', $form_state);
   if (empty($output)) {
     // Preserve this; this way we don't actually change the method until they
     // have saved the form.
@@ -760,12 +795,12 @@ function panels_ajax_cache_method($did = NULL, $pid = NULL) {
       $conf['method'] = $form_state['method'];
       $conf['settings'] = array();
       panels_cache_set('display', $did, $cache);
-      $output = new stdClass();
-      $output->type = 'dismiss';
-      $output->output = 'dummy';
+
+      $output = array();
+      $output[] = ctools_modal_command_dismiss();
 
       if ($pid != 'display') {
-        $output->id = "panel-pane-$pid";
+        $output[] = ctools_ajax_command_changed("#panel-pane-$pid", "div.grabber span.text");
       }
     }
     else {
@@ -776,7 +811,7 @@ function panels_ajax_cache_method($did = NULL, $pid = NULL) {
     }
   }
 
-  panels_ajax_render($output);
+  ctools_ajax_render($output);
 }
 
 /**
@@ -832,7 +867,8 @@ function panels_edit_cache_method_form_submit($form, &$form_state) {
  */
 function panels_ajax_cache_settings($did, $pid) {
   panels_load_include('plugins');
-  panels_load_include('ajax');
+  ctools_include('ajax');
+  ctools_include('modal');
   ctools_include('context');
 
   if (is_object($did)) {
@@ -841,7 +877,7 @@ function panels_ajax_cache_settings($did, $pid) {
     $did = $cache->display->did;
   }
   else if ((!is_numeric($did) && $did != 'new') || !($cache = panels_cache_get('display', $did))) {
-    panels_ajax_render(t('Invalid display id.'));
+    ctools_modal_render(t('Error'), t('Invalid display id.'));
   }
 
   // This lets us choose whether we're doing the display's cache or
@@ -858,7 +894,7 @@ function panels_ajax_cache_settings($did, $pid) {
     $title = t('Cache settings for !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title']));
   }
   else {
-    panels_ajax_render(t('Invalid pane id.'));
+    ctools_modal_render(t('Error'), t('Invalid pane id.'));
   }
 
   $conf['method'] = $cache->method;
@@ -872,7 +908,7 @@ function panels_ajax_cache_settings($did, $pid) {
     'url' => url("panels/ajax/cache-settings/$did/$pid", array('absolute' => TRUE)),
   );
 
-  $output = panels_ajax_form_wrapper('panels_edit_cache_settings_form', $form_state);
+  $output = ctools_modal_form_wrapper('panels_edit_cache_settings_form', $form_state);
   if (empty($output)) {
     // Preserve this; this way we don't actually change the method until they
     // have saved the form.
@@ -885,14 +921,14 @@ function panels_ajax_cache_settings($did, $pid) {
 
     panels_cache_set('display', $did, $cache);
 
-    $output = new stdClass();
-    $output->type = 'dismiss';
-    $output->output = 'dummy';
+    $output = array();
+    $output[] = ctools_modal_command_dismiss();
+
     if ($pid != 'display') {
-      $output->id = "panel-pane-$pid";
+      $output[] = ctools_ajax_command_changed("#panel-pane-$pid", "div.grabber span.text");
     }
   }
-  panels_ajax_render($output);
+  ctools_ajax_render($output);
 }
 
 /**
@@ -903,6 +939,8 @@ function panels_edit_cache_settings_form(&$form_state) {
   $conf = &$form_state['conf'];
   $pid = $form_state['pid'];
   $info = panels_get_cache($conf['method']);
+
+  $form['#action'] = $form_state['url'];
 
   $form['description'] = array(
     '#prefix' => '<div class="description">',

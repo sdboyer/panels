@@ -54,12 +54,13 @@ function panels_export_export() {
     $exportables[$module] = $function('list');
   }
   if ($exportables) {
+    ctools_include('form');
     $form_state = array(
       're_render' => FALSE,
       'no_redirect' => TRUE,
       'exportables' => $exportables,
     );
-    $output = drupal_build_form('panels_export_export_form', $form_state);
+    $output = ctools_build_form('panels_export_export_form', $form_state);
     if (!$output) {
       $output = $form_state['output'];
     }

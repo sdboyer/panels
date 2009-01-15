@@ -25,7 +25,7 @@ function panels_admin_content_types_node_form() {
     'publishing' => array(
       'title' => t('Node form publishing options'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Publishing options on the Node form.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -33,7 +33,7 @@ function panels_admin_content_types_node_form() {
     'author' => array(
       'title' => t('Node form author information'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Author information on the Node form.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -41,7 +41,7 @@ function panels_admin_content_types_node_form() {
     'input_format' => array(
       'title' => t('Node form input format'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Input format for the body field on a node.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -49,7 +49,7 @@ function panels_admin_content_types_node_form() {
     'log' => array(
       'title' => t('Node form log message'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Log message for the node.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -57,7 +57,7 @@ function panels_admin_content_types_node_form() {
     'buttons' => array(
       'title' => t('Node form submit buttons'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Submit buttons for the node form.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -67,7 +67,7 @@ function panels_admin_content_types_node_form() {
     $content['comment'] = array(
       'title' => t('Node form comment settings'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Comment settings on the Node form.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -77,7 +77,7 @@ function panels_admin_content_types_node_form() {
     $content['menu'] = array(
       'title' => t('Node form menu settings'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('menu settings on the Node form.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -87,7 +87,7 @@ function panels_admin_content_types_node_form() {
     $content['url_path'] = array(
       'title' => t('URL Path settings'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Publishing options on the Node form.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -97,7 +97,7 @@ function panels_admin_content_types_node_form() {
     $content['attachments'] = array(
       'title' => t('Node form file attachments'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('File attachments on the Node form.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -107,7 +107,7 @@ function panels_admin_content_types_node_form() {
     $content['taxonomy'] = array(
       'title' => t('Node form categories'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Taxonomy categories for the node.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),
@@ -117,7 +117,7 @@ function panels_admin_content_types_node_form() {
     $content['book'] = array(
       'title' => t('Node form book options'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Book options for the node.'),
       'required context' => new ctools_context_required(t('Form'), 'node_form'),
       'category' => array(t('Form'), -9),

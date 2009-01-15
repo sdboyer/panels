@@ -39,7 +39,7 @@ function panels_admin_content_types_user_picture() {
     'description' => array(
       'title' => t('User picture'),
       'icon' => 'icon_user.png',
-      'path' => panels_get_path('content_types/user'),
+      'path' => panels_get_path('plugins/content_types/user'),
       'description' => t('The picture of a user.'),
       'required context' => new ctools_context_required(t('User'), 'user'),
       'category' => array(t('User context'), -9),

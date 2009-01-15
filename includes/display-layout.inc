@@ -16,6 +16,7 @@
  */
 function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) {
   panels_load_include('common');
+  ctools_include('form');
 
   $form_state = array(
     'display' => &$display,
@@ -32,7 +33,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
 
   // Examine $_POST to see which form they're currently using.
   if (empty($_POST) || empty($_POST['form_id']) || $_POST['form_id'] != 'panels_change_layout') {
-    $output = drupal_build_form('panels_choose_layout', $form_state);
+    $output = ctools_build_form('panels_choose_layout', $form_state);
     if (empty($output)) {
       // upon submission go to next form.
       $change_form_state['layout'] = $_SESSION['layout'][$display->did] = $form_state['layout'];
@@ -45,7 +46,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
   }
 
   if ($change_form) {
-    $output = drupal_build_form('panels_change_layout', $change_form_state);
+    $output = ctools_build_form('panels_change_layout', $change_form_state);
     if (empty($output)) {
       if (isset($change_form_state['back'])) {
         unset($_POST);

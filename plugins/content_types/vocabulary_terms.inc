@@ -72,7 +72,7 @@ function panels_admin_content_types_vocabulary_terms() {
     'description' => array(
       'title' => t('Vocabulary terms'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('All the terms in a vocabulary.'),
       'required context' => new ctools_context_required(t('Vocabulary'), 'vocabulary'),
       'category' => array(t('Vocabulary context'), -9),

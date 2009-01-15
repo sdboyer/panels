@@ -76,7 +76,7 @@ function panels_admin_content_types_term_list() {
     'description' => array(
       'title' => t('List of related terms'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Terms related to an existing term; may be child, siblings or top level.'),
       'required context' => new ctools_context_required(t('Term'), 'term'),
       'category' => array(t('Term context'), -9),

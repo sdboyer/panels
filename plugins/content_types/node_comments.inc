@@ -48,7 +48,7 @@ function panels_admin_content_types_node_comments() {
     'comments' => array(
       'title' => t('Node comments'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('The comments of the referenced node.'),
       'required context' => new ctools_context_required(t('Node'), 'node'),
       'category' => array(t('Node context'), -9),

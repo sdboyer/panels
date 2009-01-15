@@ -71,7 +71,7 @@ function panels_admin_content_types_custom() {
     'custom' => array(
       'title' => t('New custom content'),
       'icon' => 'icon_block_custom.png',
-      'path' => panels_get_path('content_types/custom'),
+      'path' => panels_get_path('plugins/content_types/custom'),
       'description' => t('Create a completely custom piece of HTML content.'),
       'category' => array(t('Custom'), -10),
     ),

@@ -48,7 +48,7 @@ function panels_admin_content_types_node_comment_form() {
     'comment_form' => array(
       'title' => t('Comment form'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('A form to add a new comment.'),
       'required context' => new ctools_context_required(t('Node'), 'node'),
       'category' => array(t('Node context'), -9),

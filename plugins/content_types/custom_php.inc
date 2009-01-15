@@ -77,7 +77,7 @@ function panels_admin_content_types_custom_php() {
       'custom_php' => array(
         'title' => t('Custom PHP content'),
         'icon' => 'icon_block_custom.png',
-        'path' => panels_get_path('content_types/custom'),
+        'path' => panels_get_path('plugins/content_types/custom'),
         'description' => t('Custom PHP block with access to Panels context data. Use sparingly, and with caution!'),
         'category' => array(t('Custom'), -10),
       ),

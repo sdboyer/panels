@@ -90,7 +90,7 @@ function panels_mini_content_types() {
       'title' => filter_xss_admin($mini->title),
       // For now mini panels will just use the contrib block icon.
       'icon' => 'icon_contrib_block.png',
-      'path' => panels_get_path("content_types/block"),
+      'path' => panels_get_path("plugins/content_types/block"),
       'description' => filter_xss_admin($mini->title),
       'category' => array(!empty($mini->category) ? filter_xss_admin($mini->category) : t('Mini panel'), -8),
     );

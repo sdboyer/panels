@@ -45,7 +45,7 @@ function panels_admin_content_types_node_attachments() {
     'node_type' => array(
       'title' => t('Attached files'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('A list of files attached to the node.'),
       'required context' => new ctools_context_required(t('Node'), 'node'),
       'category' => array(t('Node context'), -9),

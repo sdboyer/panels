@@ -336,16 +336,6 @@ a.close img {
   margin: 0;
 }
 
-.panels-style-settings,
-.panels-style-settings-box,
-#panels-style-setting {
-  float: left;
-}
-
-.panels-style-settings-box .form-item {
-  margin: 0 1em 0 0;
-}
-
 /* ---------------------------------------------------------------------------
  * Debugging CSS
  *

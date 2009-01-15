@@ -76,9 +76,9 @@ function panels_profile_fields_content($subtype, $conf, $panel_args, $context) {
 function panels_profile_fields_content_type() {
   return array(
     'description' => array(
-      'title' => t('Profile Category'),
+      'title' => t('Profile category'),
       'icon' => 'icon_user.png',
-      'path' => panels_get_path('content_types/user'),
+      'path' => panels_get_path('plugins/content_types/user'),
       'description' => t('Profile category contents.'),
       'required context' => new ctools_context_required(t('User'), 'user'),
       'category' => array(t('User context'), -9),

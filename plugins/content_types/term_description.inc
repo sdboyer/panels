@@ -53,7 +53,7 @@ function panels_admin_content_types_term_description() {
     'description' => array(
       'title' => t('Term description'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Term description.'),
       'required context' => new ctools_context_required(t('Term'), 'term'),
       'category' => array(t('Term context'), -9),

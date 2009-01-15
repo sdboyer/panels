@@ -27,7 +27,7 @@ function panels_admin_content_types_node_content() {
     'content' => array(
       'title' => t('Node content'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('The content of the referenced node.'),
       'required context' => new ctools_context_required(t('Node'), 'node'),
       'category' => array(t('Node context'), -9),

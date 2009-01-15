@@ -23,7 +23,8 @@ function _panels_edit_layout_settings($display, $finish, $destination, $title) {
     'no_redirect' => TRUE,
   );
 
-  $output = drupal_build_form('panels_edit_layout_settings_form', $form_state);
+  ctools_include('form');
+  $output = ctools_build_form('panels_edit_layout_settings_form', $form_state);
   // no output == submit
   if (!$output) {
     panels_save_display($display);
@@ -65,7 +66,6 @@ function panels_edit_layout_settings_form(&$form_state) {
     }
     panels_cache_set('style_settings', $display->did, $display->panel_settings['style_settings']);
   }
-
 
   $layout = panels_get_layout($display->layout);
 
@@ -151,7 +151,7 @@ function panels_edit_layout_settings_form(&$form_state) {
 
   $form['panel_settings']['edit_style'] = array(
     '#type' => 'submit',
-    '#attributes' => array('class' => 'panels-ajax-link'),
+    '#attributes' => array('class' => 'ctools-use-modal'),
     '#id' => 'panels-style-settings',
     '#value' => t('Edit style settings'),
   );
@@ -203,7 +203,7 @@ function panels_edit_layout_settings_form(&$form_state) {
     $form['panel_settings']['panel'][$id]['edit_style'] = array(
       '#type' => 'submit',
       '#id' => 'panels-style-settings-' . $id,
-      '#attributes' => array('class' => 'panels-ajax-link'),
+      '#attributes' => array('class' => 'ctools-use-modal'),
       '#value' => t('Edit style settings'),
     );
     $checkboxes[] = '#panels-style-settings-' . $id;
@@ -232,9 +232,11 @@ function panels_edit_layout_settings_form(&$form_state) {
     );
   }
 
-  panels_modal_js_includes();
+  ctools_include('modal');
+  ctools_modal_add_js();
+//  panels_modal_js_includes();
   // @todo -- why dnd? That's wrong.
-  drupal_add_css(panels_get_path('css/panels_dnd.css'));
+  drupal_add_css(panels_get_path('css/panels_admin.css'));
   $settings['panels']['checkboxes']['#panel-settings-individual'] = $checkboxes;
 
   drupal_add_js($settings, 'setting');
@@ -299,16 +301,18 @@ function panels_edit_layout_settings_form_submit($form, &$form_state) {
  */
 function panels_ajax_style_settings($did = NULL, $panel = NULL, $name = NULL) {
   panels_load_include('plugins');
-  panels_load_include('ajax');
+  ctools_include('ajax');
+  ctools_include('modal');
 
+  $title = t('Edit style settings');
   if ($name == '0') {
-    panels_ajax_render(t('There are no style settings to edit.'), t('Edit default style settings'));
+    ctools_modal_render($title, t('There are no style settings to edit.'));
   }
 
   $style = panels_get_style($name);
   $style_settings = panels_cache_get('style_settings', $did);
   if (!isset($style_settings)) {
-    panels_ajax_render();
+    ctools_modal_render($title, t('Unable to find cache.'));
   }
 
   if (!isset($style_settings[$panel])) {
@@ -323,13 +327,13 @@ function panels_ajax_style_settings($did = NULL, $panel = NULL, $name = NULL) {
     'title' =>  t('Edit style settings for @style', array('@style' => $style['title'])),
   );
 
-  $output = panels_ajax_form_wrapper('panels_style_settings_form', $form_state);
+  $output = ctools_modal_form_wrapper('panels_style_settings_form', $form_state);
   if (!$output) { // no output means submit
     panels_cache_set('style_settings', $did, $style_settings);
-    $output = 'dismiss';
+    $output = array(ctools_modal_command_dismiss());
   }
 
-  panels_ajax_render($output);
+  ctools_ajax_render($output);
 }
 
 /**

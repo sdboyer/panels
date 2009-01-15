@@ -28,7 +28,7 @@ function panels_admin_content_types_form() {
     'node_type' => array(
       'title' => t('General form'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('The general parts of a form.'),
       'required context' => new ctools_context_required(t('Form'), 'form'),
       'category' => array(t('Form'), -9),

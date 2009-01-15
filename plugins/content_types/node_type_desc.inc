@@ -51,7 +51,7 @@ function panels_admin_content_types_node_type_desc() {
     'node_type' => array(
       'title' => t('Node type description'),
       'icon' => 'icon_node.png',
-      'path' => panels_get_path('content_types/node'),
+      'path' => panels_get_path('plugins/content_types/node'),
       'description' => t('Node type description.'),
       'required context' => new ctools_context_required(t('Node'), 'node'),
       'category' => array(t('Node context'), -9),
