@@ -147,7 +147,7 @@ function panels_views_all_views_render($subtype, $conf, $panel_args, $contexts) 
 
   $block = new stdClass();
   $block->module = 'views';
-  $block->delta  = $view->name . $display;
+  $block->delta  = $view->name .'-'.  $display;
   $block->subject = $view->get_title();
 
   if (!empty($conf['link_to_view'])) {

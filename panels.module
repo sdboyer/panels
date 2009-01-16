@@ -918,3 +918,12 @@ function panels_ctools_plugin_directory($module, $plugin) {
     return 'plugins/' . $plugin;
   }
 }
+
+/**
+ * Inform CTools that the layout plugin can be loaded from themes.
+ */
+function panels_ctools_plugin_layouts() {
+  return array(
+    'load themes' => TRUE,
+  );
+}
