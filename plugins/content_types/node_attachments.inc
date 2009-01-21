@@ -26,7 +26,9 @@ function panels_content_node_attachments($subtype, $conf, $panel_args, $context)
 
   $block->subject = t('Attached files');
   if ($node) {
-    $block->content = theme('upload_attachments', $node->files);
+    if (!empty($node->files)) {
+      $block->content = theme('upload_attachments', $node->files);
+    }
     $block->delta = $node->nid;
   }
   else {

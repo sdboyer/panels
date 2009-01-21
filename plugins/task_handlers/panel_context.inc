@@ -106,6 +106,7 @@ function panels_panel_context_delegator_task_handlers() {
  */
 function panels_panel_context_render($handler, $base_contexts) {
   // Go through arguments and see if they match.
+  ctools_include('context');
   ctools_include('context-task-handler');
   // Add my contexts
   $contexts = ctools_context_handler_get_handler_contexts($base_contexts, $handler);
@@ -217,7 +218,7 @@ function panels_panel_context_export(&$handler, $indent) {
  */
 function panels_panel_context_admin_summary($handler, $task, $subtask_id) {
   $output = '';
-  $display = $handler->conf['display'];
+  $display = drupal_clone($handler->conf['display']);
 
   panels_load_include('plugins');
   ctools_include('context');
@@ -244,6 +245,18 @@ function panels_panel_context_admin_summary($handler, $task, $subtask_id) {
   $output .= '<div class="left-container">';
   $output .= $icon . $title . $content;
   $output .= '</div>';
+
+  // This routine dirties the display which can cause problems later.
+  // Scrub it clean.
+  if (isset($handler->conf['display']->context)) {
+    unset($handler->conf['display']->context);
+  }
+
+  foreach ($handler->conf['display']->content as $id => $pane) {
+    if (isset($pane->context)) {
+      unset($handler->conf['display']->content[$id]->context);
+    }
+  }
 
   return $output;
 }

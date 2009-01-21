@@ -34,6 +34,8 @@ function theme_panels_block_style_render_pane($content, $pane, $display) {
   if (!empty($content->title)) {
     $content->subject = $content->title;
   }
+
+  $content->region = $pane->panel;
   return theme('block', $content);
 }
 
