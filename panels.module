@@ -465,7 +465,7 @@ class panels_display {
         $id[] = substr($pid, 4);
       }
     }
-    $next_id = end($id);
+    $next_id = max($id);
     return ++$next_id;
   }
 }

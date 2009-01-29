@@ -131,7 +131,7 @@ function panels_views_all_views_render($subtype, $conf, $panel_args, $contexts) 
     $args = array_merge($panel_args, $args);
   }
 
-  if (is_array($conf['context'])) {
+  if (isset($conf['context']) && is_array($conf['context'])) {
     foreach ($conf['context'] as $count => $cid) {
       if ($cid != 'any' && !empty($contexts[$count]) && isset($contexts[$count]->argument)) {
         array_splice($args, $count, 0, array($contexts[$count]->argument));
@@ -436,6 +436,8 @@ function panels_views_panes_render($subtype, $conf, $panel_args, $contexts) {
   }
   $view->set_arguments($args);
 
+  $allow = $view->display_handler->get_option('allow');
+
   if ($allow['path_override'] && !empty($conf['path'])) {
     $view->display_handler->set_option('path', $conf['path']);
   }
@@ -446,13 +448,13 @@ function panels_views_panes_render($subtype, $conf, $panel_args, $contexts) {
   $block->subject = $view->get_title();
 
   if (($allow['link_to_view'] && !empty($conf['link_to_view'])) ||
-      (!$allow['link_to_view'] && $view->display_handler->get_option['link_to_view'])) {
+      (!$allow['link_to_view'] && $view->display_handler->get_option('link_to_view'))) {
     $block->title_link = $view->get_url();
   }
 
   // more link
   if (($allow['more_link'] && !empty($conf['more_link'])) ||
-      (!$allow['more_link'] && $view->display_handler->get_option['more_link'])) {
+      (!$allow['more_link'] && $view->display_handler->get_option('more_link'))) {
     $block->more = array('href' => $view->get_url());
     $view->display_handler->set_option('use_more', FALSE);
     // make sure the view runs the count query so we know whether or not the more link
@@ -475,12 +477,12 @@ function panels_views_panes_render($subtype, $conf, $panel_args, $contexts) {
 
   $block->content = $view->preview();
 
-  if ($view->total_rows <= $view->display_handler->get_option('items_per_page')) {
+  if (empty($view->total_rows) || $view->total_rows <= $view->display_handler->get_option('items_per_page')) {
     unset($block->more);
   }
 
   if (($allow['feed_icons'] && !empty($conf['feed_icons'])) ||
-      (!$allow['feed_icons'] && $view->display_handler->get_option['feed_icons'])) {
+      (!$allow['feed_icons'] && $view->display_handler->get_option('feed_icons'))) {
     $new_feeds = drupal_add_feed();
     if ($diff = array_diff(array_keys($new_feeds), array_keys($stored_feeds))) {
       foreach ($diff as $url) {
@@ -506,7 +508,7 @@ function panels_views_panes_edit($id, $parents, $conf) {
   if (empty($conf)) {
     $conf['link_to_view'] = $view->display_handler->get_option('link_to_view');
     $conf['more_link'] = $view->display_handler->get_option('more_link');
-    $conf['feed_icons'] = $pv->feed_icons;
+    $conf['feed_icons'] = FALSE;
     $conf['use_pager'] = $view->display_handler->get_option('use_pager');
     $conf['element_id'] = $view->display_handler->get_option('element_id');
     $conf['items_per_page'] = $view->display_handler->get_option('items_per_page');
@@ -514,6 +516,8 @@ function panels_views_panes_edit($id, $parents, $conf) {
     $conf['path_override'] = FALSE;
     $conf['url'] = $view->get_path();
   }
+
+  $form = array();
 
   foreach ($view->display_handler->get_argument_input() as $id => $argument) {
     if ($argument['type'] == 'user') {

@@ -184,7 +184,7 @@ function panels_render_pane_content(&$display, &$pane) {
   // Override the title if configured to
   if (!empty($pane->configuration['override_title'])) {
     // Give previous title as an available substitution here.
-    $keywords['%title'] = $content->title;
+    $keywords['%title'] = empty($content->title) ? '' : $content->title;
     $content->title = $pane->configuration['override_title_text'];
   }
 

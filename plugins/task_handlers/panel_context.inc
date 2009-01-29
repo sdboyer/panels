@@ -17,83 +17,81 @@
  */
 function panels_panel_context_delegator_task_handlers() {
   return array(
-    'panel_context' => array(
-      'handler type' => 'context', // is a 'context' handler type
-      'title' => t('Panel'),
-      'admin summary' =>'panels_panel_context_admin_summary',
-      'admin title' => 'panels_panel_context_title',
-      'render' => 'panels_panel_context_render',
-      'save' => 'panels_panel_context_save',
-      'export' => 'panels_panel_context_export',
+    'handler type' => 'context', // is a 'context' handler type
+    'title' => t('Panel'),
+    'admin summary' =>'panels_panel_context_admin_summary',
+    'admin title' => 'panels_panel_context_title',
+    'render' => 'panels_panel_context_render',
+    'save' => 'panels_panel_context_save',
+    'export' => 'panels_panel_context_export',
 
-      'add forms' => array(
-        'criteria' => t('Selection criteria'),
-        'choose' => t('Choose layout'),
-        'layout-settings' => t('Configure layout'),
-        'content' => t('Panel content'),
+    'add forms' => array(
+      'criteria' => t('Selection criteria'),
+      'choose' => t('Choose layout'),
+      'layout-settings' => t('Configure layout'),
+      'content' => t('Panel content'),
+    ),
+    'edit forms' => array(
+      'content' => t('Panel content'),
+      'criteria' => t('Selection criteria'),
+      'settings' => t('General'),
+      'context' => t('Contexts'),
+      'layout' => t('Change layout'),
+      'move' => '', // no title makes it a 'hidden' edit form.
+      'layout-settings' => t('Layout settings'),
+    ),
+    'forms' => array(
+      'settings' => array(
+        'form id' => 'panels_panel_context_edit_settings',
       ),
-      'edit forms' => array(
-        'content' => t('Panel content'),
-        'criteria' => t('Selection criteria'),
-        'settings' => t('General'),
-        'context' => t('Contexts'),
-        'layout' => t('Change layout'),
-        'move' => '', // no title makes it a 'hidden' edit form.
-        'layout-settings' => t('Layout settings'),
+      'choose' => array(
+        'form id' => 'panels_panel_context_edit_choose',
       ),
-      'forms' => array(
-        'settings' => array(
-          'form id' => 'panels_panel_context_edit_settings',
-        ),
-        'choose' => array(
-          'form id' => 'panels_panel_context_edit_choose',
-        ),
-        'layout' => array(
-          'no return' => TRUE,
-          'form id' => 'panels_panel_context_edit_layout',
-        ),
-        'move' => array(
-          'include' => array(
-            drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
-          ),
-          'form id' => 'panels_panel_context_edit_move',
-          'submit' => 'panels_change_layout_submit',
-        ),
-        'layout-settings' => array(
-          'include' => array(
-            drupal_get_path('module', 'panels') . '/includes/display-layout-settings.inc',
-          ),
-          'form id' => 'panels_panel_context_edit_layout_settings',
-          'validate' => 'panels_edit_layout_settings_form_validate',
-          'submit' => 'panels_edit_layout_settings_form_submit',
-        ),
-        'content' => array(
-          'include' => array(
-            drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
-          ),
-          'form id' => 'panels_panel_context_edit_content',
-          'submit' => 'panels_edit_display_form_submit',
-          'no blocks' => TRUE,
-        ),
-        'context' => array(
-          'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
-          'form id' => 'ctools_context_handler_edit_context',
-        ),
-        'criteria' => array(
-          'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
-          'form id' => 'ctools_context_handler_edit_criteria',
-        ),
+      'layout' => array(
+        'no return' => TRUE,
+        'form id' => 'panels_panel_context_edit_layout',
       ),
-      'default conf' => array(
-        'autogenerate_title' => TRUE,
-        'title' => t('Panel'),
-        'no_blocks' => FALSE,
-        'css_id' => '',
-        'css' => '',
-        'css_cache_file' => '',
-        'contexts' => array(),
-        'relationships' => array(),
+      'move' => array(
+        'include' => array(
+          drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
+        ),
+        'form id' => 'panels_panel_context_edit_move',
+        'submit' => 'panels_change_layout_submit',
       ),
+      'layout-settings' => array(
+        'include' => array(
+          drupal_get_path('module', 'panels') . '/includes/display-layout-settings.inc',
+        ),
+        'form id' => 'panels_panel_context_edit_layout_settings',
+        'validate' => 'panels_edit_layout_settings_form_validate',
+        'submit' => 'panels_edit_layout_settings_form_submit',
+      ),
+      'content' => array(
+        'include' => array(
+          drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
+        ),
+        'form id' => 'panels_panel_context_edit_content',
+        'submit' => 'panels_edit_display_form_submit',
+        'no blocks' => TRUE,
+      ),
+      'context' => array(
+        'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+        'form id' => 'ctools_context_handler_edit_context',
+      ),
+      'criteria' => array(
+        'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+        'form id' => 'ctools_context_handler_edit_criteria',
+      ),
+    ),
+    'default conf' => array(
+      'autogenerate_title' => TRUE,
+      'title' => t('Panel'),
+      'no_blocks' => FALSE,
+      'css_id' => '',
+      'css' => '',
+      'css_cache_file' => '',
+      'contexts' => array(),
+      'relationships' => array(),
     ),
   );
 }

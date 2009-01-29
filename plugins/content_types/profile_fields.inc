@@ -6,7 +6,6 @@
  * Callback function to supply a list of content types.
  */
 function panels_profile_fields_panels_content_types() {
-  $items = array();
   if (module_exists('profile') && !is_null(profile_categories())) {
     $items['profile_fields'] = array(
       'title' => t('Profile Fields'),
@@ -18,8 +17,8 @@ function panels_profile_fields_panels_content_types() {
       'edit callback' => 'panels_profile_fields_configure',
       'title callback' => 'panels_profile_fields_configure_title',
     );
+    return $items;
   }
-  return $items;
 }
 
 /**

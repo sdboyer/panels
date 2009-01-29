@@ -211,7 +211,7 @@ function theme_panels_edit_display_form($form) {
     );
 
     $content[$panel_id] = theme('panels_panel_dnd', $content[$panel_id], $panel_id, $title, $panel_buttons);
-   }
+  }
 
   $output .= drupal_render($form);
   panels_load_include('display-render');
