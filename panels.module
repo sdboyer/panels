@@ -168,6 +168,16 @@ function panels_menu() {
     'description' => 'Administer items related to the Panels module.',
   );
 
+  if (!module_exists('delegator')) {
+    $items['admin/panels/panel-page'] = array(
+      'title' => 'Panel pages',
+      'access arguments' => array('access administration pages'),
+      'page callback' => 'panels_admin_panel_page',
+      'file' => 'includes/callbacks.inc',
+      'description' => 'A note to let you know where panel pages administration moved to.',
+    );
+  }
+
   return $items;
 }
 
