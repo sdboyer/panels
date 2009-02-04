@@ -751,21 +751,6 @@ function panels_export_display($display, $prefix = '') {
   return $output;
 }
 
-function panels_var_export($object, $prefix = '') {
-  if (is_array($object) && empty($object)) {
-    $output = 'array()';
-  }
-  else {
-    // Remove extra space to match Drupal coding standards.
-    $output = str_replace('array (', 'array(', var_export($object, TRUE));
-  }
-
-  if ($prefix) {
-    $output = str_replace("\n", "\n$prefix", $output);
-  }
-  return $output;
-}
-
 /**
  * Render a display by loading the content into an appropriate
  * array and then passing through to panels_render_layout.
