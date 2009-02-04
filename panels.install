@@ -17,39 +17,58 @@ function panels_schema_1() {
   $schema = array();
 
   $schema['panels_display'] = array(
+    'export' => array(
+      'object' => 'panels_display',
+      'can disable' => FALSE,
+      'identifier' => 'display',
+    ),
     'fields' => array(
       'did' => array(
         'type' => 'serial',
         'not null' => TRUE,
+        'no export' => TRUE,
       ),
       'layout' => array(
         'type' => 'varchar',
         'length' => '32',
+        'default' => '',
       ),
       'layout_settings' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'panel_settings' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'cache' => array(
         'type' => 'text',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'title' => array(
         'type' => 'varchar',
         'length' => '255',
+        'default' => '',
       ),
       'hide_title' => array(
         'type' => 'int',
         'size' => 'tiny',
+        'default' => 0,
       ),
     ),
     'primary key' => array('did'),
   );
 
   $schema['panels_pane'] = array(
+    'export' => array(
+      'can disable' => FALSE,
+      'identifier' => 'pane',
+    ),
     'fields' => array(
       'pid' => array(
         'type' => 'serial',
@@ -63,14 +82,17 @@ function panels_schema_1() {
       'panel' => array(
         'type' => 'varchar',
         'length' => '32',
+        'default' => '',
       ),
       'type' => array(
         'type' => 'varchar',
         'length' => '32',
+        'default' => '',
       ),
       'subtype' => array(
         'type' => 'varchar',
         'length' => '64',
+        'default' => '',
       ),
       'shown' => array(
         'type' => 'int',
@@ -78,24 +100,33 @@ function panels_schema_1() {
         'default' => 1,
       ),
       'access' => array(
-        'type' => 'varchar',
-        'length' => '128',
+        'type' => 'text',
+        'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'visibility' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'configuration' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'cache' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'position' => array(
         'type' => 'int',
         'size' => 'small',
+        'default' => 0,
       ),
     ),
     'primary key' => array('pid'),
@@ -104,32 +135,6 @@ function panels_schema_1() {
     ),
   );
 
-  $schema['panels_object_cache'] = array(
-    'fields' => array(
-      'sid' => array(
-        'type' => 'varchar',
-        'length' => '64',
-      ),
-      'did' => array(
-        'type' => 'int',
-      ),
-      'obj' => array(
-        'type' => 'varchar',
-        'length' => '255',
-      ),
-      'data' => array(
-        'type' => 'text',
-        'size' => 'big',
-      ),
-      'timestamp' => array(
-        'type' => 'int',
-      ),
-    ),
-    'indexes' => array(
-      'idx' => array('sid', 'obj', 'did'),
-      'time_idx' => array('timestamp')
-    ),
-  );
   return $schema;
 }
 
@@ -151,3 +156,9 @@ function panels_uninstall() {
   drupal_uninstall_schema('panels');
 }
 
+function panels_update_6003() {
+  // Update size of pane 'access' field.
+  // update contents of pane 'access' field.
+  // Remove panels_object_cache table
+  // update pid and did to be serial
+}

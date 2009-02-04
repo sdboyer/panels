@@ -431,12 +431,6 @@ class panels_display {
   var $incoming_content = NULL;
   var $css_id = NULL;
   var $context = array();
-  var $layout_settings = array();
-  var $panel_settings = array();
-  var $cache = array();
-  var $title = '';
-  var $hide_title = 0;
-  var $layout = '';
 
   function add_pane($pane, $location = FALSE) {
     $pane->pid = $this->next_new_pid();
@@ -517,7 +511,8 @@ function panels_sanitize_display(&$display) {
  * Creates a new display, setting the ID to our magic new id.
  */
 function panels_new_display() {
-  $display = new panels_display();
+  ctools_include('export');
+  $display = ctools_export_new_object('panels_display', FALSE);
   $display->did = 'new';
   return $display;
 }
@@ -528,14 +523,11 @@ function panels_new_display() {
  * @todo -- use schema API for some of this?
  */
 function panels_new_pane($type, $subtype) {
-  $pane = new stdClass();
+  ctools_include('export');
+  $pane = ctools_export_new_object('panels_pane', FALSE);
   $pane->pid = 'new';
   $pane->type = $type;
   $pane->subtype = $subtype;
-  $pane->configuration = array();
-  $pane->access = array();
-  $pane->shown = TRUE;
-  $pane->visibility = '';
   return $pane;
 }
 
@@ -560,39 +552,30 @@ function panels_load_displays($dids) {
 
   $result = db_query("SELECT * FROM {panels_display} WHERE did IN (" .  db_placeholders($dids) . ")", $dids);
 
-  while ($obj = db_fetch_array($result)) {
-    $display = new panels_display();
-
-    foreach ($obj as $key => $value) {
-      $display->$key = $value;
-      // unserialize important bits
-      if (in_array($key, array('layout_settings', 'panel_settings', 'cache'))) {
-        $display->$key = empty($display->$key) ? array() : unserialize($display->$key);
-      }
-    }
-
-    $display->panels = $display->content = array();
-
-    $displays[$display->did] = $display;
+  ctools_include('export');
+  while ($obj = db_fetch_object($result)) {
+    $displays[$obj->did] = ctools_export_unpack_object('panels_display', $obj);
   }
 
-  foreach (module_implements('panels_layout_content_alter') as $module) {
-    $function = $module . '_panels_layout_content_alter';
-    $function($content, $layout, $settings);
-  }
+  // @TODO
+  //
+  // This code clearly never worked ($content, $layout and $settings are all unset)
+  // where was this supposed to even have been?
+
+//  foreach (module_implements('panels_layout_content_alter') as $module) {
+//    $function = $module . '_panels_layout_content_alter';
+//    $function($content, $layout, $settings);
+//  }
 
   $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (" . db_placeholders($dids) . ") ORDER BY did, panel, position", $dids);
 
-  while ($pane = db_fetch_object($result)) {
-    $pane->configuration = unserialize($pane->configuration);
-    $pane->cache = empty($pane->cache) ? array() : unserialize($pane->cache);
-    $pane->access = ($pane->access ? explode(', ', $pane->access) : array());
-    // Old panels may not have shown property, so enable by default when loading.
-    $pane->shown = isset($pane->shown) ? $pane->shown : TRUE;
+  while ($obj = db_fetch_object($result)) {
+    $pane = ctools_export_unpack_object('panels_pane', $obj);
 
     $displays[$pane->did]->panels[$pane->panel][] = $pane->pid;
     $displays[$pane->did]->content[$pane->pid] = $pane;
   }
+
   return $displays;
 }
 
@@ -646,9 +629,11 @@ function panels_load_display($did) {
  * @return object $display instanceof panels_display \n
  */
 function panels_save_display(&$display) {
-  // @todo -- update all this to just use drupal_write_record or something like it.
-  if (!empty($display->did) && $display->did != 'new') {
-    db_query("UPDATE {panels_display} SET layout = '%s', layout_settings = '%s', panel_settings = '%s', cache = '%s', title = '%s', hide_title = %d WHERE did = %d", $display->layout, serialize($display->layout_settings), serialize($display->panel_settings), serialize($display->cache), $display->title, $display->hide_title, $display->did);
+  $update = (isset($display->did) && is_numeric($display->did)) ? array('did') : array();
+  drupal_write_record('panels_display', $display, $update);
+
+  $pids = array();
+  if ($update) {
     // Get a list of all panes currently in the database for this display so we can know if there
     // are panes that need to be deleted. (i.e, aren't currently in our list of panes).
     $result = db_query("SELECT pid FROM {panels_pane} WHERE did = %d", $display->did);
@@ -656,51 +641,33 @@ function panels_save_display(&$display) {
       $pids[$pane->pid] = $pane->pid;
     }
   }
-  else {
-    db_query("INSERT INTO {panels_display} (layout, layout_settings, panel_settings, cache, title, hide_title) VALUES ('%s', '%s', '%s', '%s', '%s', %d)", $display->layout, serialize($display->layout_settings), serialize($display->panel_settings), serialize($display->cache), $display->title, $display->hide_title);
-    $display->did = db_last_insert_id('panels_display', 'did');
-    $pids = array();
-  }
 
   // update all the panes
   panels_load_include('plugins');
 
-  foreach ((array) $display->panels as $id => $panes) {
+  foreach ($display->panels as $id => $panes) {
     $position = 0;
     $new_panes = array();
     foreach ((array) $panes as $pid) {
       $pane = $display->content[$pid];
-      $pane->position = $position++;
-
-      // make variables right.
       $type = panels_get_content_type($pane->type);
-      $access = isset($pane->access) ? implode(', ', $pane->access) : '';
-      $visibility = !empty($type['visibility serialize']) ? serialize($pane->visibility) : $pane->visibility;
-      $pane->shown = isset($pane->shown) ? $pane->shown : TRUE;
 
-      if (empty($pane->cache)) {
-        $pane->cache = array();
+      $pane->position = $position++;
+      $pane->did = $display->did;
+
+      $old_pid = $pane->pid;
+      drupal_write_record('panels_pane', $pane, is_numeric($pid) ? array('pid') : array());
+
+      if ($pane->pid != $old_pid) {
+        // and put it back so our pids and positions can be used
+        unset($display->content[$id]);
+        $display->content[$pane->pid] = $pane;
       }
 
-      $v = array($display->did, $pane->panel, $pane->type, $pane->subtype, serialize($pane->configuration), serialize($pane->cache), $pane->shown, $access, $visibility, $pane->position);
-
-      if (!is_numeric($pid)) {
-        unset($display->content[$pid]);
-        // doin it this way for readability
-        $f = 'did, panel, type, subtype, configuration, cache, shown, access, visibility, position';
-        $q = "%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d";
-
-        db_query("INSERT INTO {panels_pane} ($f) VALUES ($q)", $v);
-        $pane->pid = db_last_insert_id('panels_pane', 'pid');
-      }
-      else {
-        $v[] = $pane->pid;
-        $f = "did = %d, panel = '%s', type = '%s', subtype = '%s', configuration = '%s', cache = '%s', shown = '%s', access = '%s', visibility = '%s', position = '%d'";
-        db_query("UPDATE {panels_pane} SET $f WHERE pid = %d", $v);
-      }
-      // and put it back so our pids and positions can be used
-      $display->content[$pane->pid] = $pane;
+      // re-add this to the list of content for this panel.
       $new_panes[] = $pane->pid;
+
+      // Remove this from the list of panes scheduled for deletion.
       if (isset($pids[$pane->pid])) {
         unset($pids[$pane->pid]);
       }
@@ -761,16 +728,8 @@ function panels_delete_display($display) {
  *  the same scope as where you eval(), your existing $display variable WILL be overwritten.
  */
 function panels_export_display($display, $prefix = '') {
-  $output = '';
-  $output .= $prefix . '$display = new panels_display()' . ";\n";
-  $output .= $prefix . '$display->did = \'new\'' . ";\n";
-  // $fields = array('name', 'layout', 'layout_settings', 'panel_settings');
-  // TODO 'name' field was removed several months ago, so temporarily removing
-  // it from here whil investigations into exactly why it was removed continue
-  $fields = array('layout', 'layout_settings', 'panel_settings');
-  foreach ($fields as $field) {
-    $output .= $prefix . '$display->' . $field . ' = ' . panels_var_export($display->$field, $prefix) . ";\n";
-  }
+  ctools_include('export');
+  $output = ctools_export_object('panels_display', $display, $prefix);
 
   $output .= $prefix . '$display->content = array()' . ";\n";
   $output .= $prefix . '$display->panels = array()' . ";\n";
@@ -781,24 +740,12 @@ function panels_export_display($display, $prefix = '') {
     $region_counters = array();
     foreach ($display->content as $pane) {
       $pane->pid = 'new-' . ++$pid_counter;
-      $output .= panels_export_pane($pane, $prefix . '  ');
+      $output .= ctools_export_object('panels_pane', $pane, $prefix . '  ');
       $output .= "$prefix  " . '$display->content[\'' . $pane->pid . '\'] = $pane' . ";\n";
       if (!isset($region_counters[$pane->panel])) {
         $region_counters[$pane->panel] = 0;
       }
       $output .= "$prefix  " . '$display->panels[\'' . $pane->panel . '\'][' . $region_counters[$pane->panel]++ .'] = \'' . $pane->pid . "';\n";
-    }
-  }
-  return $output;
-}
-
-function panels_export_pane($pane, $prefix = '') {
-  $output = '';
-  $output = $prefix . '$pane = new stdClass()'  . ";\n";
-  $fields = array('pid', 'panel', 'type', 'shown', 'subtype', 'access', 'configuration', 'cache');
-  foreach ($fields as $field) {
-    if (isset($pane->$field)) {
-      $output .= "$prefix  " . '$pane->' . $field . ' = ' . panels_var_export($pane->$field, "$prefix  ") . ";\n";
     }
   }
   return $output;
@@ -857,7 +804,6 @@ function theme_panels_render_display_form($form) {
   drupal_render($form);
   return theme('form', $form);
 }
-
 
 /**
  * For external use: Given a layout ID and a $content array, return the

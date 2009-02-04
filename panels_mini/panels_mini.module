@@ -377,12 +377,13 @@ function panels_mini_delete($panel_mini) {
  * The code returned from can be used directly in panels_mini_save().
  */
 function panels_mini_export($panel_mini, $prefix = '') {
+  ctools_include('export');
   $output = '';
   $fields = panels_mini_fields();
   $output .= $prefix . '$mini = new stdClass()' . ";\n";
   $output .= $prefix . '$mini->pid = \'new\'' . ";\n";
   foreach ($fields as $field => $sub) {
-    $output .= $prefix . '  $mini->' . $field . ' = ' . panels_var_export($panel_mini->$field, '  ') . ";\n";
+    $output .= $prefix . '  $mini->' . $field . ' = ' . ctools_var_export($panel_mini->$field, '  ') . ";\n";
   }
   // Export the primary display
   $display = !empty($panel_mini->display) ? $panel_mini->display : panels_load_display($panel_mini->did);
