@@ -104,6 +104,13 @@ function panels_theme() {
 
   }
 
+  // On behalf of our own rounded corners style which wants its own theme:
+  $theme['panels_rounded_corners_box'] = array(
+    'arguments' => array('content' => NULL),
+    'path' => panels_get_path('plugins/styles/corners'),
+    'template' => 'panels-rounded-corners-box',
+  );
+
   return $theme;
 }
 

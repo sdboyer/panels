@@ -325,6 +325,7 @@ function panels_get_available_content_types($contexts = NULL, $has_content = FAL
   $content_types = panels_get_content_types();
   $available = array();
 
+  ctools_include('context');
   foreach ($content_types as $id => $type) {
     foreach (panels_ct_get_types($type) as $cid => $cinfo) {
       // exclude items that require content if we're saying we don't
@@ -335,7 +336,6 @@ function panels_get_available_content_types($contexts = NULL, $has_content = FAL
 
       // Check to see if the content type can be used in this context.
       if (!empty($cinfo['required context'])) {
-        ctools_include('context');
         if (!ctools_context_filter($contexts, $cinfo['required context'])) {
           continue;
         }

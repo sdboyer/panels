@@ -331,7 +331,6 @@ function panels_views_panes_content_types() {
       if (empty($display->handler->panel_pane_display)) {
         continue;
       }
-
       $title = $display->handler->get_option('pane_title');
       if (!$title) {
         $title = $view->name;
@@ -481,8 +480,8 @@ function panels_views_panes_render($subtype, $conf, $panel_args, $contexts) {
     unset($block->more);
   }
 
-  if (($allow['feed_icons'] && !empty($conf['feed_icons'])) ||
-      (!$allow['feed_icons'] && $view->display_handler->get_option('feed_icons'))) {
+  if ((!empty($allow['feed_icons']) && !empty($conf['feed_icons'])) ||
+      (empty($allow['feed_icons']) && $view->display_handler->get_option('feed_icons'))) {
     $new_feeds = drupal_add_feed();
     if ($diff = array_diff(array_keys($new_feeds), array_keys($stored_feeds))) {
       foreach ($diff as $url) {
@@ -547,7 +546,7 @@ function panels_views_panes_edit($id, $parents, $conf) {
     }
   }
 
-  if ($allow['feed_icons']) {
+  if (!empty($allow['feed_icons'])) {
     $form['feed_icons'] = array(
       '#type' => 'checkbox',
       '#default_value' => $conf['feed_icons'],

@@ -156,9 +156,11 @@ function panels_uninstall() {
   drupal_uninstall_schema('panels');
 }
 
+/*
 function panels_update_6003() {
   // Update size of pane 'access' field.
   // update contents of pane 'access' field.
   // Remove panels_object_cache table
   // update pid and did to be serial
 }
+*/

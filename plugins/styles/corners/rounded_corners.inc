@@ -47,7 +47,7 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
     }
     $text = panels_render_pane($pane, $display->content[$pane_id], $display);
     if ($text) {
-      $output .= ($where == 'pane') ? panels_rounded_corners_box($text) : $text;
+      $output .= ($where == 'pane') ? theme('panels_rounded_corners_box', $text) : $text;
     }
 
     // If we displayed a pane, this will become true; if not, it will become
@@ -56,7 +56,7 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
   }
 
   if ($where == 'panel') {
-    $output = panels_rounded_corners_box($output);
+    $output = theme('panels_rounded_corners_box', $output);
   }
 
   panels_add_rounded_corners_css($display, $where);
@@ -83,7 +83,7 @@ function theme_panels_rounded_corners_style_render_pane($content, $pane, $displa
   }
 
   // Just stick a box around the standard theme_panels_pane.
-  $output = panels_rounded_corners_box($output);
+  $output = theme('panels_rounded_corners_box', $output);
   panels_add_rounded_corners_css($display, 'pane');
   return $output;
 }
@@ -111,13 +111,25 @@ function panels_rounded_corners_style_settings_form($style_settings) {
  *
  * @param $display
  *   A Panels display object.
- * @param $where
- *   String indicating where the rounded corners should be applied, either
- *   'pane' or 'panel'.
  */
-function panels_rounded_corners_css($display, $where = 'pane') {
+function panels_rounded_corners_css($display) {
   $idstr = empty($display->css_id) ? '.rounded_corner' : "#$display->css_id";
-  $url = panels_get_path('styles/corners', TRUE);
+  $css_id = 'rounded-corner:' . $idstr;
+
+  ctools_include('css');
+  $filename = ctools_css_retrieve($css_id);
+  if (!$filename) {
+    $filename = ctools_css_store($css_id, _panels_rounded_corners_css($idstr), FALSE);
+  }
+
+  drupal_add_css($filename, 'module', 'all', FALSE);
+}
+
+/**
+ * Generates the dynamic CSS.
+ */
+function _panels_rounded_corners_css($idstr) {
+  $url = panels_get_path('plugins/styles/corners', TRUE);
 
   $css = <<<EOF
 
@@ -174,42 +186,12 @@ $idstr div.admin-links {
   margin-left: -12px;
 }
 
-EOF;
-
-  if ($where == 'panel') {
-    $css .= <<<EOF
 $idstr .panel-separator {
   background: url($url/shadow-b.png) repeat-x 0 center;
   font-size: 1px;
   height: 30px;
-  }
-EOF;
-  }
-
-  drupal_set_html_head("<style type=\"text/css\" media=\"all\">\n$css</style>\n");
 }
-
-/**
- * Create the HTML for our rounded corner box.
- *
- * @param $text
- *   The content of this rounded corner box.
- *
- * @return
- *   The created HTML.
- */
-function panels_rounded_corners_box($content) {
-  return <<<EOF
-<div class="rounded_corner">
-  <div class="wrap-corner">
-    <div class="t-edge"><div class="l"></div><div class="r"></div></div>
-    <div class="l-edge">
-      <div class="r-edge">
-        $content
-      </div>
-    </div>
-    <div class="b-edge"><div class="l"></div><div class="r"></div></div>
-  </div>
-</div>
 EOF;
+
+  return $css;
 }

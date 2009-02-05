@@ -285,13 +285,29 @@ function panels_flexible_panels($display, $settings) {
 }
 
 /**
- * This function uses heredoc notation to make it easier to convert
- * to a template.
+ * Theme the flexible layout.
  */
 function theme_panels_flexible($id, $content, $settings) {
   if (empty($settings)) {
     $settings = panels_flexible_default_panels();
   }
+
+  ctools_include('css');
+  // Generate an id based upon rows + columns:
+  $css_id = 'flexible:' . $id . ':';
+  for ($row = 1; $row <= intval($settings['rows']); $row++) {
+    $css_id .= 'r' . $row;
+    for ($col = 1; $col <= intval($settings["row_$row"]['columns']); $col++) {
+      $css_id .= 'c' . $settings["row_$row"]["width_$col"];
+    }
+  }
+
+  $filename = ctools_css_retrieve($css_id);
+  if (!$filename) {
+    $filename = ctools_css_store($css_id, panels_flexible_get_css($id, $settings), FALSE);
+  }
+
+  drupal_add_css($filename, 'module', 'all', FALSE);
 
   // Special check for updating.
   if (empty($settings['width_type'])) {
@@ -301,14 +317,11 @@ function theme_panels_flexible($id, $content, $settings) {
 
   if ($id) {
     $idstr = " id='$id'";
-    $idcss = "#$id";
   }
   else {
     $idstr = '';
-    $idcss = "div.panel-flexible";
   }
 
-  $css = '';
   $output = '';
 
   for ($row = 1; $row <= intval($settings['rows']); $row++) {
@@ -337,7 +350,6 @@ function theme_panels_flexible($id, $content, $settings) {
       $output .= "<div class=\"panel-col panel-col-$col $class\">\n";
       $output .= "<div class=\"inside\">" . $content["row_${row}_$col"] . "</div>\n";
       $output .= "</div>\n"; // panel-col-$col
-      $css .= "$idcss div.panel-row-$row div.panel-col-$col { width: " . ((intval($settings["row_$row"]["width_$col"])) - $reduce) . $settings["width_type"] ."; }\n";
     }
     $output .= "</div>\n"; // panel-row-$row
   }
@@ -346,6 +358,61 @@ function theme_panels_flexible($id, $content, $settings) {
   if (!empty($settings['sidebars']['left']) || !empty($settings['sidebars']['right'])) {
     // provide a wrapper if we have a sidebar
     $output = "<div class=\"panel-sidebar-middle panel-sidebar\">\n$output</div>\n";
+  }
+
+  if (!empty($settings['sidebars']['left'])) {
+    $size = intval($settings['sidebars']['left_width']) . $settings['sidebars']['width_type'];
+    $output = "<div class=\"panel-sidebar panel-sidebar-left panel-col panel-col-first\"><div class=\"inside\">\n" . $content["sidebar_left"] . "</div>\n</div>\n" . $output;
+  }
+
+  if (!empty($settings['sidebars']['right'])) {
+    $size = intval($settings['sidebars']['right_width']) . $settings['sidebars']['width_type'];
+    $output .= "<div class=\"panel-sidebar panel-sidebar-right panel-col panel-col-last\"><div class=\"inside\">\n" . $content["sidebar_right"] . "</div>\n</div>\n";
+  }
+
+  // Wrap the whole thing up nice and snug
+  $output = "<div class=\"panel-flexible clear-block\" $idstr>\n<div class=\"panel-flexible-sidebars\">\n" . $output . "</div>\n</div>\n";
+  return $output;
+}
+
+/**
+ * Theme the flexible layout.
+ */
+function panels_flexible_get_css($id, $settings) {
+  if (empty($settings)) {
+    $settings = panels_flexible_default_panels();
+  }
+
+  // Special check for updating.
+  if (empty($settings['width_type'])) {
+    $settings['width_type'] = '%';
+    $settings['percent_width'] = 100;
+  }
+
+  if ($id) {
+    $idcss = "#$id";
+  }
+  else {
+    $idcss = "div.panel-flexible";
+  }
+
+  $css = '';
+
+  for ($row = 1; $row <= intval($settings['rows']); $row++) {
+    for ($col = 1; $col <= intval($settings["row_$row"]["columns"]); $col++) {
+      // We do a width reduction formula to help IE out a little bit. If width is 100%, we take 1%
+      // off the total; by dividing by the # of columns, that gets us the reduction overall.
+      $reduce = 0;
+      if ($settings['width_type'] == '%' && $settings['percent_width'] == 100) {
+        $reduce = 1 / $settings["row_$row"]["columns"];
+      }
+      $css .= "$idcss div.panel-row-$row div.panel-col-$col { width: " . ((intval($settings["row_$row"]["width_$col"])) - $reduce) . $settings["width_type"] ."; }\n";
+    }
+  }
+
+  // Add our potential sidebars
+  if (!empty($settings['sidebars']['left']) || !empty($settings['sidebars']['right'])) {
+    // provide a wrapper if we have a sidebar
     if ($settings['sidebars']['width_type'] == '%') {
       $css .= "$idcss div.panel-flexible-sidebars div.panel-sidebar-middle { width: " . (intval($settings['percent_width']) - intval($settings['sidebars']['left_width']) - intval($settings['sidebars']['right_width'])) . "; }\n";
     }
@@ -353,7 +420,6 @@ function theme_panels_flexible($id, $content, $settings) {
 
   if (!empty($settings['sidebars']['left'])) {
     $size = intval($settings['sidebars']['left_width']) . $settings['sidebars']['width_type'];
-    $output = "<div class=\"panel-sidebar panel-sidebar-left panel-col panel-col-first\"><div class=\"inside\">\n" . $content["sidebar_left"] . "</div>\n</div>\n" . $output;
     $css .= "$idcss div.panel-flexible-sidebars div.panel-sidebar-left { width: $size; margin-left: -$size; }\n";
     $css .= "$idcss div.panel-flexible-sidebars { padding-left: $size; }\n";
     // IE hack
@@ -362,14 +428,9 @@ function theme_panels_flexible($id, $content, $settings) {
 
   if (!empty($settings['sidebars']['right'])) {
     $size = intval($settings['sidebars']['right_width']) . $settings['sidebars']['width_type'];
-    $output .= "<div class=\"panel-sidebar panel-sidebar-right panel-col panel-col-last\"><div class=\"inside\">\n" . $content["sidebar_right"] . "</div>\n</div>\n";
     $css .= "$idcss div.panel-flexible-sidebars div.panel-sidebar-right { width: $size; margin-right: -$size; }\n";
     $css .= "$idcss div.panel-flexible-sidebars { padding-right: $size; }\n";
   }
 
-  // Wrap the whole thing up nice and snug
-  $output = "<div class=\"panel-flexible clear-block\" $idstr>\n<div class=\"panel-flexible-sidebars\">\n" . $output . "</div>\n</div>\n";
-  drupal_set_html_head("<style type=\"text/css\" media=\"all\">\n$css</style>\n");
-  return $output;
+  return $css;
 }
-
