@@ -219,6 +219,10 @@ function panels_panel_context_export(&$handler, $indent) {
  */
 function panels_panel_context_admin_summary($handler, $task, $subtask_id) {
   $output = '';
+  if (empty($handler->conf['display']) || !is_object($handler->conf['display'])) {
+    return t('Error: broken handler. This handler does not have a valid display as it should. You should delete it.');
+  }
+
   $display = drupal_clone($handler->conf['display']);
 
   panels_load_include('plugins');
@@ -454,6 +458,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
     $cache = new stdClass();
     $cache->display = $display;
     $cache->content_types = $content_types;
+    $cache->display_title = TRUE;
     panels_cache_set('display', $display->did, $cache);
   }
 

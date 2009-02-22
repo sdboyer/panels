@@ -2,3 +2,4 @@ Panels 3.x-dev (no date)
 Note: This changelog is incomplete.
 
 #349979 by Dave Reid: Proper use of link alter.
+#374628: Add a check for broken display to the admin summary to prevent crashes.
