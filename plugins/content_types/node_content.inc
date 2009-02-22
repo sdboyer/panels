@@ -106,11 +106,7 @@ function panels_admin_node_content($node, $conf) {
 
   if ($conf['links']) {
     $node->links = module_invoke_all('link', 'node', $node, $conf['teaser']);
-
-    foreach (module_implements('link_alter') AS $module) {
-      $function = $module .'_link_alter';
-      $function($node, $node->links);
-    }
+    drupal_alter('link', $node->links, $node);
   }
 
   // Set the proper node part, then unset unused $node part so that a bad
