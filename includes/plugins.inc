@@ -14,9 +14,7 @@
  */
 
 /**
- * Master pane access function; combines all the relevant parameters that
- * natively used by the Panels API to determine a pane's access. Called from
- * panels_render_panes().
+ * Determine if a pane is visible.
  *
  * @param $pane
  *   The pane object to test for access.
@@ -24,55 +22,8 @@
  *   The display object containing the pane object to be tested.
  */
 function panels_pane_access($pane, $display) {
-  global $user;
-
-  // Administrator privileges
-  if (user_access('view all pane', $user)) {
-    return TRUE;
-  }
-
-  $role_access = _panels_pane_access_role($pane, $user);
-  $type = panels_get_content_type($pane->type);
-
-  if (!$visibility_check = ctools_plugin_get_function($type, 'visibility check')) {
-    return $role_access;
-  }
-  // Call the content type's custom-defined visibility rendering check.
-  // Pass as much possibly relevant data as possible.
-  $visibility_access = $visibility_check($pane, $display, $user);
-  // Content type marked both access modes to be ANDed together.
-  if (!empty($type['roles and visibility'])) {
-    return ($visibility_access === TRUE && $role_access === TRUE) ? TRUE : FALSE;
-  }
-  // Err on the safe side: if EVERYTHING else has failed, then don't render the pane.
-  return isset($visibility_access) ? $visibility_access : FALSE;
-}
-
-/**
- * Determine role-based access to a panel pane for the current user
- *
- * @param object $pane
- *  The pane object to test.
- * @param object $account
- *  The current $user object.
- *
- * @return bool $role_access
- *  The boolean result of the roles-based segment of the Panels access system.
- */
-function _panels_pane_access_role($pane, $account) {
-  // All views with an empty access setting are available to all roles.
-  if (!$pane->access || !is_array($pane->access)) {
-    return TRUE;
-  }
-
-  // Otherwise, check roles
-  static $roles = array();
-  if (!isset($roles[$account->uid])) {
-    $roles[$account->uid] = array_keys($account->roles);
-    $roles[$account->uid][] = $account->uid ? DRUPAL_AUTHENTICATED_RID : DRUPAL_ANONYMOUS_RID;
-  }
-
-  return array_intersect($pane->access, $roles[$account->uid]) ? TRUE : FALSE;
+  ctools_include('context');
+  return ctools_access($pane->access, $display->context);
 }
 
 /**
@@ -132,28 +83,6 @@ function panels_ct_conf_form($content_type, $subtype, $contexts, $conf) {
     $form['context'] = ctools_context_selector($contexts, $subtype['required context'], isset($conf['context']) ? $conf['context'] : array());
   }
 
-  $style_options = array('default' => t('Default'));
-  foreach (panels_get_styles() as $name => $properties) {
-    if (empty($properties['hidden']) && (!empty($properties['render pane']))) {
-      $style_options[$name] = $properties['title'];
-    }
-  }
-
-  asort($style_options);
-
-  if (empty($conf['style'])) {
-    $conf['style'] = 'default';
-  }
-
-  if ($style_options) {
-    $form['style'] = array(
-      '#type' => 'select',
-      '#title' => t('Pane style'),
-      '#default_value' => $conf['style'],
-      '#options' => $style_options,
-    );
-  }
-
   // Unless we're not allowed to overide the title on this content type, add this
   // gadget to all panes.
   if (empty($content_type['no title override'])) {
@@ -179,26 +108,6 @@ function panels_ct_conf_form($content_type, $subtype, $contexts, $conf) {
       '#prefix' => '<div class="description">',
       '#suffix' => '</div>',
       '#value' => t('You may use %keywords from contexts, as well as %title to contain the original title.'),
-    );
-  }
-
-  // Add CSS class and ID gadgets to all panes if advanced pane settings is set.
-  if (user_access('administer advanced pane settings')) {
-    $form['css_id'] = array(
-      '#type' => 'textfield',
-      '#default_value' => isset($conf['css_id']) ? $conf['css_id'] : '',
-      '#title' => t('CSS ID'),
-      '#description' => t('CSS ID to apply to this content. This may be blank.'),
-      '#weight' => 2,
-      '#size' => 15,
-    );
-    $form['css_class'] = array(
-      '#type' => 'textfield',
-      '#default_value' => isset($conf['css_class']) ? $conf['css_class'] : '',
-      '#title' => t('CSS class'),
-      '#description' => t('CSS class to apply to this content. This may be blank.'),
-      '#weight' => 2,
-      '#size' => 15,
     );
   }
 

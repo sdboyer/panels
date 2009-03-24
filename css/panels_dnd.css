@@ -336,6 +336,24 @@ a.close img {
   margin: 0;
 }
 
+
+div.panel-pane div.ctools-dropdown-container-wrapper {
+  margin-left: -158px;
+  margin-top: -4px;
+}
+
+html.js div.panels-display-links div.ctools-dropdown-container {
+  width: 275px;
+}
+
+html.js div.panels-display-links div.ctools-dropdown-container ul li li a {
+  width: 250px; 
+}
+
+html.js div.panels-display-links div.ctools-dropdown-container ul li a {
+  width: 270px;
+}
+
 /* ---------------------------------------------------------------------------
  * Debugging CSS
  *

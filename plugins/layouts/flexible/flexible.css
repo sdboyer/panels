@@ -56,3 +56,48 @@ div.panel-flexible div.panel-flexible-sidebars div.panel-sidebar {
 div.panel-flexible div.panel-flexible-sidebars div.panel-sidebar-middle { 
   width: 100%; 
 }
+
+/* ---- */
+
+.panel-flexible {
+  width: 99.9%;
+}
+
+.panels-flexible-region { 
+  float: left; 
+  padding: 0;
+  /* margin: 1px 0 .5em 0; */
+}
+
+.panels-flexible-row {
+  padding: 0;
+  margin: 0;
+  padding-bottom: .5em;
+  width: 99.9%;
+}
+
+.panels-flexible-row-last {
+  padding-bottom: 0;
+}
+
+.panels-flexible-region .inside { 
+  padding-right: .5em;
+  padding-left: .5em;
+}
+
+.panesl-flexible-region-first .inside { 
+  padding-left: 0;
+}
+
+.panels-flexible-region-last .inside { 
+  padding-right: 0;
+}
+
+#panels-edit-display .panel-pane,
+#panels-edit-display .helperclass {
+  margin: .5em;
+}
+
+.panel-flexible .panel-separator {
+  margin: 0 0 1em 0;
+}

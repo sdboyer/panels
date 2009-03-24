@@ -28,7 +28,6 @@ function panels_panel_context_delegator_task_handlers() {
     'add forms' => array(
       'criteria' => t('Selection criteria'),
       'choose' => t('Choose layout'),
-      'layout-settings' => t('Configure layout'),
       'content' => t('Panel content'),
     ),
     'edit forms' => array(
@@ -38,7 +37,6 @@ function panels_panel_context_delegator_task_handlers() {
       'context' => t('Contexts'),
       'layout' => t('Change layout'),
       'move' => '', // no title makes it a 'hidden' edit form.
-      'layout-settings' => t('Layout settings'),
     ),
     'forms' => array(
       'settings' => array(
@@ -57,14 +55,6 @@ function panels_panel_context_delegator_task_handlers() {
         ),
         'form id' => 'panels_panel_context_edit_move',
         'submit' => 'panels_change_layout_submit',
-      ),
-      'layout-settings' => array(
-        'include' => array(
-          drupal_get_path('module', 'panels') . '/includes/display-layout-settings.inc',
-        ),
-        'form id' => 'panels_panel_context_edit_layout_settings',
-        'validate' => 'panels_edit_layout_settings_form_validate',
-        'submit' => 'panels_edit_layout_settings_form_submit',
       ),
       'content' => array(
         'include' => array(
@@ -400,37 +390,7 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
   // This form is outside the normal wizard list, so we need to specify the
   // previous/next forms.
   $form['buttons']['previous']['#next'] = 'layout';
-  $form['buttons']['next']['#next'] = 'layout-settings';
-}
-
-/**
- * Proxy the layout settings form.
- */
-function panels_panel_context_edit_layout_settings(&$form, &$form_state) {
-  ctools_include('ajax');
-  panels_load_include('display-layout-settings');
-  panels_load_include('plugins');
-
-  $form_state['display'] = &$form_state['handler']->conf['display'];
-//  $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask_id'], $form_state['handler']);
-
-  // Allow setting of the 'display title'
-  $form_state['display_title'] = TRUE;
-
-  // Tell the Panels form not to display buttons.
-  $form_state['no buttons'] = TRUE;
-
-  // Prevent notices
-  $form_state['finish'] = '';
-
-  $form = array_merge($form, panels_edit_layout_settings_form($form_state));
-
-  // Fix up the extra Save button this page needs. Our needs are a little
-  // different than the normal Panels needs.
-  $form['save']['#next'] = 'layout-settings';
-  $form['save']['#weight'] = -1;
-  $form['buttons']['save'] = $form['save'];
-  unset($form['save']);
+  $form['buttons']['next']['#next'] = 'content';
 }
 
 /**

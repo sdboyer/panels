@@ -486,5 +486,15 @@ Drupal.behaviors.PanelsDisplayEditor = function(context) {
   $('input#panels-show-all', context).click(Drupal.Panels.clickShowAll);
 
   Drupal.Panels.bindClickDelete(context);
+
+  /*
+  // Adjust the location of the pane dropdowns.
+  $('div.panel-pane div.ctools-dropdown-container').each(function() {
+    $(this).css({
+      'margin-left':  125) + ' px',
+      'position': 'absolute'
+    });
+  });
+  */
 };
 

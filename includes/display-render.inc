@@ -65,7 +65,7 @@ function _panels_print_layout($id, $content) {
  * Given a full layout structure and a content array, render a panel display.
  * @render
  */
-function panels_render_layout($layout, $content, $css_id = NULL, $settings = array()) {
+function panels_render_layout($layout, $content, $css_id = NULL, $settings = array(), $display = NULL) {
   if (!empty($layout['css'])) {
     if (file_exists(path_to_theme() . '/' . $layout['css'])) {
       drupal_add_css(path_to_theme() . '/' . $layout['css']);
@@ -74,8 +74,6 @@ function panels_render_layout($layout, $content, $css_id = NULL, $settings = arr
       drupal_add_css($layout['path'] . '/' . $layout['css']);
     }
   }
-  $display = NULL;
-
   // This now comes after the CSS is added, because panels-within-panels must
   // have their CSS added in the right order; inner content before outer content.
 
@@ -99,6 +97,28 @@ function panels_render_layout($layout, $content, $css_id = NULL, $settings = arr
   $output = theme($layout['theme'], check_plain($css_id), $content, $settings, $display);
 
   return $output;
+}
+
+/**
+ * Render the administrative layout of a display.
+ */
+function panels_render_layout_admin($layout, $content, $display) {
+  // @todo This should be abstracted.
+  if (!empty($layout['css'])) {
+    if (file_exists(path_to_theme() . '/' . $layout['css'])) {
+      drupal_add_css(path_to_theme() . '/' . $layout['css']);
+    }
+    else {
+      drupal_add_css($layout['path'] . '/' . $layout['css']);
+    }
+  }
+
+  if (isset($layout['admin css'])) {
+    drupal_add_css($layout['path'] . '/' . $layout['admin css']);
+  }
+
+  $theme = isset($layout['admin theme']) ? $layout['admin theme'] : $layout['theme'];
+  return theme($theme, isset($display->css_id) ? $display->css_id : '', $content, $display->layout_settings, $display);
 }
 
 /**
@@ -189,13 +209,13 @@ function panels_render_pane_content(&$display, &$pane) {
   }
 
   // Pass long the css_id that is usually available.
-  if (!empty($pane->configuration['css_id'])) {
-    $content->css_id = $pane->configuration['css_id'];
+  if (!empty($pane->css['css_id'])) {
+    $content->css_id = $pane->css['css_id'];
   }
 
   // Pass long the css_class that is usually available.
-  if (!empty($pane->configuration['css_class'])) {
-    $content->css_class = $pane->configuration['css_class'];
+  if (!empty($pane->css['css_class'])) {
+    $content->css_class = $pane->css['css_class'];
   }
 
   if (!empty($content->title)) {
@@ -234,8 +254,8 @@ function panels_render_pane_content(&$display, &$pane) {
  *   The display.
  */
 function panels_render_pane($content, $pane, $display) {
-  if (!empty($pane->configuration['style'])) {
-    $style = panels_get_style($pane->configuration['style']);
+  if (!empty($pane->style['style'])) {
+    $style = panels_get_style($pane->style['style']);
 
     if (isset($style) && isset($style['render pane'])) {
       $output = theme($style['render pane'], $content, $pane, $display);

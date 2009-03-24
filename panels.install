@@ -12,6 +12,8 @@ function panels_schema() {
 
 /**
  * Schema version 1 for Panels in D6.
+ *
+ * Schema v1 is now LOCKED; any changes should be done via panels_schema_2.
  */
 function panels_schema_1() {
   $schema = array();
@@ -105,12 +107,6 @@ function panels_schema_1() {
         'serialize' => TRUE,
         'object default' => array(),
       ),
-      'visibility' => array(
-        'type' => 'text',
-        'size' => 'big',
-        'serialize' => TRUE,
-        'object default' => array(),
-      ),
       'configuration' => array(
         'type' => 'text',
         'size' => 'big',
@@ -118,6 +114,24 @@ function panels_schema_1() {
         'object default' => array(),
       ),
       'cache' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+      'style' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+      'css' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+      'extras' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
@@ -142,10 +156,6 @@ function panels_schema_1() {
  * Implementation of hook_install().
  */
 function panels_install() {
-  db_query("UPDATE {system} SET weight = 10 WHERE name = 'panels'");
-  drupal_set_message(st('Please keep in mind that this is an Alpha release of Panels for Drupal 6, and is NOT intended for use on production sites.'));
-  drupal_set_message(st('Additionally, the upgrade path from Drupal 5 has NOT been resolved, and should not be attempted.'));
-  drupal_set_message(st('Bug reports are encouraged, especially when they come with patches! The <a href="@link">Panels project page</a> has details on filing issues.', array('@link' => 'http://drupal.org/project/panels')));
   drupal_install_schema('panels');
 }
 
@@ -156,11 +166,38 @@ function panels_uninstall() {
   drupal_uninstall_schema('panels');
 }
 
-/*
-function panels_update_6003() {
-  // Update size of pane 'access' field.
-  // update contents of pane 'access' field.
-  // Remove panels_object_cache table
+
+function panels_update_6004() {
+  $ret = array();
+  // Fetch schema version 1.
+  $schema = panels_schema_1();
+
+  // @TODO: We probably should detect if these are already serial from previous installations. Not sure how.
+
   // update pid and did to be serial
+  db_drop_primary_key($ret, 'panels_pane');
+  db_change_field($ret, 'panels_pane', 'pid', 'pid', $schema['panels_pane']['fields']['pid'], array('primary key' => array('pid')));
+
+  db_drop_primary_key($ret, 'panels_display');
+  db_change_field($ret, 'panels_display', 'did', 'did', $schema['panels_display']['fields']['did'], array('primary key' => array('did')));
+
+  // Update size of pane 'access' field.
+  db_change_field($ret, 'panels_pane', 'access', 'access', $schema['panels_pane']['fields']['access']);
+
+  // Add some new fields
+  db_add_field($ret, 'panels_pane', 'style', $schema['panels_pane']['fields']['style']);
+  db_add_field($ret, 'panels_pane', 'css', $schema['panels_pane']['fields']['css']);
+  db_add_field($ret, 'panels_pane', 'extras', $schema['panels_pane']['fields']['extras']);
+  // update contents of various fields:
+  // access
+    // @TODO:
+
+  // style
+  // css
+  // extras
+  // configuration
+
+  // Remove panels_object_cache table
+  db_drop_table($ret, 'panels_object_cache');
+  return $ret;
 }
-*/

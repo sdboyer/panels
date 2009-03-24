@@ -76,15 +76,18 @@ function panels_theme() {
   // to even know what the theme function is, so files will be auto included.
   $layouts = panels_get_layouts();
   foreach ($layouts as $name => $data) {
-    if (!empty($data['theme'])) {
-      $theme[$data['theme']] = array(
-        'arguments' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL),
-        'path' => $data['path'],
-      );
+    foreach (array('theme', 'admin theme') as $callback) {
+      if (!empty($data[$callback])) {
+        $theme[$data[$callback]] = array(
+          'arguments' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL, 'display' => NULL),
+          'path' => $data['path'],
+        );
 
-      // if no theme function exists, assume template.
-      if (!function_exists("theme_$data[theme]")) {
-        $theme[$data['theme']]['template'] = str_replace('_', '-', $data['theme']);
+        // if no theme function exists, assume template.
+        if (!function_exists("theme_$data[theme]")) {
+          $theme[$data[$callback]]['template'] = str_replace('_', '-', $data[$callback]);
+          $theme[$data[$callback]]['file'] = $data['file']; // for preprocess.
+        }
       }
     }
   }
@@ -102,14 +105,15 @@ function panels_theme() {
       );
     }
 
+    if (!empty($data['hook theme'])) {
+      if (is_array($data['hook theme'])) {
+        $theme += $data['hook theme'];
+      }
+      else if (function_exists($data['hook theme'])) {
+        $data['hook theme']($theme, $data);
+      }
+    }
   }
-
-  // On behalf of our own rounded corners style which wants its own theme:
-  $theme['panels_rounded_corners_box'] = array(
-    'arguments' => array('content' => NULL),
-    'path' => panels_get_path('plugins/styles/corners'),
-    'template' => 'panels-rounded-corners-box',
-  );
 
   return $theme;
 }
@@ -152,13 +156,35 @@ function panels_menu() {
   $items['panels/ajax/cache-settings'] = array(
     'page callback' => 'panels_ajax_cache_settings',
   ) + $base;
+  $items['panels/ajax/display-settings'] = array(
+    'page callback' => 'panels_ajax_display_settings',
+  ) + $base;
+  $items['panels/ajax/style-type'] = array(
+    'page callback' => 'panels_ajax_style_type',
+  ) + $base;
+  $items['panels/ajax/style-settings'] = array(
+    'page callback' => 'panels_ajax_style_settings',
+  ) + $base;
+  $items['panels/ajax/pane-css'] = array(
+    'page callback' => 'panels_ajax_configure_pane_css',
+  ) + $base;
+  $items['panels/ajax/access-settings'] = array(
+    'page callback' => 'panels_ajax_configure_access_settings',
+  ) + $base;
+  $items['panels/ajax/access-test'] = array(
+    'page callback' => 'panels_ajax_configure_access_test',
+  ) + $base;
+  $items['panels/ajax/access-add'] = array(
+    'page callback' => 'panels_ajax_add_access_test',
+  ) + $base;
 
+/*
   // For panel settings on the edit layout settings page
   $items['panels/ajax/style-settings'] = array(
     'page callback' => 'panels_ajax_style_settings',
     'file' => 'includes/display-layout-settings.inc',
   ) + $base;
-
+*/
   // Non-display editor callbacks
   $items['panels/node/autocomplete'] = array(
     'title' => 'Autocomplete node',
@@ -185,6 +211,18 @@ function panels_menu() {
     );
   }
 
+  $layouts = panels_get_layouts();
+  foreach ($layouts as $name => $data) {
+    if (!empty($data['hook menu'])) {
+      if (is_array($data['hook menu'])) {
+        $items += $data['hook menu'];
+      }
+      else if (function_exists($data['hook menu'])) {
+        $data['hook menu']($items, $data);
+      }
+    }
+  }
+  
   return $items;
 }
 
@@ -319,11 +357,11 @@ function panels_cache_clear($obj, $did) {
  *      - If empty($destination) == FALSE: the form will redirect to the URL string
  *        given in $destination and NO value will be returned.
  */
-function panels_edit($display, $destination = NULL, $content_types = NULL) {
+function panels_edit($display, $destination = NULL, $content_types = NULL, $title = FALSE) {
   panels_load_include('display-edit');
   ctools_include('ajax');
   panels_load_include('plugins');
-  return _panels_edit($display, $destination, $content_types);
+  return _panels_edit($display, $destination, $content_types, $title);
 }
 
 /**
@@ -875,3 +913,13 @@ function panels_ctools_plugin_layouts() {
     'load themes' => TRUE,
   );
 }
+
+/**
+ * Inform CTools that the style plugin can be loaded from themes.
+ */
+function panels_ctools_plugin_styles() {
+  return array(
+    'load themes' => TRUE,
+  );
+}
+

@@ -15,7 +15,7 @@
 function panels_default_panels_styles() {
   return array(
     'default' => array(
-      'title' => t('Default'),
+      'title' => t('No style'),
       'description' => t('The default panel rendering style; displays each pane with a separator.'),
       'render panel' => 'panels_default_style_render_panel',
     ),
