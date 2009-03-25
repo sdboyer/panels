@@ -211,6 +211,7 @@ function panels_menu() {
     );
   }
 
+  panels_load_include('plugins');
   $layouts = panels_get_layouts();
   foreach ($layouts as $name => $data) {
     if (!empty($data['hook menu'])) {
