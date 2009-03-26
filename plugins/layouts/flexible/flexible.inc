@@ -230,9 +230,14 @@ function theme_panels_flexible($id, $content, $settings, $display) {
   $renderer->css_id = $id;
   $renderer->did = $display->did;
   $renderer->id_str = $id ? 'id="' . $id . '"' : '';
+  $renderer->admin = FALSE;
 
   $css = panels_flexible_render_css($renderer);
 /*
+ * TODO: We can't uncomment this code and use it until delegator starts
+ * storing displays in the database. There are other problems that can
+ * happen because of its overuse of the 'new' display ID anyway, so this
+ * is just another reminder.
   ctools_include('css');
   // Generate an id based upon rows + columns:
   $css_id = 'flexible:' . $display->did . ':';
