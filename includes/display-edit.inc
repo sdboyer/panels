@@ -792,8 +792,27 @@ function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL
   }
 
   $pane = panels_new_pane($type, $subtype);
-
   $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
+  
+  $content_type = panels_get_content_type($type);
+  
+  if (isset($content_type['defaults'])) {
+    $defaults = $content_type['defaults'];
+  }
+  else if (isset($subtype['defaults'])) {
+    $defaults = $subtype['defaults'];
+  }
+  if (isset($defaults)) {
+    if (is_string($defaults) && is_array($defaults)) {
+      if ($return = $defaults($pane)) {
+        $pane->configuration = $return;
+      }
+    }
+    else if (is_array($defaults)) {
+      $pane->configuration = $defaults;
+    }
+  }
+
   $form_state = array(
     'display' => &$cache->display,
     'pane' => &$pane,
@@ -946,7 +965,7 @@ function panels_content_config_form(&$form_state) {
  * Call any validation functions defined by the content type.
  */
 function panels_content_config_form_validate($form, &$form_state) {
-  panels_ct_pane_validate_form($form_state['pane']->type, $form['configuration'], $form_state['values']['configuration'], $form_state['op']);
+  panels_ct_pane_validate_form($form_state['pane']->type, $form['configuration'], $form_state, $form_state['op']);
 }
 
 /**

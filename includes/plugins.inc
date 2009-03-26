@@ -154,9 +154,9 @@ function panels_ct_pane_config_form($pane, $contexts, $parents, $op, $content_ty
  * @param string $op
  *  Either 'add' or 'edit' depending on the operation being performed.
  */
-function panels_ct_pane_validate_form($content_type, $form, &$form_values, $op) {
+function panels_ct_pane_validate_form($content_type, $form, &$form_state, $op) {
   if ($function = panels_plugin_get_function('content_types', $content_type, "$op validate callback")) {
-    return $function($form, $form_values);
+    return $function($form, $form_state);
   }
 }
 
@@ -712,6 +712,7 @@ function panels_get_caches() {
  *   does not exist.
  */
 function panels_plugin_get_function($plugin, $which, $function_name) {
+  ctools_include('plugins');
   if (is_object($which) || is_array($which)) {
     return ctools_plugin_get_function($which, $function_name);
   }

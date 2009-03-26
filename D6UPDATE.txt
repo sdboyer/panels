@@ -20,6 +20,8 @@ panels_node_legacy module renamed to panels_node_content.module
 'content_types' now 'content types'.
 New 'content type' to fetch information a single content type so we don't have
 to load all of them all the time.
+New 'defaults' array in either the type or subtype declaration to provide
+defaults for the add form.
 
 CONTEXTS
 ========
