@@ -14,6 +14,10 @@ div.panel-flexible-edit-layout .pane-add-link,
   border: 1px dotted green;
 }
 
+.panels-flexible-column-inside {
+  overflow: hidden;
+}
+
 .panel-flexible-edit-layout .panels-flexible-column > .flexible-title {
   color: green;
 }

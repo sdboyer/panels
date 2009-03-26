@@ -141,11 +141,12 @@ Drupal.flexible.splitter = function($splitter) {
     // Create boxes to display widths left and right of the mouse pointer.
     // Create left box only if left box is mobile.
     if (splitter.left_unit) {
-      splitter.left_box = $('<div class="flexible-splitter-hover-box></div>');
+      splitter.left_box = $('<div class="flexible-splitter-hover-box">&nbsp;</div>');
       $('body').append(splitter.left_box);
       splitter.left_box.css('top', offset.top);
       splitter.left_box.css('left', event.pageX - 65);
-      if (splitter.left_width_type == '%') {
+
+    if (splitter.left_width_type == '%') {
         var left = splitter.currentLeft / splitter.left_scale;
         splitter.left_box.html(left.toFixed(2) + splitter.left_width_type);
       }
@@ -158,7 +159,7 @@ Drupal.flexible.splitter = function($splitter) {
 
     // Create the right box if the right side is mobile.
     if (splitter.right_unit) {
-      splitter.right_box = $('<div class="flexible-splitter-hover-box></div>');
+      splitter.right_box = $('<div class="flexible-splitter-hover-box"></div>');
       $('body').append(splitter.right_box);
       splitter.right_box.css('top', offset.top);
       splitter.right_box.css('left', event.pageX + 5);
