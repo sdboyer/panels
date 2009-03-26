@@ -17,10 +17,14 @@ function panels_mini_schema_1() {
   $schema = array();
 
   $schema['panels_mini'] = array(
+    'export' => array(
+      'identifier' => 'mini',
+    ),
     'fields' => array(
       'pid' => array(
         'type' => 'serial',
         'not null' => TRUE,
+        'no export' => TRUE,
       ),
       'name' => array(
         'type' => 'varchar',
@@ -32,6 +36,7 @@ function panels_mini_schema_1() {
       ),
       'did' => array(
         'type' => 'int',
+        'no export' => TRUE,
       ),
       'title' => array(
         'type' => 'varchar',
@@ -40,14 +45,20 @@ function panels_mini_schema_1() {
       'requiredcontexts' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'contexts' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'relationships' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
     ),
     'primary key' => array('pid'),

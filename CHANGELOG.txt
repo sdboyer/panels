@@ -3,3 +3,6 @@ Note: This changelog is incomplete.
 
 #349979 by Dave Reid: Proper use of link alter.
 #374628: Add a check for broken display to the admin summary to prevent crashes.
+Retool flexible layout into a nice javascripty visual layout builder.
+Retool mini panels to use ctools export class and provide a .inc file for its content type as a better example.
+Store a panel task handler's display in the database.

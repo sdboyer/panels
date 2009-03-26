@@ -85,13 +85,6 @@ function _panels_mini_menu() {
     'weight' => -5,
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/edit-settings'] = array(
-    'title' => 'Layout settings',
-    'page callback' => 'panels_mini_edit_layout_settings',
-    'page arguments' => array(3),
-    'weight' => -3,
-    'type' => MENU_LOCAL_TASK,
-  ) + $base;
   $items['admin/panels/panel-mini/%panels_mini_admin/edit-context'] = array(
     'title' => 'Context',
     'page callback' => 'panels_mini_edit_context',
@@ -127,7 +120,6 @@ function _panels_mini_menu() {
  * Settings for mini panels.
  */
 function panels_mini_settings() {
-  return ('TODO');
   panels_load_include('common');
   return drupal_get_form('panels_common_settings', 'panels_mini');
 }
@@ -151,17 +143,6 @@ function panels_mini_list_page() {
 
   // Load all mini panels and their displays.
   $panel_minis = panels_mini_load_all();
-  $dids = array();
-  foreach ($panel_minis as $panel_mini) {
-    if (empty($panel_mini->display)) {
-      $dids[] = $panel_mini->did;
-    }
-  }
-  $displays = panels_load_displays($dids);
-
-  if (empty($displays)) {
-    return t('There are currently no mini panels.');
-  }
 
   foreach ($panel_minis as $panel_mini) {
     $ops = array();
@@ -627,13 +608,8 @@ function panels_mini_context_form_submit($form, &$form_state) {
  * Enable a default mini panel.
  */
 function panels_mini_enable_page($name = NULL) {
-  $defaults = panels_mini_default_panels();
-  if (isset($defaults[$name])) {
-    $status = variable_get('panel_mini_defaults', array());
-    $status[$name] = FALSE;
-    variable_set('panel_mini_defaults', $status);
-    drupal_set_message(t('Panel mini enabled'));
-  }
+  ctools_include('export');
+  ctools_export_set_status('panels_mini', $name, FALSE);
   drupal_goto();
 }
 
@@ -641,13 +617,8 @@ function panels_mini_enable_page($name = NULL) {
  * Disable a default mini panel.
  */
 function panels_mini_disable_page($name = NULL) {
-  $defaults = panels_mini_default_panels();
-  if (isset($defaults[$name])) {
-    $status = variable_get('panel_mini_defaults', array());
-    $status[$name] = TRUE;
-    variable_set('panel_mini_defaults', $status);
-    drupal_set_message(t('Panel mini disabled'));
-  }
+  ctools_include('export');
+  ctools_export_set_status('panels_mini', $name, TRUE);
   drupal_goto();
 }
 
@@ -693,34 +664,6 @@ function panels_mini_edit_layout($panel_mini) {
     $panel_mini->did = $output->did;
     panels_mini_save($panel_mini);
     drupal_goto("admin/panels/panel-mini/$panel_mini->name/edit-layout");
-  }
-
-  drupal_set_title(check_plain($panel_mini->title));
-  return $output;
-}
-
-/**
- * Pass through to the panels layout settings editor.
- */
-function panels_mini_edit_layout_settings($panel_mini, $next = NULL) {
-  if (!is_object($panel_mini)) {
-    $panel_mini = panels_mini_load($panel_mini);
-  }
-  if (empty($next)) {
-    $button = t('Save');
-    $dest = "admin/panels/panel-mini/$panel_mini->name/edit-settings";
-  }
-  else {
-    $button = t('Save and proceed');
-    $dest = "admin/panels/panel-mini/$panel_mini->name/edit-context/next";
-  }
-
-  $output = panels_edit_layout_settings($panel_mini->display, $button);
-  if (is_object($output)) {
-    $panel_mini->display = $output;
-    $panel_mini->did = $output->did;
-    panels_mini_save($panel_mini);
-    drupal_goto($dest);
   }
 
   drupal_set_title(check_plain($panel_mini->title));
