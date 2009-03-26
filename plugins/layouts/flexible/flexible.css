@@ -8,32 +8,6 @@
   width: 99.9%;
 }
 
-.panel-flexible .panel-col { 
-  float: left; 
-  padding: 0;
-  margin: 1px 0 .5em 0;
-}
-
-.panel-flexible .panel-row {
-  padding: 0;
-  margin: 0;
-  padding-bottom: .5em;
-  width: 99.9%;
-}
-
-.panel-flexible .panel-col-first .inside { 
-  padding-right: .5em;
-}
-
-.panel-flexible .panel-col-inside .inside { 
-  padding-right: .5em;
-  padding-left: .5em;
-}
-
-.panel-flexible .panel-col-last .inside { 
-  padding-left: .5em;
-}
-
 #panels-edit-display .panel-pane,
 #panels-edit-display .helperclass {
   margin: .5em;
@@ -41,20 +15,6 @@
 
 .panel-flexible .panel-separator {
   margin: 0 0 1em 0;
-}
-
-/* sidebar css */
-div.panel-flexible div.panel-flexible-sidebars div.panel-sidebar { 
-  float: left; 
-  position: relative; 
-}
-
-* html div.panel-sidebar-left div.inside {
-  background-color: transparent;
-}
-
-div.panel-flexible div.panel-flexible-sidebars div.panel-sidebar-middle { 
-  width: 100%; 
 }
 
 /* ---- */
@@ -67,6 +27,7 @@ div.panel-flexible div.panel-flexible-sidebars div.panel-sidebar-middle {
   float: left; 
   padding: 0;
   /* margin: 1px 0 .5em 0; */
+  overflow: hidden;
 }
 
 .panels-flexible-row {
@@ -80,16 +41,16 @@ div.panel-flexible div.panel-flexible-sidebars div.panel-sidebar-middle {
   padding-bottom: 0;
 }
 
-.panels-flexible-region .inside { 
+.panels-flexible-region-inside {
   padding-right: .5em;
   padding-left: .5em;
 }
 
-.panesl-flexible-region-first .inside { 
+.panesl-flexible-region-inside-first {
   padding-left: 0;
 }
 
-.panels-flexible-region-last .inside { 
+.panels-flexible-region-inside-last {
   padding-right: 0;
 }
 
