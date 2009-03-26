@@ -232,23 +232,26 @@ function theme_panels_flexible($id, $content, $settings, $display) {
   $renderer->id_str = $id ? 'id="' . $id . '"' : '';
   $renderer->admin = FALSE;
 
+  // CSS must be generated because it reports back left/middle/right
+  // positions.
   $css = panels_flexible_render_css($renderer);
-/*
- * TODO: We can't uncomment this code and use it until delegator starts
- * storing displays in the database. There are other problems that can
- * happen because of its overuse of the 'new' display ID anyway, so this
- * is just another reminder.
-  ctools_include('css');
-  // Generate an id based upon rows + columns:
-  $css_id = 'flexible:' . $display->did . ':';
 
-  $filename = ctools_css_store($css_id, panels_flexible_render_css($id, $settings, $settings['canvas']), FALSE);
-  drupal_add_css($filename, 'module', 'all', FALSE);
-*/
-
-  // TEMP -- we'll always do this for the admin version since we're working, but an actual
-  // display will cache like above.
-  drupal_set_html_head("<style type=\"text/css\">\n$css</style>\n");
+  if ($display->did && $display->did != 'new') {
+    ctools_include('css');
+    // Generate an id based upon rows + columns:
+    $css_id = 'flexible:' . $display->did;
+    $filename = ctools_css_retrieve($css_id);
+    if (!$filename) {
+      $filename = ctools_css_store($css_id, $css, FALSE);
+    }
+    drupal_add_css($filename, 'module', 'all', FALSE);
+  }
+  else {
+    // If the id is 'new' we can't reliably cache the CSS in the filesystem
+    // because the display does not truly exist, so we'll stick it in the
+    // head tag.
+    drupal_set_html_head("<style type=\"text/css\">\n$css</style>\n");
+  }
 
   $output = "<div class=\"panel-flexible panel-flexible-$renderer->did clear-block\" $renderer->id_str>\n";
   $output .= "<div class=\"panel-flexible-inside panel-flexible-$renderer->did-inside\">\n";
@@ -275,6 +278,14 @@ function theme_panels_flexible_admin($id, $content, $settings, $display) {
   $renderer->id_str = $id ? 'id="' . $id . '"' : '';
   $renderer->admin = TRUE;
 
+  if ($display->did && $display->did != 'new') {
+    // Automatically remove any cached CSS for this display since it's
+    // being edited. The next time it's viewed CSS will be auto generated
+    // if necessary.
+    $css_id = 'flexible:' . $display->did;
+    ctools_include('css');
+    ctools_css_clear($css_id);
+  }
   $css = panels_flexible_render_css($renderer);
 
   // For the administrative view, add CSS directly to head.
