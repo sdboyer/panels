@@ -793,14 +793,14 @@ function panels_ajax_add_pane_config($did = NULL, $panel_id = NULL, $type = NULL
 
   $pane = panels_new_pane($type, $subtype);
 
-  $subtypes = panels_ct_get_types($pane->type);
+  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
   $form_state = array(
     'display' => &$cache->display,
     'pane' => &$pane,
     'ajax' => TRUE,
-    'title' => t('Configure !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title'])),
+    'title' => t('Configure !subtype_title', array('!subtype_title' => $subtype['title'])),
     'type' => panels_get_content_type($pane->type),
-    'subtype' => $subtypes[$pane->subtype],
+    'subtype' => $subtype,
     'op' => 'add',
   );
 
@@ -842,15 +842,15 @@ function panels_ajax_configure_pane($did = NULL, $pid = NULL) {
   }
 
   $pane = &$cache->display->content[$pid];
-  $subtypes = panels_ct_get_types($pane->type);
 
+  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
   $form_state = array(
     'display' => &$cache->display,
     'pane' => &$pane,
     'ajax' => TRUE,
-    'title' => t('Configure !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title'])),
+    'title' => t('Configure !subtype_title', array('!subtype_title' => $subtype['title'])),
     'type' => panels_get_content_type($pane->type),
-    'subtype' => $subtypes[$pane->subtype],
+    'subtype' => $subtype,
     'op' => 'edit',
   );
 
@@ -1044,9 +1044,9 @@ function panels_ajax_cache_method($did = NULL, $pid = NULL) {
   }
   else if (!empty($cache->display->content[$pid])) {
     $pane = &$cache->display->content[$pid];
-    $subtypes = panels_ct_get_types($pane->type);
+    $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
     $conf = &$pane->cache;
-    $title = t('Cache method for !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title']));
+    $title = t('Cache method for !subtype_title', array('!subtype_title' => $subtype['title']));
   }
   else {
     ctools_modal_render(t('Error'), t('Invalid pane id.'));
@@ -1167,10 +1167,10 @@ function panels_ajax_cache_settings($did, $pid) {
   }
   else if (!empty($cache->display->content[$pid])) {
     $pane = &$cache->display->content[$pid];
-    $subtypes = panels_ct_get_types($pane->type);
+    $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
 
     $conf = &$pane->cache;
-    $title = t('Cache settings for !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title']));
+    $title = t('Cache settings for !subtype_title', array('!subtype_title' => $subtype['title']));
   }
   else {
     ctools_modal_render(t('Error'), t('Invalid pane id.'));
@@ -1301,8 +1301,8 @@ function panels_ajax_style_type($type = NULL, $did = NULL, $pid = NULL) {
     case 'pane':
       $pane = &$cache->display->content[$pid];
       $style = isset($pane->style['style']) ? $pane->style['style'] : 'default';
-      $subtypes = panels_ct_get_types($pane->type);
-      $title = t('Pane style for "!pane"', array('!pane' => $subtypes[$pane->subtype]['title']));
+      $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
+      $title = t('Pane style for "!pane"', array('!pane' => $subtype['title']));
       break;
 
     default:
@@ -1509,8 +1509,8 @@ function panels_ajax_style_settings($type, $did, $pid = '') {
     case 'pane':
       $pane = &$cache->display->content[$pid];
       $conf = &$pane->style['settings'];
-      $subtypes = panels_ct_get_types($pane->type);
-      $title = t('Style settings for style @style (Pane "!pane")', array('@style' => $style['title'], '!pane' => $subtypes[$pane->subtype]['title']));
+      $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
+      $title = t('Style settings for style @style (Pane "!pane")', array('@style' => $style['title'], '!pane' => $subtype['title']));
       break;
   }
 
@@ -1624,13 +1624,13 @@ function panels_ajax_configure_pane_css($did = NULL, $pid = NULL) {
   }
 
   $pane = &$cache->display->content[$pid];
-  $subtypes = panels_ct_get_types($pane->type);
+  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
 
   $form_state = array(
     'display' => &$cache->display,
     'pane' => &$pane,
     'ajax' => TRUE,
-    'title' => t('Configure CSS on !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title'])),
+    'title' => t('Configure CSS on !subtype_title', array('!subtype_title' => $subtype['title'])),
   );
 
   $output = ctools_modal_form_wrapper('panels_content_configure_pane_css_form', $form_state);
@@ -1706,13 +1706,13 @@ function panels_ajax_configure_access_settings($did = NULL, $pid = NULL) {
   }
 
   $pane = &$cache->display->content[$pid];
-  $subtypes = panels_ct_get_types($pane->type);
+  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
 
   $form_state = array(
     'display' => &$cache->display,
     'pane' => &$pane,
     'ajax' => TRUE,
-    'title' => t('Access settings on !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title'])),
+    'title' => t('Access settings on !subtype_title', array('!subtype_title' => $subtype['title'])),
   );
 
   $output = ctools_modal_form_wrapper('panels_content_configure_access_settings_form', $form_state);
@@ -1783,13 +1783,13 @@ function panels_ajax_add_access_test($did = NULL, $pid = NULL) {
   }
 
   $pane = &$cache->display->content[$pid];
-  $subtypes = panels_ct_get_types($pane->type);
+  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
 
   $form_state = array(
     'display' => &$cache->display,
     'pane' => &$pane,
     'ajax' => TRUE,
-    'title' => t('Add visibility rule for !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title'])),
+    'title' => t('Add visibility rule for !subtype_title', array('!subtype_title' => $subtype['title'])),
   );
 
   $output = ctools_modal_form_wrapper('panels_content_add_access_test_form', $form_state);
@@ -1858,7 +1858,7 @@ function panels_ajax_configure_access_test($did = NULL, $pid = NULL, $id = NULL)
   }
 
   $pane = &$cache->display->content[$pid];
-  $subtypes = panels_ct_get_types($pane->type);
+  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
 
   // Set this up here because $id gets changed later.
   $url = "panels/ajax/access-test/$did/$pid/$id";
@@ -1878,7 +1878,7 @@ function panels_ajax_configure_access_test($did = NULL, $pid = NULL, $id = NULL)
     'display' => &$cache->display,
     'pane' => &$pane,
     'ajax' => TRUE,
-    'title' => t('Configure visibility rule for !subtype_title', array('!subtype_title' => $subtypes[$pane->subtype]['title'])),
+    'title' => t('Configure visibility rule for !subtype_title', array('!subtype_title' => $subtype['title'])),
     'test' => &$pane->access['plugins'][$id],
     'plugin' => ctools_get_access_plugin($pane->access['plugins'][$id]['name']),
     'url' => url($url, array('absolute' => TRUE)),

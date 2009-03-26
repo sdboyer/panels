@@ -178,14 +178,14 @@ function panels_ct_pane_submit_form($content_type, &$form_values, $op) {
 }
 
 /**
- * Get all of the individual types provided by a given content type. This
+ * Get all of the individual subtypes provided by a given content type. This
  * would be all of the blocks for the block type, or all of the views for
  * the view type.
  *
  * @param $type
  *   The content type to load.
  */
-function panels_ct_get_types($type) {
+function panels_ct_get_subtypes($type) {
   if (is_array($type)) {
     $content_type = $type;
   }
@@ -193,7 +193,15 @@ function panels_ct_get_types($type) {
     $content_type = panels_get_content_type($type);
   }
 
-  $function = $content_type['content_types'];
+  // Leave this in to maintain a little backward compatibility. We can take
+  // this out later.
+  if (isset($content_type['content types'])) {
+    $function = $content_type['content types'];
+  }
+  else {
+    $function = $content_type['content_types'];
+  }
+  
   if (is_array($function)) {
     return (array) $function;
   }
@@ -202,6 +210,26 @@ function panels_ct_get_types($type) {
     return (array) $function();
   }
   return array();
+}
+
+/**
+ * Given a content type and a subtype id, return the information about that
+ * content subtype.
+ * 
+ * @param <type> $type
+ * @param <type> $subtype_id 
+ */
+function panels_ct_get_subtype($type, $subtype_id) {
+  $function = panels_plugin_get_function('content_types', $type, 'content_type');
+  if ($function) {
+    return $function($subtype_id);
+  }
+  else {
+    $subtypes = panels_ct_get_subtypes($type);
+    if (isset($subtypes[$subtype_id])) {
+      return $subtypes[$subtype_id];
+    }
+  }
 }
 
 /**
@@ -236,7 +264,7 @@ function panels_get_available_content_types($contexts = NULL, $has_content = FAL
 
   ctools_include('context');
   foreach ($content_types as $id => $type) {
-    foreach (panels_ct_get_types($type) as $cid => $cinfo) {
+    foreach (panels_ct_get_subtypes($type) as $cid => $cinfo) {
       // exclude items that require content if we're saying we don't
       // provide it.
       if (!empty($cinfo['requires content']) && !$has_content) {
@@ -279,7 +307,7 @@ function panels_get_all_content_types() {
   $available = array();
 
   foreach ($content_types as $id => $type) {
-    foreach (panels_ct_get_types($type) as $cid => $cinfo) {
+    foreach (panels_ct_get_subtypes($type) as $cid => $cinfo) {
       // If we made it through all the tests, then we can use this content.
       $available[$id][$cid] = $cinfo;
     }
@@ -551,14 +579,15 @@ function panels_pane_select_context($pane, $contexts) {
     return;
   }
 
-  $content_type = panels_ct_get_types($pane->type);
+  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
   // If the pane requires a context, fetch it; if no context is returned,
   // do not display the pane.
-  if (empty($content_type[$pane->subtype]['required context'])) {
+  if (empty($subtype) || empty($subtype['required context'])) {
     return;
   }
 
-  $context = ctools_context_select($contexts, $content_type[$pane->subtype]['required context'], $pane->configuration['context']);
+  $context = ctools_context_select($contexts, $subtype['required context'],
+    $pane->configuration['context']);
 
   return $context;
 }
