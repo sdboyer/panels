@@ -250,10 +250,10 @@ function theme_panels_flexible($id, $content, $settings, $display) {
   // display will cache like above.
   drupal_set_html_head("<style type=\"text/css\">\n$css</style>\n");
 
-  $output = "<div class=\"panel-flexible clear-block\" $renderer->id_str>\n";
-  $output .= "<div class=\"panel-flexible-inside\">\n";
+  $output = "<div class=\"panel-flexible panel-flexible-$renderer->did clear-block\" $renderer->id_str>\n";
+  $output .= "<div class=\"panel-flexible-inside panel-flexible-$renderer->did-inside\">\n";
 
-  $output .= panels_flexible_render_items($renderer, $settings['items']['canvas']['children'], 'panel-flexible');
+  $output .= panels_flexible_render_items($renderer, $settings['items']['canvas']['children'], 'panel-flexible-' . $renderer->did);
 
   // Wrap the whole thing up nice and snug
   $output .= "</div>\n</div>\n";
@@ -282,8 +282,8 @@ function theme_panels_flexible_admin($id, $content, $settings, $display) {
 
   $output = '<input type="submit" id="panels-flexible-toggle-layout" value ="' .
     t('Show layout designer') . '">';
-  $output .= "<div class=\"panel-flexible clear-block panel-flexible-admin panel-flexible-no-edit-layout\" $renderer->id_str>\n";
-  $output .= "<div class=\"panel-flexible-inside\">\n";
+  $output .= "<div class=\"panel-flexible panel-flexible-$renderer->did clear-block panel-flexible-admin panel-flexible-no-edit-layout\" $renderer->id_str>\n";
+  $output .= "<div class=\"panel-flexible-inside panel-flexible-$renderer->did-inside \">\n";
 
   $content = panels_flexible_render_items($renderer, $settings['items']['canvas']['children'], 'panels-flexible-row-' . $renderer->did . '-canvas');
   $output .= panels_flexible_render_item($renderer, $settings['items']['canvas'], 'panels-flexible-row', $content, 'canvas', 0, 0, TRUE);
@@ -362,6 +362,12 @@ function panels_flexible_render_item($renderer, $item, $base, $content, $id, $po
   }
 
   $output .= '  <div class="inside ' . $base . '-inside ' . $base . '-' . $renderer->did . '-' . $id . '-inside';
+  if ($position == 0) {
+    $output .= ' ' . $base . '-inside-first';
+  }
+  if ($position == $max) {
+    $output .= ' ' . $base . '-inside-last';
+  }
   if ($clear) {
     $output .= ' clear-block';
   }
@@ -513,7 +519,7 @@ function panels_flexible_render_item_links($renderer, $id, $item) {
  * Provide CSS for a flexible layout.
  */
 function panels_flexible_render_css($renderer) {
-  $parent_class = $renderer->admin ? '.panels-flexible-row-' . $renderer->did . '-canvas' : '.panel-flexible';
+  $parent_class = $renderer->admin ? '.panels-flexible-row-' . $renderer->did . '-canvas' : '.panel-flexible-' . $renderer->did;
   return panels_flexible_render_css_group($renderer, $renderer->settings['items']['canvas']['children'], $parent_class, 'column');
 }
 
@@ -913,6 +919,10 @@ function panels_ajax_flexible_edit_add($did, $id, $location = 'left') {
       $panel_buttons = panels_edit_panel_get_links($cache->display, $form_state['key']);
 
       $content = theme('panels_panel_dnd', '', $form_state['key'], $item['title'], $panel_buttons);
+      // Manually add the hidden field that our region uses to store pane info.
+      $content .= '<input type="hidden" name="panel[pane][' .
+        $form_state['key'] . ']" id="edit-panel-pane-' . $form_state['key'] . '" value="" />';
+
     }
     else {
       // We need to make sure the left/middle/right divs exist inside this
@@ -929,7 +939,7 @@ function panels_ajax_flexible_edit_add($did, $id, $location = 'left') {
     $parent_class = 'panels-flexible-' . $parent['type'] . '-' . $did . '-' . $id;
     $item_output = panels_flexible_render_item($renderer, $item, 'panels-flexible-' . $item['type'], $content, $form_state['key'], 0, 0, $item['type'] == 'row');
 
-// Get all the CSS necessary for the entire row (as width adjustments may
+    // Get all the CSS necessary for the entire row (as width adjustments may
     // have cascaded).
     $css = array();
     panels_flexible_get_css_group($css, $renderer, $parent['children'], '.' . $parent_class, $item['type']);
@@ -967,20 +977,6 @@ function panels_ajax_flexible_edit_add($did, $id, $location = 'left') {
         }
         break;
 
-//      default:
-//        // Rows are added without a 'position'.
-//        if ($location == 'left') {
-//          if (!empty($form_state['sibling'])) {
-//            $item_output .= panels_flexible_render_splitter($renderer, $form_state['key'], $form_state['sibling']);
-//          }
-//          $output[] = ctools_ajax_command_prepend('.' . $parent_class . '-inside', $item_output);
-//        }
-//        else {
-//          if (!empty($form_state['sibling'])) {
-//            $item_output = panels_flexible_render_splitter($renderer, $form_state['sibling'], $form_state['key']) .  $item_output;
-//          }
-//          $output[] = ctools_ajax_command_append('.' . $parent_class . '-inside', $item_output);
-//        }
     }
 
     // Send our fix height command.
