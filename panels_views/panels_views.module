@@ -38,7 +38,8 @@ function panels_views_panels_content_types() {
   // Only valid if views module loaded.
   $items['views'] = array(
     'title' => t('All views'),
-    'content_types' => 'panels_views_all_views_content_types',
+    'content types' => 'panels_views_all_views_content_types',
+    'content type' => 'panels_views_all_views_content_type',
     'render callback' => 'panels_views_all_views_render',
     'add callback' => 'panels_views_all_views_add',
     'edit callback' => 'panels_views_all_views_edit',
@@ -46,7 +47,8 @@ function panels_views_panels_content_types() {
   );
   $items['views_panes'] = array(
     'title' => t('Views panes'),
-    'content_types' => 'panels_views_panes_content_types',
+    'content types' => 'panels_views_panes_content_types',
+    'content type' => 'panels_views_panes_content_type',
     'render callback' => 'panels_views_panes_render',
     'add callback' => 'panels_views_panes_edit',
     'edit callback' => 'panels_views_panes_edit',
@@ -67,29 +69,54 @@ function panels_views_all_views_content_types() {
     $view->init_display();
 
     foreach ($view->display as $id => $display) {
-      $title = t('@name: @display', array('@name' => $view->name, '@display' => $display->display_title));
-
-      $icon = $display->display_plugin != 'page' ? 'icon_views_block_legacy.png' : 'icon_views_page_legacy.png';
-
-      $contexts = array();
-
-      if (isset($display->handler) && $arguments = $display->handler->get_handlers('argument')) {
-        foreach ($arguments as $arg) {
-          $contexts[] = new ctools_context_optional($arg->ui_name(), 'any');
-        }
-      }
-
-      $types[$view->name . '-' . $id] = array(
-        'title' => $title,
-        'icon' => $icon,
-        'description' => filter_xss_admin($view->description),
-        'required context' => $contexts,
-        'category' => array(t('Views'), -1),
-      );
+      $types[$view->name . '-' . $id] = _panels_views_all_views_content_type($view, $display);
     }
 
+    $view->destroy();
   }
   return $types;
+}
+
+/**
+ * Return a single content type.
+ * @param <type> $type
+ * @return <type>  
+ */
+function panels_views_all_views_content_type($subtype) {
+  list($name, $display) = explode('-', $subtype);
+  $view = views_get_view($name);
+  if (empty($view)) {
+    return;
+  }
+
+  $view->set_display($display);
+  $retval = _panels_views_all_views_content_type($view, $view->display[$display]);
+
+  $view->destroy();
+  return $retval;
+}
+
+function _panels_views_all_views_content_type($view, $display) {
+  $title = t('@name: @display', array('@name' => $view->name, '@display' => $display->display_title));
+
+  $icon = $display->display_plugin != 'page' ? 'icon_views_block_legacy.png' : 'icon_views_page_legacy.png';
+
+  $contexts = array();
+
+  if (isset($display->handler) && $arguments = $display->handler->get_handlers('argument')) {
+    foreach ($arguments as $arg) {
+      $contexts[] = new ctools_context_optional($arg->ui_name(), 'any');
+    }
+  }
+
+  return array(
+    'title' => $title,
+    'icon' => $icon,
+    'description' => filter_xss_admin($view->description),
+    'required context' => $contexts,
+    'category' => array(t('Views'), -1),
+  );
+
 }
 
 /**
@@ -309,7 +336,22 @@ function panels_views_all_views_title($subtype, $conf) {
  * Don't show Views' blocks; we expose them already.
  */
 function views_panels_block_info($module, $delta, &$info) {
-  $info = NULL;
+  if (strlen($delta) == 32) {
+    $hashes = variable_get('views_block_hashes', array());
+    if (!empty($hashes[$delta])) {
+      $delta = $hashes[$delta];
+    }
+  }
+
+  // We remove any non 'special' blocks so they don't show up repeatedly.
+  if (substr($delta, 0, 1) != '-') {
+    $info = NULL;
+  }
+  else {
+    $info['category'] = t('Views exposed filters');
+    $info['icon'] = 'icon_views_block_legacy.png';
+    $info['path'] = drupal_get_path('module', 'panels_views');
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -331,43 +373,69 @@ function panels_views_panes_content_types() {
       if (empty($display->handler->panel_pane_display)) {
         continue;
       }
-      $title = $display->handler->get_option('pane_title');
-      if (!$title) {
-        $title = $view->name;
-      }
-
-      $description = $display->handler->get_option('pane_description');
-      if (!$description) {
-        $description = $view->description;
-      }
-
-      $category = $display->handler->get_option('pane_category');
-      if (!$category['name']) {
-        $category['name'] = t('View panes');
-      }
-
-      $icon = 'icon_views_page.png';
-
-      $contexts = array();
-
-      $arguments = $display->handler->get_argument_input();
-      foreach ($arguments as $argument) {
-        if ($argument['type'] == 'context') {
-          $contexts[] = new ctools_context_required($argument['label'], $argument['context']);
-        }
-      }
-
-      $types[$view->name . '-' . $id] = array(
-        'title' => $title,
-        'icon' => $icon,
-        'description' => filter_xss_admin($description),
-        'required context' => $contexts,
-        'category' => array($category['name'], $category['weight']),
-      );
+      $types[$view->name . '-' . $id] = _panels_views_panes_content_type($view, $display);
     }
+
+    $view->destroy();
   }
 
   return $types;
+}
+
+/**
+ * Return a value for a single content type.
+ * 
+ * @param <type> $subtype
+ * @return <type>
+ */
+function panels_views_panes_content_type($subtype) {
+  list($name, $display) = explode('-', $subtype);
+  $view = views_get_view($name);
+  if (empty($view)) {
+    return;
+  }
+
+  $view->set_display($display);
+  $retval = _panels_views_panes_content_type($view, $view->display[$display]);
+
+  $view->destroy();
+  return $retval;
+}
+
+function _panels_views_panes_content_type($view, $display) {
+  $title = $display->handler->get_option('pane_title');
+  if (!$title) {
+    $title = $view->name;
+  }
+
+  $description = $display->handler->get_option('pane_description');
+  if (!$description) {
+    $description = $view->description;
+  }
+
+  $category = $display->handler->get_option('pane_category');
+  if (!$category['name']) {
+    $category['name'] = t('View panes');
+  }
+
+  $icon = 'icon_views_page.png';
+
+  $contexts = array();
+
+  $arguments = $display->handler->get_argument_input();
+  foreach ($arguments as $argument) {
+    if ($argument['type'] == 'context') {
+      $contexts[] = new ctools_context_required($argument['label'], $argument['context']);
+    }
+  }
+
+  return array(
+    'title' => $title,
+    'icon' => $icon,
+    'description' => filter_xss_admin($description),
+    'required context' => $contexts,
+    'category' => array($category['name'], $category['weight']),
+  );
 }
 
 /**
@@ -385,10 +453,6 @@ function panels_views_panes_render($subtype, $conf, $panel_args, $contexts) {
   }
 
   $view->set_display($display);
-  if (!$view->display_handler->access($GLOBALS['user'])) {
-    return;
-  }
-
   if (!$view->display_handler->access($GLOBALS['user'])) {
     return;
   }
@@ -509,11 +573,11 @@ function panels_views_panes_edit($id, $parents, $conf) {
     $conf['more_link'] = $view->display_handler->get_option('more_link');
     $conf['feed_icons'] = FALSE;
     $conf['use_pager'] = $view->display_handler->get_option('use_pager');
-    $conf['element_id'] = $view->display_handler->get_option('element_id');
+    $conf['pager_id'] = $view->display_handler->get_option('element_id');
     $conf['items_per_page'] = $view->display_handler->get_option('items_per_page');
     $conf['offset'] = $view->display_handler->get_option('offset');
     $conf['path_override'] = FALSE;
-    $conf['url'] = $view->get_path();
+    $conf['path'] = $view->get_path();
   }
 
   $form = array();
