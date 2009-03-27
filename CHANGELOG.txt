@@ -1,5 +1,5 @@
-Panels 3.x-dev (no date)
-Note: This changelog is incomplete.
+Panels 3.x-alpha3
+Note: This changelog is incomplete, as it was started sometime after alpha2.ls
 
 #349979 by Dave Reid: Proper use of link alter.
 #374628: Add a check for broken display to the admin summary to prevent crashes.
