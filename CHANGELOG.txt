@@ -11,3 +11,4 @@ Overhaul node_content_type creating a .inc file.
 Add 'content type' property to content types.
 Add 'defaults' property to content types.
 Panels views cleanup, including making exposed form blocks available.
+#391788 by guix: Simple cache should not unserialize data that is now already unserialized.
