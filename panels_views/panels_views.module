@@ -175,7 +175,6 @@ function panels_views_all_views_render($subtype, $conf, $panel_args, $contexts) 
   $block = new stdClass();
   $block->module = 'views';
   $block->delta  = $view->name .'-'.  $display;
-  $block->subject = $view->get_title();
 
   if (!empty($conf['link_to_view'])) {
     $block->title_link = $view->get_url();
@@ -192,6 +191,8 @@ function panels_views_all_views_render($subtype, $conf, $panel_args, $contexts) 
 
   $stored_feeds = drupal_add_feed();
   $block->content = $view->preview();
+
+  $block->subject = $view->get_title();
 
   if (!empty($conf['feed_icons'])) {
     $new_feeds = drupal_add_feed();
