@@ -282,12 +282,16 @@ function panels_get_panel_style_and_settings($panel_settings, $panel) {
     return array(panels_get_style('default'), array());
   }
 
-  if (empty($panel_settings['individual']) || empty($panel_settings['panel'][$panel]['style'])) {
+  if (empty($panel_settings[$panel]['style'])) {
+    if (empty($panel_settings['style'])) {
+      return array(panels_get_style('default'), array());
+    }
+
     $style = panels_get_style($panel_settings['style']);
     $style_settings = isset($panel_settings['style_settings']['default']) ? $panel_settings['style_settings']['default'] : array();
   }
   else {
-    $style = panels_get_style($panel_settings['panel'][$panel]['style']);
+    $style = panels_get_style($panel_settings[$panel]['style']);
     $style_settings = isset($panel_settings['style_settings'][$panel]) ? $panel_settings['style_settings'][$panel] : array();
   }
 
