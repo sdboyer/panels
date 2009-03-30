@@ -50,7 +50,7 @@ function panels_flexible_menu(&$items, &$info) {
 /**
  * Convert settings from old style to new, or provide defaults for
  * empty settings.
- * @param <type> $settings  
+ * @param <type> $settings
  */
 function panels_flexible_convert_settings(&$settings) {
   if (empty($settings)) {
@@ -334,7 +334,7 @@ function panels_flexible_render_items($renderer, $list, $owner_id) {
         $groups[$location] .= panels_flexible_render_item($renderer, $item, 'panels-flexible-row', $content, $id, $position, $max, TRUE);
         break;
       case 'region':
-        $content = isset($renderer->content[$id]) ? $renderer->content[$id] : '';
+        $content = isset($renderer->content[$id]) ? $renderer->content[$id] : "&nbsp;";
         $groups[$location] .= panels_flexible_render_item($renderer, $item, 'panels-flexible-region', $content, $id, $position, $max);
         break;
     }
@@ -607,7 +607,7 @@ function panels_flexible_get_css_group(&$css, $renderer, $list, $owner_id, $type
 
     // Do the same for right.
     $right_pixels = 0;
-    
+
     foreach ($right as $id) {
       $class = ".panels-flexible-$type-" . $renderer->did . "-$id";
       $css[$class] = array(
@@ -628,7 +628,7 @@ function panels_flexible_get_css_group(&$css, $renderer, $list, $owner_id, $type
         'float' => 'left',
         'width' => ($renderer->settings['items'][$id]['width'] * $scale) . "%",
       );
-      
+
       // Store this so we can use it later.
       // @todo: Store the scale, not the new width, so .js can adjust
       // bi-directionally.
@@ -705,7 +705,7 @@ function panels_ajax_flexible_edit_settings($did, $id) {
       $title = t('Configure region');
       break;
   }
-  
+
   $form_state = array(
     'display' => &$cache->display,
     'item' => &$item,
@@ -726,7 +726,7 @@ function panels_ajax_flexible_edit_settings($did, $id) {
     // If the item is a region, replace the title.
     $class = 'panels-flexible-' . $item['type'] . '-' . $did . '-' . $id;
     if ($item['type'] == 'region') {
-      $output[] = ctools_ajax_command_replace(".$class h2.label", 
+      $output[] = ctools_ajax_command_replace(".$class h2.label",
         '<h2 class="label">' . check_plain($item['title']) . '</h2>');
     }
     // If not a row, reset the css width if necessary.
@@ -749,7 +749,7 @@ function panels_flexible_config_item_form(&$form_state) {
   $siblings = &$form_state['siblings'];
   $settings = &$form_state['settings'];
   $id = &$form_state['id'];
-  
+
 //  $form['#action'] = $form_state['url'];
 
   if ($item['type'] == 'region') {
@@ -774,7 +774,7 @@ function panels_flexible_config_item_form(&$form_state) {
         $$current = TRUE; // Indirection.
       }
     }
-    
+
     $form['width_type'] = array(
       '#type' => 'select',
       '#title' => t('Width'),
@@ -918,7 +918,7 @@ function panels_ajax_flexible_edit_add($did, $id, $location = 'left') {
     // Create a renderer object so we can render our new stuff.
     $renderer = new stdClass;
     $renderer->settings = $settings;
-    $renderer->content = array(); 
+    $renderer->content = array();
     $renderer->css_id = $css_id;
     $renderer->did = $cache->display->did;
     $renderer->id_str = $css_id ? 'id="' . $css_id . '"' : '';
@@ -992,7 +992,7 @@ function panels_ajax_flexible_edit_add($did, $id, $location = 'left') {
 
     // Send our fix height command.
     $output[] = array('command' => 'flexible_fix_height');
-    
+
     if (!empty($form_state['sibling'])) {
       $sibling_width = '.panels-flexible-' . $item['type'] . '-' . $did . '-' . $form_state['sibling'] . '-width';
       $output[] = ctools_ajax_command_html($sibling_width, $settings['items'][$form_state['sibling']]['width']);
@@ -1010,7 +1010,7 @@ function panels_ajax_flexible_edit_add($did, $id, $location = 'left') {
       'selector' => '.' . $parent_class . '-inside',
       'base' => 'panels-flexible-' . $item['type'],
     );
-    
+
     $output[] = ctools_modal_command_dismiss();
   }
 
@@ -1058,7 +1058,7 @@ function panels_flexible_add_item_form(&$form_state) {
         $item['width_type'] = 'px';
       }
     }
-    
+
     $form['width_type'] = array(
       '#type' => 'select',
       '#title' => t('Width'),
