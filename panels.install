@@ -166,9 +166,16 @@ function panels_uninstall() {
   drupal_uninstall_schema('panels');
 }
 
+/**
+ * Update from 6.x v2.
+ */
+function panels_update_6290() {
+  // This is currently commented out because we failed to establish proper
+  // baselines in previous versions and we want to re-establish this in alpha3.
+  // It will return.
 
-function panels_update_6004() {
   $ret = array();
+/*
   // Fetch schema version 1.
   $schema = panels_schema_1();
 
@@ -199,5 +206,13 @@ function panels_update_6004() {
 
   // Remove panels_object_cache table
   db_drop_table($ret, 'panels_object_cache');
+ */
   return $ret;
+}
+
+/**
+ * Establish a baseline schema version for 6.x-3.x
+ */
+function panels_update_6300() {
+  return array();
 }
