@@ -26,13 +26,13 @@ function panels_panel_context_delegator_task_handlers() {
     'export' => 'panels_panel_context_export',
 
     'add forms' => array(
-      'criteria' => t('Selection criteria'),
+      'criteria' => t('Selection rules'),
       'choose' => t('Choose layout'),
       'content' => t('Panel content'),
     ),
     'edit forms' => array(
       'content' => t('Panel content'),
-      'criteria' => t('Selection criteria'),
+      'criteria' => t('Selection rules'),
       'settings' => t('General'),
       'context' => t('Contexts'),
       'layout' => t('Change layout'),
@@ -122,7 +122,7 @@ function &panels_panel_context_get_display(&$handler) {
 }
 
 /**
- * Check selection criteria and, if passed, render the contexts.
+ * Check selection rules and, if passed, render the contexts.
  *
  * We must first check to ensure the node is of a type we're allowed
  * to render. If not, decline to render it by returning NULL.
@@ -168,7 +168,7 @@ function panels_panel_context_render($handler, $base_contexts) {
 }
 
 /**
- * Set up a title for the panel based upon the selection criteria.
+ * Set up a title for the panel based upon the selection rules.
  */
 function panels_panel_context_title($handler, $task, $subtask_id) {
   if (isset($handler->conf['title'])) {
@@ -400,9 +400,9 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
   $form = array_merge($form, panels_change_layout($form_state));
 
   // Change the 'back' button to just go directly to the previous form
-  $task_id = $form_state['task']['name'];
-  $handler_id = $form_state['handler']->handler;
-  $name = $form_state['handler']->name;
+//  $task_id = $form_state['task']['name'];
+//  $handler_id = $form_state['handler']->handler;
+//  $name = $form_state['handler']->name;
 
   // This form is outside the normal wizard list, so we need to specify the
   // previous/next forms.
@@ -457,7 +457,7 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
   $form['conf']['autogenerate_title'] = array(
     '#type' => 'checkbox',
     '#title' => t('Automatically generate title'),
-    '#description' => t('If checked, the administrative title will be automatically regenerated whenever the selection criteria changes. If you change the title and leave this check, your changes may disappear.'),
+    '#description' => t('If checked, the administrative title will be automatically regenerated whenever the selection rules changes. If you change the title and leave this check, your changes may disappear.'),
     '#default_value' => $conf['autogenerate_title'],
   );
 
