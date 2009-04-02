@@ -40,17 +40,20 @@ function panels_schema_1() {
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'panel_settings' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'cache' => array(
         'type' => 'text',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'title' => array(
         'type' => 'varchar',
@@ -106,36 +109,42 @@ function panels_schema_1() {
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'configuration' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'cache' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'style' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'css' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'extras' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'initial ' => array(),
       ),
       'position' => array(
         'type' => 'int',
@@ -180,6 +189,8 @@ function panels_update_6290() {
   $schema = panels_schema_1();
 
   // @TODO: We probably should detect if these are already serial from previous installations. Not sure how.
+  // Update size of pane 'access' field.
+  db_change_field($ret, 'panels_pane', 'access', 'access', $schema['panels_pane']['fields']['access']);
 
   // update pid and did to be serial
   db_drop_primary_key($ret, 'panels_pane');
@@ -191,22 +202,171 @@ function panels_update_6290() {
   // Update size of pane 'access' field.
   db_change_field($ret, 'panels_pane', 'access', 'access', $schema['panels_pane']['fields']['access']);
 
+  // Remove panels_object_cache table
+  db_drop_table($ret, 'panels_object_cache');
+ */
+  return $ret;
+}
+
+/**
+ * Special update function for the alpha2 to alpha3 transition after
+ * I messed it up.
+ */
+function panels_update_6291() {
+  $ret = array();
+  // Fetch schema version 1.
+  $schema = panels_schema_1();
+
+
   // Add some new fields
   db_add_field($ret, 'panels_pane', 'style', $schema['panels_pane']['fields']['style']);
   db_add_field($ret, 'panels_pane', 'css', $schema['panels_pane']['fields']['css']);
   db_add_field($ret, 'panels_pane', 'extras', $schema['panels_pane']['fields']['extras']);
-  // update contents of various fields:
-  // access
-    // @TODO:
 
-  // style
-  // css
-  // extras
-  // configuration
+  return $ret;
+}
 
-  // Remove panels_object_cache table
-  db_drop_table($ret, 'panels_object_cache');
+/**
+ * Update panels pane fields using batch API.
  */
+function panels_update_6292(&$sandbox) {
+  $ret = array();
+
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    // We'll -1 to disregard the uid 0...
+    $sandbox['max'] = db_result(db_query('SELECT COUNT(*) FROM {panels_pane}'));
+  }
+
+  // configuration
+  $result = db_query_range("SELECT pid, access, configuration FROM {panels_pane} ORDER BY pid ASC", $sandbox['progress'], 20);
+  while ($pane = db_fetch_object($result)) {
+    // access
+    if (!empty($pane->access)) {
+      $rids = explode(', ', $pane->access);
+      // For safety, eliminate any non-numeric rids, as we occasionally had
+      // problems with nulls and such getting in here:
+      foreach ($rids as $id => $rid) {
+        if (!is_numeric($rid)) {
+          unset($rids[$id]);
+        }
+      }
+
+      if (empty($rids)) {
+        $pane->access = array();
+      }
+      else {
+        // The old access style was just a role based system, so let's convert
+        // it to that.
+        $pane->access = array(
+          'plugins' => array(
+            array(
+              'name' => 'role',
+              'context' => 'logged-in-user',
+              'settings' => array(
+                'rids' => array_values($rids),
+              )
+            ),
+          ),
+        );
+      }
+    }
+    else {
+      $pane->access = array();
+    }
+
+    // Move style from configuration.
+    $pane->configuration = unserialize($pane->configuration);
+    $pane->style = array();
+    if (!empty($pane->configuration['style'])) {
+      $pane->style['style'] = $pane->configuration['style'];
+      unset($pane->configuration['style']);
+    }
+
+    $pane->css = array();
+    // Move css configuration from configuration
+    if (isset($pane->configuration['css_id'])) {
+      $pane->css['css_id'] = $pane->configuration['css_id'];
+      unset($pane->configuration['css_id']);
+    }
+
+    if (isset($pane->configuration['css_class'])) {
+      $pane->css['css_class'] = $pane->configuration['css_class'];
+      unset($pane->configuration['css_class']);
+    }
+
+    // Make sure extras is an array. This isn't used by anything in Panels
+    // yet, so an empty array is just fine.
+    $pane->extras = array();
+    db_query("UPDATE {panels_pane} SET " .
+      "access = '%s', css = '%s', style = '%s', configuration = '%s', extras = '%s'" .
+      " WHERE pid = %d",
+      serialize($pane->access), 
+      serialize($pane->css),
+      serialize($pane->style),
+      serialize($pane->configuration),
+      serialize($pane->extras),
+      $pane->pid);
+
+    $sandbox['progress']++;
+  }
+
+  $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  if ($ret['#finished'] === 1) {
+    $ret[] = array('success' => TRUE, 'query' => t('Panel panes were updated'));
+  }
+  return $ret;
+}
+
+/**
+ * Update panels display fields using batch API.
+ */
+function panels_update_6293(&$sandbox) {
+  $ret = array();
+
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    // We'll -1 to disregard the uid 0...
+    $sandbox['max'] = db_result(db_query('SELECT COUNT(*) FROM {panels_display}'));
+  }
+
+  // configuration
+  $result = db_query_range("SELECT did, panel_settings FROM {panels_display} ORDER BY did ASC", $sandbox['progress'], 20);
+  while ($display = db_fetch_object($result)) {
+    if (empty($display->panel_settings)) {
+      $display->panel_settings = array();
+    }
+    else {
+      $display->panel_settings = unserialize($display->panel_settings);
+      if (!is_array($display->panel_settings)) {
+        $display->panel_settings = array();
+      }
+    }
+
+    if (isset($display->panel_settings['panel'])) {
+      foreach ($display->panel_settings['panel'] as $key => $settings) {
+        $display->panel_settings[$key] = $settings;
+      }
+      unset($display->panel_settings['panel']);
+    }
+
+    if (isset($display->panel_settings['individual'])) {
+      unset($display->panel_settings['individual']);
+    }
+
+    db_query("UPDATE {panels_display} SET " .
+      "panel_settings = '%s'" .
+      " WHERE did = %d",
+      serialize($display->panel_settings),
+      $display->did);
+
+     $sandbox['progress']++;
+  }
+
+  $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  if ($ret['#finished'] === 1) {
+    $ret[] = array('success' => TRUE, 'query' => t('Panel displays were updated'));
+  }
   return $ret;
 }
 
