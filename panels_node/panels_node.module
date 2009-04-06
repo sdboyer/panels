@@ -138,7 +138,7 @@ function panels_node_node_info() {
 /**
  * Implementation of hook_access().
  */
-function panels_node_access($op, $node = NULL) {
+function panels_node_access($op, $node, $account) {
   if (user_access('administer panel-nodes')) {
     return TRUE;
   }
@@ -147,7 +147,7 @@ function panels_node_access($op, $node = NULL) {
     return TRUE;
   }
 
-  if ($op == 'update' && $node->uid == $user->uid && user_access('edit own panel-nodes')) {
+  if ($op == 'update' && $node->uid == $account->uid && user_access('edit own panel-nodes')) {
     return TRUE;
   }
 }

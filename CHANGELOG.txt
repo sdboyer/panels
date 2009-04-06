@@ -1,3 +1,10 @@
+Panels 3.x-dev
+
+New simpler panel page task that doesn't bother with handlers at all. The UI still needs some cleanup.
+#317121: Respect 'hide title' option in display settings.
+#422404: Update to exportables left mini panels kind of broken.
+#422180 by joshk: Fix panel node_access to accept incoming $account.
+
 Panels 3.x-alpha3
 Note: This changelog is incomplete, as it was started sometime after alpha2.ls
 
