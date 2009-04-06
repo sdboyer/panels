@@ -100,3 +100,14 @@ function panels_mini_uninstall() {
   drupal_uninstall_schema('panels_mini');
 }
 
+/**
+ * Update all blocks to use 'name' as delta, not 'pid'.
+ */
+function panels_mini_update_6300() {
+  $ret = array();
+  $result = db_query("SELECT name, pid from {panels_mini}");
+  while ($mini = db_fetch_object($result)) {
+    db_query("UPDATE {blocks} SET delta = '%s' WHERE module = 'panels_mini' AND delta = %d", $mini->name, $mini->pid);
+  }
+  return $ret;
+}

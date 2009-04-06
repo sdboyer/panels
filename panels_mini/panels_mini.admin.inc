@@ -216,11 +216,11 @@ function panels_mini_delete_confirm(&$form_state, $panel_mini) {
   if (!is_object($panel_mini)) {
     $panel_mini = panels_mini_load($panel_mini);
   }
-  $form['pid'] = array('#type' => 'value', '#value' => $panel_mini->pid);
+  $form['name'] = array('#type' => 'value', '#value' => $panel_mini->name);
   $form['did'] = array('#type' => 'value', '#value' => $panel_mini->did);
   return confirm_form($form,
     t('Are you sure you want to delete the mini panel "@title"?', array('@title' => $panel_mini->title)),
-    $_GET['destination'] ? $_GET['destination'] : 'admin/panels/panel-mini',
+    !empty($_GET['destination']) ? $_GET['destination'] : 'admin/panels/panel-mini',
     t('This action cannot be undone.'),
     t('Delete'), t('Cancel')
   );
@@ -523,9 +523,6 @@ function panels_mini_edit_form_submit($form, &$form_state) {
 
     $layout = panels_get_layout($panel_mini->display->layout);
 
-    if ($layout['settings form']) {
-      $form_state['redirect'] = "admin/panels/panel-mini/$panel_mini->name/edit-settings/next";
-    }
     $form_state['redirect'] = "admin/panels/panel-mini/$panel_mini->name/edit-context/next";
   }
   else {

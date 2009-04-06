@@ -38,7 +38,7 @@ function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
     $minis = panels_mini_load_all();
     foreach ($minis as $panel_mini) {
       if (empty($mini->disabled) && empty($mini->requiredcontext)) {
-        $blocks[$panel_mini->pid] = array(
+        $blocks[$panel_mini->name] = array(
           'info' => t('Mini panel: "@title"', array('@title' => $panel_mini->title)),
         );
       }
@@ -52,8 +52,18 @@ function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
     $panel_mini->context = $panel_mini->display->context = ctools_context_load_contexts($panel_mini);
     $panel_mini->display->css_id = panels_mini_get_id($panel_mini->name);
 
+    $title = $panel_mini->title;
+    // If the hide title flag is set, just remove the title altogether.
+    if (!empty($panel_mini->display->hide_title)) {
+      $title = '';
+    }
+    else if (!empty($panel_mini->display->title)) {
+      $substitutions = ctools_context_get_keywords($panel_mini->context);
+      $title = filter_xss_admin(strtr($panel_mini->display->title, $substitutions));
+    }
+
     $block = array(
-      'subject' => $panel_mini->title,
+      'subject' => $title,
       'content' => panels_render_display($panel_mini->display),
     );
     return $block;
@@ -123,12 +133,12 @@ function panels_mini_load_all() {
  * Write a mini panel to the database.
  */
 function panels_mini_save(&$mini) {
-  if (!empty($panel_mini->display)) {
-    $display = panels_save_display($panel_mini->display);
-    $panel_mini->did = $display->did;
+  if (!empty($mini->display)) {
+    $display = panels_save_display($mini->display);
+    $mini->did = $display->did;
   }
 
-  $update = (isset($mini->pid)) ? array('pid') : array();
+  $update = (isset($mini->pid) && $mini->pid != 'new') ? array('pid') : array();
   drupal_write_record('panels_mini', $mini, $update);
 
   return $mini;
@@ -139,8 +149,8 @@ function panels_mini_save(&$mini) {
  */
 function panels_mini_delete($mini) {
   db_query("DELETE FROM {panels_mini} WHERE name = '%s'", $mini->name);
-  db_query("DELETE FROM {blocks} WHERE module = 'panels_mini' AND delta = %d", $panel_mini->pid);
-  return panels_delete_display($panel_mini->did);
+  db_query("DELETE FROM {blocks} WHERE module = 'panels_mini' AND delta = %d", $mini->name);
+  return panels_delete_display($mini->did);
 }
 
 /**
