@@ -68,12 +68,6 @@ function panels_node_menu() {
     'weight' => 2,
   ) + $base;
 
-  $items['node/%node/panel_settings'] = array(
-    'title' => 'Panel layout settings',
-    'page callback' => 'panels_node_edit_layout_settings',
-    'weight' => 2,
-  ) + $base;
-
   $items['node/%node/panel_content'] = array(
     'title' => 'Panel content',
     'page callback' => 'panels_node_edit_content',
@@ -130,7 +124,7 @@ function panels_node_node_info() {
       'name' => t('Panel'),
       'module' => 'panels_node',
       'body_label' => t('Teaser'),
-      'description' => t("A panel a page layout broken up into rows and columns."),
+      'description' => t("A panel layout broken up into rows and columns."),
     ),
   );
 }
@@ -168,7 +162,7 @@ function panels_node_add() {
  */
 function panels_node_form(&$node, &$param) {
   $form['panels_node']['#tree'] = TRUE;
-  if (!$node->nid) {
+  if (empty($node->nid)) {
     // Grab our selected layout from the $node, If it doesn't exist, try arg(3)
     // and if that doesn't work present them with a list to pick from.
     $panel_layout = isset($node->panel_layout) ? $node->panel_layout : arg(3);
@@ -291,8 +285,7 @@ function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
     $display = panels_load_display($node->panels_node['did']);
     $display->css_id = $node->panels_node['css_id'];
     // TODO: Find a way to make sure this can't node_view.
-    ctools_include('context');
-    $display->context = array('panel-node' => ctools_context_create('node', $node));
+    $display->context = panels_node_get_context($node);
 
     $node->content['body'] = array(
       '#value' => panels_render_display($display),
@@ -324,17 +317,8 @@ function panels_node_edit_layout($node) {
 //  panels_load_include('plugins');
   ctools_include('context');
   $display = panels_load_display($node->panels_node['did']);
-  $display->context = array('panel-node' => ctools_context_create('node', $node));
+  $display->context = panels_node_get_context($node);
   return panels_edit_layout($display, t('Save'), "node/$node->nid/panel_layout");
-}
-
-/**
- * Pass through to the panels layout settings editor.
- */
-function panels_node_edit_layout_settings($node) {
-  panels_load_include('plugins');
-  $display = panels_load_display($node->panels_node['did']);
-  return panels_edit_layout_settings($display, t('Save'), "node/$node->nid/panel_settings");
 }
 
 /**
@@ -344,7 +328,7 @@ function panels_node_edit_content($node) {
 //  panels_load_include('plugins');
   ctools_include('context');
   $display = panels_load_display($node->panels_node['did']);
-  $display->context = array('panel-node' => ctools_context_create('node', $node));
+  $display->context = panels_node_get_context($node);
   panels_load_include('common');
   $content_types = panels_common_get_allowed_types('panels_node', $display->context);
 
@@ -354,3 +338,13 @@ function panels_node_edit_content($node) {
   print theme('page', panels_edit($display, "node/$node->nid/panel_content", $content_types), FALSE);
 }
 
+/**
+ * Build the context to use for a panel node.
+ */
+function panels_node_get_context(&$node) {
+  ctools_include('context');
+  $context = ctools_context_create('node', $node);
+  $context->identifier = t('This node');
+  $context->keyword = 'node';
+  return array('panel-node' => $context);
+}
