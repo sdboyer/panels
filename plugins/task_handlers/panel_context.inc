@@ -23,6 +23,7 @@ function panels_panel_context_delegator_task_handlers() {
     'admin title' => 'panels_panel_context_title',
     'render' => 'panels_panel_context_render',
     'save' => 'panels_panel_context_save',
+    'delete' => 'panels_panel_context_delete',
     'export' => 'panels_panel_context_export',
 
     'add forms' => array(
@@ -187,8 +188,8 @@ function panels_panel_context_title($handler, $task, $subtask_id) {
  * Callback to allow the handler to react to being saved.
  *
  * When a handler with a display is saved, two things have to happen.
- * First, we have to scrub some contexts off the display that may
- * inadvertantly have been left on it. Second, we have to cache
+ * First, we have to save the display so that it becomes a real display,
+ * not the fake one we started with. Second, we have to cache
  * any CSS that the display is using. This CSS can get re-cached
  * later if the file disappears, but it's imperative that we do it here
  * to make sure that old, dirty CSS cache gets removed.
@@ -215,6 +216,10 @@ function panels_panel_context_save(&$handler, $update) {
   else {
     $handler->conf['css_cache'] = '';
   }
+
+  if (isset($page->conf['temp_layout'])) {
+    unset($page->conf['temp_layout']);
+  }
 }
 
 /**
@@ -226,13 +231,24 @@ function panels_panel_context_save(&$handler, $update) {
  */
 function panels_panel_context_export(&$handler, $indent) {
   $display = panels_panel_context_get_display($handler);
-  if (isset($handler->conf['display'])) {
-    unset($handler->conf['display']);
+  foreach (array('display', 'did', 'css_cache', 'temp_layout') as $item) {
+    if (isset($handler->conf[$item])) {
+      unset($handler->conf[$item]);
+    }
   }
 
   $output = panels_export_display($display, $indent);
   $output .= $indent . '$handler->conf[\'display\'] = $display' . ";\n";
   return $output;
+}
+
+/**
+ * Callback to delete the display when a handler is deleted.
+ */
+function panels_panel_context_delete(&$handler) {
+  if (!empty($handler->conf['did'])) {
+    panels_delete_display($handler->conf['did']);
+  }
 }
 
 /**

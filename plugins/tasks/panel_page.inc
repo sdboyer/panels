@@ -31,6 +31,9 @@ function panels_panel_page_delegator_tasks() {
         'path' => drupal_get_path('module', 'delegator') . '/plugins/tasks',
         'function' => 'delegator_page_subtasks',
       ),
+      'save' => 'panels_page_save_page',
+      'delete' => 'panels_page_delete_page',
+      'export' => 'panels_page_export_page',
       'hook menu' => array(
         'function' => 'panels_panel_page_menu',
       ),
@@ -43,7 +46,7 @@ function panels_panel_page_delegator_tasks() {
           'href' => 'admin/build/pages/panel-page/import',
         ),
         array(
-          'title' => t('Add page'),
+          'title' => t('Add panel   page'),
           'href' => 'admin/build/pages/panel-page/add',
         ),
       ),
@@ -208,7 +211,7 @@ function panels_panel_page_menu(&$items, $task) {
   );
 
   $items['admin/build/pages/panel-page/add'] = array(
-    'title' => 'Add page',
+    'title' => 'Add panel page',
     'description' => 'Add a delegator page subtask.',
     'page callback' => 'delegator_page_add_subtask',
     'page arguments' => array('panel_page'),
@@ -313,4 +316,74 @@ function panels_panel_page_form_basic_submit(&$form, &$form_state) {
 function panels_panel_page_context_wrapper(&$form, &$form_state) {
   $form_state['handler'] = &$form_state['page'];
   $form_state['subtask_id'] = $form_state['page']->name;
+}
+
+/**
+ * Callback to allow the task to react to being saved.
+ *
+ * When a task with a display is saved, two things have to happen.
+  * First, we have to save the display so that it becomes a real display,
+ * not the fake one we started with. Second, we have to cache
+ * any CSS that the display is using. This CSS can get re-cached
+ * later if the file disappears, but it's imperative that we do it here
+ * to make sure that old, dirty CSS cache gets removed.
+ */
+function panels_page_save_page(&$page, $update) {
+  // Only save the display if we believe it has been modified.
+  if (isset($page->conf['display'])) {
+    panels_save_display($page->conf['display']);
+    $page->conf['did'] = $page->conf['display']->did;
+    unset($page->conf['display']);
+  }
+
+  // Re-cache the CSS.
+  // Delete any previous cache file.
+  if (!empty($page->conf['css_cache'])) {
+    file_delete($page->conf['css_cache']);
+  }
+
+  if (!empty($page->conf['css'])) {
+    // And generate a new one.
+    ctools_include('css');
+    $page->conf['css_cache'] = ctools_css_cache($page->conf['css']);
+  }
+  else {
+    $page->conf['css_cache'] = '';
+  }
+
+  if (isset($page->conf['temp_layout'])) {
+    unset($page->conf['temp_layout']);
+  }
+}
+
+/**
+ * Special handling for exporting a panel task handler.
+ *
+ * When a panel is exported, we need to export the display separately
+ * rather than just letting its object be unpacked, which does not work
+ * very well.
+ */
+function panels_page_export_page(&$page, $indent) {
+  // We're relying on panel context code for display handling, so make sure
+  // it is loaded here.
+  delegator_get_task_handler('panel_context');
+  $display = &panels_panel_context_get_display($page);
+  foreach (array('display', 'did', 'css_cache', 'temp_layout') as $item) {
+    if (isset($page->conf[$item])) {
+      unset($page->conf[$item]);
+    }
+  }
+
+  $output = panels_export_display($display, $indent);
+  $output .= $indent . '$page->conf[\'display\'] = $display' . ";\n";
+  return $output;
+}
+
+/**
+ * Callback to delete the display when a handler is deleted.
+ */
+function panels_page_delete_page(&$page) {
+  if (!empty($page->conf['did'])) {
+    panels_delete_display($page->conf['did']);
+  }
 }
