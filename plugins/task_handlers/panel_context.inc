@@ -159,7 +159,11 @@ function panels_panel_context_render($handler, $base_contexts) {
     'no_blocks' => !empty($handler->conf['no_blocks']),
   );
 
-  if (!empty($display->title)) {
+  // If the hide title flag is set, just remove the title altogether.
+  if (!empty($display->hide_title)) {
+    $info['title'] = '';
+  }
+  else if (!empty($display->title)) {
     $substitutions = ctools_context_get_keywords($contexts);
     $info['title'] = filter_xss_admin(strtr($display->title, $substitutions));
   }
