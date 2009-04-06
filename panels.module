@@ -63,7 +63,8 @@ function panels_theme() {
   );
   $theme['profile_fields_pane'] = array(
     'arguments' => array('category' => NULL, 'vars' => NULL),
-    'template' => 'content_types/profile_fields_pane',
+    'path' => panels_get_path('plugins/content_types'),
+    'template' => 'profile_fields_pane',
   );
   $theme['panels_render_display_form'] = array(
     'arguments' => array('form' => NULL),
