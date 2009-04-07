@@ -1,6 +1,7 @@
 Panels 6.x-3.0-dev
 ==================
 
+#422712: Panel page import button went to wrong place.
 #423288: Profile template plugin had wrong path.
 #424176: Panel nodes: Remove unused layout screen, fix some notice errors, give context a description.
 New simpler panel page task that doesn't bother with handlers at all.

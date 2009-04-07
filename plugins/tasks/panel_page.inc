@@ -43,7 +43,7 @@ function panels_panel_page_delegator_tasks() {
       'operations' => array(
         array(
           'title' => t('Import'),
-          'href' => 'admin/build/pages/panel-page/import',
+          'href' => 'admin/build/pages/import',
         ),
         array(
           'title' => t('Add panel   page'),
