@@ -174,7 +174,7 @@ function panels_panel_page_edit_form_info() {
  *   A number of context objects as specified by the user when
  *   creating named arguments in the path.
  */
-function panels_panel_page_execute($subtask_id) {
+function panels_panel_page_execute($page) {
   // Turn the contexts into a properly keyed array.
   $contexts = array();
   foreach (func_get_args() as $arg) {
@@ -183,17 +183,22 @@ function panels_panel_page_execute($subtask_id) {
     }
   }
 
-  $task = delegator_get_task('panel_page');
+  // Delegate to the panel context handler.
+  if ($function = ctools_plugin_load_function('delegator', 'task_handlers', 'panel_context', 'render')) {
+    $info = $function($page, $contexts, FALSE);
+    if (isset($info['title'])) {
+      drupal_set_title($info['title']);
+    }
 
-  $output = 'zippidy doo dah daaaaay!';
-/*
-  ctools_include('context-task-handler');
-  $output = ctools_context_handler_render($task, $subtask_id, $contexts);
-  if ($output === FALSE) {
-    return drupal_not_found();
+    // Only directly output if $page was set to true.
+    if (!empty($info['no_blocks'])) {
+      print theme('page', $info['content'], FALSE);
+      return;
+    }
+    else {
+      return $info['content'];
+    }
   }
-*/
-  return $output;
 }
 
 /**

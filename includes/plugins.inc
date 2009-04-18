@@ -346,7 +346,7 @@ function panels_get_pane_content($display, $pane, $args = array(), $context = NU
     $content = $cache->content;
   }
   else {
-    $content = panels_ct_get_content($pane->type, $pane->subtype, $pane->configuration, $args, $context, $incoming_content);
+    $content = ctools_content_render($pane->type, $pane->subtype, $pane->configuration, $args, $context, $incoming_content);
     foreach (module_implements('panels_pane_content_alter') as $module) {
       $function = $module . '_panels_pane_content_alter';
       $function($content, $pane, $args, $context);
@@ -548,13 +548,8 @@ class panels_cache_object {
  *   The $pane object.
  */
 function panels_get_pane_title(&$pane, $context = array(), $incoming_content = NULL) {
-  if (empty($pane->context)) {
-    $pane->context = panels_pane_select_context($pane, $context);
-    if ($pane->context === FALSE) {
-      return t('Does not meet context requirements');
-    }
-  }
-  return panels_ct_get_title($pane->type, $pane->subtype, $pane->configuration, $pane->context, $incoming_content);
+  ctools_include('content');
+  return ctools_content_admin_title($pane->type, $pane->subtype, $pane->configuration, $context);
 }
 
 /**
@@ -574,24 +569,8 @@ function panels_get_pane_title(&$pane, $context = array(), $incoming_content = N
  *   requirements can't be met.
  */
 function panels_pane_select_context($pane, $contexts) {
-  // Identify which of our possible contexts apply.
-  if (empty($pane->subtype)) {
-    return;
-  }
-
-  $subtype = panels_ct_get_subtype($pane->type, $pane->subtype);
-  // If the pane requires a context, fetch it; if no context is returned,
-  // do not display the pane.
-  if (empty($subtype) || empty($subtype['required context'])) {
-    return;
-  }
-
-  $context = ctools_context_select($contexts, $subtype['required context'],
-    $pane->configuration['context']);
-
-  return $context;
+  return ctools_content_select_context($pane->type, $pane->subtype, $pane->configuration, $contexts);
 }
-
 
 /**
  * Fetch metadata on a specific layout plugin.

@@ -8,6 +8,8 @@ New simpler panel page task that doesn't bother with handlers at all.
 #317121: Respect 'hide title' option in display settings.
 #422404: Update to exportables left mini panels kind of broken.
 #422180 by joshk: Fix panel node_access to accept incoming $account.
+Moved content types to CTools.
+Better add content dialog.
 
 Panels 6.x-3.0-alpha3
 =====================

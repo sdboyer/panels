@@ -1,6 +1,0 @@
-; $Id$
-name = Node panes
-description = "Allows embedding specific nodes into panes without using contexts. While it is less powerful than using a node context, it can be simpler to use. Enable this module if you want nodes directly embedded into panel displays."
-package = "Panels"
-dependencies[] = panels
-core = 6.x

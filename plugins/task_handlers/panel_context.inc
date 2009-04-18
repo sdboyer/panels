@@ -128,7 +128,7 @@ function &panels_panel_context_get_display(&$handler) {
  * We must first check to ensure the node is of a type we're allowed
  * to render. If not, decline to render it by returning NULL.
  */
-function panels_panel_context_render($handler, $base_contexts) {
+function panels_panel_context_render($handler, $base_contexts, $test = TRUE) {
   // Go through arguments and see if they match.
   ctools_include('context');
   ctools_include('context-task-handler');
@@ -136,7 +136,7 @@ function panels_panel_context_render($handler, $base_contexts) {
   $contexts = ctools_context_handler_get_handler_contexts($base_contexts, $handler);
 
   // Test.
-  if (!ctools_context_handler_select($handler, $contexts)) {
+  if ($test && !ctools_context_handler_select($handler, $contexts)) {
     return;
   }
 
@@ -446,7 +446,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask_id'], $form_state['handler']);
   $content_types = panels_common_get_allowed_types('delegator', $display->context);
 
-  // Load the display being edited from cache, if possible.
+// Load the display being edited from cache, if possible.
   if (!empty($_POST) && is_object($cache = panels_cache_get('display', $display->did))) {
     $display = $cache->display;
   }
@@ -460,7 +460,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   }
 
   $form_state['display'] = &$display;
-
+  $form_state['content_types'] = $content_types;
   // Tell the Panels form not to display buttons.
   $form_state['no buttons'] = TRUE;
 

@@ -256,7 +256,7 @@ function panels_common_settings(&$form_state, $module_name = 'panels_common') {
     // Rebuild the entire list, setting appropriately from defaults. Give
     // each type its own checkboxes set unless it's 'single' in which
     // case it can go into our fake other set.
-    $available_content_types = panels_get_all_content_types();
+    $available_content_types = ctools_content_get_all_types();
     $allowed_content_types = variable_get($module_name . '_allowed_types', array());
 
     foreach ($available_content_types as $id => $types) {
@@ -337,8 +337,8 @@ function panels_common_get_allowed_types($module, $contexts = array(), $has_cont
     $default_types['other'] = TRUE;
   }
 
-  panels_load_include('plugins');
-  $content_types = panels_get_available_content_types($contexts, $has_content, $allowed_types, $default_types);
+  ctools_include('content');
+  $content_types = ctools_content_get_available_types($contexts, $has_content, $allowed_types, $default_types);
 
   return $content_types;
 }

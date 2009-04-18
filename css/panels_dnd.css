@@ -241,18 +241,75 @@ a.close img {
 .panels-section-decorator {
 }
 
+.panels-add-content-modal .panels-modal-add-category {
+  display: block;
+  border-bottom: 1px solid white;
+  padding-left: .5em;
+  margin-left: -2px;
+  position: relative;
+}
+
+.panels-add-content-modal .panels-modal-add-category.active {
+  background: url(../images/arrow-active.png) center right no-repeat white;
+  border-right: none;
+}
+
+.panels-add-content-modal {
+  background: url(../images/bg-content-modal.png);
+  height: 100%;
+  margin: -1em;
+  padding-top: 1em;
+  padding-left: 175px;
+  position: relative;
+}
+
+.panels-section-columns {
+  height: 100%;
+  overflow: auto;
+}
 .panels-section-column {
-  width: 31.5%;
+  width: 48%;
   float: left;
-  margin-right: 1.25%;
-  margin-bottom: 1.5em;
+}
+
+.panels-section-column .inside {
+  padding: 0 1em;
+}
+
+.panels-section-column-categories {
+  width: 173px;
+  margin-left: -173px;
+}
+
+* html .panels-section-column-categories {
+  left: 173px;
+  position: relative;
+}
+
+.panels-section-column-categories .panels-categories-box {
+  border-top: 1px solid white;
+  margin-bottom: 1em;
+}
+
+.panels-section-column-categories .inside {
+  padding: 0;
+ }
+
+.panels-section-column-categories .content-type-button {
+  padding-left: 10px;
+}
+
+.panels-modal-add-category {
+  color: #5b5b5b !important;
+  font-weight: bold;
+  line-height: 2em;
 }
 
 .panels-section {
   margin-bottom: 1em;
 }
 
-.panels-section .content-type-button {
+.panels-section-column .content-type-button {
   font-size: 8pt;
   line-height: 1em;
   overflow: hidden;

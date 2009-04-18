@@ -169,7 +169,7 @@ function panels_mini_export($mini, $indent = '') {
 /**
  * Remove the block version of mini panels from being available content types.
  */
-function panels_mini_panels_block_info($module, $delta, &$info) {
+function panels_mini_ctools_block_info($module, $delta, &$info) {
   $info = NULL;
 }
 

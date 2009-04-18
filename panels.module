@@ -61,11 +61,6 @@ function panels_theme() {
     'arguments' => array('block'),
     'file' => 'includes/display-edit.inc',
   );
-  $theme['profile_fields_pane'] = array(
-    'arguments' => array('category' => NULL, 'vars' => NULL),
-    'path' => panels_get_path('plugins/content_types'),
-    'template' => 'profile_fields_pane',
-  );
   $theme['panels_render_display_form'] = array(
     'arguments' => array('form' => NULL),
   );
@@ -186,12 +181,6 @@ function panels_menu() {
     'file' => 'includes/display-layout-settings.inc',
   ) + $base;
 */
-  // Non-display editor callbacks
-  $items['panels/node/autocomplete'] = array(
-    'title' => 'Autocomplete node',
-    'page callback' => 'panels_node_autocomplete',
-    'file' => 'includes/callbacks.inc',
-  ) + $base;
 
   // Provide a nice location for a panels admin panel.
   $items['admin/panels'] = array(
@@ -274,6 +263,9 @@ function panels_perm() {
  */
 function panels_cache_get($obj, $did, $skip_cache = FALSE) {
   ctools_include('object-cache');
+  // we often store contexts in cache, so let's just make sure we can load
+  // them.
+  ctools_include('context');
   return ctools_object_cache_get($obj, $did, $skip_cache);
 }
 
