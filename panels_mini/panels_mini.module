@@ -220,7 +220,7 @@ function panels_mini_admin_load($name) {
  * we implement task and task_handler plugins.
  */
 function panels_mini_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'panels' && $plugin == 'content_types') {
+  if ($module == 'ctools' && $plugin == 'content_types') {
     return 'plugins/' . $plugin;
   }
 }

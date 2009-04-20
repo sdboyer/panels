@@ -688,6 +688,9 @@ function panels_save_display(&$display) {
     $position = 0;
     $new_panes = array();
     foreach ((array) $panes as $pid) {
+      if (!isset($display->content[$pid])) {
+        continue;
+      }
       $pane = $display->content[$pid];
       $type = panels_get_content_type($pane->type);
 
