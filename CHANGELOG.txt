@@ -10,6 +10,7 @@ New simpler panel page task that doesn't bother with handlers at all.
 #422180 by joshk: Fix panel node_access to accept incoming $account.
 Moved content types to CTools.
 Better add content dialog.
+#437742 by jcmarco: Missing include.
 
 Panels 6.x-3.0-alpha3
 =====================
