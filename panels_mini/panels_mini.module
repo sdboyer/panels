@@ -58,8 +58,7 @@ function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
       $title = '';
     }
     else if (!empty($panel_mini->display->title)) {
-      $substitutions = ctools_context_get_keywords($panel_mini->context);
-      $title = filter_xss_admin(strtr($panel_mini->display->title, $substitutions));
+      $title = filter_xss_admin(ctools_context_keyword_substitute($panel_mini->display->title, array(), $panel_mini->context));
     }
 
     $block = array(

@@ -692,7 +692,7 @@ function panels_save_display(&$display) {
         continue;
       }
       $pane = $display->content[$pid];
-      $type = panels_get_content_type($pane->type);
+      $type = ctools_get_content_type($pane->type);
 
       $pane->position = $position++;
       $pane->did = $display->did;

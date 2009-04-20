@@ -165,8 +165,7 @@ function panels_panel_context_render($handler, $base_contexts, $test = TRUE) {
     $info['title'] = '';
   }
   else if (!empty($display->title)) {
-    $substitutions = ctools_context_get_keywords($contexts);
-    $info['title'] = filter_xss_admin(strtr($display->title, $substitutions));
+    $info['title'] = filter_xss_admin(ctools_context_keyword_substitute($display->title, array(), $contexts));
   }
 
   return $info;
