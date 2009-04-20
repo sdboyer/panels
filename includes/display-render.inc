@@ -101,6 +101,9 @@ function panels_render_layout($layout, $content, $css_id = NULL, $settings = arr
 
 /**
  * Render the administrative layout of a display.
+ *
+ * This is used for the edit version, so that layouts can have different
+ * modes, such as the flexible layout designer mode.
  */
 function panels_render_layout_admin($layout, $content, $display) {
   // @todo This should be abstracted.
@@ -310,9 +313,6 @@ function panels_render_panel($display, $panel, $panes) {
  * $content->more -- An optional 'more' link (destination only)
  * $content->admin_links -- Administrative links associated with the content
  * $content->feeds -- Any feed icons or associated with the content
- * $content->subject -- A legacy setting for block compatibility
- * $content->module -- A legacy setting for block compatibility
- * $content->delta -- A legacy setting for block compatibility
  */
 function theme_panels_pane($content, $pane, $display) {
   if (!empty($content->content)) {
