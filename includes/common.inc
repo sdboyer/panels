@@ -227,7 +227,7 @@ class panels_allowed_layouts {
 function panels_common_settings(&$form_state, $module_name = 'panels_common') {
   panels_load_include('plugins');
   ctools_include('content');
-  $content_types = panels_get_content_types();
+  $content_types = ctools_get_content_types();
   $default_types = variable_get($module_name . '_default', NULL);
   if (!isset($default_types)) {
     $default_types = array('block' => TRUE, 'views' => TRUE, 'other' => TRUE);
