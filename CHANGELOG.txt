@@ -12,6 +12,8 @@ Moved content types to CTools.
 Better add content dialog.
 #437742 by jcmarco: Missing include.
 #440142 by jcmarco: Did not change panels_get_content_types to ctools_get_content_types.
+Add a live preview widget to the panel content edit page.
+Fix panel page type to actually respect the contexts.
 
 Panels 6.x-3.0-alpha3
 =====================

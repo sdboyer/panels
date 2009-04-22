@@ -240,7 +240,6 @@ Drupal.Panels.Draggable = {
   }
 };
 
-
 Drupal.Panels.DraggableHandler = function() {
   var draggable = Drupal.Panels.Draggable;
   var scrollBuffer = 10;
@@ -486,15 +485,23 @@ Drupal.behaviors.PanelsDisplayEditor = function(context) {
   $('input#panels-show-all', context).click(Drupal.Panels.clickShowAll);
 
   Drupal.Panels.bindClickDelete(context);
+  
+  $('#panels-live-preview-button:not(.panels-preview-processed)')
+    .addClass('panels-preview-processed')
+    .click(function() {
+      if (!$('#panels-preview').size()) {
+        $('#panels-panel-context-edit-content').after('<div id="panels-preview"></div>');
+      }
 
-  /*
-  // Adjust the location of the pane dropdowns.
-  $('div.panel-pane div.ctools-dropdown-container').each(function() {
-    $(this).css({
-      'margin-left':  125) + ' px',
-      'position': 'absolute'
+      $('#panels-preview').html(Drupal.theme('CToolsModalThrobber'));
     });
-  });
-  */
 };
+
+/**
+ * AJAX responder command to render the preview.
+ */
+Drupal.CTools.AJAX.commands.panel_preview = function(command) {
+  $('#panels-preview').html(command.output);
+}
+
 

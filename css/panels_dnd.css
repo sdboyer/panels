@@ -4,13 +4,13 @@
   margin: 0.5em 0;
 }
 
-div.panels-display {
+#panels-panel-context-edit-content div.panels-display {
   border: 1px dashed #3D9CD7;
   padding: 0 0 .5em 0;
   background: #D4EBF9;
 }
 
-div.panels-display h2.label {
+#panels-panel-context-edit-content div.panels-display h2.label {
 /*  background: transparent; */
   color: #3D9CD7;
   text-align: center;
@@ -20,14 +20,14 @@ div.panels-display h2.label {
   vertical-align: middle;
 }
 
-div.panels-display .pane-add {
+#panels-panel-context-edit-content div.panels-display .pane-add {
   float: left;
   margin: 2px;
   background: #999;
   border: 1px solid #fff;
 }
 
-div.panels-display .pane-add-link {
+#panels-panel-context-edit-content div.panels-display .pane-add-link {
   display: block;
   width: 16px;
   height: 16px;
@@ -37,12 +37,12 @@ div.panels-display .pane-add-link {
   border: 1px solid #fff; 
 }
 
-div.panels-display .pane-add-link * {
+#panels-panel-context-edit-content div.panels-display .pane-add-link * {
   padding: 0;
   margin: 0;
 }
 
-.panel-pane {
+#panels-panel-context-edit-content .panel-pane {
   padding: 0em;
   background: #ffffff;
   border-top: 1px solid #78BAE3;
@@ -61,17 +61,17 @@ div.panels-display .pane-add-link * {
   margin: 2px 1px;
 }
 
-.panel-pane.hidden-pane {
+#panels-panel-context-edit-content .panel-pane.hidden-pane {
   background: #ccc;
 }
 
-.panel-pane .content {
+#panels-panel-context-edit-content .panel-pane .content {
   margin: .5em 0 .5em 0;
   padding: 0 .25em 0 .25em;
   display: none; /* initially hidden */
 }
 
-.panel-pane .grabber {
+#panels-panel-context-edit-content .panel-pane .grabber {
   width: 100%;
   height: 20px;
   cursor: move;
@@ -81,62 +81,62 @@ div.panels-display .pane-add-link * {
   overflow: hidden;
 }
 
-.panel-pane.hidden-pane .grabber {
+#panels-panel-context-edit-content .panel-pane.hidden-pane .grabber {
   background-color: #888;
 }
 
-.changed div.grabber {
+#panels-panel-context-edit-content .changed div.grabber {
   background-color: #FFFFDD !important;
   border-bottom: 1px solid #3D9CD7 !important;
   color: black !important;
 }
 
-.changed.hidden-pane div.grabber {
+#panels-panel-context-edit-content .changed.hidden-pane div.grabber {
   background-color: #B4B488 !important;
   border-bottom: 1px solid #3D9CD7 !important;
 }
 
-.changed div.grabber span.star {
+#panels-panel-context-edit-content .changed div.grabber span.star {
   font-weight: bold;
   color: #E09010;
 }
 
-.panel-pane .grabber:hover {
+#panels-panel-context-edit-content .panel-pane .grabber:hover {
   color: #fff;
   background-color: #2F78A5;
 }
 
-.panel-pane.hidden-pane .grabber:hover {
+#panels-panel-context-edit-content .panel-pane.hidden-pane .grabber:hover {
   background-color: #666;
 }
 
-.panel-pane .grabber:active {
+#panels-panel-context-edit-content .panel-pane .grabber:active {
   color: #fff;
   background-color: red;
 }
 
-.panel-pane .grabber .text {
+#panels-panel-context-edit-content .panel-pane .grabber .text {
   margin-left: 3px;
   font-size: 90%;
 }
 
-.panel-pane .buttons {
+#panels-panel-context-edit-content .panel-pane .buttons {
   float: right;
   padding: 0;
   margin: 0;
 }
 
-.panel-pane .buttons input {
+#panels-panel-context-edit-content .panel-pane .buttons input {
   margin: 0;
   padding: 0;
   display: inline;
 }
 
-.panel-pane .buttons a img {
+#panels-panel-context-edit-content .panel-pane .buttons a img {
   margin: 2px 1px;
 }
 
-.panel-pane .toggle {
+#panels-panel-context-edit-content .panel-pane .toggle {
   float: left;
   width: 21px;
   height: 21px;
@@ -146,26 +146,26 @@ div.panels-display .pane-add-link * {
   background-image: url(../images/portlet-expanded.png);
 }
 
-.panel-pane .title {
+#panels-panel-context-edit-content .panel-pane .title {
   font-size:125%;
   cursor: pointer;
 }
 
-.panel-pane .panel-pane-collapsible {
+#panels-panel-context-edit-content .panel-pane .panel-pane-collapsible {
   margin: 0;
   padding: 0;
 }
 
-.panel-pane .toggle-collapsed {
+#panels-panel-context-edit-content .panel-pane .toggle-collapsed {
   background-image: url(../images/portlet-collapsed.png);
 }
 
 /* CSS to guide a user to a place to drop */
-.helperclass {
+#panels-panel-context-edit-content .helperclass {
   border: 1px dashed #f00;
 }
 
-.hoverclass {
+#panels-panel-context-edit-content .hoverclass {
   border: 1px solid red !important;
 }
 
@@ -334,16 +334,12 @@ a.close img {
   padding-top: 5px;
 }
 
-.panels-modal-content .modal-content .panels-throbber-wrapper {
-  width: 575px;
-  height: 400px;
+#panels-preview .modal-throbber-wrapper {
+  width: 100%;
   text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
-
-.panels-modal-content .modal-content .panels-throbber-wrapper img {
-  margin-top: 160px;
-}
-
 /** modal forms CSS **/
 .panels-modal-content .form-item label {
   width: 8em;
@@ -411,18 +407,3 @@ html.js div.panels-display-links div.ctools-dropdown-container ul li a {
   width: 270px;
 }
 
-/* ---------------------------------------------------------------------------
- * Debugging CSS
- *
-.panels-dnd {
-  border: 1px dashed #f00;
-}
-.panel-col {
-  border: 1px dashed #00f;
-}
-.panel-portlet {
-  border: 1px dashed #0f0;
-}
- /**
-  * End of debugging CSS
-  */

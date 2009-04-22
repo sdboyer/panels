@@ -185,6 +185,18 @@ function panels_edit_display_form(&$form_state) {
     drupal_add_css($file);
   }
 
+  // Build up the preview portion of the form, if necessary.
+  if (empty($form_state['no preview'])) {
+    $form['preview'] = array('#tree' => TRUE);
+    ctools_context_replace_form($form['preview'], $display->context);
+    $form['preview']['button'] = array(
+      '#type' => 'submit',
+      '#value' => t('Preview'),
+      '#attributes' => array('class' => 'ctools-use-ajax'),
+      '#id' => 'panels-live-preview-button',
+      '#submit' => array('panels_edit_display_form_submit', 'panels_edit_display_form_preview'),
+    );
+  }
   return $form;
 }
 
@@ -270,10 +282,20 @@ function theme_panels_edit_display_form($form) {
     $content[$panel_id] = theme('panels_panel_dnd', $content[$panel_id], $panel_id, $title, $panel_buttons);
   }
 
+  $preview = '';
+  if (isset($form['preview'])) {
+    $preview .= '<h2>' . t('Live preview') . '</h2>';
+    $preview .= '<div id="panels-live-preview">';
+    $preview .= drupal_render($form['preview']);
+    $preview .= '</div>';
+  }
+
   $output .= drupal_render($form);
   panels_load_include('display-render');
   $output .= theme('panels_dnd', panels_render_layout_admin($layout, $content, $display));
   $output .= $save_buttons;
+  $output .= $preview;
+
   return $output;
 }
 
@@ -339,6 +361,25 @@ function panels_edit_display_form_submit($form, &$form_state) {
       }
     }
   }
+}
+
+/**
+ * Submission of the preview button. Render the preview and put it into
+ * the preview widget area.
+ */
+function panels_edit_display_form_preview(&$form, &$form_state) {
+  $display = &$form_state['display'];
+  ctools_include('ajax');
+
+  $display->context = ctools_context_replace_placeholders($display->context, $form_state['values']['preview']);
+  $output = panels_render_display($display);
+  
+  $commands = array();
+  $commands[] = array(
+    'command' => 'panel_preview',
+    'output' => $output,
+  );
+  ctools_ajax_render($commands);
 }
 
 /**

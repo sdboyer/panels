@@ -173,14 +173,9 @@ function panels_menu() {
   $items['panels/ajax/access-add'] = array(
     'page callback' => 'panels_ajax_add_access_test',
   ) + $base;
-
-/*
-  // For panel settings on the edit layout settings page
-  $items['panels/ajax/style-settings'] = array(
-    'page callback' => 'panels_ajax_style_settings',
-    'file' => 'includes/display-layout-settings.inc',
+  $items['panels/ajax/preview'] = array(
+    'page callback' => 'panels_ajax_preview',
   ) + $base;
-*/
 
   // Provide a nice location for a panels admin panel.
   $items['admin/panels'] = array(
