@@ -175,6 +175,337 @@ function panels_uninstall() {
   drupal_uninstall_schema('panels');
 }
 
+// Kept up updates from older versions of Panels 2 for D5 to smooth updates.
+// Create a field for the panel settings.
+// Renumbering to proper numbering scheme.
+function panels_update_5204() {
+  $ret   = array();
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN name varchar(255) UNIQUE");
+  $ret[] = update_sql("ALTER TABLE {panels_display} ADD COLUMN name varchar(255) UNIQUE");
+  // Give all our panels a name.
+  $ret[] = update_sql("UPDATE {panels_page} SET name = CONCAT('panel_page_', pid)");
+  $ret[] = update_sql("UPDATE {panels_display} SET name = CONCAT('display_', did)");
+  return $ret;
+}
+
+// Add the arguments field
+function panels_update_5205() {
+  $ret = array();
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN arguments longtext");
+  return $ret;
+}
+
+// Add a field so that panes can remember their subtype so we can retrieve
+// context information about it.
+function panels_update_5206() {
+  $ret = array();
+  $ret[] = update_sql("ALTER TABLE {panels_pane} ADD COLUMN subtype varchar(64)");
+  return $ret;
+}
+
+// Add fields for displays and extra contexts
+function panels_update_5207() {
+  $ret   = array();
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN displays longtext");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN contexts longtext");
+  return $ret;
+}
+
+// Correct the mistaken {panels_display}_id when it should be {panels_display}_did
+function panels_update_5208() {
+  $ret   = array();
+  $count = db_result(db_query("SELECT MAX(did) FROM {panels_display}"));
+  $ret[] = update_sql("DELETE FROM {sequences} WHERE name = '{panels_display}_did'");
+  $ret[] = update_sql("DELETE FROM {sequences} WHERE name = '{panels_display}_id'");
+  if ($count) {
+    $ret[] = update_sql("INSERT INTO {sequences} (name, id) VALUES ('{panels_display}_did',
+    $count)");
+  }
+
+  return $ret;
+}
+
+// Update argument, relationship and context code to be more correct.
+function panels_update_5209() {
+  $ret    = array();
+  $ret[]  = update_sql("ALTER TABLE {panels_page} ADD COLUMN relationships longtext");
+  $result = db_query("SELECT * FROM {panels_page}");
+  panels_load_include('plugins');
+
+  while ($page = db_fetch_object($result)) {
+    $args = unserialize($page->arguments);
+    $arguments = $ids = $keywords = array();
+    if (!empty($args)) {
+      // Update each argument
+      foreach ($args as $id => $argument) {
+        $name = $argument['name'];
+        $info = panels_get_argument($name);
+        if (!$info) {
+          continue;
+        }
+        // Make sure the id is valid
+        if (empty($argument['id'])) {
+          if (empty($ids[$name])) {
+            $ids[$name] = 1;
+          }
+          else {
+            $ids[$name]++;
+          }
+
+          $argument['id'] = $ids[$name];
+        }
+
+        // Give it an identifier if it doesn't already have one
+        if (empty($argument['identifier'])) {
+          $argument['identifier'] = $info['title'] . ($id > 1 ? ' ' . $id : '');
+          error_log($argument['identifier']);
+        }
+
+        // Give it a unique keyword if it doesn't already have one
+        if (empty($argument['keyword'])) {
+          $keyword = $base = $info['keyword'];
+          $count = 0;
+          while (!empty($keywords[$keyword])) {
+            $keyword = $base . '_' . ++$count;
+          }
+          $keywords[$keyword] = TRUE;
+          $argument['keyword'] = $keyword;
+          error_log($argument['keyword']);
+        }
+        $arguments[$id] = $argument;
+      }
+    }
+    // Move old relationships (stored as contexts) to relationships, where
+    // the belong
+    $rels = unserialize($page->contexts);
+    // Not resetting $keywords!
+    $relationships = $ids = array();
+    if (!empty($rels)) {
+      foreach ($rels as $id => $relationship) {
+        $name = $relationship['name'];
+        $info = panels_get_relationship($name);
+        if (!$info) {
+          continue;
+        }
+        // Make sure the id is valid
+        if (empty($relationship['id'])) {
+          if (empty($ids[$name])) {
+            $ids[$name] = 1;
+          }
+          else {
+            $ids[$name]++;
+          }
+
+          $relationship['id'] = $ids[$name];
+        }
+
+        // Give it an identifier if it doesn't already have one
+        if (empty($relationship['identifier'])) {
+          $relationship['identifier'] = $info['title'] . ($id > 1 ? ' ' . $id : '');
+        }
+
+        // Give it a unique keyword if it doesn't already have one
+        if (empty($relationship['keyword'])) {
+          $keyword = $base = $info['keyword'];
+          $count = 0;
+          while (!empty($keywords[$keyword])) {
+            $keyword = $base . '_' . ++$count;
+          }
+          $keywords[$keyword] = TRUE;
+          $relationship['keyword'] = $keyword;
+        }
+        $relationships[$id] = $relationship;
+      }
+    }
+    db_query("UPDATE {panels_page} " .
+      "SET arguments = '%s', " .
+      "relationships = '%s', " .
+      "contexts = '%s' " .
+      "WHERE pid = $page->pid", serialize($arguments), serialize($relationships), serialize(array()), $page->pid
+    );
+  }
+  return $ret;
+}
+
+function panels_update_5210() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 10 WHERE name = 'panels'");
+  return $ret;
+}
+
+/**
+ * Force a menu update
+ */
+function panels_update_5211() {
+  menu_rebuild();
+  return array();
+}
+
+/**
+ * Add a field to store pane caching information.
+ */
+function panels_update_5213() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {panels_pane} ADD COLUMN cache longtext AFTER configuration");
+      $ret[] = update_sql("ALTER TABLE {panels_display} ADD COLUMN cache longtext AFTER panel_settings");
+      break;
+
+    case 'pgsql':
+      db_add_column($ret, 'panels_pane', 'cache', 'text');
+      db_add_column($ret, 'panels_display', 'cache', 'text');
+  }
+  return $ret;
+}
+
+/**
+ * Create a new table for object caching. This isn't part of the cache
+ * system.
+ */
+function panels_update_5214() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql(<<<EOT
+        CREATE TABLE {panels_object_cache} (
+          sid varchar(64),
+          did integer,
+          obj varchar(255),
+          timestamp integer,
+          data text,
+          KEY (sid, obj, did),
+          KEY (timestamp)
+        ) /*!40100 DEFAULT CHARACTER SET utf8 */
+EOT
+      );
+    case 'pgsql':
+  }
+  return !empty($ret) ? $ret : $ret;
+}
+
+/**
+ * Increase the size of the data column in the {panels_object_cache} table
+ * on MySQL.
+ *
+ * Also gets rid of some duplicate indexes resulting the CREATE TABLE queries
+ * in the install() of schema 5214
+ */
+function panels_update_5215() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {panels_pane} ADD PRIMARY KEY (pid)");
+      break;
+
+    case 'pgsql':
+      $ret[] = update_sql("ALTER TABLE {panels_pane} ADD PRIMARY KEY (pid)");
+  }
+  return $ret;
+}
+
+/**
+ * Adds the 'shown' field to the panels_pane table in order to accomodate
+ * the new show/hide panes feature.
+ */
+function panels_update_5216() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {panels_pane} ADD COLUMN shown int(1) DEFAULT 1 AFTER subtype");
+      $ret[] = update_sql("ALTER TABLE {panels_display} ADD COLUMN title varchar(128) AFTER cache");
+      $ret[] = update_sql("ALTER TABLE {panels_display} ADD COLUMN hide_title int(1) AFTER title");
+      $ret[] = update_sql("ALTER TABLE {panels_display} DROP COLUMN name");
+      $ret[] = update_sql("ALTER TABLE {panels_pane} ADD COLUMN visibility text AFTER access");
+      break;
+
+    case 'pgsql':
+      db_add_column($ret, 'panels_pane', 'shown', 'tinyint', array('default' => 1));
+      db_add_column($ret, 'panels_display', 'title', 'varchar(128)');
+      db_add_column($ret, 'panels_display', 'hide_title', 'tinyint', array('default' => 0));
+      $ret = update_sql("ALTER TABLE {panels_display} DROP name");
+      db_add_column($ret, 'panels_pane', 'visibility', 'text');
+  }
+  return $ret;
+}
+
+/**
+ * Add the switcher fields to the database
+ */
+function panels_update_5217() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN switcher_type varchar(128) AFTER no_blocks");
+      $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN switcher_name varchar(128) AFTER no_blocks");
+      $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN switcher_options longtext AFTER switcher_type");
+      break;
+
+    case 'pgsql':
+      db_add_column($ret, 'panels_page', 'switcher_type', 'varchar(128)');
+      db_add_column($ret, 'panels_page', 'switcher_name', 'varchar(128)');
+      db_add_column($ret, 'panels_page', 'switcher_options', 'text');
+  }
+  return $ret;
+}
+
+
+/**
+ * Oversight in 5216: 'tinyint' is not a field type in pgsql; the type we wanted
+ * was 'smallint.'
+ */
+function panels_update_5218() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = array('success' => TRUE, 'query' => t('Update #5218 only has changes for PostgreSQL. There are no updates for MySQL databases - since you\'re running MySQL, you should consider this update successful.'));
+      break;
+
+    case 'pgsql':
+      db_add_column($ret, 'panels_pane', 'shown', 'smallint', array('default' => 1));
+      db_add_column($ret, 'panels_display', 'hide_title', 'smallint', array('default' => 0));
+      $ret[] = array('success' => TRUE, 'query' => t('You can disregard failed attempts to add new columns in update #5216 as long as the two queries preceding this text were successful.'));
+  }
+  return $ret;
+}
+
+/**
+ * Update is purely an informational message encouraging site admins to
+ * re-export any panels they have previously exported, as they will all be
+ * missing data.
+ */
+function panels_update_5219() {
+  $ret = array();
+  $ret[] = array('success' => TRUE, 'query' => t('You are strongly encouraged to re-export any panels generated with a version of Panels prior to Release Candidate 2, as several fields were (incorrectly) being ommitted from all exports, and this updater is unable to update any panels already exported with missing fields.'));
+  return $ret;
+}
+
+/**
+ * Update from 5.x v2
+ */
+function panels_update_5299() {
+  $ret = array();
+  // Fetch schema version 1.
+  $schema = panels_schema_1();
+
+  // update pid and did to be serial
+
+  db_drop_primary_key($ret, 'panels_pane');
+  db_change_field($ret, 'panels_pane', 'pid', 'pid', $schema['panels_pane']['fields']['pid'], array('primary key' => array('pid')));
+  db_drop_primary_key($ret, 'panels_display');
+  db_change_field($ret, 'panels_display', 'did', 'did', $schema['panels_display']['fields']['did'], array('primary key' => array('did')));
+
+  drupal_set_message(t('Please note that the Panels upgrade from Drupal 5 to Drupal 6 is far from perfect, especially where Views and CCK are involved. Please check all your panels carefully and compare them against the originals. You may need to do some rework to regain your original functionality.'));
+
+  return $ret;
+}
+
 /**
  * Update from 6.x v2.
  */
@@ -184,27 +515,42 @@ function panels_update_6290() {
   // It will return.
 
   $ret = array();
-/*
+
   // Fetch schema version 1.
   $schema = panels_schema_1();
 
-  // @TODO: We probably should detect if these are already serial from previous installations. Not sure how.
   // Update size of pane 'access' field.
   db_change_field($ret, 'panels_pane', 'access', 'access', $schema['panels_pane']['fields']['access']);
 
-  // update pid and did to be serial
-  db_drop_primary_key($ret, 'panels_pane');
-  db_change_field($ret, 'panels_pane', 'pid', 'pid', $schema['panels_pane']['fields']['pid'], array('primary key' => array('pid')));
-
-  db_drop_primary_key($ret, 'panels_display');
-  db_change_field($ret, 'panels_display', 'did', 'did', $schema['panels_display']['fields']['did'], array('primary key' => array('did')));
-
-  // Update size of pane 'access' field.
-  db_change_field($ret, 'panels_pane', 'access', 'access', $schema['panels_pane']['fields']['access']);
+  // Remove the no longer used visibility field
+  if (db_column_exists('panels_pane', 'visibility')) {
+    db_drop_field($ret, 'panels_pane', 'visibility');
+  }
 
   // Remove panels_object_cache table
-  db_drop_table($ret, 'panels_object_cache');
- */
+  if (db_table_exists('panels_object_cache')) {
+    db_drop_table($ret, 'panels_object_cache');
+  }
+
+  // Doublecheck that ctools is enabled. If not, automatically disable the module.
+  if (!module_exists('ctools')) {
+    // Try to enable it:
+    drupal_install_modules(array('ctools'));
+
+    // If that fails, shut off all Panels.
+    if (!module_exists('ctools')) {
+      drupal_set_message(t('Panels now requires the Chaos Tool Suite (ctools) module to function. Panels has been disabled until you can add this module.'));
+      module_disable(array('panels', 'panels_mini', 'panels_export', 'panels_node', 'panels_simple_cache'));
+    }
+  }
+
+  if (!module_exists('delegator') && db_table_exists('panels_page')) {
+    drupal_set_message('Delegator module has been automatically enabled to replace the Panels pages module.');
+    drupal_install_modules(array('delegator'));
+  }
+
+  $ret[] = update_sql("DELETE FROM {system} WHERE name IN ('panels_page', 'panels_views')");
+
   return $ret;
 }
 
@@ -301,7 +647,7 @@ function panels_update_6292(&$sandbox) {
     db_query("UPDATE {panels_pane} SET " .
       "access = '%s', css = '%s', style = '%s', configuration = '%s', extras = '%s'" .
       " WHERE pid = %d",
-      serialize($pane->access), 
+      serialize($pane->access),
       serialize($pane->css),
       serialize($pane->style),
       serialize($pane->configuration),
@@ -375,4 +721,249 @@ function panels_update_6293(&$sandbox) {
  */
 function panels_update_6300() {
   return array();
+}
+
+function panels_update_6302() {
+  $ret = array();
+
+  if (!module_exists('delegator') && db_table_exists('panels_page')) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('Conversion of panels pages cannot be completed without delegator module from CTools installed. Please install CTools, activate delegator, and attempt the update again.'));
+    return $ret;
+  }
+
+  delegator_get_task('page');
+  $result = db_query("SELECT * FROM {panels_page}");
+  while ($p = db_fetch_object($result)) {
+    $page = delegator_page_new();
+    // Should we check for uniqueness here? It doesn't seem really
+    // plausible that there could be delegator pages already.
+    $page->name = $p->name;
+    $page->task = 'panel_page'; // could become custom later.
+    $page->subtask = $p->name;
+    $page->admin_title = $p->name;
+    $page->path = $p->path;
+    // convert access
+    if (!empty($p->access)) {
+      $rids = explode(', ', $p->access);
+      // For safety, eliminate any non-numeric rids, as we occasionally had
+      // problems with nulls and such getting in here:
+      foreach ($rids as $id => $rid) {
+        if (!is_numeric($rid)) {
+          unset($rids[$id]);
+        }
+      }
+
+      if (empty($rids)) {
+        $page->access = array();
+      }
+      else {
+        // The old access style was just a role based system, so let's convert
+        // it to that.
+        $page->access = array(
+          'plugins' => array(
+            array(
+              'name' => 'role',
+              'context' => 'logged-in-user',
+              'settings' => array(
+                'rids' => array_values($rids),
+              )
+            ),
+          ),
+        );
+      }
+    }
+
+    // Convert menu stuff.
+    $page->menu = array(
+      'type' => 'none',
+      'title' => '',
+      'weight' => 0,
+      'name' => 'navigation',
+      'parent' => array(
+        'type' => 'none',
+        'title' => '',
+        'weight' => 0,
+        'name' => 'navigation',
+      ),
+    );
+
+    if ($p->menu) {
+      if ($p->menu_tab) {
+        if ($p->menu_tab_default) {
+          $page->menu['type'] = 'default tab';
+          $page->menu['parent']['type'] = $p->menu_tab_default_parent_type;
+          $page->menu['parent']['title'] = $p->menu_parent_title;
+          $page->menu['parent']['weight'] = $p->menu_parent_tab_weight;
+        }
+        else {
+          $page->menu['type'] = 'tab';
+        }
+      }
+      else {
+        $page->menu['type'] = 'normal';
+      }
+
+      $page->menu['title'] = $p->menu_title;
+      $page->menu['weight'] = $p->menu_tab_weight;
+    }
+
+    $page->conf = array();
+    $displays = unserialize($p->displays);
+    $arguments = unserialize($p->arguments);
+    foreach ($arguments as $id => $argument) {
+      $page->arguments[$argument['keyword']] = array(
+        'name' => $argument['name'],
+        'identifier' => $argument['identifier'],
+        'title' => $argument['title'],
+        'id' => $argument['id'],
+        'settings' => $argument['argument_settings'],
+      );
+
+      $match = FALSE;
+      $bits = explode('/', $page->path);
+      foreach ($bits as $pos => $bit) {
+        if ($bit == '%') {
+          $bits[$pos] = '%' . $argument['keyword'];
+          $match = TRUE;
+          $page->path = implode('/', $bits);
+          break;
+        }
+      }
+
+      if (!$match) {
+        if ($argument['default'] == '404') {
+          $page->path .= '/%' . $argument['keyword'];
+        }
+        else {
+          $page->path .= '/!' . $argument['keyword'];
+        }
+      }
+
+      // save this for later use.
+      $arguments[$id]['context'] = 'argument_' . $argument['name'] . '_' . $argument['id'];
+    }
+
+    // Reset the task type here if it's one of our overrides. This ensures
+    // that we get the right names.
+    switch ($p->path) {
+      case 'node/%':
+        $page->task = 'node_view';
+        $page->subtask = '';
+        break;
+      case 'node/%/edit':
+      case 'node/add/%':
+        // Could we get conflicts here if they had both?
+        $page->task = 'node_edit';
+        $page->subtask = '';
+        break;
+      case 'taxonomy/term':
+      case 'taxonomy/term/%':
+        $page->task = 'term_view';
+        $page->subtask = '';
+        if ($arguments[0]['name'] == 'term') {
+          variable_set('delegator_term_view_type', 'single');
+        }
+        break;
+      case 'user/%':
+        $page->task = 'user_view';
+        $page->subtask = '';
+        break;
+      // There is no default here.
+    }
+
+    if (empty($displays)) {
+      // only one display on this panel, mak
+      $page->conf['css'] = $p->css;
+      $page->conf['css_id'] = $p->css_id;
+      $page->conf['no_blocks'] = $p->no_blocks;
+      $page->conf['contexts'] = unserialize($p->contexts);
+      $page->conf['relationships'] = unserialize($p->relationships);
+      $page->conf['did'] = $p->did;
+      if ($page->task != 'panel_page') {
+        $cache = new stdClass();
+        $cache->handlers = array();
+        _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, 0, $cache);
+      }
+    }
+    else {
+      $page->type = 'custom';
+      // for each display we need to create a new handler.
+      $weight = 0;
+      $cache = new stdClass();
+      $cache->handlers = array();
+      foreach ($displays as $origin => $info) {
+        if ($info['did'] != 'new' && !empty($info['argument_id'])) {
+          _panels_update_create_handler($page, $p, $origin, $info, $arguments, $weight++, $cache);
+        }
+
+        // Also add the primary display as a default with no selector.
+        _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, $weight++, $cache);
+        $page->default_handlers = $cache->handlers;
+      }
+    }
+
+    if ($page->task != 'custom' && $page->task != 'panel_page') {
+      // just save the handlers.
+      foreach ($cache->handlers as $handler) {
+        delegator_save_task_handler($handler);
+      }
+    }
+    else {
+      delegator_page_save($page);
+    }
+  }
+
+  $ret[] = update_sql("DROP TABLE {panels_page}");
+
+  if (module_exists('ctools') && !module_exists('views_content') && db_result(db_query("SELECT pid FROM {panels_pane} WHERE type = 'views'"))) {
+    drupal_install_modules(array('views_content'));
+  }
+
+  return $ret;
+}
+
+function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $weight, &$cache) {
+  $task = delegator_get_task($page->task);
+  $plugin = delegator_get_task_handler('panel_context');
+  $handler = delegator_new_task_handler($task, $page->subtask, $plugin, $weight, $cache);
+  $handler->conf['css'] = $p->css;
+  $handler->conf['css_id'] = $p->css_id;
+  $handler->conf['no_blocks'] = $p->no_blocks;
+  $handler->conf['did'] = $info['did'];
+  $handler->conf['title'] = $info['title'];
+  $handler->conf['contexts'] = unserialize($p->contexts);
+  $handler->conf['relationships'] = unserialize($p->relationships);
+
+  if ($origin) {
+    $handler->conf['access'] = array(
+      'logic' => 'and',
+      'plugins' => array(),
+    );
+
+    // Only 4 types of arguments supported having their own displays:
+    // nid, node_add_form, node_edit_form and term. 3 of those simply used
+    // node type and the last simply used vocabulary.
+    list($junk, $key) = explode('-', $origin);
+    if ($arguments[$info['argument_id']]['name'] == 'term') {
+      $handler->conf['plugins'][] = array(
+        'name' => 'term_vocabulary',
+        'settings' => array(
+          'context' => $arguments[$info['argument_id']]['context'],
+          'vids' => array($key),
+         ),
+       );
+    }
+    else {
+      $handler->conf['plugins'][] = array(
+        'name' => 'node_type',
+        'settings' => array(
+          'context' => $arguments[$info['argument_id']]['context'],
+          'type' => array($key),
+         ),
+       );
+    }
+  }
+  $cache->handlers[$handler->name] = $handler;
+
+  return $handler;
 }
