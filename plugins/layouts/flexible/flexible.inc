@@ -111,7 +111,7 @@ function panels_flexible_convert_settings(&$settings) {
       $settings['items']['sidebar-left-row'] = array(
         'type' => 'row',
         'contains' => 'region',
-        'children' => array('center'),
+        'children' => array('sidebar_left'),
         'parent' => 'sidebar-left',
       );
       $settings['items']['sidebar_left'] = array(
@@ -137,7 +137,7 @@ function panels_flexible_convert_settings(&$settings) {
       $settings['items']['sidebar-right-row'] = array(
         'type' => 'row',
         'contains' => 'region',
-        'children' => array('center'),
+        'children' => array('sidebar_right'),
         'parent' => 'sidebar-right',
       );
       $settings['items']['sidebar_right'] = array(
@@ -202,6 +202,7 @@ function panels_flexible_convert_settings(&$settings) {
     unset($settings['canvas']);
   }
 }
+
 /**
  * Define the actual list of columns and rows for this flexible panel.
  */
