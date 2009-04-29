@@ -10,6 +10,7 @@ function panels_threecol_25_50_25_panels_layouts() {
     'icon' => 'threecol_25_50_25.png',
     'theme' => 'panels_threecol_25_50_25',
     'theme arguments' => array('id', 'content'),
+    'css' => 'threecol_25_50_25.css',
     'panels' => array(
       'left' => t('Left side'),
       'middle' => t('Middle column'),

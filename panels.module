@@ -535,6 +535,7 @@ class panels_display {
  *   The sanitized display object.
  */
 function panels_sanitize_display(&$display) {
+  return;
   if (!isset($display->args)) {
     $display->args = array();
   }

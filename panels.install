@@ -78,6 +78,7 @@ function panels_schema_1() {
       'pid' => array(
         'type' => 'serial',
         'not null' => TRUE,
+        'no export' => TRUE,
       ),
       'did' => array(
         'type' => 'int',
@@ -886,23 +887,31 @@ function panels_update_6302() {
       }
     }
     else {
-      $page->type = 'custom';
+      if ($page->task == 'panel_page') {
+        $page->task = 'page';
+      }
+      $page->multiple = TRUE;
+
       // for each display we need to create a new handler.
       $weight = 0;
       $cache = new stdClass();
       $cache->handlers = array();
       foreach ($displays as $origin => $info) {
-        if ($info['did'] != 'new' && !empty($info['argument_id'])) {
-          _panels_update_create_handler($page, $p, $origin, $info, $arguments, $weight++, $cache);
+//        drupal_set_message('<pre>' . var_export($info, 1) . '</pre>');
+        if (!isset($info['argument_id'])) {
+          $info['argument_id'] = 0;
         }
 
-        // Also add the primary display as a default with no selector.
-        _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, $weight++, $cache);
-        $page->default_handlers = $cache->handlers;
+        _panels_update_create_handler($page, $p, $origin, $info, $arguments, $weight++, $cache);
       }
+
+      // Also add the primary display as a default with no selector.
+      _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, $weight++, $cache);
+//      drupal_set_message('<pre>' . var_export($cache->handlers, 1) . '</pre>');
+      $page->default_handlers = $cache->handlers;
     }
 
-    if ($page->task != 'custom' && $page->task != 'panel_page') {
+    if ($page->task != 'page' && $page->task != 'panel_page') {
       // just save the handlers.
       foreach ($cache->handlers as $handler) {
         delegator_save_task_handler($handler);
@@ -929,7 +938,16 @@ function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $w
   $handler->conf['css'] = $p->css;
   $handler->conf['css_id'] = $p->css_id;
   $handler->conf['no_blocks'] = $p->no_blocks;
-  $handler->conf['did'] = $info['did'];
+  if (!empty($info['did']) && is_numeric($info['did'])) {
+    $handler->conf['did'] = $info['did'];
+  }
+  else {
+    $display_code = panels_export_display(panels_load_display($p->did));
+    eval($display_code);
+
+    $handler->conf['did'] = 'new';
+    $handler->conf['display'] = $display;
+  }
   $handler->conf['title'] = $info['title'];
   $handler->conf['contexts'] = unserialize($p->contexts);
   $handler->conf['relationships'] = unserialize($p->relationships);
@@ -944,23 +962,25 @@ function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $w
     // nid, node_add_form, node_edit_form and term. 3 of those simply used
     // node type and the last simply used vocabulary.
     list($junk, $key) = explode('-', $origin);
-    if ($arguments[$info['argument_id']]['name'] == 'term') {
-      $handler->conf['plugins'][] = array(
-        'name' => 'term_vocabulary',
-        'settings' => array(
+    if ($key && $key != 'default') {
+      if ($arguments[$info['argument_id']]['name'] == 'term') {
+        $handler->conf['access']['plugins'][] = array(
+          'name' => 'term_vocabulary',
           'context' => $arguments[$info['argument_id']]['context'],
-          'vids' => array($key),
-         ),
-       );
-    }
-    else {
-      $handler->conf['plugins'][] = array(
-        'name' => 'node_type',
-        'settings' => array(
+          'settings' => array(
+            'vids' => array($key),
+           ),
+         );
+      }
+      else {
+        $handler->conf['access']['plugins'][] = array(
+          'name' => 'node_type',
           'context' => $arguments[$info['argument_id']]['context'],
-          'type' => array($key),
-         ),
-       );
+          'settings' => array(
+            'type' => array($key),
+           ),
+         );
+      }
     }
   }
   $cache->handlers[$handler->name] = $handler;

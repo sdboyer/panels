@@ -32,6 +32,10 @@ function panels_mini_menu() {
  * Expose qualifying mini panels to Drupal's block system.
  */
 function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
+  if (!module_exists('ctools')) {
+    return array();
+  }
+
   if ($op == 'list') {
     $blocks = array();
 

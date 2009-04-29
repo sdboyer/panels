@@ -182,20 +182,7 @@ function panels_panel_page_edit_form_info() {
  *   A number of context objects as specified by the user when
  *   creating named arguments in the path.
  */
-function panels_panel_page_execute($page) {
-  // Turn the contexts into a properly keyed array.
-  $contexts = array();
-  $args = array();
-  foreach (func_get_args() as $count => $arg) {
-    if (is_object($arg) && get_class($arg) == 'ctools_context') {
-      $contexts[$arg->id] = $arg;
-      $args[] = $arg->original_argument;
-    }
-    else if ($count) {
-      $args[] = $arg;
-    }
-  }
-
+function panels_panel_page_execute($page, $contexts, $args) {
   // Delegate to the panel context handler.
   if ($function = ctools_plugin_load_function('delegator', 'task_handlers', 'panel_context', 'render')) {
     $info = $function($page, $contexts, $args, FALSE);

@@ -48,18 +48,15 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
 
   $print_separator = FALSE;
   foreach ($panes as $pane_id => $pane) {
-    // Add the separator if we've already displayed a pane.
-    if ($print_separator) {
-      $output .= '<div class="panel-separator"></div>';
-    }
     $text = panels_render_pane($pane, $display->content[$pane_id], $display);
     if ($text) {
+      // Add the separator if we've already displayed a pane.
+      if ($print_separator) {
+        $output .= '<div class="panel-separator"></div>';
+      }
       $output .= ($where == 'pane') ? theme('panels_rounded_corners_box', $text) : $text;
+      $print_separator = TRUE;
     }
-
-    // If we displayed a pane, this will become true; if not, it will become
-    // false.
-    $print_separator = (bool) $text;
   }
 
   if ($where == 'panel') {
