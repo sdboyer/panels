@@ -36,6 +36,12 @@ function theme_panels_block_style_render_pane($content, $pane, $display) {
   }
 
   $content->region = $pane->panel;
+  if (!isset($content->module)) {
+    $content->module = $content->type;
+  }
+  if (!isset($content->delta)) {
+    $content->delta = $content->subtype;
+  }
   return theme('block', $content);
 }
 

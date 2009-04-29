@@ -37,7 +37,7 @@ function _panels_edit($display, $destination, $content_types, $title = FALSE) {
     $cache->display_title = $title;
     panels_cache_set('display', $did, $cache);
   }
-  
+
   ctools_include('form');
   $form_state = array(
     'display' => &$display,
@@ -373,7 +373,7 @@ function panels_edit_display_form_preview(&$form, &$form_state) {
 
   $display->context = ctools_context_replace_placeholders($display->context, $form_state['values']['preview']);
   $output = panels_render_display($display);
-  
+
   $commands = array();
   $commands[] = array(
     'command' => 'panel_preview',
@@ -526,7 +526,7 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
     $block = ctools_content_admin_info($content_type, $pane->subtype, $pane->configuration, $display->context);
   }
 
- 
+
   $output = theme('panels_pane_dnd', $block, $pane->pid, $title, '', $buttons);
   if ($skin) {
     $class = 'panel-pane' . ($pane->shown ? '' : ' hidden-pane');
@@ -788,7 +788,7 @@ function panels_add_content($cache, $panel_id, $key) {
       . '<div class="inside">' . $selector . '</div></div>';
     $output .= '<div class="panels-section-columns">';
     foreach ($col as $id => $column) {
-      $output .= '<div class="panels-section-column panels-section-column-' . $id . '">' 
+      $output .= '<div class="panels-section-column panels-section-column-' . $id . '">'
       . '<div class="inside">' . $column . '</div></div>';
     }
     $output .= '</div>'; // columns

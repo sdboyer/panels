@@ -78,12 +78,12 @@ function panels_schema_1() {
       'pid' => array(
         'type' => 'serial',
         'not null' => TRUE,
-        'no export' => TRUE,
       ),
       'did' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
+        'no export' => TRUE,
       ),
       'panel' => array(
         'type' => 'varchar',
@@ -495,8 +495,11 @@ function panels_update_5299() {
   // Fetch schema version 1.
   $schema = panels_schema_1();
 
-  // update pid and did to be serial
+  // Certain really old versions of Panels had errors that would cause invalid
+  // panes to be written. This wipes them so that the conversion won't fail:
+  $ret[] = update_sql("DELETE FROM {panels_pane} WHERE pid = 0");
 
+  // update pid and did to be serial
   db_drop_primary_key($ret, 'panels_pane');
   db_change_field($ret, 'panels_pane', 'pid', 'pid', $schema['panels_pane']['fields']['pid'], array('primary key' => array('pid')));
   db_drop_primary_key($ret, 'panels_display');
@@ -732,6 +735,13 @@ function panels_update_6302() {
     return $ret;
   }
 
+  if (!db_table_exists('panels_page')) {
+    return $ret;
+  }
+
+  // Store the node edit handlers because we merged the edit/add path and we
+  // need to be able to keep these together to make sure the names work ok.
+  $node_edit_handlers = array();
   delegator_get_task('page');
   $result = db_query("SELECT * FROM {panels_page}");
   while ($p = db_fetch_object($result)) {
@@ -851,8 +861,10 @@ function panels_update_6302() {
         $page->task = 'node_view';
         $page->subtask = '';
         break;
-      case 'node/%/edit':
       case 'node/add/%':
+        // It seems nearly impossible to actually upgrade this properly.
+        continue;
+      case 'node/%/edit':
         // Could we get conflicts here if they had both?
         $page->task = 'node_edit';
         $page->subtask = '';
@@ -882,7 +894,12 @@ function panels_update_6302() {
       $page->conf['did'] = $p->did;
       if ($page->task != 'panel_page') {
         $cache = new stdClass();
-        $cache->handlers = array();
+        if ($page->task != 'node_edit') {
+          $cache->handlers = array();
+        }
+        else {
+          $cache->handlers = $node_edit_handlers;
+        }
         _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, 0, $cache);
       }
     }
@@ -895,9 +912,14 @@ function panels_update_6302() {
       // for each display we need to create a new handler.
       $weight = 0;
       $cache = new stdClass();
-      $cache->handlers = array();
+      if ($page->task != 'node_edit') {
+        $cache->handlers = array();
+      }
+      else {
+        $cache->handlers = $node_edit_handlers;
+        $weight = count($cache->handlers) + 1;
+      }
       foreach ($displays as $origin => $info) {
-//        drupal_set_message('<pre>' . var_export($info, 1) . '</pre>');
         if (!isset($info['argument_id'])) {
           $info['argument_id'] = 0;
         }
@@ -913,8 +935,13 @@ function panels_update_6302() {
 
     if ($page->task != 'page' && $page->task != 'panel_page') {
       // just save the handlers.
-      foreach ($cache->handlers as $handler) {
+      foreach ($cache->handlers as $name => $handler) {
         delegator_save_task_handler($handler);
+
+        // Keep all node edit handlers for later use.
+        if ($page->task == 'node_edit') {
+          $node_edit_handlers[$name] = $handler;
+        }
       }
     }
     else {
@@ -923,6 +950,10 @@ function panels_update_6302() {
   }
 
   $ret[] = update_sql("DROP TABLE {panels_page}");
+
+  // Update a couple of pane types that changed and are easily moved:
+  $ret[] = update_sql("UPDATE {panels_pane} SET type = CONCAT(type, '_', subtype) WHERE type = 'node_form'");
+  $ret[] = update_sql("UPDATE {panels_pane} SET type = 'node_form_path' WHERE type = 'node_form_url_path'");
 
   if (module_exists('ctools') && !module_exists('views_content') && db_result(db_query("SELECT pid FROM {panels_pane} WHERE type = 'views'"))) {
     drupal_install_modules(array('views_content'));
@@ -981,6 +1012,10 @@ function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $w
            ),
          );
       }
+    }
+    else {
+      // make sure defaults float to the bottom:
+      $handler->weight += 100;
     }
   }
   $cache->handlers[$handler->name] = $handler;
