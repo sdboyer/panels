@@ -618,11 +618,17 @@ function panels_flexible_get_css_group(&$css, $renderer, $list, $owner_id, $type
     }
 
     $max = count($middle) - 1;
+
     // Because we love IE so much, auto scale everything to 99%. This
     // means adding up the actual widths and then providing a multiplier
     // to each so that the total is 99%.
-
-    $scale = 99.0 / $middle_total;
+    if ($max > 0) {
+      $scale = 99.0 / $middle_total;
+    }
+    // But we only scale if there's more than 1 item to scale.
+    else {
+      $scale = 1;
+    }
     foreach ($middle as $position => $id) {
       $class = ".panels-flexible-$type-" . $renderer->did . "-$id";
       $css[$class] = array(
