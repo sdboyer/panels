@@ -52,10 +52,16 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
     if ($text) {
       // Add the separator if we've already displayed a pane.
       if ($print_separator) {
-        $output .= '<div class="panel-separator"></div>';
+        $output .= '<div class="panel-separator">&nbsp;</div>';
       }
-      $output .= ($where == 'pane') ? theme('panels_rounded_corners_box', $text) : $text;
-      $print_separator = TRUE;
+
+      if ($where == 'pane') {
+        $output .= theme('panels_rounded_corners_box', $text);
+      }
+      else {
+        $output .= $text;
+        $print_separator = TRUE;
+      }
     }
   }
 
@@ -195,6 +201,11 @@ $idstr .panel-separator {
   font-size: 1px;
   height: 30px;
 }
+
+$idstr .rounded_corner {
+  margin-bottom: 1em;
+}
+
 EOF;
 
   return $css;
