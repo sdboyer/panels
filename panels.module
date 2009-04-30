@@ -959,3 +959,20 @@ function panels_ctools_plugin_styles() {
   );
 }
 
+/**
+ * Get the display that is currently being rendered as a page.
+ * 
+ * Unlike in previous versions of this, this only returns the display,
+ * not the page itself, because there are a number of different ways
+ * to get to this point. It is hoped that the page data isn't needed
+ * at this point. If it turns out there is, we will do something else to
+ * get that functionality.
+ */
+function panels_get_current_page_display($change = NULL) {
+  static $display = NULL;
+  if ($change) {
+    $display = $change;
+  }
+
+  return $display;
+}

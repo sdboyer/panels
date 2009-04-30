@@ -19,6 +19,7 @@ Rearranged the menus, created the Panel dashboard.
 Returned the allowed content settings form to panel page
 Added allowed layouts to settings form for panel pages, nodes, minis.
 #362754 by dereine: Fix invalid XHTML in 3col 33/34/33 template.
+#375686: Create panels_get_current_page_display() to replace the old panels_get_current_page() function.
 
 Panels 6.x-3.0-alpha3
 =====================
