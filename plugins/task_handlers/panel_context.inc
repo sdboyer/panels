@@ -25,6 +25,7 @@ function panels_panel_context_delegator_task_handlers() {
     'save' => 'panels_panel_context_save',
     'delete' => 'panels_panel_context_delete',
     'export' => 'panels_panel_context_export',
+    'clone' => 'panels_panel_context_clone',
 
     'add forms' => array(
       'criteria' => t('Selection rules'),
@@ -243,6 +244,22 @@ function panels_panel_context_export(&$handler, $indent) {
   $output = panels_export_display($display, $indent);
   $output .= $indent . '$handler->conf[\'display\'] = $display' . ";\n";
   return $output;
+}
+
+/**
+ * When a handler is cloned, we have to clone the display.
+ */
+  function panels_panel_context_clone(&$handler) {
+  $old_display = panels_panel_context_get_display($handler);
+  $code = panels_export_display($old_display);
+  eval($code);
+  foreach (array('display', 'did', 'css_cache', 'temp_layout') as $item) {
+    if (isset($handler->conf[$item])) {
+      unset($handler->conf[$item]);
+    }
+  }
+  $display->did = 'new';
+  $handler->conf['display'] = $display;
 }
 
 /**

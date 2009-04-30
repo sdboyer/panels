@@ -20,6 +20,7 @@ Returned the allowed content settings form to panel page
 Added allowed layouts to settings form for panel pages, nodes, minis.
 #362754 by dereine: Fix invalid XHTML in 3col 33/34/33 template.
 #375686: Create panels_get_current_page_display() to replace the old panels_get_current_page() function.
+#424798: Respond to a cloned handler by properly cloning the display as well.
 
 Panels 6.x-3.0-alpha3
 =====================
