@@ -722,6 +722,7 @@ function panels_save_display(&$display) {
 
   // update all the panes
   panels_load_include('plugins');
+  ctools_include('content');
 
   foreach ($display->panels as $id => $panes) {
     $position = 0;
