@@ -225,6 +225,7 @@ function panels_menu() {
     'title' => 'General',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_admin_settings_page'),
+    'access arguments' => array('administer delegator'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   ) + $admin_base;
