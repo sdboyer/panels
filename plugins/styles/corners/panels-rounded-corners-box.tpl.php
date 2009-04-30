@@ -8,11 +8,11 @@
  * - $content: The content of the box.
  */
 ?>
-<div class="rounded_corner">
+<div class="rounded-corner">
   <div class="wrap-corner">
     <div class="t-edge"><div class="l"></div><div class="r"></div></div>
     <div class="l-edge">
-      <div class="r-edge">
+      <div class="r-edge clear-block">
         <?php print $content; ?>
       </div>
     </div>
