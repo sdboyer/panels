@@ -24,29 +24,8 @@ function panels_node_perm() {
  * Implementation of hook_menu().
  */
 function panels_node_menu() {
-/*
-  $items['node/add/panel'] = array(
-    'title' => 'Panel',
-    'access arguments' => array('create panel-nodes'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-*/
-  $items['admin/panels/panel-nodes'] = array(
+  $items['admin/build/panels/settings/panel-node'] = array(
     'title' => 'Panel nodes',
-    'access arguments' => array('create panel-nodes'),
-    'type' => MENU_NORMAL_ITEM,
-    'page callback' => 'panels_node_admin',
-    'description' => 'Panel nodes are nodes that are laid out with panel displays.',
-  );
-
-  $items['admin/panels/panel-nodes/information'] = array(
-    'title' => 'Information',
-    'access arguments' => array('create panel-nodes'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $items['admin/panels/panel-nodes/settings'] = array(
-    'title' => 'Settings',
     'description' => 'Configure which content is available to add to panel node displays.',
     'access arguments' => array('administer panel-nodes'),
     'page callback' => 'panels_node_settings',
@@ -90,26 +69,6 @@ function panels_node_edit_node($node) {
   }
 
   return node_access('update', $node);
-}
-
-/**
- * Page callback for the very short admin page.
- */
-function panels_node_admin() {
-  $output = '<p>';
-  $output .= t('Panel nodes do not have a normal administrative UI, such as panels pages or mini panels. With this module, a new node type is created: a "panel" node. These are nodes that have panel layouts, but do not have the breadth of features that panel pages do; these features are sacrificed so that you gain all the capabilities of nodes.');
-  $output .= '</p><p>';
-  $output .= t('You may create a !panel_node using the normal !create_content menu, and you can administer your panel nodes under the normal !administer_nodes menu (administrative permission required).', array(
-    '!panel_node' => l(t('panel node'), 'node/add/panel'),
-    '!create_content' => l(t('create content'), 'node/add'),
-    '!administer_nodes' => l(t('administer nodes'), 'admin/content/node'),
-  ));
-  $output .= '</p><p>';
-  $output .= t('On the !settings page, you may control which panes may be added to panel nodes; this can be very valuable to limit what content is available if your users who can create panel nodes are not administrators.', array(
-    '!settings' => l(t('settings'), 'admin/panels/panel-nodes/settings'),
-  ));
-  $output .= '</p>';
-  return $output;
 }
 
 // ---------------------------------------------------------------------------

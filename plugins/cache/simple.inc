@@ -1,51 +1,16 @@
 <?php
 // $Id$
 
-
 /**
- * @file panels_simple_cache.module
- *
+ * @file
  * Provides a simple time-based caching option for panel panes.
  */
 
 /**
- * Implementation of hook_menu().
+ * Specially named implementation of hook_panels_cache()
  */
-function panels_simple_cache_menu() {
-  $items['admin/panels/simple-cache'] = array(
-    'title' => 'Simple cache',
-    'access' => 'panels_simple_cache_access',
-    'type' => MENU_NORMAL_ITEM,
-    'callback' => 'panels_simple_cache_admin',
-    'description' => 'Information about Panels simple cache.',
-  );
-  return $items;
-}
-
-/**
- * Access callback for the simple_cache administration menu.
- */
-function panels_simple_cache_access() {
-  return user_access('access administration pages') && user_access('use panels caching features');
-}
-
-/**
- * Page callback for the very short admin page.
- */
-function panels_simple_cache_admin() {
-  $output = '<p>';
-  $output .= t('Panels simple cache does not have a normal administrative UI, such as panels pages or mini panels. With this module, you are given the option to add caching features to any panel display in panel pages, mini panels, panel nodes or any other displays provided by other modules or plugins. These options are available as an icon on each pane of the edit content pane.');
-  $output .= '</p><p>';
-  $output .= t('This module provides only very simple, time-based caching; it is not at all suitable if your content will change at all per user (and this can mean administrative additions that are just visible to you) as all users will see the same content; it is provided mostly as a reference implementation for other, smarter caching modules.');
-  $output .= '</p>';
-  return $output;
-}
-
-/**
- * Implementation of hook_panels_cache()
- */
-function panels_simple_cache_panels_cache() {
-  $cache['simple'] = array(
+function panels_simple_panels_cache() {
+  return array(
     'title' => t("Simple cache"),
     'description' => t('Simple caching is a time-based cache. This is a hard limit, and once cached it will remain that way until the time limit expires.'),
     'cache get' => 'panels_simple_cache_get_cache',
@@ -58,7 +23,6 @@ function panels_simple_cache_panels_cache() {
       'granularity' => 'none',
     ),
   );
-  return $cache;
 }
 
 /**

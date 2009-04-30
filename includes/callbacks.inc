@@ -9,28 +9,91 @@
  * A central administrative page for Panels.
  */
 function panels_admin_page() {
-  //
-  // TODO: Provide a cute little panel-base administrative panel
-  // that provides things like "Recently edited", "recently added"
-  // and other administrative items to make dealing with the complexity
-  // of panels a little easier.
-
-  // TODO -- move this to a help file.
-  $output = '<p>' . t('Panels is the core engine for a number of submodules, including panels-pages, panels-nodes, and mini-panels.  Panels allows the website adminstrator (or sometimes the end-user) to manipulate the layout of individual pages, sidebars, and content pieces, as well as easily dictate what content is displayed in the layout. ') . '</p>';
-  $output .= '<p>' . t('Most Drupal users are familiar with the block to region layout mechanism in which you can assign a block to any region defined in your theme.  Panels takes this concept a massive step forward.  Through the panels interface you can start by creating a layout with any number of columns, headers, and footer, and control the width of those areas. ') . '</p>';
-  $output .= '<p>' . t('After creating your layout, you can assign pieces of content to those areas in an easy drag and drop interface.  Content is not limited to blocks, but can be nodes, views, blocks, or other types of content that extend themselves to panels. ') . '</p>';
-  $output .= '<p><b>' . t('Panels-nodes') . '</b>' . t(', is useful for creating layouts that only occupy the content area of your pages.  Frequently, it is desirable to add an area to a node layout, such as a pull quote for a newspaper or a photo block, that you don\'t necessarily want on every node.  Panels Nodes lets you control the layout of a single node at a time and place content such as blog posts, images, blogs in and around the post. ') . '</p>';
-  $output .= '<p><b>' . t('Mini-panels') . '</b>' . t(', is a layout mechanism for blocks.  It won\'t take long using panels before you get to a point when you want a panel inside of a panel.  Or a panel that can be used as a block.  That is exactly what mini-panels does. You can create a small panel here with various pieces of content and then put it inside of a panels-page or panels-node. ') . '</p>';
-  $output .= '<p><b>' . t('Panels-pages') . '</b>'  . t(' are now handled by the delegator.module which can handle both panels as pages as well as other rendering engines. Please activate the delegator module which is part of the CTools package, and then visit <a href="!link">administer >> build >> pages</a>', array('!link' => url('admin/build/pages'))) . '</p>';
-
-  module_load_include('inc', 'system', 'system.admin');
-  $output .= system_admin_menu_block_page();
-
-  return $output;
+  return theme('panels_dashboard');
 }
 
-function panels_admin_panel_page() {
-  $output = '<p><b>' . t('Panels-pages') . '</b>'  . t(' are now handled by the delegator.module which can handle both panels as pages as well as other rendering engines. Please activate the delegator module which is part of the CTools package, and then visit <a href="!link">administer >> build >> pages</a>', array('!link' => url('admin/build/pages'))) . '</p>';
+function template_preprocess_panels_dashboard(&$vars) {
+  drupal_add_css(panels_get_path('css/panels-dashboard.css'));
+  $vars['image_path'] = url(panels_get_path('images'));
 
-  return $output;
+  $vars['panel_page_description'] = t('Panel pages can be used as landing pages. They have a URL path, accept arguments and can have menu entries.');
+  $vars['panel_custom_description'] = t('Advanced panel pages have everything regular pages do, and can have different layouts depending on the data being viewed.');
+  $vars['panel_override_description'] = t('Customize an already existing page within your site.');
+  if (module_exists('delegator')) {
+    $vars['new_panel_page'] = l(t('Panel page'), 'admin/build/pages/panel-page/add');
+    $vars['new_panel_custom'] = l(t('Advanced panel page'), 'admin/build/pages/add');
+    $vars['new_panel_override'] = drupal_get_form('panels_dashboard_override_form');
+  }
+  else {
+    $vars['new_panel_page'] = '<b>' . t('Panel page') . '</b><br /><em>' . t('You must activate the delegator module for this functionality.') . '</em>';
+    $vars['new_panel_custom'] = '<b>' . t('Advanced anel page') . '</b><br /><em>' . t('You must activate the delegator module for this functionality.') . '</em>';
+    $vars['new_panel_override'] = '<em>' . t('You must activate the delegator module for this functionality.') . '</em>';
+  }
+
+  $vars['panel_node_description'] = t('Panel nodes are node content and appear in your searches, but are more limited than panel pages.');
+  if (module_exists('panels_node')) {
+    $vars['new_panel_node'] = l(t('Panel node'), 'node/add/panel');
+  }
+  else {
+    $vars['new_panel_node'] = '<b>' . t('Panel node') . '</b><br /><em>' . t('You must activate the panel node module for this functionality.') . '</em>';
+  }
+
+  $vars['panel_mini_description'] = t('Mini panels are small content areas exposed as blocks, for when you need to have complex block layouts or layouts within layouts.');
+  if (module_exists('panels_mini')) {
+    $vars['new_panel_mini'] = l(t('Mini panel'), 'admin/build/panel-mini/add');
+  }
+  else {
+    $vars['new_panel_mini'] = '<b>' . t('Mini panel') . '</b><br /><em>' . t('You must activate the Mini panels module for this functionality.') . '</em>';
+  }
 }
+
+function panels_dashboard_override_form(&$form_state) {
+  $options = array();
+  foreach (delegator_get_tasks() as $name => $task) {
+    if ($task['task type'] == 'page' && empty($task['subtasks'])) {
+      $options[$name] = $task['title'];
+    }
+  }
+  asort($options);
+
+  $form['task'] = array(
+    '#type' => 'select',
+    '#options' => $options,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Go'),
+  );
+
+  return $form;
+}
+
+function panels_dashboard_override_form_submit(&$form, &$form_state) {
+  $form_state['redirect'] = 'admin/build/delegator/' . $form_state['values']['task'];
+}
+
+function panels_admin_settings_page() {
+  $form = array();
+  if (module_exists('delegator')) {
+    foreach (delegator_get_tasks() as $task) {
+      if ($function = ctools_plugin_get_function($task, 'admin settings')) {
+        $function($form);
+      }
+    }
+  }
+
+  ctools_include('content');
+  foreach (ctools_get_content_types() as $content) {
+    if ($function = ctools_plugin_get_function($content, 'admin settings')) {
+      $function($form);
+    }
+  }
+
+  if (empty($form)) {
+    return array('#value' => t('There are currently no settings to change, but additional plugins or modules may provide them in the future.'));
+  }
+
+  return system_settings_form($form);
+}
+

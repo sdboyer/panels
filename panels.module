@@ -71,6 +71,13 @@ function panels_theme() {
     'arguments' => array('form' => NULL),
   );
 
+  $theme['panels_dashboard'] = array(
+    'arguments' => array(),
+    'path' => drupal_get_path('module', 'panels') . '/templates',
+    'file' => '../includes/callbacks.inc',
+    'template' => 'panels-dashboard',
+  );
+  
   // Register layout and style themes on behalf of all of these items.
   panels_load_include('plugins');
 
@@ -189,7 +196,7 @@ function panels_menu() {
   ) + $base;
 
   // Provide a nice location for a panels admin panel.
-  $items['admin/panels'] = array(
+  $items['admin/build/panels'] = array(
     'title' => 'Panels',
     'access arguments' => array('access administration pages'),
     'page callback' => 'panels_admin_page',
@@ -197,15 +204,33 @@ function panels_menu() {
     'description' => 'Administer items related to the Panels module.',
   );
 
-  if (!module_exists('delegator')) {
-    $items['admin/panels/panel-page'] = array(
-      'title' => 'Panel pages',
-      'access arguments' => array('access administration pages'),
-      'page callback' => 'panels_admin_panel_page',
-      'file' => 'includes/callbacks.inc',
-      'description' => 'A note to let you know where panel pages administration moved to.',
-    );
-  }
+  $items['admin/build/panels/dashboard'] = array(
+    'title' => 'Dashboard',
+    'access arguments' => array('access administration pages'),
+    'page callback' => 'panels_admin_page',
+    'file' => 'includes/callbacks.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/build/panels/settings'] = array(
+    'title' => 'Settings',
+    'access arguments' => array('access administration pages'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('panels_admin_settings_page'),
+    'file' => 'includes/callbacks.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/build/panels/settings/general'] = array(
+    'title' => 'General',
+    'access arguments' => array('access administration pages'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('panels_admin_settings_page'),
+    'file' => 'includes/callbacks.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
 
   panels_load_include('plugins');
   $layouts = panels_get_layouts();

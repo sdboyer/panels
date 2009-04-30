@@ -18,38 +18,44 @@ function _panels_mini_menu() {
     'file' => 'panels_mini.admin.inc',
   );
 
-  $items['admin/panels/panel-mini'] = array(
+  $items['admin/build/panel-mini'] = array(
     'title' => 'Mini panels',
     'page callback' => 'panels_mini_list_page',
     'description' => 'Create and administer mini panels (panels exposed as blocks).',
   ) + $base;
-  $items['admin/panels/panel-mini/list'] = array(
+  $items['admin/build/panel-mini/list'] = array(
     'title' => 'List',
     'page callback' => 'panels_mini_list_page',
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/add'] = array(
+  $items['admin/build/panel-mini/add'] = array(
     'title' => 'Add',
     'page callback' => 'panels_mini_add_page',
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/import'] = array(
+  $items['admin/build/panel-mini/import'] = array(
     'title' => 'Import',
     'page callback' => 'panels_mini_import_mini',
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/settings'] = array(
+  $items['admin/build/panel-mini/settings'] = array(
     'title' => 'Settings',
     'page callback' => 'panels_mini_settings',
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/disable'] = array(
+  // Also provide settings on the main panel UI
+  $items['admin/build/panels/settings/panels-mini'] = array(
+    'title' => 'Mini panels',
+    'page callback' => 'panels_mini_settings',
+    'type' => MENU_LOCAL_TASK,
+  ) + $base;
+  $items['admin/build/panel-mini/disable'] = array(
     'page callback' => 'panels_mini_disable_page',
     'weight' => -1,
     'type' => MENU_CALLBACK,
   ) + $base;
-  $items['admin/panels/panel-mini/enable'] = array(
+  $items['admin/build/panel-mini/enable'] = array(
     'page callback' => 'panels_mini_enable_page',
     'weight' => -1,
     'type' => MENU_CALLBACK,
@@ -57,56 +63,56 @@ function _panels_mini_menu() {
 
   $base['access arguments'] = array('administer mini panels');
 
-  $items['admin/panels/panel-mini/%panels_mini_admin'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin'] = array(
     'title' => 'Preview',
     'page callback' => 'panels_mini_preview_panel',
     'page arguments' => array(3),
     'weight' => -10,
     'type' => MENU_CALLBACK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/preview'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin/preview'] = array(
     'title' => 'Preview',
     'page callback' => 'panels_mini_preview_panel',
     'page arguments' => array(3),
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/edit-layout'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin/edit-layout'] = array(
     'title' => 'Layout',
     'page callback' => 'panels_mini_edit_layout',
     'page arguments' => array(3),
     'weight' => -9,
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/edit-general'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin/edit-general'] = array(
     'title' => 'Settings',
     'page callback' => 'panels_mini_edit',
     'page arguments' => array(3),
     'weight' => -5,
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/edit-context'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin/edit-context'] = array(
     'title' => 'Context',
     'page callback' => 'panels_mini_edit_context',
     'page arguments' => array(3),
     'weight' => -2,
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/edit-content'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin/edit-content'] = array(
     'title' => 'Content',
     'page callback' => 'panels_mini_edit_content',
     'page arguments' => array(3),
     'weight' => -1,
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/export'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin/export'] = array(
     'title' => 'Export',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_mini_edit_export', 3),
     'weight' => 0,
     'type' => MENU_LOCAL_TASK,
   ) + $base;
-  $items['admin/panels/panel-mini/%panels_mini_admin/delete'] = array(
+  $items['admin/build/panel-mini/%panels_mini_admin/delete'] = array(
     'title' => 'Delete mini panel',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_mini_delete_confirm', 3),
@@ -147,19 +153,19 @@ function panels_mini_list_page() {
   foreach ($panel_minis as $panel_mini) {
     $ops = array();
     if (empty($panel_mini->disabled)) {
-      $ops[] = l(t('Edit'), "admin/panels/panel-mini/$panel_mini->name/edit-general");
-      $ops[] = l(t('Export'), "admin/panels/panel-mini/$panel_mini->name/export");
+      $ops[] = l(t('Edit'), "admin/build/panel-mini/$panel_mini->name/edit-general");
+      $ops[] = l(t('Export'), "admin/build/panel-mini/$panel_mini->name/export");
     }
     if ($panel_mini->type != t('Default')) {
       $text = ($panel_mini->type == t('Overridden')) ? t('Revert') : t('Delete');
-      $ops[] = l($text, "admin/panels/panel-mini/$panel_mini->name/delete");
+      $ops[] = l($text, "admin/build/panel-mini/$panel_mini->name/delete");
     }
     else {
       if (empty($panel_mini->disabled)) {
-        $ops[] = l(t('Disable'), "admin/panels/panel-mini/disable/$panel_mini->name", array('query' => drupal_get_destination()));
+        $ops[] = l(t('Disable'), "admin/build/panel-mini/disable/$panel_mini->name", array('query' => drupal_get_destination()));
       }
       else {
-        $ops[] = l(t('Enable'), "admin/panels/panel-mini/enable/$panel_mini->name", array('query' => drupal_get_destination()));
+        $ops[] = l(t('Enable'), "admin/build/panel-mini/enable/$panel_mini->name", array('query' => drupal_get_destination()));
       }
     }
 
@@ -220,7 +226,7 @@ function panels_mini_delete_confirm(&$form_state, $panel_mini) {
   $form['did'] = array('#type' => 'value', '#value' => $panel_mini->did);
   return confirm_form($form,
     t('Are you sure you want to delete the mini panel "@title"?', array('@title' => $panel_mini->title)),
-    !empty($_GET['destination']) ? $_GET['destination'] : 'admin/panels/panel-mini',
+    !empty($_GET['destination']) ? $_GET['destination'] : 'admin/build/panel-mini',
     t('This action cannot be undone.'),
     t('Delete'), t('Cancel')
   );
@@ -231,7 +237,7 @@ function panels_mini_delete_confirm(&$form_state, $panel_mini) {
  */
 function panels_mini_delete_confirm_submit($form, &$form_state) {
   panels_mini_delete((object) $form_state['values']);
-  $form_state['redirect'] = 'admin/panels/panel-mini';
+  $form_state['redirect'] = 'admin/build/panel-mini';
 }
 
 /**
@@ -523,7 +529,7 @@ function panels_mini_edit_form_submit($form, &$form_state) {
 
     $layout = panels_get_layout($panel_mini->display->layout);
 
-    $form_state['redirect'] = "admin/panels/panel-mini/$panel_mini->name/edit-context/next";
+    $form_state['redirect'] = "admin/build/panel-mini/$panel_mini->name/edit-context/next";
   }
   else {
     drupal_set_message(t('Your changes have been saved.'));
@@ -597,7 +603,7 @@ function panels_mini_context_form_submit($form, &$form_state) {
   panels_mini_save($panel_mini);
   ctools_object_cache_clear('context_object:panel_mini', $panel_mini->name);
   if ($form_state['values']['submit'] == t('Save and proceed')) {
-    $form_state['redirect'] = "admin/panels/panel-mini/$panel_mini->name/edit-content";
+    $form_state['redirect'] = "admin/build/panel-mini/$panel_mini->name/edit-content";
   }
 }
 
@@ -638,7 +644,7 @@ function panels_mini_edit_content($panel_mini) {
     $panel_mini->display = $output;
     $panel_mini->did = $output->did;
     panels_mini_save($panel_mini);
-    drupal_goto("admin/panels/panel-mini/$panel_mini->name/edit-content");
+    drupal_goto("admin/build/panel-mini/$panel_mini->name/edit-content");
   }
   // Print this with theme('page') so that blocks are disabled while editing a display.
   // This is important because negative margins in common block layouts (i.e, Garland)
@@ -660,7 +666,7 @@ function panels_mini_edit_layout($panel_mini) {
     $panel_mini->display = $output;
     $panel_mini->did = $output->did;
     panels_mini_save($panel_mini);
-    drupal_goto("admin/panels/panel-mini/$panel_mini->name/edit-layout");
+    drupal_goto("admin/build/panel-mini/$panel_mini->name/edit-layout");
   }
 
   drupal_set_title(check_plain($panel_mini->title));

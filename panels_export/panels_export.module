@@ -13,13 +13,14 @@
  */
 function panels_export_menu() {
   $items = array();
-  $items['admin/panels/export'] = array(
-    'title' => 'Export panels',
+  $items['admin/build/panels/export'] = array(
+    'title' => 'Bulk export',
     'access arguments' => array('use panels exporter'),
     'page callback' => 'panels_export_export',
     'description' => 'Export panels in bulk.',
+    'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/panels/export/results'] = array(
+  $items['admin/build/panels/export/results'] = array(
     'access arguments' => array('use panels exporter'),
     'page callback' => 'panels_export_export',
     'type' => MENU_CALLBACK,
@@ -99,7 +100,7 @@ function panels_export_export_form(&$form_state) {
     '#value' => t('Export'),
   );
 
-  $form['#action'] = url('admin/panels/export/results');
+  $form['#action'] = url('admin/build/panels/export/results');
   $form['#exportables'] = $form_state['exportables'];
   return $form;
 }
