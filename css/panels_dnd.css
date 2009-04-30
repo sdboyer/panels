@@ -4,13 +4,13 @@
   margin: 0.5em 0;
 }
 
-#panels-panel-context-edit-content div.panels-display {
+#panels-dnd-main div.panels-display {
   border: 1px dashed #3D9CD7;
   padding: 0 0 .5em 0;
   background: #D4EBF9;
 }
 
-#panels-panel-context-edit-content div.panels-display h2.label {
+#panels-dnd-main div.panels-display h2.label {
 /*  background: transparent; */
   color: #3D9CD7;
   text-align: center;
@@ -20,14 +20,14 @@
   vertical-align: middle;
 }
 
-#panels-panel-context-edit-content div.panels-display .pane-add {
+#panels-dnd-main div.panels-display .pane-add {
   float: left;
   margin: 2px;
   background: #999;
   border: 1px solid #fff;
 }
 
-#panels-panel-context-edit-content div.panels-display .pane-add-link {
+#panels-dnd-main div.panels-display .pane-add-link {
   display: block;
   width: 16px;
   height: 16px;
@@ -37,12 +37,12 @@
   border: 1px solid #fff; 
 }
 
-#panels-panel-context-edit-content div.panels-display .pane-add-link * {
+#panels-dnd-main div.panels-display .pane-add-link * {
   padding: 0;
   margin: 0;
 }
 
-#panels-panel-context-edit-content .panel-pane {
+#panels-dnd-main .panel-pane {
   padding: 0em;
   background: #ffffff;
   border-top: 1px solid #78BAE3;
@@ -56,22 +56,22 @@
   margin: .5em;
 }
 
-#panels-edit-display-form .inline-icon-help {
+#panels-dnd-main-form .inline-icon-help {
   vertical-align: middle;
   margin: 2px 1px;
 }
 
-#panels-panel-context-edit-content .panel-pane.hidden-pane {
+#panels-dnd-main .panel-pane.hidden-pane {
   background: #ccc;
 }
 
-#panels-panel-context-edit-content .panel-pane .content {
+#panels-dnd-main .panel-pane .content {
   margin: .5em 0 .5em 0;
   padding: 0 .25em 0 .25em;
   display: none; /* initially hidden */
 }
 
-#panels-panel-context-edit-content .panel-pane .grabber {
+#panels-dnd-main .panel-pane .grabber {
   width: 100%;
   height: 20px;
   cursor: move;
@@ -81,62 +81,62 @@
   overflow: hidden;
 }
 
-#panels-panel-context-edit-content .panel-pane.hidden-pane .grabber {
+#panels-dnd-main .panel-pane.hidden-pane .grabber {
   background-color: #888;
 }
 
-#panels-panel-context-edit-content .changed div.grabber {
+#panels-dnd-main .changed div.grabber {
   background-color: #FFFFDD !important;
   border-bottom: 1px solid #3D9CD7 !important;
   color: black !important;
 }
 
-#panels-panel-context-edit-content .changed.hidden-pane div.grabber {
+#panels-dnd-main .changed.hidden-pane div.grabber {
   background-color: #B4B488 !important;
   border-bottom: 1px solid #3D9CD7 !important;
 }
 
-#panels-panel-context-edit-content .changed div.grabber span.star {
+#panels-dnd-main .changed div.grabber span.star {
   font-weight: bold;
   color: #E09010;
 }
 
-#panels-panel-context-edit-content .panel-pane .grabber:hover {
+#panels-dnd-main .panel-pane .grabber:hover {
   color: #fff;
   background-color: #2F78A5;
 }
 
-#panels-panel-context-edit-content .panel-pane.hidden-pane .grabber:hover {
+#panels-dnd-main .panel-pane.hidden-pane .grabber:hover {
   background-color: #666;
 }
 
-#panels-panel-context-edit-content .panel-pane .grabber:active {
+#panels-dnd-main .panel-pane .grabber:active {
   color: #fff;
   background-color: red;
 }
 
-#panels-panel-context-edit-content .panel-pane .grabber .text {
+#panels-dnd-main .panel-pane .grabber .text {
   margin-left: 3px;
   font-size: 90%;
 }
 
-#panels-panel-context-edit-content .panel-pane .buttons {
+#panels-dnd-main .panel-pane .buttons {
   float: right;
   padding: 0;
   margin: 0;
 }
 
-#panels-panel-context-edit-content .panel-pane .buttons input {
+#panels-dnd-main .panel-pane .buttons input {
   margin: 0;
   padding: 0;
   display: inline;
 }
 
-#panels-panel-context-edit-content .panel-pane .buttons a img {
+#panels-dnd-main .panel-pane .buttons a img {
   margin: 2px 1px;
 }
 
-#panels-panel-context-edit-content .panel-pane .toggle {
+#panels-dnd-main .panel-pane .toggle {
   float: left;
   width: 21px;
   height: 21px;
@@ -146,26 +146,26 @@
   background-image: url(../images/portlet-expanded.png);
 }
 
-#panels-panel-context-edit-content .panel-pane .title {
+#panels-dnd-main .panel-pane .title {
   font-size:125%;
   cursor: pointer;
 }
 
-#panels-panel-context-edit-content .panel-pane .panel-pane-collapsible {
+#panels-dnd-main .panel-pane .panel-pane-collapsible {
   margin: 0;
   padding: 0;
 }
 
-#panels-panel-context-edit-content .panel-pane .toggle-collapsed {
+#panels-dnd-main .panel-pane .toggle-collapsed {
   background-image: url(../images/portlet-collapsed.png);
 }
 
 /* CSS to guide a user to a place to drop */
-#panels-panel-context-edit-content .helperclass {
+#panels-dnd-main .helperclass {
   border: 1px dashed #f00;
 }
 
-#panels-panel-context-edit-content .hoverclass {
+#panels-dnd-main .hoverclass {
   border: 1px solid red !important;
 }
 

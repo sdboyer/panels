@@ -335,7 +335,8 @@ function panels_mini_import_form_submit($form, &$form_state) {
  */
 function panels_mini_add_page($layout = NULL) {
   panels_load_include('plugins');
-  $layouts = panels_get_layouts();
+  panels_load_include('common');
+  $layouts = panels_common_get_allowed_layouts('panels_mini');
   $output = '';
 
   if ($layout === NULL) {
@@ -661,7 +662,7 @@ function panels_mini_edit_layout($panel_mini) {
     $panel_mini = panels_mini_load($panel_mini);
   }
 
-  $output = panels_edit_layout($panel_mini->display, t('Save'));
+  $output = panels_edit_layout($panel_mini->display, t('Save'), NULL, 'panels_mini');
   if (is_object($output)) {
     $panel_mini->display = $output;
     $panel_mini->did = $output->did;

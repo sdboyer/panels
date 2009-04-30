@@ -16,6 +16,8 @@ Add a live preview widget to the panel content edit page.
 Fix panel page type to actually respect the contexts.
 Upgrades from as far back as Drupal 5 can now be supported.
 Rearranged the menus, created the Panel dashboard.
+Returned the allowed content settings form to panel page
+Added allowed layouts to settings form for panel pages, nodes, minis.
 
 Panels 6.x-3.0-alpha3
 =====================

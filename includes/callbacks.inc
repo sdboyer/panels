@@ -97,3 +97,10 @@ function panels_admin_settings_page() {
   return system_settings_form($form);
 }
 
+/**
+ * Settings for panel contexts created by the delegator.
+ */
+function panels_admin_panel_context_page() {
+  panels_load_include('common');
+  return drupal_get_form('panels_common_settings', 'panels_page');
+}

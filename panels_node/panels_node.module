@@ -109,8 +109,12 @@ function panels_node_add() {
   $output = '';
 
   panels_load_include('plugins');
+  panels_load_include('common');
+
+  $layouts = panels_common_get_allowed_layouts('panels_node');
+
   // If no layout selected, present a list of choices.
-  foreach (panels_get_layouts() as $id => $layout) {
+  foreach ($layouts as $id => $layout) {
     $output .= panels_print_layout_link($id, $layout, 'node/add/panel/' . $id);
   }
   return $output;

@@ -74,37 +74,10 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
  */
 function panels_choose_layout(&$form_state) {
   $display = &$form_state['display'];
-  $allowed_layouts = $form_state['allowed_layouts'];
-  // @todo -- refactor the allowed layouts stuff for better code encapsulation.
-  // module_name has been provided; the data was saved by the api_save() method.
-  if (is_string($allowed_layouts)) {
-    $allowed_layouts = unserialize(variable_get($allowed_layouts . "_allowed_layouts", serialize('')));
-  }
+  panels_load_include('common');
 
-  // if no parameter was provided, or the variable_get failed
-  if (!$allowed_layouts) {
-    // tries to load the common panels allowed layouts
-    $allowed_layouts = unserialize(variable_get('panels_common_allowed_layouts', serialize('')));
-    if (!$allowed_layouts) {
-      // still no dice. simply creates a dummy version where all layouts
-      // are allowed.
-      $allowed_layouts = new panels_allowed_layouts();
-      $allowed_layouts->allow_new = TRUE;
-    }
-  }
-
-  // sanitize allowed layout listing; this is redundant if the
-  // $allowed_layouts param was null, but the data is cached anyway
-  $allowed_layouts->sync_with_available();
-  $allowed = array_filter($allowed_layouts->allowed_layout_settings);
-
-  $layouts = array();
-  $available_layouts = panels_get_layouts();
-  foreach ($available_layouts as $layout_key => $layout_settings) {
-    if (!empty($allowed[$layout_key])) {
-      $layouts[$layout_key] = $layout_settings;
-    }
-  }
+  $layouts = panels_common_get_allowed_layouts($form_state['allowed_layouts']);
+  
   foreach ($layouts as $id => $layout) {
     $options[$id] = panels_print_layout_icon($id, $layout, check_plain($layout['title']));
   }

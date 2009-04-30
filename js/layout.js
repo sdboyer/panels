@@ -8,7 +8,9 @@
 Drupal.Panels.Layout = {};
 Drupal.Panels.Layout.autoAttach = function() {
   $('div.form-item div.layout-icon').click(function() {
-    $(this).prev().find('input').attr('checked', true);
+    $widget = $('input', $(this).parent());
+    // Toggle if a checkbox, turn on if a radio.
+    $widget.attr('checked', !$widget.attr('checked') || $widget.is('input[type=radio]'));
   });
 };
 

@@ -323,7 +323,7 @@ function panels_panel_context_edit_choose(&$form, &$form_state) {
   panels_load_include('plugins');
 
   // @todo -- figure out where/how to deal with this.
-  $form_state['allowed_layouts'] = NULL;
+  $form_state['allowed_layouts'] = 'panels_page';
 
   $form_state['display'] = &panels_panel_context_get_display($form_state['handler']);
 
@@ -352,7 +352,6 @@ function panels_panel_context_edit_choose_submit(&$form, &$form_state) {
   $form_state['handler']->conf['display'] = $form_state['display'];
 }
 
-
 /**
  * Change the layout for this panel.
  *
@@ -367,7 +366,7 @@ function panels_panel_context_edit_layout(&$form, &$form_state) {
   panels_load_include('plugins');
 
   // @todo -- figure out where/how to deal with this.
-  $form_state['allowed_layouts'] = NULL;
+  $form_state['allowed_layouts'] = 'panels_page';
 
   $form_state['display'] = &panels_panel_context_get_display($form_state['handler']);
 
@@ -444,7 +443,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   $display = &panels_panel_context_get_display($form_state['handler']);
 
   $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask_id'], $form_state['handler']);
-  $content_types = panels_common_get_allowed_types('delegator', $display->context);
+  $content_types = panels_common_get_allowed_types('panels_page', $display->context);
 
 // Load the display being edited from cache, if possible.
   if (!empty($_POST) && is_object($cache = panels_cache_get('display', $display->did))) {

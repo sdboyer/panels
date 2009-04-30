@@ -83,24 +83,7 @@ function panels_edit_display_form(&$form_state) {
 
   // Annoyingly, theme doesn't have access to form_state so we have to do this.
   $form['#display'] = $display;
-/*
-  @todo -- help file
-  $explanation_text = '<p>';
-  $explanation_text .= t('Grab the title bar of any pane to drag-and-drop it into another panel. Click the add pane button (!addicon) in any panel to add more content. Click the configure (!configicon) button on any pane to re-configure that pane. Click the cache (!cacheicon) button to configure caching for that pane specifically. Click the show/hide (!showicon/!hideicon) toggle button to show or hide that pane. Panes hidden in this way will be hidden from <em>everyone</em> until the hidden status is toggled off.',
-    array(
-      '!addicon' => '<span class="inline-icon-help">' . theme('image', panels_get_path('images/icon-addcontent.png'), t('Add content to this panel'), t('Add content to this panel')) . '</span>',
-      '!configicon' => '<span class="inline-icon-help">' . theme('image', panels_get_path('images/icon-configure.png'), t('Configure this pane'), t('Configure this pane')) . '</span>',
-      '!cacheicon' => '<span class="inline-icon-help">' . theme('image', panels_get_path('images/icon-cache.png'), t('Control caching'), t('Control caching')) . '</span>',
-      '!showicon' => '<span class="inline-icon-help">' . theme('image', panels_get_path('images/icon-showpane.png'), t('Show this pane'), t('Show this pane')) . '</span>',
-      '!hideicon' => '<span class="inline-icon-help">' . theme('image', panels_get_path('images/icon-hidepane.png'), t('Hide this pane'), t('Hide this pane')) . '</span>',
-    )
-  );
-  $explanation_text .= '</p>';
 
-  $form['explanation'] = array(
-    '#value' => $explanation_text,
-  );
-*/
   $layout = panels_get_layout($display->layout);
   $layout_panels = panels_get_panels($layout, $display);
 
@@ -258,6 +241,7 @@ function panels_edit_display_get_links(&$display) {
  */
 function theme_panels_edit_display_form($form) {
   $output = '';
+//  $output = '<div id="panels-edit-display">';
   $content = array();
 
   $display = $form['#display'];
@@ -291,6 +275,7 @@ function theme_panels_edit_display_form($form) {
   }
 
   $output .= drupal_render($form);
+
   panels_load_include('display-render');
   $output .= theme('panels_dnd', panels_render_layout_admin($layout, $content, $display));
   $output .= $save_buttons;
