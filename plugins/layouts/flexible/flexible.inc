@@ -622,13 +622,13 @@ function panels_flexible_get_css_group(&$css, $renderer, $list, $owner_id, $type
     // Because we love IE so much, auto scale everything to 99%. This
     // means adding up the actual widths and then providing a multiplier
     // to each so that the total is 99%.
-    if ($max > 0) {
+//    if ($max > 0) {
       $scale = 99.0 / $middle_total;
-    }
+//    }
     // But we only scale if there's more than 1 item to scale.
-    else {
-      $scale = 1;
-    }
+//    else {
+//      $scale = 1;
+//    }
     foreach ($middle as $position => $id) {
       $class = ".panels-flexible-$type-" . $renderer->did . "-$id";
       $css[$class] = array(
@@ -1052,6 +1052,7 @@ function panels_flexible_add_item_form(&$form_state) {
     // must also be fixed. Otherwise it can be either and should default to
     // fluid.
     $restrict = FALSE;
+    $fluid_only = FALSE;
 
     if (!empty($parent['children'])) {
       if ($location == 'left') {
@@ -1065,6 +1066,9 @@ function panels_flexible_add_item_form(&$form_state) {
         $item['width_type'] = 'px';
       }
     }
+    else {
+      $fluid_only = TRUE;
+    }
 
     $form['width_type'] = array(
       '#type' => 'select',
@@ -1074,13 +1078,17 @@ function panels_flexible_add_item_form(&$form_state) {
         '%' => t('Fluid'),
         'px' => t('Fixed'),
       ),
-      '#disabled' => $restrict,
+      '#disabled' => $restrict || $fluid_only,
     );
     if ($restrict) {
       // This forces the value because disabled items don't always send
       // their data back.
       $form['width_type']['#value'] = $item['width_type'];
       $form['width_type']['#description'] = t('Items cannot be set to fluid if there are fixed items already on that side.');
+    }
+    else if ($fluid_only) {
+      $form['width_type']['#value'] = $item['width_type'] = '%';
+      $form['width_type']['#description'] = t('The first item within a row must be fluid.');
     }
   }
   else {

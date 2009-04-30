@@ -22,6 +22,7 @@ Added allowed layouts to settings form for panel pages, nodes, minis.
 #375686: Create panels_get_current_page_display() to replace the old panels_get_current_page() function.
 #424798: Respond to a cloned handler by properly cloning the display as well.
 #424290: Ensure content.inc is loaded during panels display save so that everything can be found.
+#422090: Ensure the first item added to a row is fluid. Fixed can then be added after that.
 
 Panels 6.x-3.0-alpha3
 =====================

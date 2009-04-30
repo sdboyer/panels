@@ -159,7 +159,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
 
   // With an argument, this actually sets the display.
   panels_get_current_page_display($display);
-  
+
   $info = array(
     'content' => panels_render_display($display),
     'no_blocks' => !empty($handler->conf['no_blocks']),
