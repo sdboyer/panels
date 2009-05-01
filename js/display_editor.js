@@ -490,7 +490,7 @@ Drupal.behaviors.PanelsDisplayEditor = function(context) {
     .addClass('panels-preview-processed')
     .click(function() {
       if (!$('#panels-preview').size()) {
-        $('#panels-panel-context-edit-content').after('<div id="panels-preview"></div>');
+        $('#panels-dnd-main').parents('form').after('<div id="panels-preview"></div>');
       }
 
       $('#panels-preview').html(Drupal.theme('CToolsModalThrobber'));
