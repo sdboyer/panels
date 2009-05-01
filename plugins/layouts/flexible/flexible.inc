@@ -1304,6 +1304,7 @@ function panels_ajax_flexible_edit_resize($did) {
   }
 
   $settings = &$cache->display->layout_settings;
+  panels_flexible_convert_settings($settings);
 
   $settings['items'][$_POST['left']]['width'] = $_POST['left_width'];
   $settings['items'][$_POST['right']]['width'] = $_POST['right_width'];
