@@ -31,6 +31,10 @@ function panels_block_panels_styles() {
  * @ingroup themeable
  */
 function theme_panels_block_style_render_pane($content, $pane, $display) {
+  if (empty($content->content)) {
+    return;
+  }
+
   if (!empty($content->title)) {
     $content->subject = $content->title;
   }
@@ -42,6 +46,7 @@ function theme_panels_block_style_render_pane($content, $pane, $display) {
   if (!isset($content->delta)) {
     $content->delta = $content->subtype;
   }
+
   return theme('block', $content);
 }
 
