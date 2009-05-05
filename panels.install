@@ -1037,3 +1037,16 @@ function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $w
 
   return $handler;
 }
+
+/**
+ * Ensure the panels_simple_cache module does not exist.
+ */
+function panels_update_6303() {
+  $ret = array();
+  if (module_exists('panels_simple_cache')) {
+    drupal_set_message(t('Your installation contains a module that no longer exists. When updating modules, you should always remove the module directory first, then replace it with the new code. The "Panels Simple Cache" module is being automatically disabled for you. Please do not re-enable it as it will cause your system to crash.'));
+    $ret[] = update_sql("DELETE FROM {system} WHERE name = 'panels_simple_cache");
+  }
+
+  return $ret;
+}
