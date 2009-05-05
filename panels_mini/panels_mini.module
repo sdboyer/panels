@@ -19,6 +19,10 @@ function panels_mini_perm() {
  * Implementation of hook_menu().
  */
 function panels_mini_menu() {
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    return array();
+  }
   require_once drupal_get_path('module', 'panels_mini') . '/panels_mini.admin.inc';
   return _panels_mini_menu();
 }
@@ -32,7 +36,8 @@ function panels_mini_menu() {
  * Expose qualifying mini panels to Drupal's block system.
  */
 function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
-  if (!module_exists('ctools')) {
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return array();
   }
 

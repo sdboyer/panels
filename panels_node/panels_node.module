@@ -24,6 +24,11 @@ function panels_node_perm() {
  * Implementation of hook_menu().
  */
 function panels_node_menu() {
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    return array();
+  }
+
   $items['admin/build/panels/settings/panel-node'] = array(
     'title' => 'Panel nodes',
     'description' => 'Configure which content is available to add to panel node displays.',
@@ -78,6 +83,11 @@ function panels_node_edit_node($node) {
  * Implementation of hook_node_info().
  */
 function panels_node_node_info() {
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    return array();
+  }
+
   return array(
     'panel' => array(
       'name' => t('Panel'),

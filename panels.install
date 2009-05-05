@@ -2,6 +2,21 @@
 // $Id$
 
 /**
+ * Test requirements for installation and running.
+ */
+function panels_requirements($phase) {
+  $requirements = array();
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+     $requirements['panels_ctools'] = array(
+       'title' => $t('Panels required Chaos Tool Suite (CTools) API Version'),
+       'value' => PANELS_REQUIRED_CTOOLS_API,
+       'severity' => REQUIREMENT_ERROR,
+     );
+  }
+  return $requirements;
+}
+
+/**
  * Implementation of hook_schema().
  */
 function panels_schema() {
