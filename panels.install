@@ -191,6 +191,82 @@ function panels_uninstall() {
   drupal_uninstall_schema('panels');
 }
 
+function panels_update_1000() {
+  $ret   = array();
+  $ret[] = update_sql("ALTER TABLE {panels_info} RENAME {panels_page}");
+  $ret[] = update_sql("ALTER TABLE {panels_page} CHANGE COLUMN did pid int(10) NOT NULL DEFAULT 0;");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN did int(10) NOT NULL DEFAULT 0 AFTER pid");
+  $ret[] = update_sql("UPDATE {panels_page} SET did = pid");
+
+  $max_pid = db_result(db_query("SELECT MAX(pid) FROM {panels_page}"));
+  if ($max_pid) {
+    $ret[] = update_sql("INSERT INTO {sequences} (name, id) VALUES ('{panels_page}_pid', $max_pid)");
+  }
+
+  $ret[]  = update_sql("ALTER TABLE {panels_area} RENAME {panels_pane}");
+  $ret[]  = update_sql("ALTER TABLE {panels_pane} ADD COLUMN pid int(10) NOT NULL DEFAULT 0 FIRST");
+  $ret[]  = update_sql("ALTER TABLE {panels_pane} CHANGE area panel varchar(32)");
+  $result = db_query("SELECT * FROM {panels_pane}");
+  while ($pane = db_fetch_object($result)) {
+    $count++;
+    $ret[] = update_sql("UPDATE {panels_pane} SET pid = $count WHERE did = $pane->did AND panel = '$pane->panel' AND position = $pane->position");
+  }
+  if ($count) {
+    $ret[] = update_sql("INSERT INTO {sequences} (name, id) VALUES ('{panels_pane}_pid', $count)");
+  }
+
+  $ret[] = update_sql(<<<EOT
+    CREATE TABLE {panels_display} (
+      did INT(10) NOT NULL DEFAULT 0 PRIMARY KEY,
+      layout VARCHAR(32)
+    ) /*!40100 DEFAULT CHARACTER SET utf8 */
+EOT
+  );
+  $result = db_query("SELECT did, layout FROM {panels_page}");
+  $max_did = 0;
+  while ($display = db_fetch_object($result)) {
+    $ret[] = update_sql("INSERT INTO {panels_display} VALUES ($display->did, '$display->layout')");
+    if ($display->did > $max_did) {
+      $max_did = $display->did;
+    }
+  }
+  $ret[] = update_sql("ALTER TABLE {panels_page} DROP COLUMN layout");
+  if ($max_did) {
+    $ret[] = update_sql("INSERT INTO {sequences} (name, id) VALUES ('{panels_display}_did', $max_did)");
+  }
+  return $ret;
+}
+
+function panels_update_1001() {
+  $ret   = array();
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN no_blocks int(1)");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu int(1) DEFAULT 0");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu_tab int(1)");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu_tab_weight int(4)");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu_title varchar(255)");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu_tab_default int(1)");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu_tab_default_parent_type varchar(10)");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu_parent_title varchar(255)");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN menu_parent_tab_weight int(4)");
+  return $ret;
+}
+
+// Create a field for the layout settings
+function panels_update_1002() {
+  $ret   = array();
+  $ret[] = update_sql("ALTER TABLE {panels_display} ADD COLUMN layout_settings longtext");
+  $ret[] = update_sql("ALTER TABLE {panels_pane} ADD COLUMN access varchar(128) AFTER type");
+  $ret[] = update_sql("ALTER TABLE {panels_page} ADD COLUMN css longtext AFTER css_id");
+  return $ret;
+}
+
+// Create a field for the panel settings.
+function panels_update_1003() {
+  $ret = array();
+  $ret[] = update_sql("ALTER TABLE {panels_display} ADD COLUMN panel_settings longtext");
+  return $ret;
+}
+
 // Kept up updates from older versions of Panels 2 for D5 to smooth updates.
 // Create a field for the panel settings.
 // Renumbering to proper numbering scheme.
@@ -246,6 +322,10 @@ function panels_update_5209() {
   $ret    = array();
   $ret[]  = update_sql("ALTER TABLE {panels_page} ADD COLUMN relationships longtext");
   $result = db_query("SELECT * FROM {panels_page}");
+
+  // This code removed due to call to panels_get_argument(). People with
+  // older versions will just have to suffer.
+  return $ret;
   panels_load_include('plugins');
 
   while ($page = db_fetch_object($result)) {
@@ -353,7 +433,7 @@ function panels_update_5210() {
  * Force a menu update
  */
 function panels_update_5211() {
-  menu_rebuild();
+//  menu_rebuild();
   return array();
 }
 
@@ -382,6 +462,7 @@ function panels_update_5213() {
  */
 function panels_update_5214() {
   $ret = array();
+  return $ret;
   switch ($GLOBALS['db_type']) {
     case 'mysql':
     case 'mysqli':
@@ -488,17 +569,6 @@ function panels_update_5218() {
       db_add_column($ret, 'panels_display', 'hide_title', 'smallint', array('default' => 0));
       $ret[] = array('success' => TRUE, 'query' => t('You can disregard failed attempts to add new columns in update #5216 as long as the two queries preceding this text were successful.'));
   }
-  return $ret;
-}
-
-/**
- * Update is purely an informational message encouraging site admins to
- * re-export any panels they have previously exported, as they will all be
- * missing data.
- */
-function panels_update_5219() {
-  $ret = array();
-  $ret[] = array('success' => TRUE, 'query' => t('You are strongly encouraged to re-export any panels generated with a version of Panels prior to Release Candidate 2, as several fields were (incorrectly) being ommitted from all exports, and this updater is unable to update any panels already exported with missing fields.'));
   return $ret;
 }
 
