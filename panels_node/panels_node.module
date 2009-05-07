@@ -249,6 +249,14 @@ function panels_node_update($node) {
  * Implementation of hook_view().
  */
 function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
+  static $rendering = array();
+
+  // Prevent loops if someone foolishly puts the node inside itself:
+  if (!empty($rendering[$node->nid])) {
+    return $node;
+  }
+
+  $rendering[$node->nid] = TRUE;
   panels_load_include('plugins');
   if ($teaser) {
     // Do the standard view for teaser.
@@ -266,6 +274,7 @@ function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
     );
   }
 
+  unset($rendering[$node->nid]);
   return $node;
 }
 
