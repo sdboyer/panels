@@ -1,5 +1,14 @@
-Panels 6.x-3.0-dev
-==================
+Panels 6.x-3.0-beta1
+====================
+Update to require CTools based upon its advertised API version number.
+Update code to ensure that the dead 'panels simple cache' module is really dead.
+Attempt to go back further in history for a Panels 1 upgrade path.
+Fix for making sure Panels completely disables itself if using incompatible version of CTools.
+Update CSS caching on panel page and panel context to use ctools_css_store instead of remembering the filename.
+Infinite loop protection in panel nodes.
+
+Panels 6.x-3.0-beta1
+====================
 
 #422712: Panel page import button went to wrong place.
 #423288: Profile template plugin had wrong path.
