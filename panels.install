@@ -6,6 +6,7 @@
  */
 function panels_requirements($phase) {
   $requirements = array();
+  $t = get_t();
   if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
      $requirements['panels_ctools'] = array(
        'title' => $t('Panels required Chaos Tool Suite (CTools) API Version'),

@@ -942,6 +942,10 @@ function panels_print_layout_link($id, $layout, $link) {
  * we implement task and task_handler plugins.
  */
 function panels_ctools_plugin_directory($module, $plugin) {
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    return;
+  }
   if ($module == 'delegator' || $module == 'panels') {
     return 'plugins/' . $plugin;
   }
