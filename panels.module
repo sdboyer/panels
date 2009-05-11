@@ -929,11 +929,15 @@ function theme_panels_layout_link($title, $id, $image, $link) {
  * Print the layout link. Sends out to a theme function.
  * @layout
  */
-function panels_print_layout_link($id, $layout, $link) {
+function panels_print_layout_link($id, $layout, $link, $options = array()) {
+  if (isset($options['query']['q'])) {
+    unset($options['query']['q']);
+  }
+
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $file = $layout['path'] . '/' . $layout['icon'];
-  $image = l(theme('image', $file), $link, array('html' => true));
-  $title = l($layout['title'], $link);
+  $image = l(theme('image', $file), $link, array('html' => true) + $options);
+  $title = l($layout['title'], $link, $options);
   return theme('panels_layout_link', $title, $id, $image, $link);
 }
 

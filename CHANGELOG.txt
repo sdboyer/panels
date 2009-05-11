@@ -1,4 +1,7 @@
-Panels 6.x-3.0-beta1
+Panels 6.x-3.0-dev
+==================
+
+Panels 6.x-3.0-beta2
 ====================
 Update to require CTools based upon its advertised API version number.
 Update code to ensure that the dead 'panels simple cache' module is really dead.
