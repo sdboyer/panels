@@ -26,7 +26,7 @@ function template_preprocess_panels_dashboard(&$vars) {
   }
   else {
     $vars['new_panel_page'] = '<b>' . t('Panel page') . '</b><br /><em>' . t('You must activate the delegator module for this functionality.') . '</em>';
-    $vars['new_panel_custom'] = '<b>' . t('Advanced anel page') . '</b><br /><em>' . t('You must activate the delegator module for this functionality.') . '</em>';
+    $vars['new_panel_custom'] = '<b>' . t('Advanced Panel page') . '</b><br /><em>' . t('You must activate the delegator module for this functionality.') . '</em>';
     $vars['new_panel_override'] = '<em>' . t('You must activate the delegator module for this functionality.') . '</em>';
   }
 
