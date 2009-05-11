@@ -10,6 +10,7 @@ Fix for making sure Panels completely disables itself if using incompatible vers
 Update CSS caching on panel page and panel context to use ctools_css_store instead of remembering the filename.
 Infinite loop protection in panel nodes.
 #459078: Provide the "read more" flag for teasers of panel nodes.
+Fix broken styling when dragging a panel pane.
 
 Panels 6.x-3.0-beta1
 ====================

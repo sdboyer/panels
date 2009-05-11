@@ -42,7 +42,7 @@
   margin: 0;
 }
 
-#panels-dnd-main .panel-pane {
+.panel-portlet {
   padding: 0em;
   background: #ffffff;
   border-top: 1px solid #78BAE3;
@@ -61,17 +61,17 @@
   margin: 2px 1px;
 }
 
-#panels-dnd-main .panel-pane.hidden-pane {
+.panel-pane.hidden-pane {
   background: #ccc;
 }
 
-#panels-dnd-main .panel-pane .content {
+.panel-portlet .content {
   margin: .5em 0 .5em 0;
   padding: 0 .25em 0 .25em;
   display: none; /* initially hidden */
 }
 
-#panels-dnd-main .panel-pane .grabber {
+.panel-portlet .grabber {
   width: 100%;
   height: 20px;
   cursor: move;
@@ -81,62 +81,62 @@
   overflow: hidden;
 }
 
-#panels-dnd-main .panel-pane.hidden-pane .grabber {
+.panel-portlet.hidden-pane .grabber {
   background-color: #888;
 }
 
-#panels-dnd-main .changed div.grabber {
+.panel-portlet .changed div.grabber {
   background-color: #FFFFDD !important;
   border-bottom: 1px solid #3D9CD7 !important;
   color: black !important;
 }
 
-#panels-dnd-main .changed.hidden-pane div.grabber {
+.panel-portlet .changed.hidden-pane div.grabber {
   background-color: #B4B488 !important;
   border-bottom: 1px solid #3D9CD7 !important;
 }
 
-#panels-dnd-main .changed div.grabber span.star {
+.panel-portlet .changed div.grabber span.star {
   font-weight: bold;
   color: #E09010;
 }
 
-#panels-dnd-main .panel-pane .grabber:hover {
+.panel-portlet .grabber:hover {
   color: #fff;
   background-color: #2F78A5;
 }
 
-#panels-dnd-main .panel-pane.hidden-pane .grabber:hover {
+.panel-portlet.hidden-pane .grabber:hover {
   background-color: #666;
 }
 
-#panels-dnd-main .panel-pane .grabber:active {
+.panel-portlet .grabber:active {
   color: #fff;
   background-color: red;
 }
 
-#panels-dnd-main .panel-pane .grabber .text {
+.panel-portlet .grabber .text {
   margin-left: 3px;
   font-size: 90%;
 }
 
-#panels-dnd-main .panel-pane .buttons {
+.panel-portlet .buttons {
   float: right;
   padding: 0;
   margin: 0;
 }
 
-#panels-dnd-main .panel-pane .buttons input {
+.panel-portlet .buttons input {
   margin: 0;
   padding: 0;
   display: inline;
 }
 
-#panels-dnd-main .panel-pane .buttons a img {
+.panel-portlet .buttons a img {
   margin: 2px 1px;
 }
 
-#panels-dnd-main .panel-pane .toggle {
+.panel-portlet .toggle {
   float: left;
   width: 21px;
   height: 21px;
@@ -146,17 +146,17 @@
   background-image: url(../images/portlet-expanded.png);
 }
 
-#panels-dnd-main .panel-pane .title {
+.panel-portlet .title {
   font-size:125%;
   cursor: pointer;
 }
 
-#panels-dnd-main .panel-pane .panel-pane-collapsible {
+.panel-portlet .panel-pane-collapsible {
   margin: 0;
   padding: 0;
 }
 
-#panels-dnd-main .panel-pane .toggle-collapsed {
+.panel-portlet .toggle-collapsed {
   background-image: url(../images/portlet-collapsed.png);
 }
 
