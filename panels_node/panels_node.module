@@ -263,6 +263,9 @@ function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
   if ($teaser) {
     // Do the standard view for teaser.
     $node = node_prepare($node, $teaser);
+    // Because our teasier is never the same as our content, *always* provide
+    // the read more flag.
+    $node->readmore = TRUE;
   }
   else {
     $display = panels_load_display($node->panels_node['did']);
