@@ -185,6 +185,13 @@ function panels_panel_page_edit_form_info() {
 function panels_panel_page_execute($page, $contexts, $args) {
   // Delegate to the panel context handler.
   if ($function = ctools_plugin_load_function('delegator', 'task_handlers', 'panel_context', 'render')) {
+    // Provide a tab to edit this context:
+    ctools_include('menu');
+    ctools_menu_add_tab(array(
+      'title' => t('Edit panel'),
+      'href' => "admin/build/pages/edit-panel-page/" . $page->name,
+    ));
+
     $info = $function($page, $contexts, $args, FALSE);
     if (isset($info['title'])) {
       drupal_set_title($info['title']);

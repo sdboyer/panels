@@ -140,6 +140,10 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
     return;
   }
 
+  if (isset($handler->handler)) {
+    ctools_context_handler_pre_render($handler, $contexts, $args);
+  }
+  
   // Load the display
   $display = panels_panel_context_get_display($handler);
 

@@ -11,6 +11,7 @@ Update CSS caching on panel page and panel context to use ctools_css_store inste
 Infinite loop protection in panel nodes.
 #459078: Provide the "read more" flag for teasers of panel nodes.
 Fix broken styling when dragging a panel pane.
+Integrate with CTools tab system so we can add edit tabs to all our panel pages.
 
 Panels 6.x-3.0-beta1
 ====================

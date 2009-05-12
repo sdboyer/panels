@@ -7,7 +7,7 @@
  * Core functionality for the Panels engine.
  */
 
-define('PANELS_REQUIRED_CTOOLS_API', '1.0');
+define('PANELS_REQUIRED_CTOOLS_API', '1.0.1');
 
 /**
  * Returns the API version of Panels. This didn't exist in 1.

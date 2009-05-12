@@ -142,7 +142,7 @@ function panels_edit_display_form(&$form_state) {
             if (file_exists($file)) {
               $js[$file] = TRUE;
             }
-            else if (file(exists($subtype['path'] . '/' . $file))) {
+            else if (file_exists($subtype['path'] . '/' . $file)) {
               $js[$subtype['path'] . '/' . $file] = TRUE;
             }
           }
@@ -152,7 +152,7 @@ function panels_edit_display_form(&$form_state) {
             if (file_exists($file)) {
               $css[$file] = TRUE;
             }
-            else if (file(exists($subtype['path'] . '/' . $file))) {
+            else if (file_exists($subtype['path'] . '/' . $file)) {
               $css[$subtype['path'] . '/' . $file] = TRUE;
             }
           }
