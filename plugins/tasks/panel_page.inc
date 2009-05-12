@@ -350,7 +350,7 @@ function panels_page_save_page(&$page, $update) {
 
   // Delete any previous CSS cache file.
   ctools_include('css');
-  ctools_css_clear('panel_context:' . $handler->name);
+  ctools_css_clear('panel_context:' . $page->name);
 
   if (isset($page->conf['temp_layout'])) {
     unset($page->conf['temp_layout']);
