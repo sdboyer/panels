@@ -1,4 +1,10 @@
-CHANGES DURING D6 UPDATE
+CHANGES DURING D6 UPDATE TO PANELS 3
+
+ALL PLUGINS
+===========
+
+Function to advertise directory for plugins:
+  hook_ctools_plugin_directory($module, $plugin)
 
 LAYOUTS
 =======

@@ -7,12 +7,27 @@
 function panels_requirements($phase) {
   $requirements = array();
   $t = get_t();
-  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
-     $requirements['panels_ctools'] = array(
-       'title' => $t('Panels required Chaos Tool Suite (CTools) API Version'),
-       'value' => PANELS_REQUIRED_CTOOLS_API,
-       'severity' => REQUIREMENT_ERROR,
-     );
+  if ($phase == 'install') {
+    // apparently the install process doesn't include .module files,
+    // so we need to force the issue in order for our versioning
+    // check to work.
+    if (!defined('PANELS_REQUIRED_CTOOLS_API')) {
+      include_once drupal_get_path('module', 'panels') . '/panels.module';
+    }
+
+    // In theory we should check module_exists, but Drupal's gating should
+    // actually prevent us from getting here otherwise.
+    if (!defined('CTOOLS_API_VERSION')) {
+      include_once drupal_get_path('module', 'ctools') . '/ctools.module';
+    }
+    if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+       $requirements['panels_ctools'] = array(
+         'title' => $t('CTools API Version'),
+         'value' => CTOOLS_API_VERSION,
+         'severity' => REQUIREMENT_ERROR,
+         'description' => t('The CTools API version is too old for Panels. Panels needs at least %version.', array('%version' => PANELS_REQUIRED_CTOOLS_API))
+       );
+    }
   }
   return $requirements;
 }
