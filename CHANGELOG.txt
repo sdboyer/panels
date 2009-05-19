@@ -13,6 +13,7 @@ Infinite loop protection in panel nodes.
 Fix broken styling when dragging a panel pane.
 Integrate with CTools tab system so we can add edit tabs to all our panel pages.
 #454208: pgsql does not support concat(), so use || instead for postgres.
+#445828: Remove "Settings" link if a content type has no settings form.
 
 Panels 6.x-3.0-beta1
 ====================

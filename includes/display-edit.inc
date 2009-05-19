@@ -409,12 +409,14 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
     );
   }
 
-  $links[] = array(
-    'title' => t('Settings'),
-    'href' => "panels/ajax/configure/$display->did/$pane->pid",
-    'attributes' => array('class' => 'ctools-use-modal'),
-  );
-
+  if (isset($content_type['edit form'])) {
+    $links[] = array(
+      'title' => t('Settings'),
+      'href' => "panels/ajax/configure/$display->did/$pane->pid",
+      'attributes' => array('class' => 'ctools-use-modal'),
+    );
+  }
+  
   $style = panels_get_style((!empty($pane->style['style'])) ? $pane->style['style'] : 'default');
 
   $links[] = array(
