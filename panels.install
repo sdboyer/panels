@@ -1053,7 +1053,15 @@ function panels_update_6302() {
   $ret[] = update_sql("DROP TABLE {panels_page}");
 
   // Update a couple of pane types that changed and are easily moved:
-  $ret[] = update_sql("UPDATE {panels_pane} SET type = CONCAT(type, '_', subtype) WHERE type = 'node_form'");
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("UPDATE {panels_pane} SET type = CONCAT(type, '_', subtype) WHERE type = 'node_form'");
+      break;
+
+    case 'pgsql':
+      $ret[] = update_sql("UPDATE {panels_pane} SET type = type || '_' || subtype WHERE type = 'node_form'");
+  }
   $ret[] = update_sql("UPDATE {panels_pane} SET type = 'node_form_path' WHERE type = 'node_form_url_path'");
 
   if (module_exists('ctools') && !module_exists('views_content') && db_result(db_query("SELECT pid FROM {panels_pane} WHERE type = 'views'"))) {
