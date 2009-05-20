@@ -340,6 +340,11 @@ function panels_flexible_render_items($renderer, $list, $owner_id) {
         break;
     }
 
+    // If all items are fixed then we have a special splitter on the right to
+    // control the overall width.
+    if ($max == $position && $location == 'left') {
+      $groups[$location] .= panels_flexible_render_splitter($renderer, $id, NULL);
+    }
     $prev = $id;
   }
 
@@ -393,16 +398,25 @@ function panels_flexible_render_item($renderer, $item, $base, $content, $id, $po
 }
 /**
  * Render a splitter div to place between the $left and $right items.
- * @param <type> $renderer
- * @param <type> $left_id
- * @param <type> $right_id
+ *
+ * If the right ID is NULL that means there isn't actually a box to the
+ * right, but we need a splitter anyway. We'll mostly use info about the
+ * left, but pretend it's 'fluid' so that the javascript won't actually
+ * modify the right item.
  */
 function panels_flexible_render_splitter($renderer, $left_id, $right_id) {
   $left = $renderer->settings['items'][$left_id];
-  $right = $renderer->settings['items'][$right_id];
 
   $left_class = 'panels-flexible-' . $left['type'] . '-' . $renderer->did . '-' . $left_id;
-  $right_class = 'panels-flexible-' . $right['type'] . '-' . $renderer->did . '-' . $right_id;
+  if ($right_id) {
+    $right = $renderer->settings['items'][$right_id];
+    $right_class = 'panels-flexible-' . $right['type'] . '-' . $renderer->did . '-' . $right_id;
+  }
+  else {
+    $right = $left;
+    $right_class = $left_class;
+  }
+
   $output = '<div class="panels-flexible-splitter flexible-splitter-for-' . $left_class . '">';
 
   // Name the left object
@@ -444,7 +458,8 @@ function panels_flexible_render_splitter($renderer, $left_id, $right_id) {
   $output .= '</span>';
 
   $output .= '<span class="panels-flexible-splitter-right-width-type">';
-  $output .= $right['width_type'];
+  // If there is no right, make it fluid.
+  $output .= $right_id ? $right['width_type'] : '%';
   $output .= '</span>';
 
   $output .= '</div>';
@@ -619,29 +634,25 @@ function panels_flexible_get_css_group(&$css, $renderer, $list, $owner_id, $type
 
     $max = count($middle) - 1;
 
-    // Because we love IE so much, auto scale everything to 99%. This
-    // means adding up the actual widths and then providing a multiplier
-    // to each so that the total is 99%.
-//    if ($max > 0) {
+    if ($middle_total) {
+      // Because we love IE so much, auto scale everything to 99%. This
+      // means adding up the actual widths and then providing a multiplier
+      // to each so that the total is 99%.
       $scale = 99.0 / $middle_total;
-//    }
-    // But we only scale if there's more than 1 item to scale.
-//    else {
-//      $scale = 1;
-//    }
-    foreach ($middle as $position => $id) {
-      $class = ".panels-flexible-$type-" . $renderer->did . "-$id";
-      $css[$class] = array(
-        'float' => 'left',
-        'width' => ($renderer->settings['items'][$id]['width'] * $scale) . "%",
-      );
+      foreach ($middle as $position => $id) {
+        $class = ".panels-flexible-$type-" . $renderer->did . "-$id";
+        $css[$class] = array(
+          'float' => 'left',
+          'width' => ($renderer->settings['items'][$id]['width'] * $scale) . "%",
+        );
 
-      // Store this so we can use it later.
-      // @todo: Store the scale, not the new width, so .js can adjust
-      // bi-directionally.
-      $renderer->scale[$id] = $scale;
+        // Store this so we can use it later.
+        // @todo: Store the scale, not the new width, so .js can adjust
+        // bi-directionally.
+        $renderer->scale[$id] = $scale;
+      }
     }
-
+    
     // If there is any total remaining, we need to offset the splitter
     // by this much too.
     if ($left_total) {
@@ -789,13 +800,9 @@ function panels_flexible_config_item_form(&$form_state) {
       '#options' => array(
         '%' => t('Fluid'),
         'px' => t('Fixed'),
-      )
+      ),
+      '#disabled' => TRUE,
     );
-    if ($left && $right) {
-      $form['width_type']['#disabled'] = TRUE;
-      $form['width_type']['#value'] = '%';
-      $form['width_type']['#description'] = t('Items cannot be set to fixed if there are fluid items both to the right and to the left.');
-    }
   }
   else {
     $form['contains'] = array(
@@ -969,10 +976,19 @@ function panels_ajax_flexible_edit_add($did, $id, $location = 'left') {
     // duplicated because the order changes based on left or right.
     switch ($position) {
       case 'left':
-        if (!empty($form_state['sibling'])) {
+        if ($location == 'left') {
           $item_output .= panels_flexible_render_splitter($renderer, $form_state['key'], $form_state['sibling']);
+          $output[] = ctools_ajax_command_prepend('.' . $parent_class . '-left', $item_output);
         }
-        $output[] = ctools_ajax_command_prepend('.' . $parent_class . '-left', $item_output);
+        else if ($location == 'right') {
+          // If we are adding to the right side of the left box, there is
+          // a splitter that we have to remove; then we add our box normally,
+          // and then add a new splitter for just our guy.
+          $output[] = ctools_ajax_command_remove('panels-flexible-splitter-for-panels-flexible-' . $item['type'] . '-' . $did . '-' . $form_state['key']);
+          $item_output = panels_flexible_render_splitter($renderer, $form_state['sibling'], $form_state['key']) .  $item_output;
+          $item_output .= panels_flexible_render_splitter($renderer, $form_state['key'], NULL);
+          $output[] = ctools_ajax_command_append('.' . $parent_class . '-left', $item_output);
+        }
         break;
       case 'right':
         if (!empty($form_state['sibling'])) {
@@ -1052,7 +1068,6 @@ function panels_flexible_add_item_form(&$form_state) {
     // must also be fixed. Otherwise it can be either and should default to
     // fluid.
     $restrict = FALSE;
-    $fluid_only = FALSE;
 
     if (!empty($parent['children'])) {
       if ($location == 'left') {
@@ -1066,9 +1081,6 @@ function panels_flexible_add_item_form(&$form_state) {
         $item['width_type'] = 'px';
       }
     }
-    else {
-      $fluid_only = TRUE;
-    }
 
     $form['width_type'] = array(
       '#type' => 'select',
@@ -1078,17 +1090,13 @@ function panels_flexible_add_item_form(&$form_state) {
         '%' => t('Fluid'),
         'px' => t('Fixed'),
       ),
-      '#disabled' => $restrict || $fluid_only,
+      '#disabled' => $restrict,
     );
     if ($restrict) {
       // This forces the value because disabled items don't always send
       // their data back.
       $form['width_type']['#value'] = $item['width_type'];
       $form['width_type']['#description'] = t('Items cannot be set to fluid if there are fixed items already on that side.');
-    }
-    else if ($fluid_only) {
-      $form['width_type']['#value'] = $item['width_type'] = '%';
-      $form['width_type']['#description'] = t('The first item within a row must be fluid.');
     }
   }
   else {
@@ -1143,15 +1151,16 @@ function panels_flexible_add_item_form_submit(&$form, &$form_state) {
     $form_state['key'] = $key = max(array_keys($settings['items'])) + 1;
   }
 
+  $form_state['sibling'] = NULL;
   if ($item['type'] != 'row' && !empty($parent['children'])) {
     // Figure out what the width should be and adjust our sibling if
     // necessary.
-    $form_state['sibling'] = NULL;
     if ($location == 'left') {
       $form_state['sibling'] = reset($parent['children']);
     }
     else {
       $form_state['sibling'] = end($parent['children']);
+
     }
 
     // If there is no sibling, or the sibling is of a different type,
@@ -1265,9 +1274,9 @@ function panels_ajax_flexible_edit_remove($did, $id) {
   if (!empty($prev)) {
     $output[] = ctools_ajax_command_remove('.flexible-splitter-for-panels-flexible-' . $item['type'] . '-' . $did . '-' . $prev);
   }
-  if (!empty($next)) {
-    $output[] = ctools_ajax_command_remove('.flexible-splitter-for-panels-flexible-' . $item['type'] . '-' . $did . '-' . $id);
-  }
+
+  // Try to remove the 'next' one even if there isn't a $next.
+  $output[] = ctools_ajax_command_remove('.flexible-splitter-for-panels-flexible-' . $item['type'] . '-' . $did . '-' . $id);
 
   if (!empty($prev) && !empty($next)) {
     // Add a new splitter that links $prev and $next:
@@ -1307,7 +1316,9 @@ function panels_ajax_flexible_edit_resize($did) {
   panels_flexible_convert_settings($settings);
 
   $settings['items'][$_POST['left']]['width'] = $_POST['left_width'];
-  $settings['items'][$_POST['right']]['width'] = $_POST['right_width'];
+  if (!empty($_POST['right']) && $_POST['right'] != $_POST['left']) {
+    $settings['items'][$_POST['right']]['width'] = $_POST['right_width'];
+  }
 
   // Save our new state.
   panels_cache_set('display', $did, $cache);
