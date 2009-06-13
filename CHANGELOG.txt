@@ -1,5 +1,6 @@
 Panels 6.x-3.0-dev
 ==================
+Fix notices.
 
 Panels 6.x-3.0-beta2
 ====================

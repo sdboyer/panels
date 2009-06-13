@@ -280,7 +280,7 @@ function panels_panel_page_form_basic(&$form, &$form_state) {
   $conf = $form_state['page']->conf;
   $form['no_blocks'] = array(
     '#type' => 'checkbox',
-    '#default_value' => $conf['no_blocks'],
+    '#default_value' => !empty($conf['no_blocks']),
     '#title' => t('Disable Drupal blocks/regions'),
     '#description' => t('Check this to have the panel page disable all regions displayed in the theme.'),
   );
@@ -288,7 +288,7 @@ function panels_panel_page_form_basic(&$form, &$form_state) {
   $form['css_id'] = array(
     '#type' => 'textfield',
     '#size' => 35,
-    '#default_value' => $conf['css_id'],
+    '#default_value' => isset($conf['css_id']) ? $conf['css_id'] : '',
     '#title' => t('CSS ID'),
     '#description' => t('The CSS ID to apply to this page'),
   );
@@ -297,7 +297,7 @@ function panels_panel_page_form_basic(&$form, &$form_state) {
     '#type' => 'textarea',
     '#title' => t('CSS code'),
     '#description' => t('Enter well-formed CSS code here; this code will be embedded into the page, and should only be used for minor adjustments; it is usually better to try to put CSS for the page into the theme if possible. This CSS will be filtered for safety so some CSS may not work.'),
-    '#default_value' => $conf['css'],
+    '#default_value' => isset($conf['css']) ? $conf['css'] : '',
   );
 }
 
