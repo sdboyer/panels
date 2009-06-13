@@ -107,7 +107,7 @@ function panels_rounded_corners_style_settings_form($style_settings) {
     '#title' => t('Box around'),
     '#options' => array(
       'pane' => t('Each pane'),
-      'panel' => t('Each panel'),
+      'panel' => t('Each region'),
     ),
     '#default_value' => (isset($style_settings['corner_location'])) ? $style_settings['corner_location'] : 'ul',
     '#description' => t('Choose whether to include the box around each pane (piece of content) or panel (each column or region)'),
