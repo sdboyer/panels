@@ -225,12 +225,12 @@ function panels_menu() {
     'title' => 'General',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_admin_settings_page'),
-    'access arguments' => array('administer delegator'),
+    'access arguments' => array('administer page manager'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   ) + $admin_base;
 
-  if (module_exists('delegator')) {
+  if (module_exists('page_manager')) {
     $items['admin/build/panels/settings/panel-page'] = array(
       'title' => 'Panel pages',
       'page callback' => 'panels_admin_panel_context_page',
@@ -309,7 +309,7 @@ function panels_cache_get($obj, $did, $skip_cache = FALSE) {
   // we often store contexts in cache, so let's just make sure we can load
   // them.
   ctools_include('context');
-  return ctools_object_cache_get($obj, $did, $skip_cache);
+  return ctools_object_cache_get($obj, 'panels_display:' . $did, $skip_cache);
 }
 
 /**
@@ -317,7 +317,7 @@ function panels_cache_get($obj, $did, $skip_cache = FALSE) {
  */
 function panels_cache_set($obj, $did, $cache) {
   ctools_include('object-cache');
-  return ctools_object_cache_set($obj, $did, $cache);
+  return ctools_object_cache_set($obj, 'panels_display:' . $did, $cache);
 }
 
 /**
@@ -325,7 +325,7 @@ function panels_cache_set($obj, $did, $cache) {
  */
 function panels_cache_clear($obj, $did) {
   ctools_include('object-cache');
-  return ctools_object_cache_clear($obj, $did);
+  return ctools_object_cache_clear($obj, 'panels_display:' . $did);
 }
 
 // ---------------------------------------------------------------------------
@@ -950,7 +950,7 @@ function panels_ctools_plugin_directory($module, $plugin) {
   if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return;
   }
-  if ($module == 'delegator' || $module == 'panels') {
+  if ($module == 'page_manager' || $module == 'panels') {
     return 'plugins/' . $plugin;
   }
 }

@@ -6,32 +6,131 @@
  *
  * This is the task handler plugin to handle attaching a panel to any
  * task that advertises itself as a 'context' type, which all of the
- * basic page tasks provided by delegator.module do by default.
- *
- * Most of our config is handled by panels delegator.inc, but we do have
- * to customize it a little bit to match what we're doing with this task.
+ * basic page tasks provided by page_manager.module do by default.
  */
 
 /**
- * Specialized implementation of hook_delegator_task_handlers().
+ * Specialized implementation of hook_page_manager_task_task_handlers().
  */
-function panels_panel_context_delegator_task_handlers() {
+function panels_panel_context_page_manager_task_handlers() {
   return array(
-    'handler type' => 'context', // is a 'context' handler type
+    // is a 'context' handler type, meaning it supports the API of the
+    // context handlers provided by ctools context plugins.
+    'handler type' => 'context', 
+    'visible' => TRUE, // may be added up front.
+
+    // Administrative fields.
     'title' => t('Panel'),
     'admin summary' =>'panels_panel_context_admin_summary',
     'admin title' => 'panels_panel_context_title',
+    'admin css' => array(
+      panels_get_path('css/panels_admin.css'),
+    ),
+    'admin js' => array(
+      panels_get_path('js/layout.js'),
+    ),
+    'operations' => array(    
+      'settings' => array(
+        'title' => t('General'),
+        'description' => t('Change general settings about this variant.'),
+        'form' => 'panels_panel_context_edit_settings',
+      ),
+      'criteria' => array(
+        'title' => t('Selection rules'),
+        'description' => t('Control the criteria used to decide whether or not this variant is used.'),
+        'form' => array(
+          'order' => array(
+            'form' => t('Selection rules'),
+          ),
+          'forms' => array(
+            'form' => array(
+              'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+              'form id' => 'ctools_context_handler_edit_criteria',
+            ),
+          ),
+        ),
+      ),
+      'context' => array(
+        'title' => t('Contexts'),
+        'description' => t('Add additional context objects to this variant that can be used by the content.'),
+        'form' => array(
+          'order' => array(
+            'form' => t('Context'),
+          ),
+          'forms' => array(
+            'form' => array(
+              'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+              'form id' => 'ctools_context_handler_edit_context',
+            ),
+          ),
+        ),
+      ),
+      'layout' => array(
+        'title' => t('Layout'),
+        'description' => t('Add content items and change their location with a drag and drop interface.'),
+        // No AJAX so we get our CSS loaded.
+        'ajax' => FALSE,
+        'form' => array(
+          'order' => array(
+            'choose' => t('Change layout'),
+            'move' => t('Move content from old layout'),
+          ),
+          'forms' => array(
+            'choose' => array(
+              'form id' => 'panels_panel_context_edit_layout',
+            ),
+            'move' => array(
+              'include' => array(
+                drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
+              ),
+              'form id' => 'panels_panel_context_edit_move',
+              'submit' => 'panels_change_layout_submit',
+            ),
+          ),
+        ),
+      ),
+      'content' => array(
+        'title' => t('Content'),
+        'description' => t('Add content items and change their location with a drag and drop interface.'),
+        'ajax' => FALSE,
+        'form' => array(
+          'order' => array(
+            'form' => t('Content'),
+          ),
+          'forms' => array(
+            'form' => array(
+              'include' => array(
+                drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
+              ),
+              'form id' => 'panels_panel_context_edit_content',
+              'submit' => 'panels_edit_display_form_submit',
+              'no blocks' => TRUE,
+            ),
+          ),
+        ),
+      ),
+    ),
+
+    // Callback to render the data. 
     'render' => 'panels_panel_context_render',
+
+    // Various callbacks for operations performed on the handler to ensure
+    // related data is updated properly.
     'save' => 'panels_panel_context_save',
     'delete' => 'panels_panel_context_delete',
     'export' => 'panels_panel_context_export',
     'clone' => 'panels_panel_context_clone',
 
-    'add forms' => array(
+    'add features' => array(
       'criteria' => t('Selection rules'),
+      'context' => t('Contexts'),
+    ),
+
+    'required forms' => array(
       'choose' => t('Choose layout'),
       'content' => t('Panel content'),
     ),
+
     'edit forms' => array(
       'content' => t('Panel content'),
       'criteria' => t('Selection rules'),
@@ -46,6 +145,7 @@ function panels_panel_context_delegator_task_handlers() {
       ),
       'choose' => array(
         'form id' => 'panels_panel_context_edit_choose',
+        'no back validate' => TRUE,
       ),
       'layout' => array(
         'no return' => TRUE,
@@ -76,7 +176,6 @@ function panels_panel_context_delegator_task_handlers() {
       ),
     ),
     'default conf' => array(
-      'autogenerate_title' => TRUE,
       'title' => t('Panel'),
       'no_blocks' => FALSE,
       'css_id' => '',
@@ -184,7 +283,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
 /**
  * Set up a title for the panel based upon the selection rules.
  */
-function panels_panel_context_title($handler, $task, $subtask_id) {
+function panels_panel_context_title($handler, $task, $subtask) {
   if (isset($handler->conf['title'])) {
     return $handler->conf['title'];
   }
@@ -273,7 +372,7 @@ function panels_panel_context_delete(&$handler) {
  * provide a summary of the layout type and content on one side, and
  * a summary of the contexts in use on the other.
  */
-function panels_panel_context_admin_summary($handler, $task, $subtask_id) {
+function panels_panel_context_admin_summary($handler, $task, $subtask) {
   $output = '';
 
   $display = panels_panel_context_get_display($handler);
@@ -285,9 +384,9 @@ function panels_panel_context_admin_summary($handler, $task, $subtask_id) {
   $layout = panels_get_layout($display->layout);
   $icon = panels_print_layout_icon($display->layout, $layout);
 
-  $plugin = delegator_get_task_handler($handler->handler);
+  $plugin = page_manager_get_task_handler($handler->handler);
 
-  $object = ctools_context_handler_get_task_object($task, $subtask_id, $handler);
+  $object = ctools_context_handler_get_task_object($task, $subtask, $handler);
   $display->context = ctools_context_load_contexts($object, TRUE);
 
   $content = theme('panels_common_content_list', $display);
@@ -441,6 +540,9 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
   // previous/next forms.
   $form['buttons']['previous']['#next'] = 'layout';
   $form['buttons']['next']['#next'] = 'content';
+
+  $form_state['form_info']['return path'] = 'admin/build/pages/nojs/operation/' 
+    . $form_state['task_name'] . '/handlers/' . $form_state['handler_id'] . '/content';
 }
 
 /**
@@ -456,7 +558,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
 
   $display = &panels_panel_context_get_display($form_state['handler']);
 
-  $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask_id'], $form_state['handler']);
+  $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask'], $form_state['handler']);
   $content_types = panels_common_get_allowed_types('panels_page', $display->context);
 
 // Load the display being edited from cache, if possible.
@@ -487,25 +589,18 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
  */
 function panels_panel_context_edit_settings(&$form, &$form_state) {
   $conf = $form_state['handler']->conf;
-  $form['conf']['autogenerate_title'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Automatically generate title'),
-    '#description' => t('If checked, the administrative title will be automatically regenerated whenever the selection rules changes. If you change the title and leave this check, your changes may disappear.'),
-    '#default_value' => $conf['autogenerate_title'],
-  );
-
   $form['conf']['title'] = array(
     '#type' => 'textfield',
     '#default_value' => $conf['title'],
     '#title' => t('Administrative title'),
-    '#description' => t('Administrative title of this task handler.'),
+    '#description' => t('Administrative title of this variant.'),
   );
 
   $form['conf']['no_blocks'] = array(
     '#type' => 'checkbox',
     '#default_value' => $conf['no_blocks'],
     '#title' => t('Disable Drupal blocks/regions'),
-    '#description' => t('Check this to have the panel page disable all regions displayed in the theme.'),
+    '#description' => t('Check this to have the page disable all regions displayed in the theme. Note that some themes support this setting better than others. If in doubt, try with stock themes to see.'),
   );
 
   $form['conf']['css_id'] = array(
@@ -531,5 +626,6 @@ function panels_panel_context_edit_settings_submit(&$form, &$form_state) {
   $form_state['handler']->conf['no_blocks'] = $form_state['values']['no_blocks'];
   $form_state['handler']->conf['css_id'] = $form_state['values']['css_id'];
   $form_state['handler']->conf['css'] = $form_state['values']['css'];
+  $form_state['handler']->conf['title'] = $form_state['values']['title'];
 }
 
