@@ -706,9 +706,9 @@ function panels_update_6290() {
     }
   }
 
-  if (!module_exists('delegator') && db_table_exists('panels_page')) {
-    drupal_set_message('Delegator module has been automatically enabled to replace the Panels pages module.');
-    drupal_install_modules(array('delegator'));
+  if (!module_exists('page_manager') && db_table_exists('panels_page')) {
+    drupal_set_message('Page manager module has been automatically enabled to replace the Panels pages module.');
+    drupal_install_modules(array('page_manager'));
   }
 
   $ret[] = update_sql("DELETE FROM {system} WHERE name IN ('panels_page', 'panels_views')");
@@ -888,8 +888,8 @@ function panels_update_6300() {
 function panels_update_6302() {
   $ret = array();
 
-  if (!module_exists('delegator') && db_table_exists('panels_page')) {
-    $ret['#abort'] = array('success' => FALSE, 'query' => t('Conversion of panels pages cannot be completed without delegator module from CTools installed. Please install CTools, activate delegator, and attempt the update again.'));
+  if (!module_exists('page_manager') && db_table_exists('panels_page')) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('Conversion of panels pages cannot be completed without page manager module from CTools installed. Please install CTools, activate page manager, and attempt the update again.'));
     return $ret;
   }
 
@@ -900,14 +900,15 @@ function panels_update_6302() {
   // Store the node edit handlers because we merged the edit/add path and we
   // need to be able to keep these together to make sure the names work ok.
   $node_edit_handlers = array();
-  delegator_get_task('page');
+  page_manager_get_task('page');
   $result = db_query("SELECT * FROM {panels_page}");
   while ($p = db_fetch_object($result)) {
-    $page = delegator_page_new();
+    $page = page_manager_page_new();
+    $page->default_handlers = array();
     // Should we check for uniqueness here? It doesn't seem really
-    // plausible that there could be delegator pages already.
+    // plausible that there could be page manager pages already.
     $page->name = $p->name;
-    $page->task = 'panel_page'; // could become custom later.
+    $page->task = 'page'; // could become custom later.
     $page->subtask = $p->name;
     $page->admin_title = $p->name;
     $page->path = $p->path;
@@ -1033,7 +1034,7 @@ function panels_update_6302() {
         $page->task = 'term_view';
         $page->subtask = '';
         if ($arguments[0]['name'] == 'term') {
-          variable_set('delegator_term_view_type', 'single');
+          variable_set('page_manager_term_view_type', 'single');
         }
         break;
       case 'user/%':
@@ -1045,29 +1046,17 @@ function panels_update_6302() {
 
     if (empty($displays)) {
       // only one display on this panel, mak
-      $page->conf['css'] = $p->css;
-      $page->conf['css_id'] = $p->css_id;
-      $page->conf['no_blocks'] = $p->no_blocks;
-      $page->conf['contexts'] = unserialize($p->contexts);
-      $page->conf['relationships'] = unserialize($p->relationships);
-      $page->conf['did'] = $p->did;
-      if ($page->task != 'panel_page') {
-        $cache = new stdClass();
-        if ($page->task != 'node_edit') {
-          $cache->handlers = array();
-        }
-        else {
-          $cache->handlers = $node_edit_handlers;
-        }
-        _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, 0, $cache);
+      $cache = new stdClass();
+      if ($page->task != 'node_edit') {
+        $cache->handlers = array();
       }
+      else {
+        $cache->handlers = $node_edit_handlers;
+      }
+      _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Panel')), $arguments, 0, $cache);
+      $page->default_handlers = $cache->handlers;
     }
     else {
-      if ($page->task == 'panel_page') {
-        $page->task = 'page';
-      }
-      $page->multiple = TRUE;
-
       // for each display we need to create a new handler.
       $weight = 0;
       $cache = new stdClass();
@@ -1087,15 +1076,14 @@ function panels_update_6302() {
       }
 
       // Also add the primary display as a default with no selector.
-      _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, $weight++, $cache);
-//      drupal_set_message('<pre>' . var_export($cache->handlers, 1) . '</pre>');
+//      _panels_update_create_handler($page, $p, NULL, array('did' => $p->did, 'title' => t('Default')), $arguments, $weight++, $cache);
       $page->default_handlers = $cache->handlers;
     }
 
-    if ($page->task != 'page' && $page->task != 'panel_page') {
+    if ($page->task != 'page') {
       // just save the handlers.
       foreach ($cache->handlers as $name => $handler) {
-        delegator_save_task_handler($handler);
+        page_manager_save_task_handler($handler);
 
         // Keep all node edit handlers for later use.
         if ($page->task == 'node_edit') {
@@ -1104,7 +1092,7 @@ function panels_update_6302() {
       }
     }
     else {
-      delegator_page_save($page);
+      page_manager_page_save($page);
     }
   }
 
@@ -1130,9 +1118,19 @@ function panels_update_6302() {
 }
 
 function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $weight, &$cache) {
-  $task = delegator_get_task($page->task);
-  $plugin = delegator_get_task_handler('panel_context');
-  $handler = delegator_new_task_handler($task, $page->subtask, $plugin, $weight, $cache);
+  $task = page_manager_get_task($page->task);
+  $task_name = 'page-' . $page->name;
+  $plugin = page_manager_get_task_handler('panel_context');
+  $handler = page_manager_new_task_handler($plugin);
+
+  $handler->weight = $weight;
+  $handler->task = $page->task;
+  $handler->subtask = $page->name;
+  $handler->export_type = EXPORT_IN_DATABASE;
+  $handler->type = t('Normal');
+
+  $handler->name = page_manager_handler_get_name($task_name, $cache->handlers, $handler);
+  
   $handler->conf['css'] = $p->css;
   $handler->conf['css_id'] = $p->css_id;
   $handler->conf['no_blocks'] = $p->no_blocks;
