@@ -281,18 +281,6 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
 }
 
 /**
- * Set up a title for the panel based upon the selection rules.
- */
-function panels_panel_context_title($handler, $task, $subtask) {
-  if (isset($handler->conf['title'])) {
-    return $handler->conf['title'];
-  }
-  else {
-    return t('Panel');
-  }
-}
-
-/**
  * Callback to allow the handler to react to being saved.
  *
  * When a handler with a display is saved, two things have to happen.
@@ -365,6 +353,18 @@ function panels_panel_context_delete(&$handler) {
 }
 
 /**
+ * Set up a title for the panel based upon the selection rules.
+ */
+function panels_panel_context_title($handler, $task, $subtask) {
+  if (isset($handler->conf['title'])) {
+    return check_plain($handler->conf['title']);
+  }
+  else {
+    return t('Panel');
+  }
+}
+
+/**
  * Provide a nice little summary of what's in a panel.
  *
  * The task handler manager provides a summary of a given handler in a
@@ -373,6 +373,7 @@ function panels_panel_context_delete(&$handler) {
  * a summary of the contexts in use on the other.
  */
 function panels_panel_context_admin_summary($handler, $task, $subtask) {
+  $task_name = page_manager_make_task_name($task['name'], $subtask['name']);
   $output = '';
 
   $display = panels_panel_context_get_display($handler);
@@ -382,27 +383,73 @@ function panels_panel_context_admin_summary($handler, $task, $subtask) {
   ctools_include('context-task-handler');
 
   $layout = panels_get_layout($display->layout);
-  $icon = panels_print_layout_icon($display->layout, $layout);
+//  $icon = panels_print_layout_icon($display->layout, $layout);
 
   $plugin = page_manager_get_task_handler($handler->handler);
 
   $object = ctools_context_handler_get_task_object($task, $subtask, $handler);
   $display->context = ctools_context_load_contexts($object, TRUE);
 
+  $access = ctools_access_group_summary(!empty($handler->conf['access']) ? $handler->conf['access'] : array(), $display->context);
+  if ($access) {
+    $access = t('This panel will be selected if @conditions.', array('@conditions' => $access));
+  }
+  else {
+    $access = t('This panel will always be selected.');
+  }
+
+  $rows = array();
+
+  $link = l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'criteria')));
+  $rows[] = array(
+    array('class' => t('page-summary-label'), 'data' => t('Selection rule')),
+    array('class' => t('page-summary-data'), 'data' => $access),
+    array('class' => t('page-summary-operation'), 'data' => $link),
+  );
+
+  $link = l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'layout')));
+  $rows[] = array(
+    array('class' => t('page-summary-label'), 'data' => t('Layout')),
+    array('class' => t('page-summary-data'), 'data' => check_plain($layout['title'])),
+    array('class' => t('page-summary-operation'), 'data' => $link),
+  );
+
+  $content_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'content'))) . ']';
+  $context_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'context'))) . ']';
+  
+
+  $info = theme('table', array(), $rows, array('class' => 'page-manager-handler-summary'));
+
   $content = theme('panels_common_content_list', $display);
+  if (empty($contents)) {
+    $contents = t('This panel has no content.');
+  }
   $contexts = theme('ctools_context_list_no_table', $object);
+  if (empty($contexts)) {
+    $contexts = t('This panel has no contexts.');
+  }
 
-  $title = '<h2 class="content-title">' . check_plain($layout['title']) . '</h2>';
-
+  $title = $handler->conf['title'];
+  if ($title != t('Panel')) {
+    $title = t('Panel: @title', array('@title' => $title));
+  }
+  
+  $output .= '<div class="clear-block">';
+  $output .= '<h3 class="handler-title">' . $title . '</h3>';
+  $output .= $info;
+  $output .= '</div>';
+/*
   $output .= '<div class="right-container">';
-  $output .= '<h2 class="context-title">' . t('Contexts') . '</h2>';
+  $output .= '<h3 class="context-title">' . t('Contexts') . $context_link . '</h3>';
   $output .= $contexts;
   $output .= '</div>';
 
   $output .= '<div class="left-container">';
-  $output .= $icon . $title . $content;
+//  $output .= $icon;
+  $output .= '<h3 class="handler-title">' . t('Content') . $content_link . '</h3>';
+  $output .= $content;
   $output .= '</div>';
-
+*/
   return $output;
 }
 
