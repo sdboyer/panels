@@ -588,8 +588,7 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
   $form['buttons']['previous']['#next'] = 'layout';
   $form['buttons']['next']['#next'] = 'content';
 
-  $form_state['form_info']['return path'] = 'admin/build/pages/nojs/operation/' 
-    . $form_state['task_name'] . '/handlers/' . $form_state['handler_id'] . '/content';
+  $form_state['form_info']['return path'] = page_manager_edit_url($page->task_name, array('handlers', $form_state['handler_id'], 'content'));
 }
 
 /**
