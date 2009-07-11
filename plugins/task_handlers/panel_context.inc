@@ -624,6 +624,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   $form_state['content_types'] = $content_types;
   // Tell the Panels form not to display buttons.
   $form_state['no buttons'] = TRUE;
+  $form_state['display_title'] = !empty($cache->display_title);
 
   $form = array_merge($form, panels_edit_display_form($form_state));
   // Make sure the theme will work since our form id is different.
