@@ -109,6 +109,14 @@ function panels_panel_context_page_manager_task_handlers() {
           ),
         ),
       ),
+      'preview' => array(
+        'title' => t('Preview'),
+        'description' => t('Get a preview of what this variant will look like.'),
+        'form' => 'panels_panel_context_edit_preview',
+        'ajax' => FALSE,
+        'silent' => TRUE,
+        'form info' => array('finish text' => t('Preview')),
+      ),
     ),
 
     // Callback to render the data. 
@@ -625,6 +633,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   // Tell the Panels form not to display buttons.
   $form_state['no buttons'] = TRUE;
   $form_state['display_title'] = !empty($cache->display_title);
+  $form_state['no preview'] = TRUE;
 
   $form = array_merge($form, panels_edit_display_form($form_state));
   // Make sure the theme will work since our form id is different.
@@ -676,3 +685,46 @@ function panels_panel_context_edit_settings_submit(&$form, &$form_state) {
   $form_state['handler']->conf['title'] = $form_state['values']['title'];
 }
 
+/**
+ * Form to show a nice preview.
+ */
+function panels_panel_context_edit_preview(&$form, &$form_state) {
+  ctools_include('context');
+  ctools_include('context-task-handler');
+
+  $contexts = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask'], $form_state['handler']);
+  $form['preview'] = array();
+  ctools_context_replace_form($form['preview'], $contexts);
+
+  // automatically preview if there are no argument placeholders.
+  if (empty($form['preview'])) {
+    $display = panels_panel_context_get_display($form_state['handler']);
+    $display->context = $contexts;
+    $output = panels_render_display($display);
+    unset($form['buttons']);
+  }
+  else {
+    $form['preview']['#tree'] = TRUE;
+    $form_state['contexts'] = $contexts;
+  }
+
+  if (!empty($output)) {
+    $form['output'] = array(
+      '#value' => $output,
+    );
+  }
+
+  $form_state['do not cache'] = TRUE;
+}
+
+/**
+ * Display a preview upon submit if arguments were needed.
+ */
+function panels_panel_context_edit_preview_submit(&$form, &$form_state) {
+  $display = panels_panel_context_get_display($form_state['handler']);
+  $display->context = ctools_context_replace_placeholders($form_state['contexts'], $form_state['values']['preview']);
+
+  $form_state['content'] = panels_render_display($display);
+  $form_state['redirect'] = FALSE;
+  $form_state['rerender'] = TRUE;
+}
