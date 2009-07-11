@@ -103,7 +103,6 @@ function panels_panel_context_page_manager_task_handlers() {
                 drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
               ),
               'form id' => 'panels_panel_context_edit_content',
-              'submit' => 'panels_edit_display_form_submit',
               'no blocks' => TRUE,
             ),
           ),
@@ -171,7 +170,6 @@ function panels_panel_context_page_manager_task_handlers() {
           drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
         ),
         'form id' => 'panels_panel_context_edit_content',
-        'submit' => 'panels_edit_display_form_submit',
         'no blocks' => TRUE,
       ),
       'context' => array(
@@ -638,6 +636,16 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   $form = array_merge($form, panels_edit_display_form($form_state));
   // Make sure the theme will work since our form id is different.
   $form['#theme'] = 'panels_edit_display_form';
+
+  $form['buttons']['preview'] = $form['buttons']['return'];
+  $form['buttons']['preview']['#value'] = t('Update and preview');
+}
+
+function panels_panel_context_edit_content_submit(&$form, &$form_state) {
+  panels_edit_display_form_submit($form, $form_state);
+  if ($form_state['clicked_button']['#value'] == t('Update and preview')) {
+    $form_state['new trail'] = array('handlers', $form_state['handler_id'], 'preview');
+  }
 }
 
 /**
