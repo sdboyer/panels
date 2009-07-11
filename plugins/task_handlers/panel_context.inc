@@ -637,8 +637,10 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   // Make sure the theme will work since our form id is different.
   $form['#theme'] = 'panels_edit_display_form';
 
-  $form['buttons']['preview'] = $form['buttons']['return'];
-  $form['buttons']['preview']['#value'] = t('Update and preview');
+  if (!isset($form_state['type']) || $form_state['type'] != 'add') {
+    $form['buttons']['preview'] = $form['buttons']['return'];
+    $form['buttons']['preview']['#value'] = t('Update and preview');
+  }
 }
 
 function panels_panel_context_edit_content_submit(&$form, &$form_state) {
