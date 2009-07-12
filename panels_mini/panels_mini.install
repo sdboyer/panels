@@ -20,6 +20,12 @@ function panels_mini_schema_1() {
     'export' => array(
       'identifier' => 'mini',
       'export callback' => 'panels_mini_export',
+      'api' => array(
+        'owner' => 'panels_mini',
+        'api' => 'panels_default',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
     ),
     'fields' => array(
       'pid' => array(
