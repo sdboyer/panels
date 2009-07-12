@@ -52,6 +52,7 @@ function panels_schema_1() {
   $schema['panels_display'] = array(
     'export' => array(
       'object' => 'panels_display',
+      'bulk export' => FALSE,
       'can disable' => FALSE,
       'identifier' => 'display',
     ),
@@ -104,6 +105,7 @@ function panels_schema_1() {
     'export' => array(
       'can disable' => FALSE,
       'identifier' => 'pane',
+      'bulk export' => FALSE,
     ),
     'fields' => array(
       'pid' => array(

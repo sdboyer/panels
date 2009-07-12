@@ -19,6 +19,7 @@ function panels_mini_schema_1() {
   $schema['panels_mini'] = array(
     'export' => array(
       'identifier' => 'mini',
+      'export callback' => 'panels_mini_export',
     ),
     'fields' => array(
       'pid' => array(

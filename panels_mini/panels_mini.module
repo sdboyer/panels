@@ -182,37 +182,6 @@ function panels_mini_ctools_block_info($module, $delta, &$info) {
 }
 
 /**
- * Implementation of hook_panels_exportables().
- */
-function panels_mini_panels_exportables($op = 'list', $panels = NULL, $name = 'foo') {
-  static $all_panels = NULL;
-  if ($op == 'list') {
-    if (empty($all_panels)) {
-      $all_panels = panels_mini_load_all();
-    }
-
-    foreach ($all_panels as $name => $panel) {
-      $return[$name] = check_plain($name) . ' (' . check_plain($panel->title) . ')';
-    }
-    return $return;
-  }
-
-  if ($op == 'export') {
-    $code = "/**\n";
-    $code .= " * Implementation of hook_default_panel_minis()\n";
-    $code .= " */\n";
-    $code .= "function " . $name . "_default_panel_minis() {\n";
-    foreach ($panels as $panel => $truth) {
-      $code .= panels_mini_export($all_panels[$panel], '  ');
-      $code .= '  $minis[\'' . check_plain($panel) . '\'] = $mini;' . "\n\n\n";
-    }
-    $code .= "  return \$minis;\n";
-    $code .= "}\n";
-    return $code;
-  }
-}
-
-/**
  * Menu callback to check to see if a mini panel is valid as part
  * of a path, and if it is, return the mini.
  */
@@ -231,4 +200,14 @@ function panels_mini_ctools_plugin_directory($module, $plugin) {
   if ($module == 'ctools' && $plugin == 'content_types') {
     return 'plugins/' . $plugin;
   }
+}
+
+function panels_mini_panels_mini_list() {
+  $all_panels = panels_mini_load_all();
+  $list = array();
+
+  foreach ($all_panels as $name => $panel) {
+    $list[$name] = check_plain($name) . ' (' . check_plain($panel->title) . ')';
+  }
+  return $list;
 }
