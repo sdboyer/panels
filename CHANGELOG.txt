@@ -2,6 +2,13 @@ Panels 6.x-3.0-dev
 ==================
 Fix notices.
 
+Panels 6.x-3.0-beta4
+====================
+Note: beta3 skipped to stay even with CTools beta numbers.
+Removal of non-functioning bulk export module in favor of the new one in CTools.
+Update to require CTools API 1.1.0
+Updates to work with the new Page Manager UI in CTools.
+
 Panels 6.x-3.0-beta2
 ====================
 Update to require CTools based upon its advertised API version number.
@@ -16,7 +23,6 @@ Integrate with CTools tab system so we can add edit tabs to all our panel pages.
 #454208: pgsql does not support concat(), so use || instead for postgres.
 #445828: Remove "Settings" link if a content type has no settings form.
 #460200: Allow regions and columns that have only 'fixed' width items. Disallow changing a 'fixed' item to 'fluid.'
-Removal of non-functioning bulk export module in favor of the new one in CTools.
 
 Panels 6.x-3.0-beta1
 ====================
