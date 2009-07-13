@@ -297,7 +297,7 @@ function panels_perm() {
     'administer pane visibility',
     'administer pane access',
     'administer advanced pane settings',
-    'use panels caching features'
+    'use panels caching features',
     'use panels dashboard',
   );
 }
