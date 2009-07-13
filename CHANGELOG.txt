@@ -2,6 +2,7 @@ Panels 6.x-3.0-dev
 ==================
 
 #515316: Add permission to view Panels admin dashboard.
+#298174: Recursion defense for mini panels.
 
 Panels 6.x-3.0-beta4
 ====================
