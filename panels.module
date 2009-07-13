@@ -197,7 +197,7 @@ function panels_menu() {
 
   $admin_base = array(
     'file' => 'includes/callbacks.inc',
-    'access arguments' => array('access administration pages'),
+    'access arguments' => array('use panels dashboard'),
 
   );
   // Provide a nice location for a panels admin panel.
@@ -298,6 +298,7 @@ function panels_perm() {
     'administer pane access',
     'administer advanced pane settings',
     'use panels caching features'
+    'use panels dashboard',
   );
 }
 
