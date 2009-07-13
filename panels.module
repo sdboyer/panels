@@ -514,6 +514,7 @@ class panels_display {
   var $incoming_content = NULL;
   var $css_id = NULL;
   var $context = array();
+  var $did = 'new';
 
   function add_pane($pane, $location = FALSE) {
     $pane->pid = $this->next_new_pid();

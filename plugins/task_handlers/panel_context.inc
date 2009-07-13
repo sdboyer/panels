@@ -594,7 +594,7 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
   $form['buttons']['previous']['#next'] = 'layout';
   $form['buttons']['next']['#next'] = 'content';
 
-  $form_state['form_info']['return path'] = page_manager_edit_url($page->task_name, array('handlers', $form_state['handler_id'], 'content'));
+  $form_state['form_info']['return path'] = page_manager_edit_url($form_state['page']->task_name, array('handlers', $form_state['handler_id'], 'content'));
 }
 
 /**

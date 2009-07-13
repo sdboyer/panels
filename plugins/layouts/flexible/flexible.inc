@@ -342,7 +342,7 @@ function panels_flexible_render_items($renderer, $list, $owner_id) {
 
     // If all items are fixed then we have a special splitter on the right to
     // control the overall width.
-    if ($max == $position && $location == 'left') {
+    if (!empty($renderer->admin) && $max == $position && $location == 'left') {
       $groups[$location] .= panels_flexible_render_splitter($renderer, $id, NULL);
     }
     $prev = $id;
