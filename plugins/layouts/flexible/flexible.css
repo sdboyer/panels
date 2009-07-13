@@ -27,7 +27,7 @@
   float: left; 
   padding: 0;
   /* margin: 1px 0 .5em 0; */
-  overflow: hidden;
+/*  overflow: hidden; */
 }
 
 .panels-flexible-row {

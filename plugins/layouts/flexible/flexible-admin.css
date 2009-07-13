@@ -15,7 +15,7 @@ div.panel-flexible-edit-layout .pane-add-link,
 }
 
 .panels-flexible-column-inside {
-  overflow: hidden;
+/*  overflow: hidden; */
 }
 
 .panel-flexible-edit-layout .panels-flexible-column > .flexible-title {
