@@ -145,53 +145,56 @@ function panels_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/display-edit.inc',
+    'page arguments' => array(3),
   );
 
-  $items['panels/ajax/add-pane'] = array(
+  $items['panels/ajax/add-pane/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_add_pane_choose',
   ) + $base;
-  $items['panels/ajax/add-pane-config'] = array(
+  $items['panels/ajax/add-pane-config/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_add_pane_config',
   ) + $base;
-  $items['panels/ajax/configure'] = array(
+  $items['panels/ajax/configure/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_configure_pane',
   ) + $base;
-  $items['panels/ajax/show'] = array(
+  $items['panels/ajax/show/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_toggle_shown',
-    'page arguments' => array('show'),
+    'page arguments' => array('show', 3),
   ) + $base;
-  $items['panels/ajax/hide'] = array(
+  $items['panels/ajax/hide/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_toggle_shown',
-    'page arguments' => array('hide'),
+    'page arguments' => array('hide', 3),
   ) + $base;
-  $items['panels/ajax/cache-method'] = array(
+  $items['panels/ajax/cache-method/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_cache_method',
   ) + $base;
-  $items['panels/ajax/cache-settings'] = array(
+  $items['panels/ajax/cache-settings/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_cache_settings',
   ) + $base;
-  $items['panels/ajax/display-settings'] = array(
+  $items['panels/ajax/display-settings/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_display_settings',
   ) + $base;
-  $items['panels/ajax/style-type'] = array(
+  $items['panels/ajax/style-type/%/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_style_type',
+    'page arguments' => array(3, 4),
   ) + $base;
-  $items['panels/ajax/style-settings'] = array(
+  $items['panels/ajax/style-settings/%/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_style_settings',
+    'page arguments' => array(3, 4),
   ) + $base;
-  $items['panels/ajax/pane-css'] = array(
+  $items['panels/ajax/pane-css/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_configure_pane_css',
   ) + $base;
-  $items['panels/ajax/access-settings'] = array(
+  $items['panels/ajax/access-settings/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_configure_access_settings',
   ) + $base;
-  $items['panels/ajax/access-test'] = array(
+  $items['panels/ajax/access-test/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_configure_access_test',
   ) + $base;
-  $items['panels/ajax/access-add'] = array(
+  $items['panels/ajax/access-add/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_add_access_test',
   ) + $base;
-  $items['panels/ajax/preview'] = array(
+  $items['panels/ajax/preview/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_preview',
   ) + $base;
 
@@ -253,6 +256,22 @@ function panels_menu() {
   }
 
   return $items;
+}
+
+/**
+ * Menu loader function to load a cache item for Panels AJAX.
+ *
+ * This load all of the includes needed to perform AJAX, and loads the
+ * cache object and makes sure it is valid.
+ */
+function panels_edit_cache_load($cache_key) {
+  panels_load_include('display-edit');
+  panels_load_include('plugins');
+  ctools_include('ajax');
+  ctools_include('modal');
+  ctools_include('context');
+
+  return panels_edit_cache_get($cache_key);
 }
 
 /**
@@ -991,4 +1010,47 @@ function panels_get_current_page_display($change = NULL) {
   }
 
   return $display;
+}
+
+/**
+ * Get display edit cache on behalf of panel context.
+ *
+ * The key is the second half of the key in this form:
+ * panel_context:TASK_NAME:HANDLER_NAME;
+ */
+function panel_context_panels_cache_get($key) {
+  panels_load_include('common');
+  ctools_include('context-task-handler');
+  // this loads the panel context inc even if we don't use the plugin.
+  $plugin = page_manager_get_task_handler('panel_context');
+
+  list($task_name, $handler_name) = explode(':', $key, 2);
+  $page = page_manager_get_page_cache($task_name);
+  if (isset($page->display_cache[$handler_name])) {
+    return $page->display_cache[$handler_name];
+  }
+
+  $handler = &$page->handlers[$handler_name];
+  $cache = new stdClass();
+ 
+  $cache->display = &panels_panel_context_get_display($handler); 
+  $cache->display->context = ctools_context_handler_get_all_contexts($page->task, $page->subtask, $handler);
+  $cache->display->cache_key = 'panel_context:' . $key;
+  $cache->content_types = panels_common_get_allowed_types('panels_page', $cache->display->context);
+  $cache->display_title = TRUE;
+
+  return $cache;
+}
+
+/**
+ * Store a display edit in progress in the page cache.
+ */
+function panel_context_panels_cache_set($key, $cache) {
+  list($task_name, $handler_name) = explode(':', $key, 2);
+  $page = page_manager_get_page_cache($task_name);
+  $page->display_cache[$handler_name] = $cache;
+  $page->handlers[$handler_name]->conf['display'] = $cache->display;
+  $page->handler_info[$handler_name]['changed'] |= PAGE_MANAGER_CHANGED_CACHED;
+
+  page_manager_set_page_cache($page);
 }

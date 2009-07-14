@@ -608,26 +608,10 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   ctools_include('context');
   ctools_include('context-task-handler');
 
-  $display = &panels_panel_context_get_display($form_state['handler']);
+  $cache = panels_edit_cache_get('panel_context:' . $form_state['task_name'] . ':' . $form_state['handler_id']);
 
-  $display->context = ctools_context_handler_get_all_contexts($form_state['task'], $form_state['subtask'], $form_state['handler']);
-  $content_types = panels_common_get_allowed_types('panels_page', $display->context);
-
-// Load the display being edited from cache, if possible.
-  if (!empty($_POST) && is_object($cache = panels_cache_get('display', $display->did))) {
-    $display = $cache->display;
-  }
-  else {
-    panels_cache_clear('display', $display->did);
-    $cache = new stdClass();
-    $cache->display = $display;
-    $cache->content_types = $content_types;
-    $cache->display_title = TRUE;
-    panels_cache_set('display', $display->did, $cache);
-  }
-
-  $form_state['display'] = &$display;
-  $form_state['content_types'] = $content_types;
+  $form_state['display'] = &$cache->display;
+  $form_state['content_types'] = $cache->content_types;
   // Tell the Panels form not to display buttons.
   $form_state['no buttons'] = TRUE;
   $form_state['display_title'] = !empty($cache->display_title);
@@ -645,6 +629,12 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
 
 function panels_panel_context_edit_content_submit(&$form, &$form_state) {
   panels_edit_display_form_submit($form, $form_state);
+  $handler = &$form_state['handler'];
+  $display = $form_state['page']->display_cache[$form_state['handler_id']]->display;
+  $handler->conf['display'] = $display;
+
+  unset($form_state['page']->display_cache[$form_state['handler_id']]);
+
   if ($form_state['clicked_button']['#value'] == t('Update and preview')) {
     $form_state['new trail'] = array('handlers', $form_state['handler_id'], 'preview');
   }
