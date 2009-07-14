@@ -2,8 +2,8 @@
 // $Id$
 
 /**
- * @file styles/block.inc
- * Definition of the 'default' panel style.
+ * @file
+ * Definition of the 'naked' panel style.
  */
 
 // ---------------------------------------------------------------------------
@@ -14,11 +14,9 @@
  */
 function panels_block_panels_styles() {
   return array(
-    'block' => array(
-      'title' => t('System block'),
-      'description' => t('Display the pane as a system block; this is more restrictive than the default.'),
-      'render pane' => 'panels_block_style_render_pane',
-    ),
+    'title' => t('System block'),
+    'description' => t('Display the pane as a system block; this is more restrictive than the default.'),
+    'render pane' => 'panels_block_style_render_pane',
   );
 }
 

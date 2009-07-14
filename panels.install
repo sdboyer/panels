@@ -1202,3 +1202,14 @@ function panels_update_6303() {
 
   return $ret;
 }
+
+/**
+ * Ensure that users are informed about the page manager module.
+ */
+function panels_update_6304() {
+  if (!module_exists('page_manager')) {
+    drupal_set_message(t('The delegator module has been replaced by the Page Manager module. You should enable the page manager module to ensure that any panel pages you have will not be lost.'));
+  }
+
+  return array();
+}
