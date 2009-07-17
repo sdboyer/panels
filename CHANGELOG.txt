@@ -5,6 +5,7 @@ Panels 6.x-3.0-dev
 #298174: Recursion defense for mini panels.
 #502670: Extra HTML designed only for flexible layout admin accidentally rendered.
 #507516: "Default" panel style on regions not being properly utilized.
+#476440: Seriously, cloning variants really realy fixed.
 
 Panels 6.x-3.0-beta4
 ====================

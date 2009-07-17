@@ -408,6 +408,28 @@ function panels_panel_context_admin_summary($handler, $task, $subtask) {
 
   $rows = array();
 
+  $type = $handler->type == t('Default') ? t('In code') : $handler->type;
+  $rows[] = array(
+    array('class' => t('page-summary-label'), 'data' => t('Storage')),
+    array('class' => t('page-summary-data'), 'data' => $type),
+    array('class' => t('page-summary-operation'), 'data' => ''),
+  );
+
+  if (!empty($handler->disabled)) {
+    $link = l(t('Enable'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'actions', 'enable')));
+    $text = t('Disabled');
+  }
+  else {
+    $link = l(t('Disable'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'actions', 'disable')));
+    $text = t('Enabled');
+  }
+
+  $rows[] = array(
+    array('class' => t('page-summary-label'), 'data' => t('Status')),
+    array('class' => t('page-summary-data'), 'data' => $text),
+    array('class' => t('page-summary-operation'), 'data' => $link),
+  );
+
   $link = l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'criteria')));
   $rows[] = array(
     array('class' => t('page-summary-label'), 'data' => t('Selection rule')),
@@ -443,7 +465,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask) {
   if ($title != t('Panel')) {
     $title = t('Panel: @title', array('@title' => $title));
   }
-  
+
   $output .= '<div class="clear-block">';
   $output .= '<h3 class="handler-title">' . $title . '</h3>';
   $output .= $info;
