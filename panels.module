@@ -1020,6 +1020,7 @@ function panels_get_current_page_display($change = NULL) {
  */
 function panel_context_panels_cache_get($key) {
   panels_load_include('common');
+  ctools_include('context');
   ctools_include('context-task-handler');
   // this loads the panel context inc even if we don't use the plugin.
   $plugin = page_manager_get_task_handler('panel_context');
@@ -1030,7 +1031,12 @@ function panel_context_panels_cache_get($key) {
     return $page->display_cache[$handler_name];
   }
 
-  $handler = &$page->handlers[$handler_name];
+  if ($handler_name) {
+    $handler = &$page->handlers[$handler_name];
+  }
+  else {
+    $handler = &$page->new_handler;
+  }
   $cache = new stdClass();
  
   $cache->display = &panels_panel_context_get_display($handler); 
@@ -1049,8 +1055,12 @@ function panel_context_panels_cache_set($key, $cache) {
   list($task_name, $handler_name) = explode(':', $key, 2);
   $page = page_manager_get_page_cache($task_name);
   $page->display_cache[$handler_name] = $cache;
-  $page->handlers[$handler_name]->conf['display'] = $cache->display;
-  $page->handler_info[$handler_name]['changed'] |= PAGE_MANAGER_CHANGED_CACHED;
-
+  if ($handler_name) {
+    $page->handlers[$handler_name]->conf['display'] = $cache->display;
+    $page->handler_info[$handler_name]['changed'] |= PAGE_MANAGER_CHANGED_CACHED;
+  }
+  else {
+    $page->new_handler->conf['display'] = $cache->display;
+  }
   page_manager_set_page_cache($page);
 }

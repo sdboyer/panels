@@ -132,6 +132,8 @@ function panels_panel_context_page_manager_task_handlers() {
       'criteria' => t('Selection rules'),
       'context' => t('Contexts'),
     ),
+    // Where to go when finished.
+    'add finish' => 'content',
 
     'required forms' => array(
       'choose' => t('Choose layout'),
@@ -413,7 +415,9 @@ function panels_panel_context_admin_summary($handler, $task, $subtask) {
     array('class' => t('page-summary-operation'), 'data' => $link),
   );
 
-  $link = l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'layout')));
+  $link = l(t('Change layout'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'layout')));
+  $link .= '<br />' . l(t('Edit content'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'content')));
+  $link .= '<br />' . l(t('Preview'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'preview')));
   $rows[] = array(
     array('class' => t('page-summary-label'), 'data' => t('Layout')),
     array('class' => t('page-summary-data'), 'data' => check_plain($layout['title'])),
@@ -516,6 +520,9 @@ function panels_panel_context_edit_choose_validate(&$form, &$form_state) {
 function panels_panel_context_edit_choose_submit(&$form, &$form_state) {
   $form_state['display']->layout = $form_state['values']['layout'];
   $form_state['handler']->conf['display'] = $form_state['display'];
+  if (isset($form_state['page']->display_cache[$form_state['handler_id']])) {
+    $form_state['page']->display_cache[$form_state['handler_id']]->display = $form_state['display'];
+  }
 }
 
 /**
@@ -616,12 +623,13 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   $form_state['no buttons'] = TRUE;
   $form_state['display_title'] = !empty($cache->display_title);
   $form_state['no preview'] = TRUE;
+  $form_state['page']->display_cache[$form_state['handler_id']] = $cache;
 
   $form = array_merge($form, panels_edit_display_form($form_state));
   // Make sure the theme will work since our form id is different.
   $form['#theme'] = 'panels_edit_display_form';
 
-  if (!isset($form_state['type']) || $form_state['type'] != 'add') {
+  if (!isset($form_state['type']) || $form_state['type'] != 'add' && !empty($form_state['handler_id'])) {
     $form['buttons']['preview'] = $form['buttons']['return'];
     $form['buttons']['preview']['#value'] = t('Update and preview');
   }
@@ -630,9 +638,10 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
 function panels_panel_context_edit_content_submit(&$form, &$form_state) {
   panels_edit_display_form_submit($form, $form_state);
   $handler = &$form_state['handler'];
+
+  // update the cached display:
   $display = $form_state['page']->display_cache[$form_state['handler_id']]->display;
   $handler->conf['display'] = $display;
-
   unset($form_state['page']->display_cache[$form_state['handler_id']]);
 
   if ($form_state['clicked_button']['#value'] == t('Update and preview')) {
