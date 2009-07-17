@@ -6,6 +6,7 @@ Panels 6.x-3.0-dev
 #502670: Extra HTML designed only for flexible layout admin accidentally rendered.
 #507516: "Default" panel style on regions not being properly utilized.
 #476440: Seriously, cloning variants really realy fixed.
+#518360: Panels node form doesn't have format properly associated.
 
 Panels 6.x-3.0-beta4
 ====================
