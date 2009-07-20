@@ -924,7 +924,6 @@ function panels_ajax_add_pane_config_finish(&$form_state) {
 function panels_ajax_edit_pane_config_finish(&$form_state) {
   $cache = &$form_state['cache'];
   $pane = &$form_state['pane'];
-  $cache_key = $form_state['cache_key'];
   panels_edit_cache_set($cache);
 
   $form_state['commands'][] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
