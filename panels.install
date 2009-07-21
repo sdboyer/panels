@@ -1142,11 +1142,14 @@ function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $w
     $handler->conf['did'] = $info['did'];
   }
   else {
-    $display_code = panels_export_display(panels_load_display($p->did));
-    eval($display_code);
+    $d = panels_load_display($p->did);
+    if ($d) {
+      $display_code = panels_export_display($d);
+      eval($display_code);
 
-    $handler->conf['did'] = 'new';
-    $handler->conf['display'] = $display;
+      $handler->conf['did'] = 'new';
+      $handler->conf['display'] = $display;
+    }
   }
   $handler->conf['title'] = !empty($info['title']) ? $info['title'] : '';
   $handler->conf['contexts'] = unserialize($p->contexts);
