@@ -33,13 +33,7 @@
   height: 16px;
   float: left;
   margin: 2px;
-  padding: 0;
   border: 1px solid #fff; 
-}
-
-#panels-dnd-main div.panels-display .pane-add-link * {
-  padding: 0;
-  margin: 0;
 }
 
 .panel-portlet {

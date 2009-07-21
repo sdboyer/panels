@@ -1874,7 +1874,7 @@ function theme_panels_pane_dnd($block, $id, $label, $left_buttons = NULL, $butto
 // @DND
 function theme_panels_pane_collapsible($block) {
   $output = '';
-  $output .= '<h2 class="title">' . $block->title . '</h2>';
-  $output .= '<div class="content">' . filter_xss_admin($block->content) . '</div>';
+  $output .= '<div class="pane-title">' . $block->title . '</div>';
+  $output .= '<div class="pane-content">' . filter_xss_admin($block->content) . '</div>';
   return $output;
 }
