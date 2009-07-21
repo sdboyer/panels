@@ -9,7 +9,7 @@ Panels 6.x-3.0-dev
 #518360 by joshk: Panels node form doesn't have format properly associated.
 #525340 by markus_petrux: Dashboard improperly initializing a variable.
 #460902 by dmmckenna: Fix problem installing panels from an install profile.
-#452590 by jcmarco: Fix minor issue with panel node creation.
+#488278: Preview on panel nodes prior to creation caused errors.
 
 Panels 6.x-3.0-beta4
 ====================
