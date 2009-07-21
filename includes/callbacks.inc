@@ -45,7 +45,7 @@ function template_preprocess_panels_dashboard(&$vars) {
   if (module_exists('page_manager')) {
     module_load_include('inc', 'page_manager', 'page_manager.admin');
     $tasks = page_manager_get_tasks_by_type('page');
-    $pages = array();
+    $pages = array('operations' => array());
 
     page_manager_get_pages($tasks, $pages);
     $count = 0;
