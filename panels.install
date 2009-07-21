@@ -1024,6 +1024,7 @@ function panels_update_6302() {
       case 'node/%':
         $page->task = 'node_view';
         $page->subtask = '';
+        variable_set('page_manager_node_view_disabled', FALSE);
         break;
       case 'node/add/%':
         // It seems nearly impossible to actually upgrade this properly.
@@ -1032,6 +1033,7 @@ function panels_update_6302() {
         // Could we get conflicts here if they had both?
         $page->task = 'node_edit';
         $page->subtask = '';
+        variable_set('page_manager_node_edit_disabled', FALSE);
         break;
       case 'taxonomy/term':
       case 'taxonomy/term/%':
@@ -1040,10 +1042,12 @@ function panels_update_6302() {
         if ($arguments[0]['name'] == 'term') {
           variable_set('page_manager_term_view_type', 'single');
         }
+        variable_set('page_manager_term_view_disabled', FALSE);
         break;
       case 'user/%':
         $page->task = 'user_view';
         $page->subtask = '';
+        variable_set('page_manager_user_view_disabled', FALSE);
         break;
       // There is no default here.
     }
@@ -1129,7 +1133,9 @@ function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $w
 
   $handler->weight = $weight;
   $handler->task = $page->task;
-  $handler->subtask = $page->name;
+  if ($page->task == 'page') {
+    $handler->subtask = $page->name;
+  }
   $handler->export_type = EXPORT_IN_DATABASE;
   $handler->type = t('Normal');
 
