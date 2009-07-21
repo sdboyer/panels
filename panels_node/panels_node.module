@@ -135,11 +135,11 @@ function panels_node_add() {
  */
 function panels_node_form(&$node, &$param) {
   $form['panels_node']['#tree'] = TRUE;
-  if (empty($node->nid)) {
+  if (empty($node->nid) && empty($param)) {
     // Grab our selected layout from the $node, If it doesn't exist, try arg(3)
     // and if that doesn't work present them with a list to pick from.
     $panel_layout = isset($node->panel_layout) ? $node->panel_layout : arg(3);
-    if (empty($panel_layout)) {
+    if (!isset($panel_layout)) {
       $opts = $_GET;
       unset($opts['q']);
       return drupal_goto('node/add/panel/choose-layout', $opts);
