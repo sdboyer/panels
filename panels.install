@@ -7,7 +7,9 @@
 function panels_requirements($phase) {
   $requirements = array();
   $t = get_t();
-  if ($phase == 'install') {
+  // Assume that if the user is running an installation profile that both
+  // Panels and CTools are the same release.
+  if ($phase == 'install' && !(defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install')) {
     // apparently the install process doesn't include .module files,
     // so we need to force the issue in order for our versioning
     // check to work.
