@@ -10,6 +10,7 @@ Panels 6.x-3.0-dev
 #525340 by markus_petrux: Dashboard improperly initializing a variable.
 #460902 by dmmckenna: Fix problem installing panels from an install profile.
 #488278: Preview on panel nodes prior to creation caused errors.
+#475920: Create "use panels dashboard" permission to more easily control who can and cannot use it.
 
 Panels 6.x-3.0-beta4
 ====================
