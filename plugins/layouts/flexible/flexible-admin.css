@@ -1,6 +1,6 @@
 /* $Id$ */
 
-div.panel-flexible-edit-layout .pane-add-link,
+#panels-dnd-main .panel-flexible-edit-layout div.panels-display .pane-add-link,
 .panel-flexible-edit-layout .panel-pane {
   display: none;
 }
@@ -40,10 +40,6 @@ div.panel-flexible-edit-layout .pane-add-link,
   width: 5em;
   margin-left: auto;
   margin-right: auto;
-}
-
-#panels-flexible-toggle-layout {
-  text-align: right;
 }
 
 .panel-flexible-no-edit-layout .panels-flexible-splitter {

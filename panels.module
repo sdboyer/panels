@@ -50,24 +50,6 @@ function panels_theme() {
     'arguments' => array('display'),
     'file' => 'includes/common.inc',
   );
-  $theme['panels_dnd'] = array(
-    'arguments' => array('content'),
-    'file' => 'includes/display-edit.inc',
-    'function' => 'theme_panels_dnd',
-  );
-  $theme['panels_panel_dnd'] = array(
-    'arguments' => array('content', 'area', 'label', 'footer'),
-    'file' => 'includes/display-edit.inc',
-    'function' => 'theme_panels_panel_dnd',
-  );
-  $theme['panels_pane_dnd'] = array(
-    'arguments' => array('block', 'id', 'label', 'left_buttons' => NULL, 'buttons' => NULL),
-    'file' => 'includes/display-edit.inc',
-  );
-  $theme['panels_pane_collapsible'] = array(
-    'arguments' => array('block'),
-    'file' => 'includes/display-edit.inc',
-  );
   $theme['panels_render_display_form'] = array(
     'arguments' => array('form' => NULL),
   );

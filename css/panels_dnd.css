@@ -5,14 +5,16 @@
 }
 
 #panels-dnd-main div.panels-display {
-  border: 1px dashed #3D9CD7;
   padding: 0 0 .5em 0;
-  background: #D4EBF9;
+  border: 1px dashed #ddd;
+  background: #f8f8f8;
+  -webkit-border-radius: 0.333em;
+  -moz-border-radius: 0.333em;
 }
 
 #panels-dnd-main div.panels-display h2.label {
-/*  background: transparent; */
-  color: #3D9CD7;
+  color: #555;
+  text-shadow: #fff 1px 1px 1px;
   text-align: center;
   font-size: 13pt;
   margin: 0 0 .5em 0;
@@ -28,21 +30,48 @@
 }
 
 #panels-dnd-main div.panels-display .pane-add-link {
+  position: absolute;
   display: block;
   width: 16px;
   height: 16px;
   float: left;
-  margin: 2px;
-  border: 1px solid #fff; 
+  margin: 2px 2px 2px 4px;
+}
+
+/* Add Icon */
+#panels-dnd-main div.panels-display .pane-add-link  {
+}
+#panels-dnd-main div.panels-display .pane-add-link img {
+  display: none;
+}
+#panels-dnd-main div.panels-display .pane-add-link a.ctools-dropdown-image-link {
+  border: none;
+  width: 16px;
+  height: 18px;
+  float: left;
+  background: url('../images/sprite.png') no-repeat 0 -1178px;  
+/*  background: url('../images/sprite.png') no-repeat -166px -582px; */
 }
 
 .panel-portlet {
   padding: 0em;
   background: #ffffff;
-  border-top: 1px solid #78BAE3;
-  border-right: 1px solid #2B6D96;
-  border-bottom: 1px solid #2B6D96;
-  border-left: 1px solid #78BAE3;
+  border: 1px solid #bbb;
+}
+
+/* Cog Icon */
+.panel-portlet .buttons a img {
+  display: none;
+  margin: 0;
+}
+.panel-portlet .buttons a.ctools-dropdown-image-link {
+  border: none;
+  width: 16px;
+  height: 16px;
+  margin: 0 5px 0 0;
+  float: none;
+  display: block;
+  background: url('../images/sprite.png') no-repeat 0 -1178px;  
 }
 
 #panels-dnd-main .panel-pane,
@@ -56,7 +85,7 @@
 }
 
 .panel-pane.hidden-pane {
-  background: #ccc;
+  background: #f8f8f8;
 }
 
 .panel-portlet .content {
@@ -70,9 +99,12 @@
   height: 20px;
   cursor: move;
   margin: 0 0 0.5em 0;
-  color: #fff;
-  background-color: #3D9CD7;
   overflow: hidden;
+  background: #b3b3b3 url('../images/bg-shade-medium.png') repeat-x 0 100%;
+  color: #fff;
+  text-shadow: #555 1px 1px 1px;
+  border-color: #999;
+  font-weight: bold;
 }
 
 .panel-portlet.hidden-pane .grabber {
@@ -105,13 +137,21 @@
 }
 
 .panel-portlet .grabber:active {
-  color: #fff;
   background-color: red;
+}
+
+.panel-portlet .grabber:hover,
+.panel-portlet .grabber:active {
+  background: #858585 url('../images/bg-shade-dark.png') repeat-x 0 100%;
+  color: #fff;
+  text-shadow: #333 1px 1px 1px;
+  border-color: #858585;
 }
 
 .panel-portlet .grabber .text {
   margin-left: 3px;
   font-size: 90%;
+  line-height: 20px;
 }
 
 .panel-portlet .buttons {
@@ -130,18 +170,8 @@
   margin: 2px 1px;
 }
 
-.panel-portlet .toggle {
-  float: left;
-  width: 21px;
-  height: 21px;
-  cursor: pointer;
-  background-position: 7px 7px;
-  background-repeat: no-repeat;
-  background-image: url(../images/portlet-expanded.png);
-}
-
-.panel-portlet .title {
-  font-size:125%;
+.panel-portlet .pane-title {
+  font-size:110%;
   cursor: pointer;
 }
 
@@ -150,13 +180,21 @@
   padding: 0;
 }
 
+.panel-portlet .toggle {
+  float: left;
+  width: 21px;
+  height: 21px;
+  cursor: pointer;
+  background: url('../images/sky.png') no-repeat 6px -245px;
+}
+
 .panel-portlet .toggle-collapsed {
-  background-image: url(../images/portlet-collapsed.png);
+  background: url('../images/sky.png') no-repeat 6px -1021px;
 }
 
 /* CSS to guide a user to a place to drop */
 #panels-dnd-main .helperclass {
-  border: 1px dashed #f00;
+  border: 1px dashed red;
 }
 
 #panels-dnd-main .hoverclass {
@@ -401,3 +439,126 @@ html.js div.panels-display-links div.ctools-dropdown-container ul li a {
   width: 270px;
 }
 
+
+.panel-pane .pane-title {
+  padding: 0.25em 0.5em;
+}
+.panel-pane .pane-title:after {
+  font-size: 0.8em;
+  color: crimson;
+  letter-spacing: normal;
+  display: block;
+}
+.panel-pane.hidden-pane .pane-title:after {
+  content: " status: hidden";
+}
+.panel-pane.changed .pane-title:after {
+  content: " status: changes not saved";
+}
+.panel-pane.hidden-pane.changed .pane-title:after {
+  content: " status: hidden & changed";
+}
+
+/* @end */
+
+
+/* @group CTools Dropdown */
+#panels-dnd-main .ctools-dropdown a.ctools-dropdown-text-link {
+  background: url('../images/arrow-down-light.png') 0 3px no-repeat!important;
+  padding-left: 12px;
+}
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container {
+  width: 160px!important;
+  background: #fff url('../images/bg-shade-white-lrg.png') repeat-x 0 100%;
+  border: solid 1px #ddd!important;
+  margin: 0!important;
+  padding: 0.5em!important;
+  -webkit-border-radius: 0.333em;
+  -moz-border-radius: 0.333em;
+  -webkit-box-shadow: 0.333em 0.333em 0.333em rgba(0, 0, 0, 0.25);
+  font-size: 0.9em;
+}
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li {
+  text-decoration: none;
+  padding: 0.2em 0!important;
+  color: #555!important;
+  text-shadow: #fff 1px 1px 1px;
+}
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li span.text {
+  font-style: normal;
+  color: #000;
+  font-weight: bold;
+}
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li a {
+  color: #555!important;
+  font-weight: normal;
+}
+html.js#panels-dnd-main  div.ctools-dropdown div.ctools-dropdown-container ul li a:hover {
+  background: none!important;
+  color: #000!important;
+}
+html.js #panels-dnd-main div.panels-display-links div.ctools-dropdown-container ul li a {
+  width: 160px;
+}
+/* @end */
+
+/* @group Modal */
+/* Account for the extra div coming from ctools_modal_form_render() */
+div.messages div.messages {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0; 
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+}
+div.ctools-modal-content .modal-header {
+  background: #fff url('../images/bg-shade-light.png') repeat-x bottom left;
+  color: #777;
+  display: block;
+  font-weight: 700;
+  letter-spacing: normal;
+  padding: 0.25em 1em;
+  -moz-border-radius-topleft: 0.5em;
+  -moz-border-radius-topright: 0.5em;
+  -webkit-border-top-left-radius: 0.5em;
+  -webkit-border-top-right-radius: 0.5em;
+}
+div.ctools-modal-content .modal-title {
+  font-size: 120%;
+  font-weight: bold;
+  text-shadow: #fff 1px 1px 1px;
+  color: #555;
+}
+div.ctools-modal-content a.close {
+  color: #666;
+  font-weight: normal;
+  padding-left: 1.6em;
+  background: url('../images/sprite.png') no-repeat -166px -1686px;
+}
+div.ctools-modal-content a.close img {
+  display: none;
+}
+/** modal forms CSS **/
+div.ctools-modal-content .form-item label {
+  width: 100%;
+  float: none;
+  clear: both;
+}
+div.ctools-modal-content .resizable-textarea {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+div.ctools-modal-content {
+  font-size: 12px;
+  border: solid 1px #ddd;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-box-shadow: -1em 1em 1em rgba(0, 0, 0, 0.5);
+}
+#modalBackdrop {
+  position: fixed!important;
+  background-color: #000!important;
+}
+/* @end */

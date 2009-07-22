@@ -296,7 +296,7 @@ function theme_panels_edit_display_form($form) {
 
     $panel_buttons = panels_edit_panel_get_links($display, $panel_id, $cache_key);
 
-    $content[$panel_id] = theme('panels_panel_dnd', $content[$panel_id], $panel_id, $title, $panel_buttons);
+    $content[$panel_id] = panels_render_region_dnd($content[$panel_id], $panel_id, $title, $panel_buttons);
   }
 
   $preview = '';
@@ -310,7 +310,7 @@ function theme_panels_edit_display_form($form) {
   $output .= drupal_render($form);
 
   panels_load_include('display-render');
-  $output .= theme('panels_dnd', panels_render_layout_admin($layout, $content, $display));
+  $output .= panels_render_dnd(panels_render_layout_admin($layout, $content, $display));
   $output .= $save_buttons;
   $output .= $preview;
 
@@ -551,7 +551,7 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
   }
 
 
-  $output = theme('panels_pane_dnd', $block, $pane->pid, $title, '', $buttons);
+  $output = panels_render_pane_dnd($block, $pane->pid, $title, '', $buttons);
   if ($skin) {
     $class = 'panel-pane' . ($pane->shown ? '' : ' hidden-pane');
     $output = '<div class="' . $class . '" id="panel-pane-' . $pane->pid . '">' . $output . '</div>';
@@ -1840,18 +1840,18 @@ function panels_content_configure_access_test_form_submit(&$form, &$form_state) 
 // Panels theming functions
 
 // @DND
-function theme_panels_dnd($content) {
+function panels_render_dnd($content) {
   $output = '<div class="panels-dnd" id="panels-dnd-main">' . $content . '</div>';
   return $output;
 }
 
 // @DND
-function theme_panels_panel_dnd($content, $area, $label, $footer) {
+function panels_render_region_dnd($content, $area, $label, $footer) {
   return "<div class='panels-display' id='panel-pane-$area'>$footer<h2 class='label'>$label</h2>$content</div>";
 }
 
 // @DND
-function theme_panels_pane_dnd($block, $id, $label, $left_buttons = NULL, $buttons = NULL) {
+function panels_render_pane_dnd($block, $id, $label, $left_buttons = NULL, $buttons = NULL) {
   $output = '';
   if (!$block->title) {
     $block->title = t('No title');
@@ -1866,13 +1866,13 @@ function theme_panels_pane_dnd($block, $id, $label, $left_buttons = NULL, $butto
   }
   $output .= '<span class="text">' . $label . '</span></div>';
   $output .= '<div class="panel-pane-collapsible">';
-  $output .= theme('panels_pane_collapsible', $block);
+  $output .= panels_render_pane_collapsible($block);
   $output .= '</div>';
   return $output;
 }
 
 // @DND
-function theme_panels_pane_collapsible($block) {
+function panels_render_pane_collapsible($block) {
   $output = '';
   $output .= '<div class="pane-title">' . $block->title . '</div>';
   $output .= '<div class="pane-content">' . filter_xss_admin($block->content) . '</div>';
