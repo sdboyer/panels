@@ -427,6 +427,7 @@ div.panel-pane div.ctools-dropdown-container-wrapper {
   margin-top: -4px;
 }
 
+/*
 html.js div.panels-display-links div.ctools-dropdown-container {
   width: 275px;
 }
@@ -438,7 +439,7 @@ html.js div.panels-display-links div.ctools-dropdown-container ul li li a {
 html.js div.panels-display-links div.ctools-dropdown-container ul li a {
   width: 270px;
 }
-
+*/
 
 .panel-pane .pane-title {
   padding: 0.25em 0.5em;
@@ -463,43 +464,55 @@ html.js div.panels-display-links div.ctools-dropdown-container ul li a {
 
 
 /* @group CTools Dropdown */
-#panels-dnd-main .ctools-dropdown a.ctools-dropdown-text-link {
+#panels-dnd-main .ctools-dropdown a.ctools-dropdown-text-link,
+html.js div.panels-display-links a.ctools-dropdown-text-link {
+
   background: url('../images/arrow-down-light.png') 0 3px no-repeat!important;
   padding-left: 12px;
 }
-html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container {
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container,
+html.js div.panels-display-links div.ctools-dropdown-container {
   width: 160px!important;
   background: #fff url('../images/bg-shade-white-lrg.png') repeat-x 0 100%;
   border: solid 1px #ddd!important;
   margin: 0!important;
-  padding: 0.5em!important;
+/*  padding: 0.5em!important; */
   -webkit-border-radius: 0.333em;
   -moz-border-radius: 0.333em;
   -webkit-box-shadow: 0.333em 0.333em 0.333em rgba(0, 0, 0, 0.25);
   font-size: 0.9em;
 }
-html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li {
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li,
+html.js div.panels-display-links div.ctools-dropdown-container ul li {
+
   text-decoration: none;
   padding: 0.2em 0!important;
   color: #555!important;
   text-shadow: #fff 1px 1px 1px;
 }
-html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li span.text {
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li span.text,
+html.js div.panels-display-links div.ctools-dropdown-container ul li span.text {
+
   font-style: normal;
   color: #000;
   font-weight: bold;
 }
-html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li a {
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li a,
+html.js div.panels-display-links div.ctools-dropdown-container ul li a {
+
   color: #555!important;
   font-weight: normal;
+  width: auto;
+  padding: 0 10px;
 }
-html.js#panels-dnd-main  div.ctools-dropdown div.ctools-dropdown-container ul li a:hover {
+
+/*
+html.js #panels-dnd-main  div.ctools-dropdown div.ctools-dropdown-container ul li a:hover,
+html.js div.panels-display-links div.ctools-dropdown-container ul li a:hover {
   background: none!important;
   color: #000!important;
 }
-html.js #panels-dnd-main div.panels-display-links div.ctools-dropdown-container ul li a {
-  width: 160px;
-}
+*/
 /* @end */
 
 /* @group Modal */
