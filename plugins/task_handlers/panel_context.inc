@@ -577,8 +577,13 @@ function panels_panel_context_edit_layout(&$form, &$form_state) {
  * Validate that a layout was chosen.
  */
 function panels_panel_context_edit_layout_validate(&$form, &$form_state) {
+  $display = &panels_panel_context_get_display($form_state['handler']);
+
   if (empty($form_state['values']['layout'])) {
     form_error($form['layout'], t('You must select a layout.'));
+  }
+  if ($form_state['values']['layout'] == $display->layout) {
+    form_error($form['layout'], t('You must select a different layout if you wish to change layouts.'));
   }
 }
 
@@ -586,13 +591,10 @@ function panels_panel_context_edit_layout_validate(&$form, &$form_state) {
  * A layout has been selected, set it up.
  */
 function panels_panel_context_edit_layout_submit(&$form, &$form_state) {
-  // By default, 'next' takes us to whatever is next, but if they changed
-  // the layout we need to interject a form.
   $display = &panels_panel_context_get_display($form_state['handler']);
 
   if ($form_state['values']['layout'] != $display->layout) {
     $form_state['handler']->conf['temp_layout'] = $form_state['values']['layout'];
-    $form_state['clicked_button']['#next'] = 'move';
   }
 }
 
