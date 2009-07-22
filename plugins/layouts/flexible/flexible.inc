@@ -231,7 +231,7 @@ function theme_panels_flexible($id, $content, $settings, $display) {
   $renderer->content = $content;
   $renderer->css_id = $id;
   $renderer->did = $display->did;
-  $renderer->cache_key = $display->cache_key;
+//  $renderer->cache_key = $display->cache_key;
   $renderer->id_str = $id ? 'id="' . $id . '"' : '';
   $renderer->admin = FALSE;
 
