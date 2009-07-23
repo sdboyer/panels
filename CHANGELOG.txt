@@ -1,4 +1,4 @@
-Panels 6.x-3.0-dev
+Panels 6.x-3.0-rc1
 ==================
 
 #515316: Add permission to view Panels admin dashboard.
