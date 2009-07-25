@@ -1505,6 +1505,7 @@ function panels_edit_style_settings_form_submit($form, &$form_state) {
  * AJAX entry point to configure CSS for a pane.
  */
 function panels_ajax_configure_pane_css($cache, $pid = NULL) {
+  ctools_include('content');
   if (empty($cache->display->content[$pid])) {
     ctools_modal_render(t('Error'), t('Invalid pane id.'));
   }

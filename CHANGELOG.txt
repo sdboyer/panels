@@ -1,3 +1,8 @@
+Panels 6.x-3.0-dev
+==================
+
+#529258 by stella: Attempting to modify CSS properties on mini panel causes ajax failure.
+
 Panels 6.x-3.0-rc1
 ==================
 
