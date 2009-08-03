@@ -1402,6 +1402,7 @@ function panels_ajax_style_settings($type, $cache, $pid = '') {
       break;
 
     case 'pane':
+      ctools_include('content');
       $pane = &$cache->display->content[$pid];
       $conf = &$pane->style['settings'];
       $subtype = ctools_content_get_subtype($pane->type, $pane->subtype);
