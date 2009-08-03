@@ -137,7 +137,9 @@ function panels_mini_load_all() {
   $minis = ctools_export_load_object('panels_mini');
   $dids = array();
   foreach ($minis as $mini) {
-    $dids[$mini->did] = $mini->name;
+    if (!empty($mini->did)) {
+      $dids[$mini->did] = $mini->name;
+    }
   }
 
   $displays = panels_load_displays(array_keys($dids));
@@ -168,7 +170,9 @@ function panels_mini_save(&$mini) {
  */
 function panels_mini_delete($mini) {
   db_query("DELETE FROM {panels_mini} WHERE name = '%s'", $mini->name);
-  db_query("DELETE FROM {blocks} WHERE module = 'panels_mini' AND delta = %d", $mini->name);
+  if ($mini->type != t('Overridden')) {
+    db_query("DELETE FROM {blocks} WHERE module = 'panels_mini' AND delta = '%s'", $mini->name);
+  }
   return panels_delete_display($mini->did);
 }
 

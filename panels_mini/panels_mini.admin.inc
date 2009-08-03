@@ -236,7 +236,8 @@ function panels_mini_delete_confirm(&$form_state, $panel_mini) {
  * Handle the submit button to delete a mini panel.
  */
 function panels_mini_delete_confirm_submit($form, &$form_state) {
-  panels_mini_delete((object) $form_state['values']);
+  $mini = panels_mini_load($form_state['values']['name']);
+  panels_mini_delete($mini);
   $form_state['redirect'] = 'admin/build/panel-mini';
 }
 
@@ -390,8 +391,9 @@ function panels_mini_edit_form(&$form_state, $panel_mini) {
 
   $form['pid'] = array(
     '#type' => 'value',
-    '#value' => $panel_mini->pid,
+    '#value' => isset($panel_mini->pid) ? $panel_mini->pid : '',
   );
+
   $form['panel_mini'] = array(
     '#type' => 'value',
     '#value' => $panel_mini,
@@ -467,7 +469,7 @@ function panels_mini_edit_form(&$form_state, $panel_mini) {
     );
   }
 
-  $label = ($panel_mini->pid == 'new') ? t('Save and proceed') : t('Save');
+  $label = (!empty($panel_mini->pid) && $panel_mini->pid == 'new') ? t('Save and proceed') : t('Save');
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => $label,
@@ -506,7 +508,7 @@ function panels_mini_edit_form_validate($form, &$form_state) {
  */
 function panels_mini_edit_form_submit($form, &$form_state) {
   $panel_mini = $form_state['values']['panel_mini'];
-  if ($panel_mini->pid != 'new' && $panel_mini->name != $form_state['values']['name']) {
+  if (isset($panel_mini->pid) && $panel_mini->pid != 'new' && $panel_mini->name != $form_state['values']['name']) {
     // update all existing mini panels to point to this one appropriately.
     db_query("UPDATE {blocks} b SET delta = '%s' WHERE b.module = 'panels_mini' AND b.delta = '%s'", $form_state['values']['name'], $panel_mini->name);
 
@@ -523,7 +525,7 @@ function panels_mini_edit_form_submit($form, &$form_state) {
   $panel_mini->name = $form_state['values']['name'];
   $panel_mini->category = empty($form_state['values']['category']) ? '' : $form_state['values']['category'];
 
-  if ($panel_mini->pid == 'new') {
+  if (isset ($panel_mini->pid) && $panel_mini->pid == 'new') {
     unset($_SESSION['pm_import']);
     drupal_set_message(t('Your new mini panel %title has been saved.', array('%title' => $panel_mini->title)));
     panels_mini_save($panel_mini);
