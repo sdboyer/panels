@@ -3,6 +3,7 @@ Panels 6.x-3.0-dev
 
 #529258 by stella: Attempting to modify CSS properties on mini panel causes ajax failure.
 #537430 by dereine: Fix untranslatable strings in panels dashboard template.
+#530104 by stella: Fix import problem with mini panels.
 
 Panels 6.x-3.0-rc1
 ==================

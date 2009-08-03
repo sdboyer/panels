@@ -122,7 +122,9 @@ function panels_mini_load($name) {
   ctools_include('export');
   $result = ctools_export_load_object('panels_mini', 'names', array($name));
   if (isset($result[$name])) {
-    $result[$name]->display = panels_load_display($result[$name]->did);
+    if (empty($result[$name]->display)) {
+      $result[$name]->display = panels_load_display($result[$name]->did);
+    }
     return $result[$name];
   }
 }
