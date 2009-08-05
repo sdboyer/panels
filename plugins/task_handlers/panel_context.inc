@@ -16,7 +16,7 @@ function panels_panel_context_page_manager_task_handlers() {
   return array(
     // is a 'context' handler type, meaning it supports the API of the
     // context handlers provided by ctools context plugins.
-    'handler type' => 'context', 
+    'handler type' => 'context',
     'visible' => TRUE, // may be added up front.
 
     // Administrative fields.
@@ -29,7 +29,7 @@ function panels_panel_context_page_manager_task_handlers() {
     'admin js' => array(
       panels_get_path('js/layout.js'),
     ),
-    'operations' => array(    
+    'operations' => array(
       'settings' => array(
         'title' => t('General'),
         'description' => t('Change general settings about this variant.'),
@@ -118,7 +118,7 @@ function panels_panel_context_page_manager_task_handlers() {
       ),
     ),
 
-    // Callback to render the data. 
+    // Callback to render the data.
     'render' => 'panels_panel_context_render',
 
     // Various callbacks for operations performed on the handler to ensure
@@ -250,7 +250,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   if (isset($handler->handler)) {
     ctools_context_handler_pre_render($handler, $contexts, $args);
   }
-  
+
   // Load the display
   $display = panels_panel_context_get_display($handler);
 
@@ -380,7 +380,7 @@ function panels_panel_context_title($handler, $task, $subtask) {
  * provide a summary of the layout type and content on one side, and
  * a summary of the contexts in use on the other.
  */
-function panels_panel_context_admin_summary($handler, $task, $subtask) {
+function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $show_title = TRUE) {
   $task_name = page_manager_make_task_name($task['name'], $subtask['name']);
   $output = '';
 
@@ -389,6 +389,14 @@ function panels_panel_context_admin_summary($handler, $task, $subtask) {
   panels_load_include('plugins');
   ctools_include('context');
   ctools_include('context-task-handler');
+
+  // Get the operations
+  $operations = page_manager_get_operations($page);
+
+  // Get operations for just this handler.
+  $operations = $operations['handlers']['children'][$handler->name]['children']['actions']['children'];
+  $args = array('handlers', $handler->name, 'summary');
+  $rendered_operations = page_manager_render_operations($page, $operations, $args, array('class' => 'actions'), 'actions');
 
   $layout = panels_get_layout($display->layout);
 //  $icon = panels_print_layout_icon($display->layout, $layout);
@@ -448,7 +456,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask) {
 
   $content_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'content'))) . ']';
   $context_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'context'))) . ']';
-  
+
 
   $info = theme('table', array(), $rows, array('class' => 'page-manager-handler-summary'));
 
@@ -467,7 +475,13 @@ function panels_panel_context_admin_summary($handler, $task, $subtask) {
   }
 
   $output .= '<div class="clear-block">';
-  $output .= '<h3 class="handler-title">' . $title . '</h3>';
+  if ($show_title) {
+  $output .= '<div class="handler-title">';
+    $output .= '<div class="actions handler-actions">' . $rendered_operations['actions'] . '</div>';
+    $output .= '<span class="title-label">' . $title . '</span>';
+  }
+
+  $output .= '</div>';
   $output .= $info;
   $output .= '</div>';
 /*
