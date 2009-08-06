@@ -453,7 +453,7 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
       'attributes' => array('class' => 'ctools-use-modal'),
     );
   }
-  
+
   $style = panels_get_style((!empty($pane->style['style'])) ? $pane->style['style'] : 'default');
 
   $links[] = array(
@@ -721,7 +721,6 @@ function panels_add_content($cache, $panel_id, $key) {
       $content_type = ctools_get_content_type($type_name);
       foreach ($subtypes as $subtype_name => $subtype_info) {
         $title = filter_xss_admin($subtype_info['title']);
-        $description = isset($subtype_info['description']) ? $subtype_info['description'] : $title;
 
         $icon = ctools_content_admin_icon($subtype_info);
 
@@ -784,7 +783,7 @@ function panels_add_content($cache, $panel_id, $key) {
       }
 
       $url = "panels/ajax/add-pane/$cache_key/$panel_id/$category";
-      $selector .= ctools_ajax_text_button($name, $url, $description, $class);
+      $selector .= ctools_ajax_text_button($name, $url, '', $class);
     }
 
     $selector .= '</div>';

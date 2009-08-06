@@ -6,6 +6,7 @@ Panels 6.x-3.0-dev
 #530104 by stella: Fix import problem with mini panels.
 #535606: Mini panel deletion deleted all block config of all mini panels.
 #539418 by esmerel: Remove reference to panel page from module description.
+#535722: Fix incorrect "title" tag on categories in add content modal.
 
 Panels 6.x-3.0-rc1
 ==================
