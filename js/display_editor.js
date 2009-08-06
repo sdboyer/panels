@@ -1,6 +1,6 @@
 // $Id$
 /**
- * @file display_editor.js 
+ * @file display_editor.js
  *
  * Contains the javascript for the Panels display editor.
  */
@@ -99,7 +99,7 @@ Drupal.Panels.Draggable = {
   },
 
   createLandingPad: function(where, append) {
-    var obj = $('<div class="' + this.helperclass +'" id="' + 
+    var obj = $('<div class="' + this.helperclass +'" id="' +
       $(where).attr('id') + '-dropzone">&nbsp;</div>');
     if (append) {
       $(where).append(obj);
@@ -112,7 +112,7 @@ Drupal.Panels.Draggable = {
     $(obj).css({
       display: 'none'
     });
-    this.landing_pads.push({ 
+    this.landing_pads.push({
       centerX: offset.left + ($(obj).innerWidth() / 2),
       centerY: offset.top + ($(obj).innerHeight() / 2),
       obj: obj
@@ -194,7 +194,7 @@ Drupal.Panels.Draggable = {
 //      console.log('x:' + x + ' left:' + this.dropzones[i].left + ' right: ' + this.dropzones[i].left + this.dropzones[i].width);
       if (this.dropzones[i].left < x &&
         x < this.dropzones[i].left + this.dropzones[i].width &&
-        this.dropzones[i].top < y && 
+        this.dropzones[i].top < y &&
         y < this.dropzones[i].top + this.dropzones[i].height) {
           new_dropzone = this.dropzones[i];
           break;
@@ -241,6 +241,7 @@ Drupal.Panels.Draggable = {
 };
 
 Drupal.Panels.DraggableHandler = function() {
+  $(this).addClass('panel-draggable');
   var draggable = Drupal.Panels.Draggable;
   var scrollBuffer = 10;
   var scrollDistance = 10;
@@ -249,7 +250,7 @@ Drupal.Panels.DraggableHandler = function() {
   getMouseOffset = function(docPos, mousePos, windowPos) {
     return { x: mousePos.x - docPos.x + windowPos.x, y: mousePos.y - docPos.y + windowPos.y};
   };
-  
+
   getMousePos = function(ev) {
     ev = ev || window.event;
 
@@ -262,11 +263,11 @@ Drupal.Panels.DraggableHandler = function() {
     };
   };
 
-  getPosition = function(e) {   
+  getPosition = function(e) {
     /*
     if (document.defaultView && document.defaultView.getComputedStyle) {
       var css = document.defaultView.getComputedStyle(e, null);
-      return { 
+      return {
         x: parseInt(css.getPropertyValue('left')),
         y: parseInt(css.getPropertyValue('top'))
       };
@@ -302,7 +303,7 @@ Drupal.Panels.DraggableHandler = function() {
     }
     // remove the placeholder
     draggable.placeholder.remove();
-   
+
     // restore original settings.
     $(draggable.object).css(draggable.original);
     if (draggable.current_dropzone) {
@@ -394,7 +395,7 @@ Drupal.Panels.DraggableHandler = function() {
     var newPos = $(draggable.object).offset();
 
     var windowOffset = { left: originalPos.left - newPos.left, top: originalPos.top - newPos.top }
-    
+
     // if they grabbed outside the area where we make the draggable smaller, move it
     // closer to the cursor.
     if (layerX != 'undefined' && layerX > width) {
@@ -477,7 +478,7 @@ Drupal.behaviors.PanelsDisplayEditor = function(context) {
   }
 
   // Make draggables and make sure their positions are saved.
-  $(context).find('div.grabber').panelsDraggable();
+  $(context).find('div.grabber:not(.panel-draggable)').panelsDraggable();
   Drupal.Panels.Draggable.savePositions();
 
   // Bind buttons.
@@ -485,7 +486,7 @@ Drupal.behaviors.PanelsDisplayEditor = function(context) {
   $('input#panels-show-all', context).click(Drupal.Panels.clickShowAll);
 
   Drupal.Panels.bindClickDelete(context);
-  
+
   $('#panels-live-preview-button:not(.panels-preview-processed)')
     .addClass('panels-preview-processed')
     .click(function() {
