@@ -7,6 +7,8 @@ Panels 6.x-3.0-dev
 #535606: Mini panel deletion deleted all block config of all mini panels.
 #539418 by esmerel: Remove reference to panel page from module description.
 #535722: Fix incorrect "title" tag on categories in add content modal.
+Fix a bug with drag and drop UI that caused panes to break after other panes were added.
+#538900: Fix bug with flexible when having multiple regions of the same name if they have a space.
 
 Panels 6.x-3.0-rc1
 ==================
