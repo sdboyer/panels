@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: panels 5.x\n"
 "POT-Creation-Date: 2009-08-16 16:42+0200\n"
-"PO-Revision-Date: 2009-08-16 23:53+0100\n"
+"PO-Revision-Date: 2009-08-16 23:58+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: Alexander Hass\n"
 "MIME-Version: 1.0\n"
@@ -680,7 +680,7 @@ msgstr "Das Panel-Layout wurde aktualisiert."
 #: panels_node/panels_node.module:62
 #: plugins/task_handlers/panel_context.inc:139
 msgid "Choose layout"
-msgstr "Layout wählen"
+msgstr "Layout auswählen"
 
 #: includes/display-layout.inc:179
 msgid "There is no content in the panel display. If there were content, you would be given an opportunity to select where in the new layout the old content would be placed. Select \"Save\" or \"Continue\" to proceed. This change will not be processed if you do not continue."
