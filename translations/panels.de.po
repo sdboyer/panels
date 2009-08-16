@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: panels 5.x\n"
 "POT-Creation-Date: 2009-08-16 16:42+0200\n"
-"PO-Revision-Date: 2009-08-16 17:46+0100\n"
+"PO-Revision-Date: 2009-08-16 23:49+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: Alexander Hass\n"
 "MIME-Version: 1.0\n"
@@ -245,7 +245,7 @@ msgstr "Bestimmt das Standardverhalten für neue Inhalte. Falls aktiviert, wird 
 
 #: includes/common.inc:259
 msgid "<p>Click Submit to be presented with a complete list of available content types set to the defaults you selected.</p>"
-msgstr "<p>Absenden klicken, um eine Liste der verfügbaren Inhalte auf Basis der ausgewählten Standardeinstellungen angezeigt zu bekommen.</p>"
+msgstr "<p>Speichern, um eine Liste der verfügbaren Inhalte auf Basis der ausgewählten Standardeinstellungen angezeigt zu bekommen.</p>"
 
 #: includes/common.inc:288
 msgid "Other"
@@ -271,11 +271,11 @@ msgstr "Die Änderungen wurden gespeichert."
 
 #: includes/common.inc:396
 msgid "Select allowed layouts"
-msgstr "Erlaubtes Layout auswählen"
+msgstr "Zulässige Layouts auswählen"
 
 #: includes/common.inc:398
 msgid "Check the boxes for all layouts you want to allow users choose from when picking a layout. You must allow at least one layout."
-msgstr "Die Layouts aktivieren, welche Benutzer auswählen können sollen. Mindestens ein Layout muss erlaubt sein."
+msgstr "Die Ankreuzfelder für alle Layouts aktivieren, welche die Benutzer bei der Auswahl eines Layouts auswählen dürfen. Mindestens ein Layout muss zugelassen sein."
 
 #: includes/common.inc:486
 msgid "Empty"
