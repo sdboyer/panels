@@ -151,6 +151,7 @@ class panels_cache_object {
   var $head = NULL;
   var $css = NULL;
   var $js = NULL;
+  var $tokens = NULL;
   var $ready = FALSE;
 
   /**
@@ -159,6 +160,7 @@ class panels_cache_object {
   function panels_cache_object() {
     $this->head = drupal_set_html_head();
     $this->css = drupal_add_css();
+    $this->tokens = ctools_set_page_token();
 
     foreach (array('header', 'footer') as $scope) {
       $this->js[$scope] = drupal_add_js(NULL, NULL, $scope);
@@ -234,6 +236,16 @@ class panels_cache_object {
         }
       }
     }
+
+    // And for tokens:
+    $tokens = ctools_set_page_token();
+    foreach ($this->tokens as $token => $argument) {
+      if (isset($tokens[$token])) {
+        unset($tokens);
+      }
+    }
+
+    $this->tokens = $tokens;
   }
 
   /**
@@ -251,6 +263,13 @@ class panels_cache_object {
     if (!empty($this->js)) {
       foreach ($this->js as $args) {
         call_user_func_array('drupal_add_js', $args);
+      }
+    }
+
+    if (!empty($this->tokens)) {
+      foreach ($this->tokens as $token => $key) {
+        list($type, $argument) = $key;
+        ctools_set_page_token($token, $type, $argument);
       }
     }
   }

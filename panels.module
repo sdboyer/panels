@@ -7,7 +7,7 @@
  * Core functionality for the Panels engine.
  */
 
-define('PANELS_REQUIRED_CTOOLS_API', '1.1.0');
+define('PANELS_REQUIRED_CTOOLS_API', '1.1.1');
 
 /**
  * Returns the API version of Panels. This didn't exist in 1.
@@ -1020,8 +1020,8 @@ function panel_context_panels_cache_get($key) {
     $handler = &$page->new_handler;
   }
   $cache = new stdClass();
- 
-  $cache->display = &panels_panel_context_get_display($handler); 
+
+  $cache->display = &panels_panel_context_get_display($handler);
   $cache->display->context = ctools_context_handler_get_all_contexts($page->task, $page->subtask, $handler);
   $cache->display->cache_key = 'panel_context:' . $key;
   $cache->content_types = panels_common_get_allowed_types('panels_page', $cache->display->context);
