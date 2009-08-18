@@ -771,12 +771,6 @@ function panels_add_content($cache, $panel_id, $key) {
 
     $output = '<div class="panels-add-content-modal">';
     natcasesort($category_names);
-    if (empty($key) || empty($category_names[$key]) || $key == 'root') {
-      $key = current(array_keys($category_names));
-    }
-
-    natcasesort($titles[$key]);
-
     $selector = '<div class="panels-categories-box">';
 
     // Render our list of categories in column 0.
@@ -797,27 +791,38 @@ function panels_add_content($cache, $panel_id, $key) {
       }
     }
 
-    // Fill out the info for our current category.
-    $columns = 2;
-    $col[1] = '';
-    $col[2] = '';
-
-    $col_size = count($titles[$key]) / $columns;
-    $count = 0;
-    foreach ($titles[$key] as $id => $title) {
-      $which = floor($count++ / $col_size) + 1; // we leave 0 for the categories.
-      $col[$which] .= $categories[$key][$id];
+    if (empty($key) || empty($category_names[$key]) || $key == 'root') {
+//      $key = current(array_keys($category_names));
+      $center = '<div class="panels-categories-description">';
+      $center .= t('Content options are divided by category. Please select a category from the left to proceed.');
+      $center .= '</div>';
     }
+    else {
+      natcasesort($titles[$key]);
 
+      // Fill out the info for our current category.
+      $columns = 2;
+      $col[1] = '';
+      $col[2] = '';
+
+      $col_size = count($titles[$key]) / $columns;
+      $count = 0;
+      foreach ($titles[$key] as $id => $title) {
+        $which = floor($count++ / $col_size) + 1; // we leave 0 for the categories.
+        $col[$which] .= $categories[$key][$id];
+      }
+
+      $center = '';
+      foreach ($col as $id => $column) {
+        $center .= '<div class="panels-section-column panels-section-column-' . $id . '">'
+        . '<div class="inside">' . $column . '</div></div>';
+      }
+      $center .= '</div>'; // columns
+    }
     $output .= '<div class="panels-section-column panels-section-column-categories">'
       . '<div class="inside">' . $selector . '</div></div>';
     $output .= '<div class="panels-section-columns">';
-    foreach ($col as $id => $column) {
-      $output .= '<div class="panels-section-column panels-section-column-' . $id . '">'
-      . '<div class="inside">' . $column . '</div></div>';
-    }
-    $output .= '</div>'; // columns
-
+    $output .= $center;
     $output .= '</div>'; // categories box
   }
   return $output;
