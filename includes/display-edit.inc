@@ -616,30 +616,33 @@ function panels_edit_display_settings_form(&$form_state) {
       '#type' => 'textfield',
       '#default_value' => $display->title,
       '#title' => t('Title'),
-      '#description' => t('The title of this panel. You may use substitutions in this title.'),
+      '#description' => t('The title of this panel.'),
       '#process' => array('ctools_process_dependency'),
       '#dependency' => array('edit-display-title-hide-title' => array(0)),
     );
 
-    $form['display_title']['contexts'] = array(
-      '#title' => t('Substitutions'),
-      '#type' => 'fieldset',
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
+    if (!empty($display->context)) {
+      $form['display_title']['title']['#description'] .= ' ' . t('You may use substitutions in this title.');
+      $form['display_title']['contexts'] = array(
+        '#title' => t('Substitutions'),
+        '#type' => 'fieldset',
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+      );
 
-    $rows = array();
-    foreach ($display->context as $context) {
-      foreach (ctools_context_get_converters('%' . check_plain($context->keyword) . ':', $context) as $keyword => $title) {
-        $rows[] = array(
-          check_plain($keyword),
-          t('@identifier: @title', array('@title' => $title, '@identifier' => $context->identifier)),
-        );
+      $rows = array();
+      foreach ($display->context as $context) {
+        foreach (ctools_context_get_converters('%' . check_plain($context->keyword) . ':', $context) as $keyword => $title) {
+          $rows[] = array(
+            check_plain($keyword),
+            t('@identifier: @title', array('@title' => $title, '@identifier' => $context->identifier)),
+          );
+        }
       }
-    }
 
-    $header = array(t('Keyword'), t('Value'));
-    $form['display_title']['contexts']['context'] = array('#value' => theme('table', $header, $rows));
+      $header = array(t('Keyword'), t('Value'));
+      $form['display_title']['contexts']['context'] = array('#value' => theme('table', $header, $rows));
+    }
   }
 
   // TODO doc the ability to do this as part of the API
