@@ -67,7 +67,7 @@ function panels_panel_context_page_manager_task_handlers() {
       ),
       'layout' => array(
         'title' => t('Layout'),
-        'description' => t('Add content items and change their location with a drag and drop interface.'),
+        'description' => t('Change the layout of this panel.'),
         // No AJAX so we get our CSS loaded.
         'ajax' => FALSE,
         'form' => array(
