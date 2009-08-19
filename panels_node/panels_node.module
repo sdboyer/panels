@@ -308,7 +308,7 @@ function panels_node_edit_layout($node) {
   ctools_include('context');
   $display = panels_load_display($node->panels_node['did']);
   $display->context = panels_node_get_context($node);
-  return panels_edit_layout($display, t('Save'), "node/$node->nid/panel_layout");
+  return panels_edit_layout($display, t('Save'), "node/$node->nid/panel_layout", 'panels_node');
 }
 
 /**

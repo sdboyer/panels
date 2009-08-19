@@ -11,6 +11,7 @@ Fix a bug with drag and drop UI that caused panes to break after other panes wer
 #538900: Fix bug with flexible when having multiple regions of the same name if they have a space.
 #552014: Hide Substitutions fieldset if there are no contexts.
 #552006: Add Content modal now opens to explanatory text instead of the first category.
+#553392 by lee20: Fix node allowed layouts not properly respected on edit layout screen.
 
 Panels 6.x-3.0-rc1
 ==================
