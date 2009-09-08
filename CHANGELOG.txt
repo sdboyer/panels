@@ -1,3 +1,5 @@
+Panels 6.x-dev
+#552846 by eMPee584: Fix notice with tablesorts on mini panels page if no mini panels exist.
 
 Panels 6.x-3.0
 ==============
