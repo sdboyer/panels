@@ -395,11 +395,10 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
 
   // Get operations for just this handler.
   $operations = $operations['handlers']['children'][$handler->name]['children']['actions']['children'];
-  $args = array('handlers', $handler->name, 'summary');
-  $rendered_operations = page_manager_render_operations($page, $operations, $args, array('class' => 'actions'), 'actions');
+  $args = array('handlers', $handler->name, 'actions');
+  $rendered_operations = page_manager_render_operations($page, $operations, array(), array('class' => 'actions'), 'actions', $args);
 
   $layout = panels_get_layout($display->layout);
-//  $icon = panels_print_layout_icon($display->layout, $layout);
 
   $plugin = page_manager_get_task_handler($handler->handler);
 
