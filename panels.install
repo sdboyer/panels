@@ -679,8 +679,11 @@ function panels_update_5299() {
  * Update from 6.x v2.
  */
 function panels_update_6290() {
-
   $ret = array();
+  if (!module_exists('panels')) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('The Panels module cannot be updated while disabled. If you wish to update Panels, please enable it. If you do not wish to update Panels, please uninstall it.'));
+    return $ret;
+  }
 
   // Fetch schema version 1.
   $schema = panels_schema_1();
@@ -726,6 +729,11 @@ function panels_update_6290() {
  */
 function panels_update_6291() {
   $ret = array();
+  if (!module_exists('panels')) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('The Panels module cannot be updated while disabled. If you wish to update Panels, please enable it. If you do not wish to update Panels, please uninstall it.'));
+    return $ret;
+  }
+
   // Fetch schema version 1.
   $schema = panels_schema_1();
 
@@ -743,6 +751,10 @@ function panels_update_6291() {
  */
 function panels_update_6292(&$sandbox) {
   $ret = array();
+  if (!module_exists('panels')) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('The Panels module cannot be updated while disabled. If you wish to update Panels, please enable it. If you do not wish to update Panels, please uninstall it.'));
+    return $ret;
+  }
 
   if (!isset($sandbox['progress'])) {
     $sandbox['progress'] = 0;
@@ -835,6 +847,10 @@ function panels_update_6292(&$sandbox) {
  */
 function panels_update_6293(&$sandbox) {
   $ret = array();
+  if (!module_exists('panels')) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('The Panels module cannot be updated while disabled. If you wish to update Panels, please enable it. If you do not wish to update Panels, please uninstall it.'));
+    return $ret;
+  }
 
   if (!isset($sandbox['progress'])) {
     $sandbox['progress'] = 0;
@@ -891,6 +907,10 @@ function panels_update_6300() {
 
 function panels_update_6302() {
   $ret = array();
+  if (!module_exists('panels')) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('The Panels module cannot be updated while disabled. If you wish to update Panels, please enable it. If you do not wish to update Panels, please uninstall it.'));
+    return $ret;
+  }
 
   if (!module_exists('page_manager') && db_table_exists('panels_page')) {
     $ret['#abort'] = array('success' => FALSE, 'query' => t('Conversion of panels pages cannot be completed without page manager module from CTools installed. Please install CTools, activate page manager, and attempt the update again.'));
@@ -1140,7 +1160,7 @@ function _panels_update_create_handler($page, $p, $origin, $info, $arguments, $w
   $handler->type = t('Normal');
 
   $handler->name = page_manager_handler_get_name($task_name, $cache->handlers, $handler);
-  
+
   $handler->conf['css'] = $p->css;
   $handler->conf['css_id'] = $p->css_id;
   $handler->conf['no_blocks'] = $p->no_blocks;
