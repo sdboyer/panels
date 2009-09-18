@@ -21,15 +21,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Drupal Panels V6.x-3.0\n"
-"POT-Creation-Date: 2009-08-20 10:33+0200\n"
-"PO-Revision-Date: 2009-08-20 12:03+0100\n"
-"Last-Translator: Frank Tartler <frank.tartler@googlemail.com>\n"
-"Language-Team: Frank Tartler <frank.tartler@googlemail.com>\n"
+"Project-Id-Version: panels 5.x\n"
+"POT-Creation-Date: 2009-08-16 16:42+0200\n"
+"PO-Revision-Date: 2009-08-16 23:58+0100\n"
+"Last-Translator: Alexander Haß\n"
+"Language-Team: Alexander Hass\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n!= 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Language: German\n"
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -58,9 +58,11 @@ msgstr "Erweiterte Einstellungen von Panel-Inhalten verwalten"
 msgid "use panels caching features"
 msgstr "Panels-Caching-Funktionen verwenden"
 
+# Dashboard?
 #: panels.module:302
+#, fuzzy
 msgid "use panels dashboard"
-msgstr "Panels-Dashboard verwenden"
+msgstr "Panels Dashboard verwenden"
 
 #: panels.module:190
 #: panels.info:0;0
@@ -86,15 +88,19 @@ msgstr "Einstellungen"
 #: panels.module:210
 #: plugins/task_handlers/panel_context.inc:34;146
 msgid "General"
-msgstr "Allgemeines"
+msgstr "Allgemein"
 
 #: panels.module:220
 msgid "Panel pages"
 msgstr "Panel-Seiten"
 
+#: panels.module:0
+msgid "panels"
+msgstr "Panels"
+
 #: panels.install:30
 msgid "The CTools API version is too old for Panels. Panels needs at least %version."
-msgstr "Die CTools-API-Version ist zu alt für Panels. Panels benötigt mindestens %version."
+msgstr ""
 
 #: panels.install:641
 msgid "Update #5218 only has changes for PostgreSQL. There are no updates for MySQL databases - since you're running MySQL, you should consider this update successful."
@@ -106,23 +112,27 @@ msgstr "Fehlgeschlagene Versuche, neue Spalten im Update #5216 hinzuzufügen, k�
 
 #: panels.install:673
 msgid "Please note that the Panels upgrade from Drupal 5 to Drupal 6 is far from perfect, especially where Views and CCK are involved. Please check all your panels carefully and compare them against the originals. You may need to do some rework to regain your original functionality."
-msgstr "Zu beachten ist, dass das Panels-Upgrade von Drupal 5 nach Drupal 6 weit davon entfernt ist, perfekt zu sein, vor allem wenn Views und CCK involviert sind. Es sollten alle bestehenden Panels sorgfältig geprüft und mit den Originalen verglichen werden. Es kann etwas Nacharbeit nötig sein, um die usprüngliche Funktionalität wiederherzustellen."
+msgstr ""
 
 #: panels.install:708
 msgid "Panels now requires the Chaos Tool Suite (ctools) module to function. Panels has been disabled until you can add this module."
-msgstr "Panels benötigt inzwischen da Modul Chaos Tool Suite um zu funktionieren. Panels wurde deaktiviert, bis dieses Modul hinzugefügt werden kann."
+msgstr ""
 
+# Missing period?
 #: panels.install:828
+#, fuzzy
 msgid "Panel panes were updated"
-msgstr "Panel-Panes wurden aktualisiert"
+msgstr "Die Panel-Ausschnitte wurden aktualisiert"
 
+# Missing period?
 #: panels.install:880
+#, fuzzy
 msgid "Panel displays were updated"
-msgstr "Panel-Anzeigen wurden aktualisiert"
+msgstr "Die Panel-Anzeigen wurden aktualisiert"
 
 #: panels.install:896
 msgid "Conversion of panels pages cannot be completed without page manager module from CTools installed. Please install CTools, activate page manager, and attempt the update again."
-msgstr "Die Konvertierung von Panel-Seiten kann nicht abgeschlossen werden, solange das Page-Manager-Modul von CTools nicht installiert ist. CTools muss installiert und der Page Manager aktiviert werden, um die Aktualisierung erneut zu versuchen."
+msgstr ""
 
 #: panels.install:1064
 #: panels_node/panels_node.module:93
@@ -136,27 +146,27 @@ msgstr "Normal"
 
 #: panels.install:1210
 msgid "Your installation contains a module that no longer exists. When updating modules, you should always remove the module directory first, then replace it with the new code. The \"Panels Simple Cache\" module is being automatically disabled for you. Please do not re-enable it as it will cause your system to crash."
-msgstr "Zu beachten ist, dass das Panels-Upgrade von Drupal 5 nach Drupal 6 weit davon entfernt ist, perfekt zu sein, vor allem wenn Views und CCK involviert sind. Es sollten alle bestehenden Panels sorgfältig geprüft und mit den Originalen verglichen werden. Es kann etwas Nacharbeit nötig sein, um die usprüngliche Funktionalität wiederherzustellen."
+msgstr ""
 
 #: panels.install:1222
 msgid "The delegator module has been replaced by the Page Manager module. You should enable the page manager module to ensure that any panel pages you have will not be lost."
-msgstr "Das Delegator-Modul wurde durch das Page-Manager-Modul ersetzt. Das Page-Manager-Modul sollte aktiviert werden um sicherzustellen, dass keine bestehenden Panel-Seiten verloren gehen."
+msgstr ""
 
 #: (duplicate) panels.install:27
 msgid "CTools API Version"
-msgstr "CTools-API-Version"
+msgstr "CTools API-Version"
 
 #: panels.info:0
 msgid "Core Panels display functions; provides no external UI, at least one other Panels module should be enabled."
-msgstr "Grundlegende Panels-Anzeigefunktionen; stellt keine externe Benutzeroberfläche bereit, mindestens ein anderes Panels-Modul sollte aktiviert werden."
+msgstr ""
 
 #: includes/callbacks.inc:19
 msgid "Panel pages can be used as landing pages. They have a URL path, accept arguments and can have menu entries."
-msgstr "Panel-Seiten können als Landeseiten verwendet werden. Sie haben einen URL-Pfad, akzeptieren Argumente und können Menüeinträge haben."
+msgstr ""
 
 #: includes/callbacks.inc:20
 msgid "Customize an already existing page within your site."
-msgstr "Anpassen einer schon bestehenden Seite innerhalb dieser Website."
+msgstr "Eine vorhandene Seite innerhalb der Website anpassen."
 
 #: includes/callbacks.inc:22;25
 msgid "Panel page"
@@ -164,11 +174,11 @@ msgstr "Panel-Seite"
 
 #: includes/callbacks.inc:25;26
 msgid "You must activate the page manager module for this functionality."
-msgstr "Für diese Funktionalität muss as Page-Manager-Modul aktiviert werden."
+msgstr "Für diese Funktionalität muss das Seiten-Manager-Modul aktiviert werden."
 
 #: includes/callbacks.inc:29
 msgid "Panel nodes are node content and appear in your searches, but are more limited than panel pages."
-msgstr "Panel-Beiträge sind Beitragsinhalt und erscheinen in Suchen, sind aber eingeschränktger als Panel-Seiten."
+msgstr ""
 
 #: includes/callbacks.inc:31;34
 msgid "Panel node"
@@ -176,11 +186,11 @@ msgstr "Panel-Beitrag"
 
 #: includes/callbacks.inc:34
 msgid "You must activate the panel node module for this functionality."
-msgstr "Für diese Funktionalität muss das Panel-Node-Modul aktiviert werden."
+msgstr "Für diese Funktionalität muss das Panel-Beitrag-Modul aktiviert werden."
 
 #: includes/callbacks.inc:37
 msgid "Mini panels are small content areas exposed as blocks, for when you need to have complex block layouts or layouts within layouts."
-msgstr "Mini-Panels sind kleine Inhaltsbereiche, die als Blöcke angeboten werden, v.a. wenn komplexe Block-Layouts oder Layouts innerhalb Layouts benötigt werden."
+msgstr ""
 
 #: includes/callbacks.inc:39;42
 #: panels_mini/plugins/content_types/panels_mini.inc:39
@@ -192,13 +202,12 @@ msgid "You must activate the Mini panels module for this functionality."
 msgstr "Für diese Funktionalität muss das Mini-Panels-Modul aktiviert werden."
 
 #: includes/callbacks.inc:69;102
-#, fuzzy
 msgid "Go to list"
-msgstr "Zur Liste"
+msgstr ""
 
 #: includes/callbacks.inc:72
 msgid "You must install and activate the Page Manager module to manage pages. This module is located within the Chaos Tools Suite."
-msgstr "Um Seiten zu verwalten muss das Page-Manager-Modul installiert und aktiviert werden. Das Modul liegt in der Chaos Tool Suite."
+msgstr ""
 
 #: includes/callbacks.inc:85
 #: panels_mini/panels_mini.admin.inc:156
@@ -208,15 +217,15 @@ msgstr "Bearbeiten"
 
 #: includes/callbacks.inc:100
 msgid "There are no mini panels."
-msgstr "Es gibt keine Mini-Panels."
+msgstr "Es gibt derzeit keine Mini-Panels."
 
 #: includes/callbacks.inc:105
 msgid "You must install and activate the Mini Panels module to manage them."
-msgstr "Das Mini-Panels-Modul muss installiert und aktiviert werden, um es zu verwalten."
+msgstr ""
 
 #: includes/callbacks.inc:128
 msgid "There are currently no settings to change, but additional plugins or modules may provide them in the future."
-msgstr "Momentan gibt es keine zu änderbaren Einstellungen, aber zusätzliche Plugins oder Module können diese in der Zukunft bereitstellen."
+msgstr ""
 
 #: includes/common.inc:241
 msgid "New @s"
@@ -236,7 +245,7 @@ msgstr "Bestimmt das Standardverhalten für neue Inhalte. Falls aktiviert, wird 
 
 #: includes/common.inc:259
 msgid "<p>Click Submit to be presented with a complete list of available content types set to the defaults you selected.</p>"
-msgstr "<p>Absenden klicken, um eine Liste der verfügbaren Inhalte auf Basis der ausgewählten Standardeinstellungen angezeigt zu bekommen.</p>"
+msgstr "<p>Speichern, um eine Liste der verfügbaren Inhalte auf Basis der ausgewählten Standardeinstellungen angezeigt zu bekommen.</p>"
 
 #: includes/common.inc:288
 msgid "Other"
@@ -247,7 +256,7 @@ msgid "Allowed @s content"
 msgstr "Erlaubter @s-Inhalt"
 
 #: includes/common.inc:312
-#: includes/display-edit.inc:143;1171;1485;1566;1636;1801
+#: includes/display-edit.inc:143;1163;1477;1558;1628;1793
 #: includes/display-layout-settings.inc:220;360
 #: panels_mini/panels_mini.admin.inc:472;591;668
 #: panels_node/panels_node.module:311
@@ -262,11 +271,11 @@ msgstr "Die Änderungen wurden gespeichert."
 
 #: includes/common.inc:396
 msgid "Select allowed layouts"
-msgstr "Erlaubtes Layout auswählen"
+msgstr "Zulässige Layouts auswählen"
 
 #: includes/common.inc:398
 msgid "Check the boxes for all layouts you want to allow users choose from when picking a layout. You must allow at least one layout."
-msgstr "Die Layouts aktivieren, welche Benutzer auswählen können sollen. Mindestens ein Layout muss erlaubt sein."
+msgstr "Die Ankreuzfelder für alle Layouts aktivieren, welche die Benutzer bei der Auswahl eines Layouts auswählen dürfen. Mindestens ein Layout muss zugelassen sein."
 
 #: includes/common.inc:486
 msgid "Empty"
@@ -328,13 +337,13 @@ msgstr "Vorschau"
 
 #: includes/display-edit.inc:236
 msgid "Display style: @style"
-msgstr "Anzeige-Stil: @style"
+msgstr "Anzeige-Design: @style"
 
 #: includes/display-edit.inc:242;347;467
 msgid "Style settings"
-msgstr "Stil-Einstellungen"
+msgstr "Design-Einstellungen"
 
-#: includes/display-edit.inc:251;517;1050
+#: includes/display-edit.inc:251;517;1042
 msgid "No caching"
 msgstr "Kein Caching"
 
@@ -348,7 +357,7 @@ msgstr "Cache-Einstellungen"
 
 #: includes/display-edit.inc:266;578
 msgid "Display settings"
-msgstr "Anzeige-Einstellungen"
+msgstr "Anzeigeeinstellungen"
 
 #: includes/display-edit.inc:304
 msgid "Live preview"
@@ -366,7 +375,7 @@ msgstr "Standard"
 
 #: includes/display-edit.inc:341
 msgid "Region style: @style"
-msgstr "Bereichs-Stil: @style"
+msgstr "Regionen-Design: @style"
 
 #: includes/display-edit.inc:430
 msgid "Deleted/missing content type @type"
@@ -374,15 +383,15 @@ msgstr "Entfernter/fehlender Inhaltstyp @type"
 
 #: includes/display-edit.inc:436
 msgid "Disable this pane"
-msgstr "Diese Pane deaktivieren"
+msgstr "Diesen Ausschnitt deaktivieren"
 
 #: includes/display-edit.inc:443
 msgid "Enable this pane"
-msgstr "Diese Pane aktivieren"
+msgstr "Diesen Ausschnitt aktivieren"
 
 #: includes/display-edit.inc:460
 msgid "Style: @style"
-msgstr "Stil: @style"
+msgstr "Design: @style"
 
 #: includes/display-edit.inc:475
 msgid "CSS properties"
@@ -390,21 +399,21 @@ msgstr "CSS-Eigenschaften"
 
 #: includes/display-edit.inc:483
 msgid "Visibility settings"
-msgstr "Sichtbarkeits-Einstellungen"
+msgstr "Sichtbarkeitseinstellung"
 
 #: includes/display-edit.inc:497
 msgid "Broken/missing access plugin %plugin"
-msgstr "Fehlerhaftes/Fehlendes Zugriffs-Plugin %plugin"
+msgstr ""
 
 #: includes/display-edit.inc:501
 msgid "@title: !description"
-msgstr ""
+msgstr "@title: !description"
 
 #: includes/display-edit.inc:508
 msgid "Add new visibility rule"
-msgstr "Neue Sichtbarkeits-Regel hinzufügen"
+msgstr "Neue Sichtbarkeitsregel hinzufügen"
 
-#: includes/display-edit.inc:533;1806
+#: includes/display-edit.inc:533;1798
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -423,7 +432,7 @@ msgstr "Titel verstecken"
 
 #: includes/display-edit.inc:612
 msgid "If checked, this panel will have no visible title."
-msgstr "Falls aktiviert, hat dieses Panel keinen sichtbaren Titel."
+msgstr "Sobald aktiviert, wird dieses Panel keinen sichtbaren Titel haben."
 
 #: includes/display-edit.inc:618
 #: includes/display-layout-settings.inc:89
@@ -431,167 +440,170 @@ msgstr "Falls aktiviert, hat dieses Panel keinen sichtbaren Titel."
 msgid "Title"
 msgstr "Titel"
 
+# Platzhalter?
 #: includes/display-edit.inc:619
-msgid "The title of this panel."
-msgstr "Der Titel dieses Panels."
+#, fuzzy
+msgid "The title of this panel. You may use substitutions in this title."
+msgstr "Der Titel von diesem Panel. Im Titel können Ersetzungen verwendet werden."
 
+# Context sensitive?
 #: includes/display-edit.inc:625
-msgid "You may use substitutions in this title."
-msgstr "Im Titel können Ersetzungen verwendet werden."
-
-#: includes/display-edit.inc:627
+#, fuzzy
 msgid "Substitutions"
 msgstr "Ersetzungen"
 
-#: includes/display-edit.inc:638
+#: includes/display-edit.inc:636
 msgid "@identifier: @title"
-msgstr ""
+msgstr "@identifier: @title"
 
-#: includes/display-edit.inc:643
+#: includes/display-edit.inc:641
 msgid "Keyword"
 msgstr "Platzhalter"
 
-#: includes/display-edit.inc:643
+#: includes/display-edit.inc:641
 msgid "Value"
 msgstr "Wert"
 
-#: includes/display-edit.inc:703
+#: includes/display-edit.inc:700
 msgid "Add content to !s"
 msgstr "Inhalt zu !s hinzufügen"
 
-#: includes/display-edit.inc:708;882;988;1100;1225;1519;1592;1661;1724;1741
+#: includes/display-edit.inc:705;874;980;1092;1217;1511;1584;1653;1716;1733
 #: plugins/layouts/flexible/flexible.inc:703;855
 msgid "Error"
 msgstr "Fehler"
 
-#: includes/display-edit.inc:708
+#: includes/display-edit.inc:705
 msgid "Invalid input"
 msgstr "Ungültige Eingabe"
 
-#: includes/display-edit.inc:743
+#: includes/display-edit.inc:740
 msgid "Uncategorized"
 msgstr "Nicht kategorisiert"
 
-#: includes/display-edit.inc:765
+#: includes/display-edit.inc:762
 msgid "There are no content types you may add to this display."
 msgstr "Es gibt keine Inhaltstypen, die zu dieser Ansicht hinzugefügt werden können."
 
-#: includes/display-edit.inc:797
-msgid "Content options are divided by category. Please select a category from the left to proceed."
-msgstr "Inhaltsoptionen sind nach Kategorien unterteilt. Bitte zuerst links eine Kategorie auswählen."
-
-#: includes/display-edit.inc:882;955;988;1100;1225;1519;1592;1661;1724
+#: includes/display-edit.inc:874;947;980;1092;1217;1511;1584;1653;1716
 msgid "Invalid pane id."
 msgstr "Ungültige Panel-Inhalt-ID."
 
-#: includes/display-edit.inc:979
+#: includes/display-edit.inc:971
 msgid "Cache method for this display"
 msgstr "Cache-Methode für diese Anzeige"
 
-#: includes/display-edit.inc:985
+#: includes/display-edit.inc:977
 msgid "Cache method for !subtype_title"
 msgstr "Cache-Methode für !subtype_title"
 
-#: includes/display-edit.inc:1046
+#: includes/display-edit.inc:1038
 msgid "No caching options are available at this time. Please enable a panels caching module in order to use caching options."
 msgstr "Derzeit stehen keine Caching-Optionen zur Verfügung. Das Panels-Caching Modul muss aktiviert sein, um Caching-Optionen verwenden zu können."
 
-#: includes/display-edit.inc:1059
+#: includes/display-edit.inc:1051
 msgid "Method"
 msgstr "Methode"
 
-#: includes/display-edit.inc:1066;1334;1711
+#: includes/display-edit.inc:1058;1326;1703
 #: includes/display-layout.inc:101
 msgid "Next"
 msgstr "Weiter"
 
-#: includes/display-edit.inc:1090
+#: includes/display-edit.inc:1082
 msgid "Cache settings for this display"
 msgstr "Cache-Einstellungen für diese Anzeige"
 
-#: includes/display-edit.inc:1097
+#: includes/display-edit.inc:1089
 msgid "Cache settings for !subtype_title"
 msgstr "Cache-Einstellungen für !subtype_title"
 
-#: includes/display-edit.inc:1206
+#: includes/display-edit.inc:1198
 msgid "Default style for this display"
-msgstr "Standard-Stil für diese Anzeige"
+msgstr "Standardmäßiges Design für diese Anzeige"
+
+#: includes/display-edit.inc:1205
+msgid "Panel style for region \"!region\""
+msgstr "Panel-Design für die Region „!region“"
 
 #: includes/display-edit.inc:1213
-msgid "Panel style for region \"!region\""
-msgstr "Panel-Stil für Bereich „!region“"
-
-#: includes/display-edit.inc:1221
+#, fuzzy
 msgid "Pane style for \"!pane\""
-msgstr "Panel-Stil für „!pane“"
+msgstr "Ausschnitt-Design für „!pane“"
 
-#: includes/display-edit.inc:1312
+#: includes/display-edit.inc:1304
 msgid "Use display default style"
-msgstr "Standard-Stil der Anzeige verwenden"
+msgstr "Das standardmäßige Anzeige-Design verwenden"
 
-#: includes/display-edit.inc:1327
+#: includes/display-edit.inc:1319
 msgid "Style"
-msgstr "Stil"
+msgstr "Design"
 
-#: includes/display-edit.inc:1402
+#: includes/display-edit.inc:1394
 msgid "Style settings for @style (display)"
-msgstr "Stil-Einstellungen für @style (Anzeige)"
+msgstr "Design-Einstellungen für @style (Anzeige)"
 
-#: includes/display-edit.inc:1409
+#: includes/display-edit.inc:1401
 msgid "Style settings for style @style (Region \"!region\")"
-msgstr "Stil-Einstellungen für Stil @style (Bereich „!region“)"
+msgstr "Design-Einstellungen für Darstellung @style (Region „!region“)"
 
-#: includes/display-edit.inc:1417
+# Pane = Ausschnitt?
+#: includes/display-edit.inc:1409
+#, fuzzy
 msgid "Style settings for style @style (Pane \"!pane\")"
-msgstr "Stil-Einstellungen für Stil @style (Pane „!pane“)"
+msgstr "Design-Einstellungen für Darstellung @style (Ausschnitt „!pane“)"
 
-#: includes/display-edit.inc:1529
+#: includes/display-edit.inc:1521
+#, fuzzy
 msgid "Configure CSS on !subtype_title"
-msgstr "CSS für !subtype_title konfigurieren"
+msgstr "CSS auf !subtype_title konfigurieren"
 
-#: includes/display-edit.inc:1554
+#: includes/display-edit.inc:1546
 #: panels_node/panels_node.module:188
 #: plugins/task_handlers/panel_context.inc:713
 msgid "CSS ID"
 msgstr "CSS-ID"
 
-#: includes/display-edit.inc:1555
+#: includes/display-edit.inc:1547
+#, fuzzy
 msgid "CSS ID to apply to this pane. This may be blank."
-msgstr "Die für diese Pane zu verwendende CSS-ID. Dies kann leer gelassen werden."
+msgstr "CSS-ID für diesen Ausschnitt. Dies kann leer gelassen werden."
 
-#: includes/display-edit.inc:1560
+#: includes/display-edit.inc:1552
 msgid "CSS class"
 msgstr "CSS-Klasse"
 
-#: includes/display-edit.inc:1561
+#: includes/display-edit.inc:1553
+#, fuzzy
 msgid "CSS class to apply to this pane. This may be blank."
-msgstr "CSS-Klasse für diese Pane. Kann leer gelassen werden."
+msgstr "CSS-Klasse für diesen Ausschnitt. Kann leer gelassen werden."
 
-#: includes/display-edit.inc:1602
+#: includes/display-edit.inc:1594
+#, fuzzy
 msgid "Access settings on !subtype_title"
-msgstr "Zugriffs-Einstellungen für !subtype_title"
+msgstr "Zugriffseinstellungen auf !subtype_title"
 
-#: includes/display-edit.inc:1628
+#: includes/display-edit.inc:1620
 msgid "All criteria must pass."
-msgstr "Alle Kriterien müssen übereinstimmen."
+msgstr "Alle Kriterien müssen richtig sein."
 
-#: includes/display-edit.inc:1629
+#: includes/display-edit.inc:1621
 msgid "Only one criteria must pass."
-msgstr "Nur ein Kriterium muss übereinstimmen."
+msgstr "Ein Kriterium muss richtig sein."
 
-#: includes/display-edit.inc:1671
+#: includes/display-edit.inc:1663
 msgid "Add visibility rule for !subtype_title"
-msgstr "Sichtbarkeits-Regel für !subtype_title hinzufügen"
+msgstr "Sichtbarkeitsregel für !subtype_title hinzufügen"
 
-#: includes/display-edit.inc:1741
+#: includes/display-edit.inc:1733
 msgid "Invalid test id."
 msgstr "Ungültige Test-ID."
 
-#: includes/display-edit.inc:1748
+#: includes/display-edit.inc:1740
 msgid "Configure visibility rule for !subtype_title"
-msgstr "Sichtbarkeits-Regel für !subtype_title konfigurieren"
+msgstr "Sichtbarkeitsregel für !subtype_title konfigurieren"
 
-#: includes/display-edit.inc:1867
+#: includes/display-edit.inc:1859
 msgid "No title"
 msgstr "Kein Titel"
 
@@ -604,8 +616,9 @@ msgid "Panel title"
 msgstr "Panel-Titel"
 
 #: includes/display-layout-settings.inc:90
+#, fuzzy
 msgid "The title of this panel. Your theme will render this text as the main page title users view this display, unless this text is overridden elsewhere."
-msgstr "Der Titel dieses Panels. Die Theme wird diesen Text als Hauptseitentitel anzeigen, wenn Benutzer die Seite anzeigen, solange dieser Text nicht anderswo überschrieben wird."
+msgstr "Der Titel von diesem Panel. Das Theme wird diesen Text als Seitentitel anzeigen, wenn ein Benutzer die Seite ansieht. Unter Umständen kann dieser Titel durch andere Optionen übersteuert werden."
 
 #: includes/display-layout-settings.inc:97
 msgid "Check this box to hide the main page title for this panel."
@@ -613,7 +626,7 @@ msgstr "Aktivieren, um den Seitentitel für dieses Panel nicht anzuzeigen."
 
 #: includes/display-layout-settings.inc:101
 msgid "If you leave this field blank, then the default title, '@title', will be used instead."
-msgstr "Wenn dieses Feld leer gelassen wird, dann wird der standardmäßige Titel ‚@title‘ verwendet."
+msgstr "Sollte das Feld leer gelassen werden, wird stattdessen der standardmäßige Titel ‚@title‘ verwendet."
 
 #: includes/display-layout-settings.inc:119
 msgid "Panel settings"
@@ -641,7 +654,7 @@ msgstr "Das standardmäßige Panel-Design verwenden"
 
 #: includes/display-layout-settings.inc:223
 msgid "Save and edit again"
-msgstr "Speichern und wieder bearbeiten"
+msgstr "Speichern und nochmal Bearbeiten"
 
 #: includes/display-layout-settings.inc:309
 msgid "There are no style settings to edit."
@@ -649,7 +662,7 @@ msgstr "Es stehen keine Design-Einstellungen zur Bearbeitung zu Verfügung."
 
 #: includes/display-layout-settings.inc:315
 msgid "Unable to find cache."
-msgstr "Cache kann nicht gefunden werden."
+msgstr "Cache konnte nicht gefunden werden."
 
 #: includes/display-layout-settings.inc:327
 msgid "Edit style settings for @style"
@@ -667,11 +680,11 @@ msgstr "Das Panel-Layout wurde aktualisiert."
 #: panels_node/panels_node.module:62
 #: plugins/task_handlers/panel_context.inc:139
 msgid "Choose layout"
-msgstr "Layout wählen"
+msgstr "Layout auswählen"
 
 #: includes/display-layout.inc:179
 msgid "There is no content in the panel display. If there were content, you would be given an opportunity to select where in the new layout the old content would be placed. Select \"Save\" or \"Continue\" to proceed. This change will not be processed if you do not continue."
-msgstr "Es gibt keinen Inhalt in der Panel-Anzeige. Wenn es Inhalt gäbe bestünde die Möglichkeit auszuwählen wo in dem neuen Layout der alte inhalt platziert würde. Zum Fortsetzen „Speichern“ oder “Fortsetzen“ auswählen. Diese Änderung wird nicht verarbeitet ohne fortzusetzen."
+msgstr ""
 
 #: includes/display-layout.inc:187
 msgid "Move content in @layout to"
@@ -688,6 +701,10 @@ msgstr "mehr"
 #: includes/plugins.inc:55
 msgid "Incoming content will be displayed here."
 msgstr "Eingehender Inhalt wird hier angezeigt."
+
+#: panels_export/panels_export.module:0
+msgid "panels_export"
+msgstr "panels_export"
 
 #: panels_mini/panels_mini.admin.inc:144
 msgid "Name"
@@ -834,6 +851,10 @@ msgstr "Mini-Panels erstellen"
 msgid "administer mini panels"
 msgstr "Mini-Panels verwalten"
 
+#: panels_mini/panels_mini.module:0
+msgid "panels_mini"
+msgstr "panels_mini"
+
 #: panels_mini/panels_mini.info:0
 #: panels_mini/plugins/content_types/panels_mini.inc:20
 msgid "Mini panels"
@@ -857,7 +878,7 @@ msgstr "Anrisstext"
 
 #: panels_node/panels_node.module:96
 msgid "A panel layout broken up into rows and columns."
-msgstr "Ein Panel-Seiten-Layout, in Spalten und Zeilen zerlegt."
+msgstr "Ein Panel-Layout, dass in Reihen und Spalten aufgeteilt ist."
 
 #: panels_node/panels_node.module:174
 msgid "The teaser is a piece of text to describe when the panel is listed (such as when promoted to front page); the actual content will only be displayed on the full node view."
@@ -893,9 +914,8 @@ msgid "Panel nodes"
 msgstr "Panel-Beiträge"
 
 #: panels_node/panels_node.module:34
-#, fuzzy
 msgid "Configure which content is available to add to panel node displays."
-msgstr "Konfigurieren, welcher Inhalt Panel-Beitrags-Anzeigen hinzugefügt werden kann."
+msgstr "Den verfügbaren Inhalt konfigurieren, der zu Anzeigen von Panel-Beiträgen hinzugefügt werden kann."
 
 #: panels_node/panels_node.module:50
 msgid "Panel layout"
@@ -905,6 +925,10 @@ msgstr "Panel-Layout"
 #: plugins/task_handlers/panel_context.inc:140;144
 msgid "Panel content"
 msgstr "Panel-Inhalt"
+
+#: panels_node/panels_node.module:0
+msgid "panels_node"
+msgstr "panels_node"
 
 #: panels_node/panels_node.info:0
 msgid "Create nodes that are divided into areas with selectable content."
@@ -952,9 +976,8 @@ msgid "Flexible"
 msgstr "Flexibel"
 
 #: plugins/layouts/flexible/flexible.inc:84
-#, fuzzy
 msgid "Center"
-msgstr "Zentriert"
+msgstr ""
 
 #: plugins/layouts/flexible/flexible.inc:120
 msgid "Left sidebar"
@@ -989,13 +1012,17 @@ msgstr "Spalte entfernen"
 msgid "Add row"
 msgstr "Zeile hinzufügen"
 
+# oben = am Anfang?
 #: plugins/layouts/flexible/flexible.inc:487
+#, fuzzy
 msgid "Add row to top"
-msgstr "Zeile am Anfang hinzufügen"
+msgstr "Zeile oben hinzufügen"
 
+# unten = am Ende?
 #: plugins/layouts/flexible/flexible.inc:488
+#, fuzzy
 msgid "Add row to bottom"
-msgstr "Zeile am Ende hinzufügen"
+msgstr "Zeile unten hinzufügen"
 
 #: plugins/layouts/flexible/flexible.inc:493
 msgid "Canvas"
@@ -1015,7 +1042,7 @@ msgstr "Zeile entfernen"
 
 #: plugins/layouts/flexible/flexible.inc:503
 msgid "Add region"
-msgstr "Bereich hinzufügen"
+msgstr "Region hinzufügen"
 
 #: plugins/layouts/flexible/flexible.inc:503
 msgid "Add column"
@@ -1023,7 +1050,7 @@ msgstr "Spalte hinzufügen"
 
 #: plugins/layouts/flexible/flexible.inc:506;874
 msgid "Add region to left"
-msgstr "Bereich links hinzufügen"
+msgstr "Region links hinzufügen"
 
 #: plugins/layouts/flexible/flexible.inc:506;884
 msgid "Add column to left"
@@ -1031,7 +1058,7 @@ msgstr "Spalte links hinzufügen"
 
 #: plugins/layouts/flexible/flexible.inc:507;874
 msgid "Add region to right"
-msgstr "Bereich rechts hinzufügen"
+msgstr "Region rechts hinzufügen"
 
 #: plugins/layouts/flexible/flexible.inc:507;884
 msgid "Add column to right"
@@ -1039,19 +1066,19 @@ msgstr "Spalte rechts hinzufügen"
 
 #: plugins/layouts/flexible/flexible.inc:511
 msgid "Region"
-msgstr "Bereich"
+msgstr "Region"
 
 #: plugins/layouts/flexible/flexible.inc:512
 msgid "Region settings"
-msgstr "Bereichs-Einstellungen"
+msgstr "Regionen-Einstellungen"
 
 #: plugins/layouts/flexible/flexible.inc:513
 msgid "Remove region"
-msgstr "Bereich entfernen"
+msgstr "Region entfernen"
 
 #: plugins/layouts/flexible/flexible.inc:703;855;1186
 msgid "Invalid item id."
-msgstr "Ungültige Element-ID."
+msgstr "Ungültige Eintrags-ID."
 
 #: plugins/layouts/flexible/flexible.inc:711
 msgid "Configure column"
@@ -1063,18 +1090,17 @@ msgstr "Zeile konfigurieren"
 
 #: plugins/layouts/flexible/flexible.inc:717
 msgid "Configure region"
-msgstr "Bereich konfigurieren"
+msgstr "Region konfigurieren"
 
 #: plugins/layouts/flexible/flexible.inc:770;1049
 msgid "Region title"
-msgstr "Bereichs-Titel"
+msgstr "Titel der Region"
 
 #: plugins/layouts/flexible/flexible.inc:793;1077
 msgid "Width"
 msgstr "Breite"
 
 #: plugins/layouts/flexible/flexible.inc:796;1080
-#, fuzzy
 msgid "Fluid"
 msgstr "Fließend"
 
@@ -1084,11 +1110,11 @@ msgstr "Statisch"
 
 #: plugins/layouts/flexible/flexible.inc:805;1095
 msgid "Contains"
-msgstr "Beinhaltet"
+msgstr "Enthält"
 
 #: plugins/layouts/flexible/flexible.inc:808;1098
 msgid "Regions"
-msgstr "Bereiche"
+msgstr "Regionen"
 
 #: plugins/layouts/flexible/flexible.inc:809;1099
 msgid "Columns"
@@ -1096,15 +1122,15 @@ msgstr "Spalten"
 
 #: plugins/layouts/flexible/flexible.inc:816
 msgid "You must remove contained items to change the row container type."
-msgstr "Enthaltene Elemente müssen entfernt werden, um den Zeilen-Containertyp zu ändern."
+msgstr ""
 
 #: plugins/layouts/flexible/flexible.inc:1089
 msgid "Items cannot be set to fluid if there are fixed items already on that side."
-msgstr "Elemente können nicht als fließend eingestellt werden, wenn es bereits feste Elemente auf dieser Seite gibt."
+msgstr ""
 
 #: plugins/layouts/flexible/flexible-admin.js:0
 msgid "Hide layout designer"
-msgstr "Layout-Designer verbergen"
+msgstr "Layout-Designer ausblenden"
 
 #: plugins/layouts/onecol/onecol.inc:9
 msgid "Single column"
@@ -1208,7 +1234,7 @@ msgstr "Den Panel-Inhalt als Drupal Block darstellen; dies ist eingeschränkter 
 
 #: plugins/styles/default.inc:18
 msgid "No style"
-msgstr "Kein Stil"
+msgstr "Kein Design"
 
 #: plugins/styles/default.inc:19
 msgid "The default panel rendering style; displays each pane with a separator."
@@ -1235,14 +1261,12 @@ msgid "Ordered"
 msgstr "Geordnet"
 
 #: plugins/styles/naked.inc:17
-#, fuzzy
 msgid "No markup at all"
-msgstr "Überhaupt keine Auszeichnung"
+msgstr ""
 
 #: plugins/styles/naked.inc:18
-#, fuzzy
 msgid "Display the pane with no markup, not even a title."
-msgstr "Diese Pane ohne Auszeichnung anzeigen, nicht einmal einen Titel."
+msgstr ""
 
 #: plugins/styles/corners/rounded_corners.inc:18
 msgid "Rounded corners"
@@ -1262,15 +1286,16 @@ msgstr "Jeder Panel-Inhalt"
 
 #: plugins/styles/corners/rounded_corners.inc:110
 msgid "Each region"
-msgstr "Jeder Bereich"
+msgstr "Jede Region"
 
 #: plugins/styles/corners/rounded_corners.inc:113
+#, fuzzy
 msgid "Choose whether to include the box around each pane (piece of content) or region (each column or region)"
-msgstr "Auswahl ob ein Rahmen um jede Pane (jedes Stück Inhalt) oder jeden Bereich (jede Spalte oder jeder Bereich) enthalten sein soll "
+msgstr "Legt fest, ob jeder Panel-Inhalt oder jede Region abgerundete Ecken haben soll."
 
 #: plugins/task_handlers/panel_context.inc:35
 msgid "Change general settings about this variant."
-msgstr "Allgemeine Einstellungen für diesen Variante ändern."
+msgstr "Die allgemeinen Einstellungen von diese Variante ändern."
 
 #: plugins/task_handlers/panel_context.inc:39;43;132;145
 msgid "Selection rules"
@@ -1278,15 +1303,15 @@ msgstr "Auswahlregeln"
 
 #: plugins/task_handlers/panel_context.inc:40
 msgid "Control the criteria used to decide whether or not this variant is used."
-msgstr "Kriterien festlegen die verwendet werden um zu entscheiden, ob die Variante verwendet wird oder nicht."
+msgstr ""
 
 #: plugins/task_handlers/panel_context.inc:55
 msgid "Add additional context objects to this variant that can be used by the content."
-msgstr "Dieser Variante zusätzliche Kontext-Objekte hinzufügen, die vom Inhalt verwendet werden können."
+msgstr ""
 
-#: plugins/task_handlers/panel_context.inc:70
-msgid "Change the layout of this panel."
-msgstr "Das Layout dieses Panels ändern."
+#: plugins/task_handlers/panel_context.inc:70;94
+msgid "Add content items and change their location with a drag and drop interface."
+msgstr ""
 
 #: plugins/task_handlers/panel_context.inc:75;148;448
 msgid "Change layout"
@@ -1294,47 +1319,50 @@ msgstr "Layout ändern"
 
 #: plugins/task_handlers/panel_context.inc:76
 msgid "Move content from old layout"
-msgstr "Inhalt von altem Layout verschieben"
+msgstr "Inhalt aus altem Layout verschieben"
 
 #: plugins/task_handlers/panel_context.inc:93;98
 msgid "Content"
 msgstr "Inhalt"
 
-#: plugins/task_handlers/panel_context.inc:94
-msgid "Add content items and change their location with a drag and drop interface."
-msgstr "Inhaltselemente hinzufügen und ihre Platzierung mit einer Drag-und-Drop-Oberfläche ändern."
-
 #: plugins/task_handlers/panel_context.inc:113
 msgid "Get a preview of what this variant will look like."
-msgstr "Aufruf einer Vorschau wie die Variante aussieht."
+msgstr ""
 
 #: plugins/task_handlers/panel_context.inc:411
 msgid "This panel will be selected if @conditions."
-msgstr "Dieses Panel wird ausgewählt wenn @conditions."
+msgstr ""
 
 #: plugins/task_handlers/panel_context.inc:414
 msgid "This panel will always be selected."
-msgstr "Dieses Panel wird immer ausgewählt."
+msgstr "Dieses Panel wird immer ausgewählt sein."
 
 #: plugins/task_handlers/panel_context.inc:419
+#, fuzzy
 msgid "In code"
-msgstr ""
+msgstr "Im Code"
 
+# Better do not translate CSS classes
 #: plugins/task_handlers/panel_context.inc:421;436;443;452
+#, fuzzy
 msgid "page-summary-label"
-msgstr ""
+msgstr "page-summary-label"
 
 #: plugins/task_handlers/panel_context.inc:421
 msgid "Storage"
 msgstr "Speicher"
 
+# Better do not translate CSS classes
 #: plugins/task_handlers/panel_context.inc:422;437;444;453
+#, fuzzy
 msgid "page-summary-data"
-msgstr ""
+msgstr "page-summary-data"
 
+# Better do not translate CSS classes
 #: plugins/task_handlers/panel_context.inc:423;438;445;454
+#, fuzzy
 msgid "page-summary-operation"
-msgstr ""
+msgstr "page-summary-operation"
 
 #: plugins/task_handlers/panel_context.inc:428
 msgid "Disabled"
@@ -1358,11 +1386,11 @@ msgstr "Inhalt bearbeiten"
 
 #: plugins/task_handlers/panel_context.inc:465
 msgid "This panel has no content."
-msgstr "Dieses Panel hat keinen Inhalt."
+msgstr "Dieses Panel enthält keinen Inhalt."
 
 #: plugins/task_handlers/panel_context.inc:469
 msgid "This panel has no contexts."
-msgstr "Dieses Panel hat keine Kontexte."
+msgstr "Dieses Panel enthält keinen Kontext."
 
 #: plugins/task_handlers/panel_context.inc:474
 msgid "Panel: @title"
@@ -1370,11 +1398,11 @@ msgstr "Panel: @title"
 
 #: plugins/task_handlers/panel_context.inc:549;597
 msgid "You must select a layout."
-msgstr "Es muss ein Layout ausgewählt werden."
+msgstr "Ein Layout muss ausgewählt werden."
 
 #: plugins/task_handlers/panel_context.inc:600
 msgid "You must select a different layout if you wish to change layouts."
-msgstr "Es muss ein anderes Layout ausgewählt werden, wenn das Layout geändert werden soll."
+msgstr ""
 
 #: plugins/task_handlers/panel_context.inc:672;685
 msgid "Update and preview"
@@ -1386,7 +1414,7 @@ msgstr "Administrativer Titel"
 
 #: plugins/task_handlers/panel_context.inc:699
 msgid "Administrative title of this variant."
-msgstr "Administrativer Titel dieser Variante"
+msgstr "Administrativer Titel von dieser Variante."
 
 #: plugins/task_handlers/panel_context.inc:705
 msgid "Disable Drupal blocks/regions"
@@ -1394,7 +1422,7 @@ msgstr "Drupal-Blöcke/Regionen deaktivieren"
 
 #: plugins/task_handlers/panel_context.inc:706
 msgid "Check this to have the page disable all regions displayed in the theme. Note that some themes support this setting better than others. If in doubt, try with stock themes to see."
-msgstr "Dies kann angekreuzt werden wenn auf der Seite alle im Theme angezeigten Bereiche deaktiviedrt werden sollen. Zu beachten ist, dass manche Themes diese Einstellung besser als andere unterstützen. Im Zweifel mit Standard-Themes testen."
+msgstr ""
 
 #: plugins/task_handlers/panel_context.inc:714
 msgid "The CSS ID to apply to this page"
@@ -1405,12 +1433,15 @@ msgid "CSS code"
 msgstr "CSS-Code"
 
 #: plugins/task_handlers/panel_context.inc:720
+#, fuzzy
 msgid "Enter well-formed CSS code here; this code will be embedded into the page, and should only be used for minor adjustments; it is usually better to try to put CSS for the page into the theme if possible. This CSS will be filtered for safety so some CSS may not work."
-msgstr "Gültigen CSS-Code hier eingeben; dieser Code wird direkt in die Seite eingebunden und sollte ausschließlich für geringfügige Anpassungen verwendet werden; für gewöhnlich ist es besser, den CSS-Code in das Theme einzubinden, falls möglich. Dieser CSS-Code wird zur Sicherheit gefiltert, mancher CSS-Code funktioniert daher möglicherweise nicht."
+msgstr "Hier nur gültigen CSS-Code eingeben. Dieser Code wird direkt in die Seite eingebunden und sollte ausschließlich für geringfügige Anpassungen verwendet werden. Für gewöhnlich ist es besser, den CSS-Code in das Theme einzubinden. Da dieser CSS-Code zur Sicherheit gefilter wird, können manche CSS-Angaben nicht funktionieren."
 
+# context senstive
 #: templates/panels-dashboard.tpl.php:13
+#, fuzzy
 msgid "Create new"
-msgstr "Neu erstellen"
+msgstr "Neues erstellen"
 
 #: templates/panels-dashboard.tpl.php:47
 msgid "Manage mini panels"
