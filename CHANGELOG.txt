@@ -4,6 +4,7 @@ Panels 6.x-dev
 #552846 by eMPee584: Fix notice with tablesorts on mini panels page if no mini panels exist.
 #568218: Links to clone, export, delete/revert, enable/disable variants from the main summary page were incorrect and led to an operation trail not found message.
 #533724: Prevent Panels from upgrading while uninstalled, as that upgrades into broken pages.
+#529816: Allow flexible layout to add custom classes to each region.
 
 Panels 6.x-3.0
 ==============

@@ -223,7 +223,6 @@ function panels_flexible_panels($display, $settings) {
  * Draw the flexible layout.
  */
 function theme_panels_flexible($id, $content, $settings, $display) {
-  // TEMP
   panels_flexible_convert_settings($settings);
 
   $renderer = new stdClass;
@@ -231,7 +230,6 @@ function theme_panels_flexible($id, $content, $settings, $display) {
   $renderer->content = $content;
   $renderer->css_id = $id;
   $renderer->did = $display->did;
-//  $renderer->cache_key = $display->cache_key;
   $renderer->id_str = $id ? 'id="' . $id . '"' : '';
   $renderer->admin = FALSE;
 
@@ -373,6 +371,10 @@ function panels_flexible_render_item($renderer, $item, $base, $content, $id, $po
   }
   if ($clear) {
     $output .= ' clear-block';
+  }
+
+  if (isset($item['class'])) {
+    $output .= ' ' . check_plain($item['class']);
   }
 
   $output .= '">' . "\n";
@@ -772,6 +774,13 @@ function panels_flexible_config_item_form(&$form_state) {
       '#default_value' => $item['title'],
       '#required' => TRUE,
     );
+
+    $form['class'] = array(
+      '#title' => t('Region class'),
+      '#type' => 'textfield',
+      '#default_value' => isset($item['class']) ? $item['class'] : '',
+      '#description' => t('Enter a CSS class that will be used for this region. This can be used to apply automatic styling from your theme, for example.'),
+    );
   }
 
   if ($item['type'] != 'row') {
@@ -832,6 +841,7 @@ function panels_flexible_config_item_form_submit(&$form, &$form_state) {
   $item = &$form_state['item'];
   if ($item['type'] == 'region') {
     $item['title'] = $form_state['values']['title'];
+    $item['class'] = $form_state['values']['class'];
   }
 
   if ($item['type'] != 'row') {
