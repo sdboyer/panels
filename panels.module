@@ -447,60 +447,6 @@ function panels_edit_layout($display, $finish, $destination = NULL, $allowed_lay
   return _panels_edit_layout($display, $finish, $destination, $allowed_layouts);
 }
 
-/**
- * API entry point for configuring the layout settings for a given display.
- *
- * For all layouts except Flexible, the layout settings form allows the user to select styles,
- * as defined by .inc files in the panels/styles subdirectory, for the panels in their display.
- * For the Flexible layout, the layout settings form allows the user to provide dimensions
- * for their flexible layout in addition to applying styles to panels.
- *
- * @param object $display instanceof panels_display \n
- *  A fully loaded panels $display object, as returned from panels_load_display().
- *  Merely passing a did is NOT sufficient.
- * @param string $finish
- *  A string that will be used for the text of (one of) the form submission button(s). Note that
- *  panels will NOT wrap $finish in t() for you, so your caller should make sure to do so. \n
- *  The submit behavior of the form is primarily governed by the value of $destination (see
- *  below), but is secondarily governed by $finish as follows:
- *    -# If $finish != t('Save'), then two #submit buttons will be present: one with the button
- *       text t('Save'), and the other with the button text $finish. .
- *      - Clicking the 'Save' button will save any changes on the form to the $display object and
- *        keep the user on the same editing page.
- *      - Clicking the $finish button will also save the $display object, but the user will be
- *        redirected to the URL specified in $destination.
- *    -# If $finish == t('Save'), then there is only one button, still called t('Save'), but it
- *       mimics the behavior of the $finish button above by redirecting the user away from the form.
- * @param mixed $destination
- *  Basic usage is a string containing the URL that the form should redirect to upon submission.
- *  For a discussion of advanced usages that rely on NULL values for $destination, see the
- *  panels_edit() documentation.
- * @param mixed $title
- *  The $title variable has three modes of operation:
- *    -# If $title == FALSE (the default), then no widget will appear on the panels_edit_layout_settings form
- *       allowing the user to select a title, and other means for setting page titles will take precedent. If
- *       no other means are used to provide a title, then the title will be hidden when rendering the $display.
- *    -# If $title == TRUE, then two widgets will appear on the panels_edit_layout_settings form allowing the
- *       user to input a title specific to this $display, as well as a checkbox enabling the user to disable
- *       page titles entirely for this $display object.
- *    -# If $title == (string), then the behavior is very similar to mode 2, but the widget description
- *       on the title textfield will indicate that the $title string will be used as the default page title
- *       if none is provided on this form. When utilizing this option, note that the panels API can only
- *       provide the data for these values; you must implement the appropriate conditionals to make it true.
- *
- * @return
- *  Can return nothing, or a modified $display object, or a redirection string; return values for the
- *  panels_edit* family of functions are quite complex. See panels_edit() for detailed discussion.
- * @see panels_edit()
- */
-function panels_edit_layout_settings($display, $finish, $destination = NULL, $title = FALSE) {
-  panels_load_include('display-layout-settings');
-  ctools_include('ajax');
-  panels_load_include('plugins');
-  return _panels_edit_layout_settings($display, $finish, $destination, $title);
-}
-
-
 // ---------------------------------------------------------------------------
 // panels database functions
 
