@@ -174,7 +174,7 @@ function panels_node_form(&$node, &$param) {
       '#description' => t('The teaser is a piece of text to describe when the panel is listed (such as when promoted to front page); the actual content will only be displayed on the full node view.'),
       '#default_value' => $node->body,
     );
-    $form['format'] = filter_form($node->format); // Now we can set the format! 
+    $form['format'] = filter_form($node->format); // Now we can set the format!
   }
 
 //  drupal_set_message('<pre>' . check_plain(var_export($node, true)) . '</pre>');
@@ -223,6 +223,14 @@ function panels_node_insert(&$node) {
   // Create a new display and record that.
   $display = panels_new_display();
   $display->layout = $node->panels_node['layout'];
+
+  // Special handling for nodes being imported from an export.module data dump.
+  if (!empty($node->export_display)) {
+    // This works by overriding the $display set above
+    eval($node->export_display);
+    unset($node->export_display);
+  }
+
   panels_save_display($display);
   $css_id = $node->panels_node['css_id'];
 
@@ -337,4 +345,17 @@ function panels_node_get_context(&$node) {
   $context->identifier = t('This node');
   $context->keyword = 'node';
   return array('panel-node' => $context);
+}
+
+/**
+ * hook_export_node_alter() - integegrate with export.module for saving
+ *                            panel_nodes into code.
+ */
+function panels_node_export_node_alter(&$node, $original_node, $method) {
+  if ($method == 'export') {
+    drupal_set_message(t("NOTE: in order to import panel_nodes you must first set the export.module settings to \"Save as a new node then edit\", otherwise it won't work."));
+    $display = panels_load_display($node->panels_node['did']);
+    $export = panels_export_display($display);
+    $node->export_display = $export;
+  }
 }
