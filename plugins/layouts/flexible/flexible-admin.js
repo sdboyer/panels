@@ -122,7 +122,7 @@ Drupal.flexible.splitter = function($splitter) {
         splitter.right_min = 25;
         splitter.right_padding = parseInt(splitter.parent.css('padding-right'));
         splitter.right_parent = parseInt(splitter.right.parent().css('margin-right'));
-        splitter.max = splitter.right.width() + splitter.left.parent().width() - 
+        splitter.max = splitter.right.width() + splitter.left.parent().width() -
           (splitter.left.siblings(':not(.panels-flexible-splitter)').length * 25) - 25;
       }
       else {
@@ -183,7 +183,7 @@ Drupal.flexible.splitter = function($splitter) {
 
     return false;
   };
-  
+
   function splitterMove(event) {
     var diff = splitter.startX - event.pageX;
     var moved = 0;
@@ -329,7 +329,7 @@ Drupal.flexible.splitter = function($splitter) {
 
     splitter.putSizes();
     Drupal.flexible.fixHeight();
-    
+
     $(document)
       .unbind("mousemove", splitterMove)
       .unbind("mouseup", splitterEnd);

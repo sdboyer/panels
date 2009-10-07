@@ -9,6 +9,10 @@
 
 define('PANELS_REQUIRED_CTOOLS_API', '1.1.1');
 
+define('PANELS_TITLE_FIXED', 0); // Hide title use to be true/false. So false remains old behavior.
+define('PANELS_TITLE_NONE', 1); // And true meant no title.
+define('PANELS_TITLE_PANE', 2); // And this is the new behavior, where the title field will pick from a pane.
+
 /**
  * Returns the API version of Panels. This didn't exist in 1.
  *
@@ -155,6 +159,9 @@ function panels_menu() {
   ) + $base;
   $items['panels/ajax/display-settings/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_display_settings',
+  ) + $base;
+  $items['panels/ajax/panel-title/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ajax_set_display_title',
   ) + $base;
   $items['panels/ajax/style-type/%/%panels_edit_cache'] = array(
     'page callback' => 'panels_ajax_style_type',
@@ -587,17 +594,8 @@ function panels_load_displays($dids) {
   ctools_include('export');
   while ($obj = db_fetch_object($result)) {
     $displays[$obj->did] = ctools_export_unpack_object('panels_display', $obj);
+    // Modify the hide_title field to go from a bool to an int if necessary.
   }
-
-  // @TODO
-  //
-  // This code clearly never worked ($content, $layout and $settings are all unset)
-  // where was this supposed to even have been?
-
-//  foreach (module_implements('panels_layout_content_alter') as $module) {
-//    $function = $module . '_panels_layout_content_alter';
-//    $function($content, $layout, $settings);
-//  }
 
   $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (" . db_placeholders($dids) . ") ORDER BY did, panel, position", $dids);
 
@@ -698,6 +696,16 @@ function panels_save_display(&$display) {
         // and put it back so our pids and positions can be used
         unset($display->content[$id]);
         $display->content[$pane->pid] = $pane;
+
+        // If the title pane was one of our panes that just got its ID changed,
+        // we need to change it in the database, too.
+        if (isset($display->title_pane) && $display->title_pane == $old_pid) {
+          $display->title_pane = $pane->pid;
+          // Do a simple update query to write it so we don't have to rewrite
+          // the whole record. We can't just save writing the whole record here
+          // because it was needed to get the did. Chicken, egg, more chicken.
+          db_query("UPDATE {panels_display} SET title_pane = %d WHERE did = %d", $pane->pid, $display->did);
+        }
       }
 
       // re-add this to the list of content for this panel.

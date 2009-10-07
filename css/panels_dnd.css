@@ -38,6 +38,10 @@
   margin: 2px 2px 2px 4px;
 }
 
+div.panels-set-title-hide .panels-set-title {
+  display: none !important;
+}
+
 /* Add Icon */
 #panels-dnd-main div.panels-display .pane-add-link  {
 }
@@ -57,6 +61,14 @@
   padding: 0em;
   background: #ffffff;
   border: 1px solid #bbb;
+}
+
+div.panels-set-title-hide .panel-pane-is-title {
+  border: 1px solid #bbb;
+}
+
+.panel-pane-is-title {
+  border: 2px solid #777;
 }
 
 /* Cog Icon */
@@ -492,7 +504,8 @@ html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li
 html.js div.panels-display-links div.ctools-dropdown-container ul li {
 
   text-decoration: none;
-  padding: 0.2em 0!important;
+  padding: 0;
+  margin: 0;
   color: #555!important;
   text-shadow: #fff 1px 1px 1px;
 }
@@ -503,13 +516,40 @@ html.js div.panels-display-links div.ctools-dropdown-container ul li span.text {
   color: #000;
   font-weight: bold;
 }
+
 html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li a,
 html.js div.panels-display-links div.ctools-dropdown-container ul li a {
-
   color: #555!important;
   font-weight: normal;
   width: auto;
   padding: 0 10px;
+}
+
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li span.panels-text,
+html.js div.panels-display-links div.ctools-dropdown-container ul li span.panels-text {
+  width: auto;
+  padding: 0 10px;
+}
+
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li span.dropdown-header,
+html.js div.panels-display-links div.ctools-dropdown-container ul li span.dropdown-header {
+  background-color: #fefefe;
+  padding: 0 10px;
+}
+
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li .panels-sub-menu ul li a,
+html.js div.panels-display-links div.ctools-dropdown-container ul li .panels-sub-menu ul li a,
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li .panels-sub-menu span.panels-text,
+html.js div.panels-display-links div.ctools-dropdown-container ul li .panels-sub-menu span.panels-text {
+  padding: 0 20px;
+}
+
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container hr,
+html.js div.panels-display-links div.ctools-dropdown-container hr {
+  border: 0;
+  color: #ddd;
+  background-color: #ddd;
+  height: 1px;
 }
 
 /*

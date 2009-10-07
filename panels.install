@@ -40,7 +40,21 @@ function panels_requirements($phase) {
 function panels_schema() {
   // This should always point to our 'current' schema. This makes it relatively easy
   // to keep a record of schema as we make changes to it.
-  return panels_schema_1();
+  return panels_schema_2();
+}
+
+/**
+ * Schema that adds the title_pane field.
+ */
+function panels_schema_2() {
+  $schema = panels_schema_1();
+
+  $schema['panels_display']['fields']['title_pane'] = array(
+    'type' => 'int',
+    'default' => 0,
+  );
+
+  return $schema;
 }
 
 /**
@@ -1243,4 +1257,19 @@ function panels_update_6304() {
   }
 
   return array();
+}
+
+/**
+ * Add the title_pane field.
+ */
+function panels_update_6305() {
+  $ret = array();
+
+  // Fetch schema version 2.
+  $schema = panels_schema_2();
+
+  // Add new field
+  db_add_field($ret, 'panels_display', 'title_pane', $schema['panels_display']['fields']['title_pane']);
+
+  return $ret;
 }

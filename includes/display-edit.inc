@@ -446,26 +446,24 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
     );
   }
 
+  if (isset($display->title_pane) && $display->title_pane == $pane->pid) {
+    $links['panels-set-title'] = array(
+      'title' => t('&#x2713;Panel title'),
+      'html' => TRUE,
+    );
+  }
+  else {
+    $links['panels-set-title'] = array(
+      'title' => t('Panel title'),
+      'href' => "panels/ajax/panel-title/$cache_key/$pane->pid",
+      'attributes' => array('class' => 'ctools-use-ajax'),
+    );
+  }
+
   if (isset($content_type['edit form'])) {
     $links[] = array(
       'title' => t('Settings'),
       'href' => "panels/ajax/configure/$cache_key/$pane->pid",
-      'attributes' => array('class' => 'ctools-use-modal'),
-    );
-  }
-
-  $style = panels_get_style((!empty($pane->style['style'])) ? $pane->style['style'] : 'default');
-
-  $links[] = array(
-    'title' => t('Style: @style', array('@style' => $style['title'])),
-    'href' => 'panels/ajax/style-type/pane/' . $cache_key . '/' . $pane->pid,
-    'attributes' => array('class' => 'ctools-use-modal'),
-  );
-
-  if (panels_plugin_get_function('style', $style, 'pane settings form')) {
-    $links[] = array(
-      'title' => ' -- ' . t('Style settings'),
-      'href' => 'panels/ajax/style-settings/pane/' . $cache_key . '/' . $pane->pid,
       'attributes' => array('class' => 'ctools-use-modal'),
     );
   }
@@ -478,11 +476,42 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
     );
   }
 
+  $links[] = array(
+    'title' => '<hr />',
+    'html' => TRUE,
+  );
+
+  $style = panels_get_style((!empty($pane->style['style'])) ? $pane->style['style'] : 'default');
+
+  $style_links[] = array(
+    'title' => $style['title'],
+    'attributes' => array('class' => 'panels-text'),
+  );
+
+  $style_links[] = array(
+    'title' => t('Change'),
+    'href' => 'panels/ajax/style-type/pane/' . $cache_key . '/' . $pane->pid,
+    'attributes' => array('class' => 'ctools-use-modal'),
+  );
+
+  if (panels_plugin_get_function('style', $style, 'pane settings form')) {
+    $style_links[] = array(
+      'title' => t('Settings'),
+      'href' => 'panels/ajax/style-settings/pane/' . $cache_key . '/' . $pane->pid,
+      'attributes' => array('class' => 'ctools-use-modal'),
+    );
+  }
+
+  $links[] = array(
+    'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links($style_links),
+    'html' => TRUE,
+    'attributes' => array('class' => 'panels-sub-menu'),
+  );
+
   if (user_access('administer pane access')) {
     $links[] = array(
-      'title' => t('Visibility settings'),
-      'href' => "panels/ajax/access-settings/$cache_key/$pane->pid",
-      'attributes' => array('class' => 'ctools-use-modal'),
+      'title' => '<hr />',
+      'html' => TRUE,
     );
 
     $contexts = $display->context;
@@ -491,43 +520,84 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
       $contexts['logged-in-user'] = ctools_access_get_loggedin_context();
     }
 
+    $visibility_links = array();
+
     if (!empty($pane->access['plugins'])) {
       foreach ($pane->access['plugins'] as $id => $test) {
         $plugin = ctools_get_access_plugin($test['name']);
         $access_title  = isset($plugin['title']) ? $plugin['title'] : t('Broken/missing access plugin %plugin', array('%plugin' => $test['name']));
         $access_description = ctools_access_summary($plugin, $contexts, $test);
 
-        $links[] = array(
-          'title' => ' -- ' . t('@title: !description', array('@title' => $access_title, '!description' => $access_description)),
+        $visiblity_links[] = array(
+          'title' => t('@title: !description', array('@title' => $access_title, '!description' => $access_description)),
           'href' => "panels/ajax/access-test/$cache_key/$pane->pid/$id",
           'attributes' => array('class' => 'ctools-use-modal'),
         );
       }
     }
-    $links[] = array(
-      'title' => ' -- ' . t('Add new visibility rule'),
+    if (empty($visibility_links)) {
+      $visibility_links[] = array(
+        'title' => t('No rules'),
+        'attributes' => array('class' => 'panels-text'),
+      );
+    }
+
+    $visibility_links[] = array(
+      'title' => t('Add new rule'),
       'href' => "panels/ajax/access-add/$cache_key/$pane->pid",
       'attributes' => array('class' => 'ctools-use-modal'),
+    );
+
+    $visibility_links[] = array(
+      'title' => t('Settings'),
+      'href' => "panels/ajax/access-settings/$cache_key/$pane->pid",
+      'attributes' => array('class' => 'ctools-use-modal'),
+    );
+
+    $links[] = array(
+      'title' => '<span class="dropdown-header">' . t('Visibility rules') . '</span>' . theme_links($visibility_links),
+      'html' => TRUE,
+      'attributes' => array('class' => 'panels-sub-menu'),
     );
   }
 
   if (panels_get_caches() && user_access('use panels caching features')) {
+    $links[] = array(
+      'title' => '<hr />',
+      'html' => TRUE,
+    );
+
     $method = isset($pane->cache['method']) ? $pane->cache['method'] : 0;
     $info = panels_get_cache($method);
     $cache_method = isset($info['title']) ? $info['title'] : t('No caching');
-    $links[] = array(
-      'title' => t('Cache method: @method', array('@method' => $cache_method)),
+    $cache_links[] = array(
+      'title' => $cache_method,
+      'attributes' => array('class' => 'panels-text'),
+    );
+    $cache_links[] = array(
+      'title' => t('Change'),
       'href' => "panels/ajax/cache-method/$cache_key/$pane->pid",
       'attributes' => array('class' => 'ctools-use-modal'),
     );
     if (panels_plugin_get_function('cache', $info, 'settings form')) {
-      $links[] = array(
-        'title' => ' -- ' . t('Cache settings'),
+      $cache_links[] = array(
+        'title' => t('Settings'),
         'href' => "panels/ajax/cache-settings/$cache_key/$pane->pid",
         'attributes' => array('class' => 'ctools-use-modal'),
       );
     }
+
+    $links[] = array(
+      'title' => '<span class="dropdown-header">' . t('Caching') . '</span>' . theme_links($cache_links),
+      'html' => TRUE,
+      'attributes' => array('class' => 'panels-sub-menu'),
+    );
   }
+
+  $links[] = array(
+    'title' => '<hr />',
+    'html' => TRUE,
+  );
 
   $links[] = array(
     'title' => t('Remove'),
@@ -550,10 +620,18 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
     $block = ctools_content_admin_info($content_type, $pane->subtype, $pane->configuration, $display->context);
   }
 
-
   $output = panels_render_pane_dnd($block, $pane->pid, $title, '', $buttons);
   if ($skin) {
-    $class = 'panel-pane' . ($pane->shown ? '' : ' hidden-pane');
+    $class = 'panel-pane';
+
+    if (empty($pane->shown)) {
+      $class .= ' hidden-pane';
+    }
+
+    if (isset($display->title_pane) && $display->title_pane == $pane->pid) {
+      $class .= ' panel-pane-is-title';
+    }
+
     $output = '<div class="' . $class . '" id="panel-pane-' . $pane->pid . '">' . $output . '</div>';
   }
   return $output;
@@ -600,34 +678,44 @@ function panels_edit_display_settings_form(&$form_state) {
   $layout = panels_get_layout($display->layout);
   $form_state['layout'] = $layout;
 
+  ctools_include('dependent');
+
   if ($form_state['display_title']) {
     $form['display_title'] = array (
       '#tree' => TRUE,
     );
 
     $form['display_title']['hide_title'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Hide title'),
-      '#default_value' => $display->hide_title,
-      '#description' => t('If checked, this panel will have no visible title.'),
+      '#type' => 'select',
+      '#title' => t('Title type'),
+      '#default_value' => (int) $display->hide_title,
+      '#options' => array(
+        PANELS_TITLE_NONE => t('No title'),
+        PANELS_TITLE_FIXED => t('Manually set'),
+        PANELS_TITLE_PANE => t('From pane'),
+      ),
     );
 
     $form['display_title']['title'] = array(
       '#type' => 'textfield',
       '#default_value' => $display->title,
       '#title' => t('Title'),
-      '#description' => t('The title of this panel.'),
-      '#process' => array('ctools_process_dependency'),
-      '#dependency' => array('edit-display-title-hide-title' => array(0)),
+      '#description' => t('The title of this panel. If left blank, a default title may be used. Set to No Title if you want the title to actually be blank.'),
+      '#process' => array('ctools_dependent_process'),
+      '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
     );
 
     if (!empty($display->context)) {
       $form['display_title']['title']['#description'] .= ' ' . t('You may use substitutions in this title.');
-      $form['display_title']['contexts'] = array(
-        '#title' => t('Substitutions'),
-        '#type' => 'fieldset',
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
+
+      // We have to create a manual fieldset because fieldsets do not support IDs.
+      // Use 'hidden' instead of 'markup' so that the process will run.
+      $form['display_title']['contexts_prefix'] = array(
+        '#type' => 'hidden',
+        '#id' => 'edit-display-substitutions',
+        '#prefix' => '<div><fieldset id="edit-display-substitutions" class="collapsed collapsible"><legend>' . t('Substitutions') . '</legend>',
+        '#process' => array('ctools_dependent_process'),
+        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
       );
 
       $rows = array();
@@ -642,6 +730,9 @@ function panels_edit_display_settings_form(&$form_state) {
 
       $header = array(t('Keyword'), t('Value'));
       $form['display_title']['contexts']['context'] = array('#value' => theme('table', $header, $rows));
+      $form['display_title']['contexts_suffix'] = array(
+        '#value' => '</fieldset></div>',
+      );
     }
   }
 
@@ -963,6 +1054,40 @@ function panels_ajax_toggle_shown($op, $cache, $pid = NULL) {
   $output = array();
   $output[] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
   $output[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+
+  ctools_ajax_render($output);
+}
+
+/**
+ * Entry point for AJAX: switch which pane is being used to set the display title.
+ *
+ * @param int $cache
+ *  The display id for the display object currently being edited. Errors out silently if absent.
+ * @param int $pid
+ *  The pane id for the pane object whose show/hide state we're toggling.
+ */
+function panels_ajax_set_display_title($cache, $pid = NULL) {
+  if (empty($cache->display->content[$pid])) {
+    ctools_ajax_render_error(t('Invalid pane id.'));
+  }
+
+  $pane = &$cache->display->content[$pid];
+
+  $old_title = !empty($cache->display->title_pane) ? $cache->display->title_pane : NULL;
+  $cache->display->title_pane = $pid;
+
+  panels_edit_cache_set($cache);
+
+  $output = array();
+  $output[] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
+
+  if ($old_title && !empty($cache->display->content[$old_title])) {
+    $old_pane = $cache->display->content[$old_title];
+    $output[] = ctools_ajax_command_replace("#panel-pane-$old_pane->pid", panels_show_pane($cache->display, $old_pane, TRUE));
+  }
+
+  // Update the text stating which pane is currently selected as the title.
+//  $output[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
 
   ctools_ajax_render($output);
 }

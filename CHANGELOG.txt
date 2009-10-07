@@ -5,6 +5,8 @@ Panels 6.x-dev
 #568218: Links to clone, export, delete/revert, enable/disable variants from the main summary page were incorrect and led to an operation trail not found message.
 #533724: Prevent Panels from upgrading while uninstalled, as that upgrades into broken pages.
 #529816: Allow flexible layout to add custom classes to each region.
+Rearrange the pane dropdown menus to be better organized and look a little nicer.
+Add a new field to allow setting a panel title from one of its panes.
 
 Panels 6.x-3.0
 ==============

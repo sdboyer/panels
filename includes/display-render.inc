@@ -217,7 +217,20 @@ function panels_render_pane_content(&$display, &$pane, $keywords) {
  * $display
  *   The display.
  */
-function panels_render_pane($content, $pane, $display) {
+function panels_render_pane($content, $pane, &$display) {
+  if ($display->hide_title == PANELS_TITLE_PANE && !empty($display->title_pane) && $display->title_pane == $pane->pid) {
+
+    // If the user selected to override the title with nothing, and selected
+    // this as the title pane, assume the user actually wanted the original
+    // title to bubble up to the top but not actually be used on the pane.
+    if (empty($content->title) && !empty($content->original_title)) {
+      $display->stored_pane_title = $content->original_title;
+    }
+    else {
+      $display->stored_pane_title = $content->title;
+    }
+  }
+
   if (!empty($pane->style['style'])) {
     $style = panels_get_style($pane->style['style']);
 
@@ -291,6 +304,36 @@ function panels_render_panel($display, $panel, $panes) {
   }
 
   return theme($style['render panel'], $display, $owner_id, $panes, $style_settings, $panel);
+}
+
+/**
+ * Get the title from a display.
+ *
+ * The display must have already been rendered, or the setting to set the display's title
+ * from a pane's title will not have worked.
+ *
+ * @param $display
+ *   The display to get the title from.
+ *
+ * @return
+ *   The title to use. If NULL, this means to let any default title that may be in use
+ *   pass through. i.e, do not actually set the title.
+ */
+function panels_display_get_title($display) {
+  switch ($display->hide_title) {
+    case PANELS_TITLE_NONE:
+      return '';
+
+    case PANELS_TITLE_PANE:
+      return isset($display->stored_pane_title) ? $display->stored_pane_title : '';
+
+    case PANELS_TITLE_FIXED:
+    case FALSE; // For old exported panels that are not in the database.
+      if (!empty($display->title)) {
+        return filter_xss_admin(ctools_context_keyword_substitute($display->title, array(), $display->context));
+      }
+      return NULL;
+  }
 }
 
 /**
