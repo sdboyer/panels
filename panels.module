@@ -47,7 +47,7 @@ function panels_theme() {
     'file' => 'includes/display-edit.inc',
   );
   $theme['panels_pane'] = array(
-    'arguments' => array('content' => array(), 'pane' => array(), 'display' => array()),
+    'arguments' => array('output' => array(), 'pane' => array(), 'display' => array()),
     'path' => drupal_get_path('module', 'panels') . '/templates',
     'template' => 'panels-pane',
   );
@@ -93,7 +93,7 @@ function panels_theme() {
   foreach ($styles as $name => $data) {
     if (!empty($data['render pane'])) {
       $theme[$data['render pane']] = array(
-        'arguments' => array('content' => NULL, 'pane' => NULL, 'display' => NULL),
+        'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
       );
     }
     if (!empty($data['render panel'])) {
@@ -1006,7 +1006,7 @@ function panel_context_panels_cache_set($key, $cache) {
  * Clean up the panel pane variables for the template.
  */
 function template_preprocess_panels_pane($vars) {
-  $content = $vars['content'];
+  $content = $vars['output'];
   // basic classes
   $vars['classes'] = 'panel-pane';
   $vars['id'] = '';
