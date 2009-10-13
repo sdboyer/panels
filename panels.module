@@ -47,8 +47,9 @@ function panels_theme() {
     'file' => 'includes/display-edit.inc',
   );
   $theme['panels_pane'] = array(
-    'arguments' => array('content', 'pane', 'display'),
-    'file' => 'includes/display-render.inc',
+    'arguments' => array('content' => array(), 'pane' => array(), 'display' => array()),
+    'path' => drupal_get_path('module', 'panels') . '/templates',
+    'template' => 'panels-pane',
   );
   $theme['panels_common_content_list'] = array(
     'arguments' => array('display'),
@@ -999,4 +1000,44 @@ function panel_context_panels_cache_set($key, $cache) {
     $page->new_handler->conf['display'] = $cache->display;
   }
   page_manager_set_page_cache($page);
+}
+
+/**
+ * Clean up the panel pane variables for the template.
+ */
+function template_preprocess_panels_pane($vars) {
+  $content = $vars['content'];
+  // basic classes
+  $vars['classes'] = 'panel-pane';
+  $vars['id'] = '';
+
+  // Add id and custom class if sent in.
+  if (!empty($content->content)) {
+    if (!empty($content->css_id)) {
+      $vars['id'] = ' id="' . $content->css_id . '"';
+    }
+    if (!empty($content->css_class)) {
+      $vars['classes'] = ' ' . $content->css_class;
+    }
+  }
+
+  // administrative links, only if there is permission.
+  $vars['admin_links'] = '';
+  if (user_access('view pane admin links') && !empty($content->admin_links)) {
+    $vars['admin_links'] = theme('links', $content->admin_links);
+  }
+
+  $vars['title'] = !empty($content->title) ? $content->title : '';
+
+  $vars['feeds'] = !empty($content->feeds) ? implode(' ', $content->feeds) : '';
+  $vars['content'] = $content->content;
+
+  $vars['links'] = !empty($content->links) ? implode(' ', $content->links) : '';
+  $vars['more'] = '';
+  if (!empty($content->more)) {
+    if (empty($content->more['title'])) {
+      $content->more['title'] = t('more');
+    }
+    $vars['more'] = l($content->more['title'], $content->more['href'], $content->more);;
+  }
 }
