@@ -83,6 +83,11 @@ function panels_get_pane_content($display, $pane, $keywords, $args = array(), $c
  *   The cached content, or FALSE to indicate no cached content exists.
  */
 function panels_get_cached_content($display, $args, $context, $pane = NULL) {
+  // Never use cache on a POST
+  if (!empty($_POST)) {
+    return FALSE;
+  }
+
   $method = $pane ? $pane->cache['method'] : $display->cache['method'];
   $function = panels_plugin_get_function('cache', $method, 'cache get');
 
@@ -105,6 +110,11 @@ function panels_get_cached_content($display, $args, $context, $pane = NULL) {
  * Store cached content for a given display and possibly pane.
  */
 function panels_set_cached_content($cache, $display, $args, $context, $pane = NULL) {
+  // Never use cache on a POST
+  if (!empty($_POST)) {
+    return FALSE;
+  }
+
   $method = $pane ? $pane->cache['method'] : $display->cache['method'];
   $function = panels_plugin_get_function('cache', $method, 'cache set');
 

@@ -9,6 +9,7 @@ Rearrange the pane dropdown menus to be better organized and look a little nicer
 Add a new field to allow setting a panel title from one of its panes.
 #562560 by Damien McKenna: Integration with export.module
 #583172 by jacine: Turn panel pane into a template, as it always should have been.
+#604404: Make sure caching does not trigger for form POSTs.
 
 Panels 6.x-3.0
 ==============
