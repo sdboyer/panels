@@ -1,6 +1,7 @@
 Panels 6.x-3.x-dev
 ==================
 #606980 by Deciphered and sethfreach: Typo caused panel-pane class to disappear if another class was assigned.
+#607242: Using the wrong variable in hook_block can cause title to not be overridable.
 
 Panels 6.x-3.1
 ==============
