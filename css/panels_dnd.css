@@ -531,6 +531,11 @@ html.js div.panels-display-links div.ctools-dropdown-container ul li span.panels
   padding: 0 10px;
 }
 
+html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li .panels-italic,
+html.js div.panels-display-links div.ctools-dropdown-container ul li .panels-italic {
+  font-style: italic;
+}
+
 html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li span.dropdown-header,
 html.js div.panels-display-links div.ctools-dropdown-container ul li span.dropdown-header {
   background-color: #fefefe;

@@ -528,10 +528,10 @@ function panels_show_pane($display, $pane, $skin = TRUE) {
         $access_title  = isset($plugin['title']) ? $plugin['title'] : t('Broken/missing access plugin %plugin', array('%plugin' => $test['name']));
         $access_description = ctools_access_summary($plugin, $contexts, $test);
 
-        $visiblity_links[] = array(
-          'title' => t('@title: !description', array('@title' => $access_title, '!description' => $access_description)),
+        $visibility_links[] = array(
+          'title' => $access_description,
           'href' => "panels/ajax/access-test/$cache_key/$pane->pid/$id",
-          'attributes' => array('class' => 'ctools-use-modal'),
+          'attributes' => array('class' => 'ctools-use-modal panels-italic'),
         );
       }
     }
@@ -1778,7 +1778,7 @@ function panels_content_configure_access_settings_form_submit($form, &$form_stat
 }
 
 /**
- * AJAX entry point for to add a visiblity rule.
+ * AJAX entry point for to add a visibility rule.
  */
 function panels_ajax_add_access_test($cache, $pid = NULL) {
   ctools_include('content');
