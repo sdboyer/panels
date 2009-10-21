@@ -1,4 +1,4 @@
-Panels 6.x-3.1
+Panels 6.x-3.2
 ==============
 
 #606980 by Deciphered and sethfreach: Typo caused panel-pane class to disappear if another class was assigned.
