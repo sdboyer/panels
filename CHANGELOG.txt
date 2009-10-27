@@ -1,3 +1,9 @@
+Panels 6.x-3.x-dev
+==================
+
+#612850: Fix crash bug with panes referencing deleted/missing views.
+#614178: Transition to panels-pane.tpl.php caused empty panes to display again.
+
 Panels 6.x-3.2
 ==============
 

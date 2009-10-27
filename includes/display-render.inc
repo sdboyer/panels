@@ -244,7 +244,7 @@ function panels_render_pane($content, $pane, &$display) {
     }
   }
 
-  if (!empty($content)) {
+  if (!empty($content->content) {
     // fallback
     return theme('panels_pane', $content, $pane, $display);
   }

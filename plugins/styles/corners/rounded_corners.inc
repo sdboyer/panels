@@ -86,11 +86,11 @@ function panels_add_rounded_corners_css($display, $where) {
  * Render callback for a single pane.
  */
 function theme_panels_rounded_corners_style_render_pane($content, $pane, $display) {
-  $output = theme('panels_pane', $content, $pane, $display);
-
-  if (!$output) {
+  if (empty($content->content) {
     return;
   }
+
+  $output = theme('panels_pane', $content, $pane, $display);
 
   // Just stick a box around the standard theme_panels_pane.
   $output = theme('panels_rounded_corners_box', $output);
