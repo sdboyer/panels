@@ -86,7 +86,7 @@ function panels_add_rounded_corners_css($display, $where) {
  * Render callback for a single pane.
  */
 function theme_panels_rounded_corners_style_render_pane($content, $pane, $display) {
-  if (empty($content->content) {
+  if (empty($content->content)) {
     return;
   }
 
