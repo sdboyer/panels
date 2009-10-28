@@ -227,7 +227,7 @@ function panels_render_pane($content, $pane, &$display) {
       $display->stored_pane_title = $content->original_title;
     }
     else {
-      $display->stored_pane_title = $content->title;
+      $display->stored_pane_title = !empty($content->title) ? $content->title : '';
     }
   }
 
