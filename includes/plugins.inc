@@ -48,7 +48,7 @@ function panels_get_panels($layout, $display) {
 function panels_get_pane_content($display, $pane, $keywords, $args = array(), $context = NULL, $incoming_content = '') {
   ctools_include('context');
   if (!$context) {
-    $context = new ctools_context;
+    $context = array(new ctools_context);
   }
 
   if (!$incoming_content === '') {
