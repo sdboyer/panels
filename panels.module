@@ -776,15 +776,21 @@ function panels_export_display($display, $prefix = '') {
   ctools_include('export');
   $output = ctools_export_object('panels_display', $display, $prefix);
 
+  // Initialize empty properties.
   $output .= $prefix . '$display->content = array()' . ";\n";
   $output .= $prefix . '$display->panels = array()' . ";\n";
   $panels = array();
 
+  $title_pid = 0;
   if (!empty($display->content)) {
     $pid_counter = 0;
     $region_counters = array();
     foreach ($display->content as $pane) {
-      $pane->pid = 'new-' . ++$pid_counter;
+      $pid = 'new-' . ++$pid_counter;
+      if ($pane->pid == $display->title_pane) {
+        $title_pid = $pid;
+      }
+      $pane->pid = $pid;
       $output .= ctools_export_object('panels_pane', $pane, $prefix . '  ');
       $output .= "$prefix  " . '$display->content[\'' . $pane->pid . '\'] = $pane' . ";\n";
       if (!isset($region_counters[$pane->panel])) {
@@ -793,6 +799,7 @@ function panels_export_display($display, $prefix = '') {
       $output .= "$prefix  " . '$display->panels[\'' . $pane->panel . '\'][' . $region_counters[$pane->panel]++ .'] = \'' . $pane->pid . "';\n";
     }
   }
+  $output .= $prefix . '$display->title_pane =' . " '$title_pid';\n";
   return $output;
 }
 

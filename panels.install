@@ -52,6 +52,7 @@ function panels_schema_2() {
   $schema['panels_display']['fields']['title_pane'] = array(
     'type' => 'int',
     'default' => 0,
+    'no export' => TRUE,
   );
 
   return $schema;
