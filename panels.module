@@ -191,7 +191,6 @@ function panels_menu() {
   $admin_base = array(
     'file' => 'includes/callbacks.inc',
     'access arguments' => array('use panels dashboard'),
-
   );
   // Provide a nice location for a panels admin panel.
   $items['admin/build/panels'] = array(
@@ -799,6 +798,20 @@ function panels_export_display($display, $prefix = '') {
       $output .= "$prefix  " . '$display->panels[\'' . $pane->panel . '\'][' . $region_counters[$pane->panel]++ .'] = \'' . $pane->pid . "';\n";
     }
   }
+  $output .= $prefix . '$display->hide_title = ';
+  switch ($display->hide_title) {
+    case PANELS_TITLE_FIXED:
+      $output .= 'PANELS_TITLE_FIXED';
+      break;
+    case PANELS_TITLE_NONE:
+      $output .= 'PANELS_TITLE_NONE';
+      break;
+    case PANELS_TITLE_PANE:
+      $output .= 'PANELS_TITLE_PANE';
+      break;
+  }
+  $output .= ";\n";
+
   $output .= $prefix . '$display->title_pane =' . " '$title_pid';\n";
   return $output;
 }

@@ -70,6 +70,7 @@ function panels_schema_1() {
     'export' => array(
       'object' => 'panels_display',
       'bulk export' => FALSE,
+      'export callback' => 'panels_export_display',
       'can disable' => FALSE,
       'identifier' => 'display',
     ),
@@ -113,6 +114,7 @@ function panels_schema_1() {
         'type' => 'int',
         'size' => 'tiny',
         'default' => 0,
+        'no export' => TRUE,
       ),
     ),
     'primary key' => array('did'),
