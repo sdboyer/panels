@@ -1031,6 +1031,19 @@ function template_preprocess_panels_pane($vars) {
   $vars['classes'] = 'panel-pane';
   $vars['id'] = '';
 
+  // Add some usable classes based on type/subtype
+  ctools_include('cleanstring');
+  $type_class = $content->type ? 'pane-'. ctools_cleanstring($content->type, array('lower case' => TRUE)) : '';
+  $subtype_class = $content->subtype ? 'pane-'. ctools_cleanstring($content->subtype, array('lower case' => TRUE)) : '';
+
+  // Sometimes type and subtype are the same. Avoid redudant classes.
+  if ($type_class != $subtype_class) { 
+    $vars['classes'] .= " $type_class $subtype_class";
+  }
+  else { 
+    $vars['classes'] .= " $type_class";
+  }
+
   // Add id and custom class if sent in.
   if (!empty($content->content)) {
     if (!empty($content->css_id)) {
