@@ -4,6 +4,7 @@ Panels 6.x-3.x-dev
 #612850: Fix crash bug with panes referencing deleted/missing views.
 #614178: Transition to panels-pane.tpl.php caused empty panes to display again.
 #634746 by joshk: Allow pane caching to modify the content during cache storage.
+#612116 by johnskulski: panels-pane preprocess was incorrectly rendering $links
 
 Panels 6.x-3.2
 ==============

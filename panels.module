@@ -1052,7 +1052,7 @@ function template_preprocess_panels_pane($vars) {
   $vars['feeds'] = !empty($content->feeds) ? implode(' ', $content->feeds) : '';
   $vars['content'] = !empty($content->content) ? $content->content : '';
 
-  $vars['links'] = !empty($content->links) ? implode(' ', $content->links) : '';
+  $vars['links'] = !empty($content->links) ? theme('links', $content->links) : '';
   $vars['more'] = '';
   if (!empty($content->more)) {
     if (empty($content->more['title'])) {
