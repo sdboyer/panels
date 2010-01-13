@@ -9,190 +9,186 @@
  * basic page tasks provided by page_manager.module do by default.
  */
 
-/**
- * Specialized implementation of hook_page_manager_task_task_handlers().
- */
-function panels_panel_context_page_manager_task_handlers() {
-  return array(
-    // is a 'context' handler type, meaning it supports the API of the
-    // context handlers provided by ctools context plugins.
-    'handler type' => 'context',
-    'visible' => TRUE, // may be added up front.
+// Plugin definition
+$plugin = array(
+  // is a 'context' handler type, meaning it supports the API of the
+  // context handlers provided by ctools context plugins.
+  'handler type' => 'context',
+  'visible' => TRUE, // may be added up front.
 
-    // Administrative fields.
+  // Administrative fields.
+  'title' => t('Panel'),
+  'admin summary' =>'panels_panel_context_admin_summary',
+  'admin title' => 'panels_panel_context_title',
+  'admin css' => array(
+    panels_get_path('css/panels_admin.css'),
+  ),
+  'admin js' => array(
+    panels_get_path('js/layout.js'),
+  ),
+  'operations' => array(
+    'settings' => array(
+      'title' => t('General'),
+      'description' => t('Change general settings about this variant.'),
+      'form' => 'panels_panel_context_edit_settings',
+    ),
+    'criteria' => array(
+      'title' => t('Selection rules'),
+      'description' => t('Control the criteria used to decide whether or not this variant is used.'),
+      'form' => array(
+        'order' => array(
+          'form' => t('Selection rules'),
+        ),
+        'forms' => array(
+          'form' => array(
+            'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+            'form id' => 'ctools_context_handler_edit_criteria',
+          ),
+        ),
+      ),
+    ),
+    'context' => array(
+      'title' => t('Contexts'),
+      'description' => t('Add additional context objects to this variant that can be used by the content.'),
+      'form' => array(
+        'order' => array(
+          'form' => t('Context'),
+        ),
+        'forms' => array(
+          'form' => array(
+            'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+            'form id' => 'ctools_context_handler_edit_context',
+          ),
+        ),
+      ),
+    ),
+    'layout' => array(
+      'title' => t('Layout'),
+      'description' => t('Change the layout of this panel.'),
+      // No AJAX so we get our CSS loaded.
+      'ajax' => FALSE,
+      'form' => array(
+        'order' => array(
+          'choose' => t('Change layout'),
+          'move' => t('Move content from old layout'),
+        ),
+        'forms' => array(
+          'choose' => array(
+            'form id' => 'panels_panel_context_edit_layout',
+          ),
+          'move' => array(
+            'include' => array(
+              drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
+            ),
+            'form id' => 'panels_panel_context_edit_move',
+            'submit' => 'panels_change_layout_submit',
+          ),
+        ),
+      ),
+    ),
+    'content' => array(
+      'title' => t('Content'),
+      'description' => t('Add content items and change their location with a drag and drop interface.'),
+      'ajax' => FALSE,
+      'form' => array(
+        'order' => array(
+          'form' => t('Content'),
+        ),
+        'forms' => array(
+          'form' => array(
+            'include' => array(
+              drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
+            ),
+            'form id' => 'panels_panel_context_edit_content',
+            'no blocks' => TRUE,
+          ),
+        ),
+      ),
+    ),
+    'preview' => array(
+      'title' => t('Preview'),
+      'description' => t('Get a preview of what this variant will look like.'),
+      'form' => 'panels_panel_context_edit_preview',
+      'ajax' => FALSE,
+      'silent' => TRUE,
+      'form info' => array('finish text' => t('Preview')),
+    ),
+  ),
+
+  // Callback to render the data.
+  'render' => 'panels_panel_context_render',
+
+  // Various callbacks for operations performed on the handler to ensure
+  // related data is updated properly.
+  'save' => 'panels_panel_context_save',
+  'delete' => 'panels_panel_context_delete',
+  'export' => 'panels_panel_context_export',
+  'clone' => 'panels_panel_context_clone',
+
+  'add features' => array(
+    'criteria' => t('Selection rules'),
+    'context' => t('Contexts'),
+  ),
+  // Where to go when finished.
+  'add finish' => 'content',
+
+  'required forms' => array(
+    'choose' => t('Choose layout'),
+    'content' => t('Panel content'),
+  ),
+
+  'edit forms' => array(
+    'content' => t('Panel content'),
+    'criteria' => t('Selection rules'),
+    'settings' => t('General'),
+    'context' => t('Contexts'),
+    'layout' => t('Change layout'),
+    'move' => '', // no title makes it a 'hidden' edit form.
+  ),
+  'forms' => array(
+    'settings' => array(
+      'form id' => 'panels_panel_context_edit_settings',
+    ),
+    'choose' => array(
+      'form id' => 'panels_panel_context_edit_choose',
+      'no back validate' => TRUE,
+    ),
+    'layout' => array(
+      'no return' => TRUE,
+      'form id' => 'panels_panel_context_edit_layout',
+    ),
+    'move' => array(
+      'include' => array(
+        drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
+      ),
+      'form id' => 'panels_panel_context_edit_move',
+      'submit' => 'panels_change_layout_submit',
+    ),
+    'content' => array(
+      'include' => array(
+        drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
+      ),
+      'form id' => 'panels_panel_context_edit_content',
+      'no blocks' => TRUE,
+    ),
+    'context' => array(
+      'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+      'form id' => 'ctools_context_handler_edit_context',
+    ),
+    'criteria' => array(
+      'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
+      'form id' => 'ctools_context_handler_edit_criteria',
+    ),
+  ),
+  'default conf' => array(
     'title' => t('Panel'),
-    'admin summary' =>'panels_panel_context_admin_summary',
-    'admin title' => 'panels_panel_context_title',
-    'admin css' => array(
-      panels_get_path('css/panels_admin.css'),
-    ),
-    'admin js' => array(
-      panels_get_path('js/layout.js'),
-    ),
-    'operations' => array(
-      'settings' => array(
-        'title' => t('General'),
-        'description' => t('Change general settings about this variant.'),
-        'form' => 'panels_panel_context_edit_settings',
-      ),
-      'criteria' => array(
-        'title' => t('Selection rules'),
-        'description' => t('Control the criteria used to decide whether or not this variant is used.'),
-        'form' => array(
-          'order' => array(
-            'form' => t('Selection rules'),
-          ),
-          'forms' => array(
-            'form' => array(
-              'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
-              'form id' => 'ctools_context_handler_edit_criteria',
-            ),
-          ),
-        ),
-      ),
-      'context' => array(
-        'title' => t('Contexts'),
-        'description' => t('Add additional context objects to this variant that can be used by the content.'),
-        'form' => array(
-          'order' => array(
-            'form' => t('Context'),
-          ),
-          'forms' => array(
-            'form' => array(
-              'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
-              'form id' => 'ctools_context_handler_edit_context',
-            ),
-          ),
-        ),
-      ),
-      'layout' => array(
-        'title' => t('Layout'),
-        'description' => t('Change the layout of this panel.'),
-        // No AJAX so we get our CSS loaded.
-        'ajax' => FALSE,
-        'form' => array(
-          'order' => array(
-            'choose' => t('Change layout'),
-            'move' => t('Move content from old layout'),
-          ),
-          'forms' => array(
-            'choose' => array(
-              'form id' => 'panels_panel_context_edit_layout',
-            ),
-            'move' => array(
-              'include' => array(
-                drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
-              ),
-              'form id' => 'panels_panel_context_edit_move',
-              'submit' => 'panels_change_layout_submit',
-            ),
-          ),
-        ),
-      ),
-      'content' => array(
-        'title' => t('Content'),
-        'description' => t('Add content items and change their location with a drag and drop interface.'),
-        'ajax' => FALSE,
-        'form' => array(
-          'order' => array(
-            'form' => t('Content'),
-          ),
-          'forms' => array(
-            'form' => array(
-              'include' => array(
-                drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
-              ),
-              'form id' => 'panels_panel_context_edit_content',
-              'no blocks' => TRUE,
-            ),
-          ),
-        ),
-      ),
-      'preview' => array(
-        'title' => t('Preview'),
-        'description' => t('Get a preview of what this variant will look like.'),
-        'form' => 'panels_panel_context_edit_preview',
-        'ajax' => FALSE,
-        'silent' => TRUE,
-        'form info' => array('finish text' => t('Preview')),
-      ),
-    ),
-
-    // Callback to render the data.
-    'render' => 'panels_panel_context_render',
-
-    // Various callbacks for operations performed on the handler to ensure
-    // related data is updated properly.
-    'save' => 'panels_panel_context_save',
-    'delete' => 'panels_panel_context_delete',
-    'export' => 'panels_panel_context_export',
-    'clone' => 'panels_panel_context_clone',
-
-    'add features' => array(
-      'criteria' => t('Selection rules'),
-      'context' => t('Contexts'),
-    ),
-    // Where to go when finished.
-    'add finish' => 'content',
-
-    'required forms' => array(
-      'choose' => t('Choose layout'),
-      'content' => t('Panel content'),
-    ),
-
-    'edit forms' => array(
-      'content' => t('Panel content'),
-      'criteria' => t('Selection rules'),
-      'settings' => t('General'),
-      'context' => t('Contexts'),
-      'layout' => t('Change layout'),
-      'move' => '', // no title makes it a 'hidden' edit form.
-    ),
-    'forms' => array(
-      'settings' => array(
-        'form id' => 'panels_panel_context_edit_settings',
-      ),
-      'choose' => array(
-        'form id' => 'panels_panel_context_edit_choose',
-        'no back validate' => TRUE,
-      ),
-      'layout' => array(
-        'no return' => TRUE,
-        'form id' => 'panels_panel_context_edit_layout',
-      ),
-      'move' => array(
-        'include' => array(
-          drupal_get_path('module', 'panels') . '/includes/display-layout.inc',
-        ),
-        'form id' => 'panels_panel_context_edit_move',
-        'submit' => 'panels_change_layout_submit',
-      ),
-      'content' => array(
-        'include' => array(
-          drupal_get_path('module', 'panels') . '/includes/display-edit.inc',
-        ),
-        'form id' => 'panels_panel_context_edit_content',
-        'no blocks' => TRUE,
-      ),
-      'context' => array(
-        'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
-        'form id' => 'ctools_context_handler_edit_context',
-      ),
-      'criteria' => array(
-        'include' => drupal_get_path('module', 'ctools') . '/includes/context-task-handler.inc',
-        'form id' => 'ctools_context_handler_edit_criteria',
-      ),
-    ),
-    'default conf' => array(
-      'title' => t('Panel'),
-      'no_blocks' => FALSE,
-      'css_id' => '',
-      'css' => '',
-      'contexts' => array(),
-      'relationships' => array(),
-    ),
-  );
-}
+    'no_blocks' => FALSE,
+    'css_id' => '',
+    'css' => '',
+    'contexts' => array(),
+    'relationships' => array(),
+  ),
+);
 
 /**
  * Get the display for a task handler.

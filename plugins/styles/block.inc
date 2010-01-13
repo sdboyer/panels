@@ -3,25 +3,15 @@
 
 /**
  * @file
- * Definition of the 'naked' panel style.
+ * Definition of the 'block' panel style.
  */
 
-// ---------------------------------------------------------------------------
-// Panels hooks.
-
-/**
- * Implementation of hook_panels_style_info().
- */
-function panels_block_panels_styles() {
-  return array(
-    'title' => t('System block'),
-    'description' => t('Display the pane as a system block; this is more restrictive than the default.'),
-    'render pane' => 'panels_block_style_render_pane',
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Panels style plugin callbacks.
+// Plugin definition
+$plugin = array(
+  'title' => t('System block'),
+  'description' => t('Display the pane as a system block; this is more restrictive than the default.'),
+  'render pane' => 'panels_block_style_render_pane',
+);
 
 /**
  * Render callback.

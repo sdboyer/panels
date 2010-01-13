@@ -2,28 +2,16 @@
 // $Id$
 
 /**
- * @file styles/block.inc
+ * @file
  * Definition of the 'default' panel style.
  */
 
-// ---------------------------------------------------------------------------
-// Panels hooks.
-
-/**
- * Implementation of hook_panels_style_info().
- */
-function panels_default_panels_styles() {
-  return array(
-    'default' => array(
-      'title' => t('No style'),
-      'description' => t('The default panel rendering style; displays each pane with a separator.'),
-      'render panel' => 'panels_default_style_render_panel',
-    ),
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Panels style plugin callbacks.
+// Plugin definition
+$plugin = array(
+  'title' => t('No style'),
+  'description' => t('The default panel rendering style; displays each pane with a separator.'),
+  'render panel' => 'panels_default_style_render_panel',
+);
 
 /**
  * Render callback.

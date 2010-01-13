@@ -3,32 +3,18 @@
 
 
 /**
- * @file styles/list.inc
+ * @file
  * Definition of the 'list' panel style.
  */
 
-
-// ---------------------------------------------------------------------------
-// Panels hooks.
-
-/**
- * Implementation of hook_panels_style_info().
- */
-function panels_list_panels_styles() {
-  return array(
-    'list' => array(
-      'title' => t('List'),
-      'description' => t('Presents the panes in the form of an HTML list.'),
-      'render panel' => 'panels_list_style_render_panel',
-      'settings form' => 'panels_list_style_settings_form',
-      'settings validate' => 'panels_list_style_settings_validate',
-    ),
-  );
-}
-
-
-// ---------------------------------------------------------------------------
-// Panels style plugin callbacks.
+// Plugin definition
+$plugin = array(
+  'title' => t('List'),
+  'description' => t('Presents the panes in the form of an HTML list.'),
+  'render panel' => 'panels_list_style_render_panel',
+  'settings form' => 'panels_list_style_settings_form',
+  'settings validate' => 'panels_list_style_settings_validate',
+);
 
 /**
  * Render callback.

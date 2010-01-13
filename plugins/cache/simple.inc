@@ -6,24 +6,20 @@
  * Provides a simple time-based caching option for panel panes.
  */
 
-/**
- * Specially named implementation of hook_panels_cache()
- */
-function panels_simple_panels_cache() {
-  return array(
-    'title' => t("Simple cache"),
-    'description' => t('Simple caching is a time-based cache. This is a hard limit, and once cached it will remain that way until the time limit expires.'),
-    'cache get' => 'panels_simple_cache_get_cache',
-    'cache set' => 'panels_simple_cache_set_cache',
-    'cache clear' => 'panels_simple_cache_clear_cache',
-    'settings form' => 'panels_simple_cache_settings_form',
-    'settings form submit' => 'panels_simple_cache_settings_form_submit',
-    'defaults' => array(
-      'lifetime' => 15,
-      'granularity' => 'none',
-    ),
-  );
-}
+// Plugin definition
+$plugin = array(
+  'title' => t("Simple cache"),
+  'description' => t('Simple caching is a time-based cache. This is a hard limit, and once cached it will remain that way until the time limit expires.'),
+  'cache get' => 'panels_simple_cache_get_cache',
+  'cache set' => 'panels_simple_cache_set_cache',
+  'cache clear' => 'panels_simple_cache_clear_cache',
+  'settings form' => 'panels_simple_cache_settings_form',
+  'settings form submit' => 'panels_simple_cache_settings_form_submit',
+  'defaults' => array(
+    'lifetime' => 15,
+    'granularity' => 'none',
+  ),
+);
 
 /**
  * Get cached content.
