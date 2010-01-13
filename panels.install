@@ -1276,3 +1276,16 @@ function panels_update_6305() {
 
   return $ret;
 }
+
+/**
+ * Drop a table that should have been gone long ago.
+ */
+function panels_update_6306() {
+  $ret = array();
+
+  if (db_table_exists('panels_page_router_store')) {
+    db_drop_table($ret, 'panels_page_router_store');
+  }
+
+  return $ret;
+}
