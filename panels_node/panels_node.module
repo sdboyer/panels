@@ -17,7 +17,7 @@
  * Implementation of hook_perm().
  */
 function panels_node_perm() {
-  return array('create panel-nodes', 'edit own panel-nodes', 'administer panel-nodes');
+  return array('create panel-nodes', 'edit any panel-nodes', 'edit own panel-nodes', 'administer panel-nodes');
 }
 
 /**
@@ -110,7 +110,7 @@ function panels_node_access($op, $node, $account) {
     return TRUE;
   }
 
-  if ($op == 'update' && $node->uid == $account->uid && user_access('edit own panel-nodes')) {
+  if ($op == 'update' && (user_access('edit any panel-nodes') || $node->uid == $account->uid && user_access('edit own panel-nodes'))) {
     return TRUE;
   }
 }

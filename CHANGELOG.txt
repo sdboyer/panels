@@ -7,6 +7,7 @@ Panels 6.x-3.x-dev
 #612116 by johnskulski: panels-pane preprocess was incorrectly rendering $links
 #612704 by c960657: panels_get_pane_content() inappropriately created a blank context when no contexts were available.
 #618624 by johnskulski: Better classes for panel panes.
+#651306 by joachim: Add "edit any panel node" permission. Not sure why this was never there.
 
 Panels 6.x-3.2
 ==============
