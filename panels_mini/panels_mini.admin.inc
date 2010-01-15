@@ -424,6 +424,7 @@ function panels_mini_edit_form(&$form_state, $panel_mini) {
     '#size' => 24,
     '#default_value' => $panel_mini->name,
     '#title' => t('Mini panel name'),
+    '#maxlength' => 32,
     '#description' => t('A unique name used to identify this panel page internally. It must be only be alpha characters and underscores. No spaces, numbers or uppercase characters.'),
   );
 
