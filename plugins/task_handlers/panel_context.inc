@@ -35,6 +35,7 @@ $plugin = array(
     'criteria' => array(
       'title' => t('Selection rules'),
       'description' => t('Control the criteria used to decide whether or not this variant is used.'),
+      'ajax' => FALSE,
       'form' => array(
         'order' => array(
           'form' => t('Selection rules'),
