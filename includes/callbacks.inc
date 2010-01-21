@@ -6,55 +6,135 @@
  */
 
 /**
- * Helper function for autocompletion of node titles.
- * This is mostly stolen from clipper.
- */
-function panels_node_autocomplete($string) {
-  if ($string != '') { // if there are node_types passed, we'll use those in a MySQL IN query.
-    $preg_matches = array();
-    $match = preg_match('/\[nid: (\d+)\]/', $string, $preg_matches);
-    if (!$match) {
-      $match = preg_match('/^nid: (\d+)/', $string, $preg_matches);
-    }
-    if ($match) {
-      $arg = $preg_matches[1];
-      $where = "n.nid = %d";
-    }
-    else {
-      $arg = $string;
-      $where = "LOWER(title) LIKE LOWER('%%%s%%')";
-    }
-    $result = db_query_range(db_rewrite_sql("SELECT n.nid, n.title, u.name FROM {node} n INNER JOIN {users} u ON u.uid = n.uid WHERE $where"), $arg, 0, 10);
-
-    $matches = array();
-    while ($node = db_fetch_object($result)) {
-      $name = empty($node->name) ? variable_get('anonymous', t('Anonymous')) : check_plain($node->name);
-      $matches[$node->title . " [nid: $node->nid]"] = '<span class="autocomplete_title">'. check_plain($node->title) .'</span> <span class="autocomplete_user">('. t('by @user', array('@user' => $name)) .')</span>';
-    }
-    drupal_json($matches);
-  }
-}
-
-/**
  * A central administrative page for Panels.
  */
 function panels_admin_page() {
-  //
-  // TODO: Provide a cute little panel-base administrative panel
-  // that provides things like "Recently edited", "recently added"
-  // and other administrative items to make dealing with the complexity
-  // of panels a little easier.
+  return theme('panels_dashboard');
+}
 
-  // TODO -- move this to a help file.
-  $output = '<p>'. t('Panels is the core engine for a number of submodules, including panels-pages, panels-nodes, and mini-panels.  Panels allows the website adminstrator (or sometimes the end-user) to manipulate the layout of individual pages, sidebars, and content pieces, as well as easily dictate what content is displayed in the layout.') .'</p>';
-  $output .= '<p>'. t('Most Drupal users are familiar with the block to region layout mechanism in which you can assign a block to any region defined in your theme.  Panels takes this concept a massive step forward.  Through the panels interface you can start by creating a layout with any number of columns, headers, and footer, and control the width of those areas.') .'</p>';
-  $output .= '<p>'. t('After creating your layout, you can assign pieces of content to those areas in an easy drag and drop interface.  Content is not limited to blocks, but can be nodes, views, blocks, or other types of content that extend themselves to panels.') .'</p>';
-  $output .= '<p><b>'. t('Panels-pages') .'</b>' .t(', is the the primary panels module, you can use this for creating single full page layouts.  This replaces the standard panel that existed in the earlier versions of panels. If you are upgrading your site from Panels 1, and you cannot find where your panels went, be sure to enable the panel pages module!') .'</p>';
-  $output .= '<p><b>'. t('Panels-nodes') .'</b>' .t(', is useful for creating layouts that only occupy the content area of your pages.  Frequently, it is desirable to add an area to a node layout, such as a pull quote for a newspaper or a photo block, that you don\'t necessarily want on every node.  Panels Nodes lets you control the layout of a single node at a time and place content such as blog posts, images, blogs in and around the post.') .'</p>';
-  $output .= '<p><b>'. t('Mini-panels') .'</b>' .t(', is a layout mechanism for blocks.  It won\'t take long using panels before you get to a point when you want a panel inside of a panel.  Or a panel that can be used as a block.  That is exactly what mini-panels does. You can create a small panel here with various pieces of content and then put it inside of a panels-page or panels-node.') .'</p>';
+function template_preprocess_panels_dashboard(&$vars) {
+  drupal_add_css(panels_get_path('css/panels-dashboard.css'));
+  $vars['image_path'] = url(panels_get_path('images'));
 
-  require_once './' . drupal_get_path('module', 'system') . '/system.admin.inc';
-  $output .= system_admin_menu_block_page();
+  $vars['panel_page_description'] = t('Panel pages can be used as landing pages. They have a URL path, accept arguments and can have menu entries.');
+  $vars['panel_override_description'] = t('Customize an already existing page within your site.');
+  if (module_exists('page_manager')) {
+    $vars['new_panel_page'] = l(t('Panel page'), 'admin/build/pages/add');
+  }
+  else {
+    $vars['new_panel_page'] = '<b>' . t('Panel page') . '</b><br /><em>' . t('You must activate the page manager module for this functionality.') . '</em>';
+    $vars['new_panel_override'] = '<em>' . t('You must activate the page manager module for this functionality.') . '</em>';
+  }
 
-  return $output;
+  $vars['panel_node_description'] = t('Panel nodes are node content and appear in your searches, but are more limited than panel pages.');
+  if (module_exists('panels_node')) {
+    $vars['new_panel_node'] = l(t('Panel node'), 'node/add/panel');
+  }
+  else {
+    $vars['new_panel_node'] = '<b>' . t('Panel node') . '</b><br /><em>' . t('You must activate the panel node module for this functionality.') . '</em>';
+  }
+
+  $vars['panel_mini_description'] = t('Mini panels are small content areas exposed as blocks, for when you need to have complex block layouts or layouts within layouts.');
+  if (module_exists('panels_mini')) {
+    $vars['new_panel_mini'] = l(t('Mini panel'), 'admin/build/panel-mini/add');
+  }
+  else {
+    $vars['new_panel_mini'] = '<b>' . t('Mini panel') . '</b><br /><em>' . t('You must activate the Mini panels module for this functionality.') . '</em>';
+  }
+
+  if (module_exists('page_manager')) {
+    module_load_include('inc', 'page_manager', 'page_manager.admin');
+    $tasks = page_manager_get_tasks_by_type('page');
+    $pages = array('operations' => array());
+
+    page_manager_get_pages($tasks, $pages);
+    $count = 0;
+    $rows = array();
+    foreach ($pages['rows'] as $id => $info) {
+      $rows[] = array(
+        'data' => array(
+          $info['data']['title'],
+          $info['data']['operations'],
+        ),
+        'class' => $info['class'],
+      );
+
+      // Only show 10.
+      if (++$count >= 10) {
+        break;
+      }
+    }
+
+    $vars['pages'] = theme('table', array(), $rows, array('class' => 'panels-manage'));
+    $vars['pagelink'] = l(t('Go to list'), 'admin/build/pages');
+  }
+  else {
+    $vars['pages'] = '<p>' . t('You must install and activate the Page Manager module to manage pages. This module is located within the Chaos Tools Suite.') . '</p>';
+  }
+
+  if (module_exists('panels_mini')) {
+    // Load all mini panels and their displays.
+    $panel_minis = panels_mini_load_all();
+    $count = 0;
+    $rows = array();
+
+    foreach ($panel_minis as $panel_mini) {
+      $rows[] = array(
+        check_plain($panel_mini->title),
+        array(
+          'data' => l(t('Edit'), "admin/build/panel-mini/$panel_mini->name/edit-general"),
+          'class' => 'page-manager-page-operations',
+        ),
+      );
+
+      // Only show 10.
+      if (++$count >= 10) {
+        break;
+      }
+    }
+
+    if ($rows) {
+      $vars['minis'] = theme('table', array(), $rows, array('class' => 'panels-manage'));
+    }
+    else {
+      $vars['minis'] = '<p>' . t('There are no mini panels.') . '</p>';
+    }
+    $vars['minilink'] = l(t('Go to list'), 'admin/build/panel-mini');
+  }
+  else {
+    $vars['minis'] = '<p>' . t('You must install and activate the Mini Panels module to manage them.') . '</p>';
+    $vars['minilink'] = '';
+  }
+}
+
+function panels_admin_settings_page() {
+  $form = array();
+  if (module_exists('page_manager')) {
+    foreach (page_manager_get_tasks() as $task) {
+      if ($function = ctools_plugin_get_function($task, 'admin settings')) {
+        $function($form);
+      }
+    }
+  }
+
+  ctools_include('content');
+  foreach (ctools_get_content_types() as $content) {
+    if ($function = ctools_plugin_get_function($content, 'admin settings')) {
+      $function($form);
+    }
+  }
+
+  if (empty($form)) {
+    return array('#value' => t('There are currently no settings to change, but additional plugins or modules may provide them in the future.'));
+  }
+
+  return system_settings_form($form);
+}
+
+/**
+ * Settings for panel contexts created by the page manager.
+ */
+function panels_admin_panel_context_page() {
+  panels_load_include('common');
+  return drupal_get_form('panels_common_settings', 'panels_page');
 }

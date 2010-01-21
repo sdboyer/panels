@@ -17,36 +17,20 @@
  * Implementation of hook_perm().
  */
 function panels_node_perm() {
-  return array('create panel-nodes', 'edit own panel-nodes', 'administer panel-nodes');
+  return array('create panel-nodes', 'edit any panel-nodes', 'edit own panel-nodes', 'administer panel-nodes');
 }
 
 /**
  * Implementation of hook_menu().
  */
 function panels_node_menu() {
-/*
-  $items['node/add/panel'] = array(
-    'title' => 'Panel',
-    'access arguments' => array('create panel-nodes'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-*/
-  $items['admin/panels/panel-nodes'] = array(
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!defined('PANELS_REQUIRED_CTOOLS_API') || !module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    return array();
+  }
+
+  $items['admin/build/panels/settings/panel-node'] = array(
     'title' => 'Panel nodes',
-    'access arguments' => array('create panel-nodes'),
-    'type' => MENU_NORMAL_ITEM,
-    'page callback' => 'panels_node_admin',
-    'description' => 'Panel nodes are nodes that are laid out with panel displays.',
-  );
-
-  $items['admin/panels/panel-nodes/information'] = array(
-    'title' => 'Information',
-    'access arguments' => array('create panel-nodes'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $items['admin/panels/panel-nodes/settings'] = array(
-    'title' => 'Settings',
     'description' => 'Configure which content is available to add to panel node displays.',
     'access arguments' => array('administer panel-nodes'),
     'page callback' => 'panels_node_settings',
@@ -65,12 +49,6 @@ function panels_node_menu() {
     'path' => $base . 'layout',
     'title' => 'Panel layout',
     'page callback' => 'panels_node_edit_layout',
-    'weight' => 2,
-  ) + $base;
-
-  $items['node/%node/panel_settings'] = array(
-    'title' => 'Panel layout settings',
-    'page callback' => 'panels_node_edit_layout_settings',
     'weight' => 2,
   ) + $base;
 
@@ -98,26 +76,6 @@ function panels_node_edit_node($node) {
   return node_access('update', $node);
 }
 
-/**
- * Page callback for the very short admin page.
- */
-function panels_node_admin() {
-  $output = '<p>';
-  $output .= t('Panel nodes do not have a normal administrative UI, such as panels pages or mini panels. With this module, a new node type is created: a "panel" node. These are nodes that have panel layouts, but do not have the breadth of features that panel pages do; these features are sacrificed so that you gain all the capabilities of nodes.');
-  $output .= '</p><p>';
-  $output .= t('You may create a !panel_node using the normal !create_content menu, and you can administer your panel nodes under the normal !administer_nodes menu (administrative permission required).', array(
-    '!panel_node' => l(t('panel node'), 'node/add/panel'),
-    '!create_content' => l(t('create content'), 'node/add'),
-    '!administer_nodes' => l(t('administer nodes'), 'admin/content/node'),
-  ));
-  $output .= '</p><p>';
-  $output .= t('On the !settings page, you may control which panes may be added to panel nodes; this can be very valuable to limit what content is available if your users who can create panel nodes are not administrators.', array(
-    '!settings' => l(t('settings'), 'admin/panels/panel-nodes/settings'),
-  ));
-  $output .= '</p>';
-  return $output;
-}
-
 // ---------------------------------------------------------------------------
 // Node hooks
 
@@ -125,12 +83,17 @@ function panels_node_admin() {
  * Implementation of hook_node_info().
  */
 function panels_node_node_info() {
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!defined('PANELS_REQUIRED_CTOOLS_API') || !module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    return array();
+  }
+
   return array(
     'panel' => array(
       'name' => t('Panel'),
       'module' => 'panels_node',
       'body_label' => t('Teaser'),
-      'description' => t("A panel a page layout broken up into rows and columns."),
+      'description' => t("A panel layout broken up into rows and columns."),
     ),
   );
 }
@@ -138,7 +101,7 @@ function panels_node_node_info() {
 /**
  * Implementation of hook_access().
  */
-function panels_node_access($op, $node = NULL) {
+function panels_node_access($op, $node, $account) {
   if (user_access('administer panel-nodes')) {
     return TRUE;
   }
@@ -147,7 +110,7 @@ function panels_node_access($op, $node = NULL) {
     return TRUE;
   }
 
-  if ($op == 'update' && $node->uid == $user->uid && user_access('edit own panel-nodes')) {
+  if ($op == 'update' && (user_access('edit any panel-nodes') || $node->uid == $account->uid && user_access('edit own panel-nodes'))) {
     return TRUE;
   }
 }
@@ -156,9 +119,13 @@ function panels_node_add() {
   $output = '';
 
   panels_load_include('plugins');
+  panels_load_include('common');
+
+  $layouts = panels_common_get_allowed_layouts('panels_node');
+
   // If no layout selected, present a list of choices.
-  foreach (panels_get_layouts() as $id => $layout) {
-    $output .= panels_print_layout_link($id, $layout, 'node/add/panel/' . $id);
+  foreach ($layouts as $id => $layout) {
+    $output .= panels_print_layout_link($id, $layout, 'node/add/panel/' . $id, array('query' => $_GET));
   }
   return $output;
 }
@@ -168,12 +135,14 @@ function panels_node_add() {
  */
 function panels_node_form(&$node, &$param) {
   $form['panels_node']['#tree'] = TRUE;
-  if (!$node->nid) {
+  if (empty($node->nid)) {
     // Grab our selected layout from the $node, If it doesn't exist, try arg(3)
     // and if that doesn't work present them with a list to pick from.
     $panel_layout = isset($node->panel_layout) ? $node->panel_layout : arg(3);
     if (empty($panel_layout)) {
-      return drupal_goto('node/add/panel/choose-layout');
+      $opts = $_GET;
+      unset($opts['q']);
+      return drupal_goto('node/add/panel/choose-layout', $opts);
     }
 
     panels_load_include('plugins');
@@ -205,6 +174,7 @@ function panels_node_form(&$node, &$param) {
       '#description' => t('The teaser is a piece of text to describe when the panel is listed (such as when promoted to front page); the actual content will only be displayed on the full node view.'),
       '#default_value' => $node->body,
     );
+    $form['format'] = filter_form($node->format); // Now we can set the format!
   }
 
 //  drupal_set_message('<pre>' . check_plain(var_export($node, true)) . '</pre>');
@@ -253,6 +223,14 @@ function panels_node_insert(&$node) {
   // Create a new display and record that.
   $display = panels_new_display();
   $display->layout = $node->panels_node['layout'];
+
+  // Special handling for nodes being imported from an export.module data dump.
+  if (!empty($node->export_display)) {
+    // This works by overriding the $display set above
+    eval($node->export_display);
+    unset($node->export_display);
+  }
+
   panels_save_display($display);
   $css_id = $node->panels_node['css_id'];
 
@@ -282,23 +260,37 @@ function panels_node_update($node) {
  * Implementation of hook_view().
  */
 function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
+  static $rendering = array();
+
+  // Prevent loops if someone foolishly puts the node inside itself:
+  if (!empty($rendering[$node->nid])) {
+    return $node;
+  }
+
+  $rendering[$node->nid] = TRUE;
   panels_load_include('plugins');
   if ($teaser) {
     // Do the standard view for teaser.
     $node = node_prepare($node, $teaser);
+    // Because our teasier is never the same as our content, *always* provide
+    // the read more flag.
+    $node->readmore = TRUE;
   }
   else {
-    $display = panels_load_display($node->panels_node['did']);
-    $display->css_id = $node->panels_node['css_id'];
-    // TODO: Find a way to make sure this can't node_view.
-    $display->context = array('panel-node' => panels_context_create('node', $node));
+    if (!empty($node->panels_node['did'])) {
+      $display = panels_load_display($node->panels_node['did']);
+      $display->css_id = $node->panels_node['css_id'];
+      // TODO: Find a way to make sure this can't node_view.
+      $display->context = panels_node_get_context($node);
 
-    $node->content['body'] = array(
-      '#value' => panels_render_display($display),
-      '#weight' => 0,
-    );
+      $node->content['body'] = array(
+        '#value' => panels_render_display($display),
+        '#weight' => 0,
+      );
+    }
   }
 
+  unset($rendering[$node->nid]);
   return $node;
 }
 
@@ -320,28 +312,21 @@ function panels_node_settings() {
  * Pass through to the panels layout editor.
  */
 function panels_node_edit_layout($node) {
-  panels_load_include('plugins');
+//  panels_load_include('plugins');
+  ctools_include('context');
   $display = panels_load_display($node->panels_node['did']);
-  $display->context = array('panel-node' => panels_context_create('node', $node));
-  return panels_edit_layout($display, t('Save'), "node/$node->nid/panel_layout");
-}
-
-/**
- * Pass through to the panels layout settings editor.
- */
-function panels_node_edit_layout_settings($node) {
-  panels_load_include('plugins');
-  $display = panels_load_display($node->panels_node['did']);
-  return panels_edit_layout_settings($display, t('Save'), "node/$node->nid/panel_settings");
+  $display->context = panels_node_get_context($node);
+  return panels_edit_layout($display, t('Save'), "node/$node->nid/panel_layout", 'panels_node');
 }
 
 /**
  * Pass through to the panels content editor.
  */
 function panels_node_edit_content($node) {
-  panels_load_include('plugins');
+//  panels_load_include('plugins');
+  ctools_include('context');
   $display = panels_load_display($node->panels_node['did']);
-  $display->context = array('panel-node' => panels_context_create('node', $node));
+  $display->context = panels_node_get_context($node);
   panels_load_include('common');
   $content_types = panels_common_get_allowed_types('panels_node', $display->context);
 
@@ -351,3 +336,26 @@ function panels_node_edit_content($node) {
   print theme('page', panels_edit($display, "node/$node->nid/panel_content", $content_types), FALSE);
 }
 
+/**
+ * Build the context to use for a panel node.
+ */
+function panels_node_get_context(&$node) {
+  ctools_include('context');
+  $context = ctools_context_create('node', $node);
+  $context->identifier = t('This node');
+  $context->keyword = 'node';
+  return array('panel-node' => $context);
+}
+
+/**
+ * hook_export_node_alter() - integegrate with export.module for saving
+ *                            panel_nodes into code.
+ */
+function panels_node_export_node_alter(&$node, $original_node, $method) {
+  if ($method == 'export') {
+    drupal_set_message(t("NOTE: in order to import panel_nodes you must first set the export.module settings to \"Save as a new node then edit\", otherwise it won't work."));
+    $display = panels_load_display($node->panels_node['did']);
+    $export = panels_export_display($display);
+    $node->export_display = $export;
+  }
+}

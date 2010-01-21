@@ -47,7 +47,8 @@
   margin-top: 1em;
 }
 
-.layout-container .layout-icon {
+.layout-container .layout-icon,
+.left-container .layout-icon {
   float: right;
   margin-left: .5em;
 }
@@ -66,38 +67,42 @@
 }
 
 /* styles for the choose layout page */
-#panels-common-set-allowed-layouts .form-checkboxes .form-item,
+.panels-layouts-checkboxes .form-checkboxes .form-item,
 #panels-choose-layout .form-radios .form-item {
   float: left;
   margin-right: .5em;
   width: 90px;
 }
 
-#panels-common-set-allowed-layouts .form-checkboxes .form-item .layout-icon,
+.panels-layouts-checkboxes .form-checkboxes .form-item .layout-icon,
 #panels-choose-layout .form-radios .form-item .layout-icon {
   float: none;
   height: 15em;
   width: 90px;
 }
-#panels-common-set-allowed-layouts .form-checkboxes .option,
+.panels-layouts-checkboxes .form-checkboxes .option,
 #panels-choose-layout .form-radios .form-item .option {
   width: 50px;
   display: block;
   text-align: center; 
 }
 
-#panels-common-set-allowed-layouts .form-submit,
+.panels-layouts-checkboxes .form-submit,
 #panels-choose-layout .form-submit {
   clear: left;
 }
 
-#panels-common-set-allowed-layouts .panels-layout-list label,
+.panels-layouts-checkboxes .panels-layout-list label,
 #panels-choose-layout .panels-layout-list label {
   width: 300px;
   float: left;
   clear: left;
   background: url(../images/go-right.png) right no-repeat;
   margin-right: 20px;
+}
+
+.panels-layouts-checkboxes .description {
+  clear: left;
 }
 
 .change-layout-display .layout-icon {
@@ -139,4 +144,14 @@ tr.changed td span.star {
 td select {
   margin: 0;
   padding: 0;
+}
+
+.panels-style-settings,
+.panels-style-settings-box,
+#panels-style-setting {
+  float: left;
+}
+
+.panels-style-settings-box .form-item {
+  margin: 0 1em 0 0;
 }

@@ -65,7 +65,7 @@ function _panels_print_layout($id, $content) {
  * Given a full layout structure and a content array, render a panel display.
  * @render
  */
-function panels_render_layout($layout, $content, $css_id = NULL, $settings = array()) {
+function panels_render_layout($layout, $content, $css_id = NULL, $settings = array(), $display = NULL) {
   if (!empty($layout['css'])) {
     if (file_exists(path_to_theme() . '/' . $layout['css'])) {
       drupal_add_css(path_to_theme() . '/' . $layout['css']);
@@ -74,8 +74,6 @@ function panels_render_layout($layout, $content, $css_id = NULL, $settings = arr
       drupal_add_css($layout['path'] . '/' . $layout['css']);
     }
   }
-  $display = NULL;
-
   // This now comes after the CSS is added, because panels-within-panels must
   // have their CSS added in the right order; inner content before outer content.
 
@@ -102,14 +100,38 @@ function panels_render_layout($layout, $content, $css_id = NULL, $settings = arr
 }
 
 /**
+ * Render the administrative layout of a display.
+ *
+ * This is used for the edit version, so that layouts can have different
+ * modes, such as the flexible layout designer mode.
+ */
+function panels_render_layout_admin($layout, $content, $display) {
+  // @todo This should be abstracted.
+  if (!empty($layout['css'])) {
+    if (file_exists(path_to_theme() . '/' . $layout['css'])) {
+      drupal_add_css(path_to_theme() . '/' . $layout['css']);
+    }
+    else {
+      drupal_add_css($layout['path'] . '/' . $layout['css']);
+    }
+  }
+
+  if (isset($layout['admin css'])) {
+    drupal_add_css($layout['path'] . '/' . $layout['admin css']);
+  }
+
+  $theme = isset($layout['admin theme']) ? $layout['admin theme'] : $layout['theme'];
+  return theme($theme, isset($display->css_id) ? $display->css_id : '', $content, $display->layout_settings, $display);
+}
+
+/**
  * Render all the panes in a display into a $content array to be used by
  * the display theme function.
  */
-function panels_render_panes($display) {
-  // Safety check.
-  if (empty($display->content)) {
-    return array();
-  }
+function panels_render_panes(&$display) {
+  ctools_include('content');
+
+  $keywords = array();
 
   // First, render all the panes into little boxes. We do this here because
   // some panes request to be rendered after other panes (primarily so they
@@ -117,27 +139,26 @@ function panels_render_panes($display) {
   $panes = array();
   $later = array();
 
-  foreach ($display->content as $pid => $pane) {
-    $pane->shown = isset($pane->shown) ? $pane->shown : TRUE;
-    // TODO Really ought to design a method for creating a quick-access set of content_type (and other plugin) data to help optimize render performance
+  foreach ((array) $display->content as $pid => $pane) {
+    $pane->shown = !empty($pane->shown); // guarantee this field exists.
     // If the user can't see this pane, do not render it.
     if (!$pane->shown || !panels_pane_access($pane, $display)) {
       continue;
     }
 
     // If this pane wants to render last, add it to the $later array.
-    $content_type = panels_get_content_type($pane->type);
+    $content_type = ctools_get_content_type($pane->type);
 
     if (!empty($content_type['render last'])) {
       $later[$pid] = $pane;
       continue;
     }
 
-    $panes[$pid] = panels_render_pane_content($display, $pane);
+    $panes[$pid] = panels_render_pane_content($display, $pane, $keywords);
   }
 
   foreach ($later as $pid => $pane) {
-    $panes[$pid] = panels_render_pane_content($display, $pane);
+    $panes[$pid] = panels_render_pane_content($display, $pane, $keywords);
   }
 
   // Loop through all panels, put all panes that belong to the current panel
@@ -170,56 +191,19 @@ function panels_render_panes($display) {
  * Render a single pane, identifying its context, and put it into
  * the $panes array.
  */
-function panels_render_pane_content(&$display, &$pane) {
-  if (empty($pane->context)) {
-    $pane->context = panels_pane_select_context($pane, $display->context);
-    if ($pane->context === FALSE) {
-      return FALSE;
-    }
-  }
-
-  $content = panels_get_pane_content($display, $pane, $display->args, $pane->context, $display->incoming_content);
-
-  $keywords = !empty($display->keywords) ? $display->keywords : array();
-  // Override the title if configured to
-  if (!empty($pane->configuration['override_title'])) {
-    // Give previous title as an available substitution here.
-    $keywords['%title'] = $content->title;
-    $content->title = $pane->configuration['override_title_text'];
-  }
+function panels_render_pane_content(&$display, &$pane, $keywords) {
+  $content = panels_get_pane_content($display, $pane, $keywords, $display->args, $display->context, $display->incoming_content);
 
   // Pass long the css_id that is usually available.
-  if (!empty($pane->configuration['css_id'])) {
-    $content->css_id = $pane->configuration['css_id'];
+  if (!empty($pane->css['css_id'])) {
+    $content->css_id = $pane->css['css_id'];
   }
 
   // Pass long the css_class that is usually available.
-  if (!empty($pane->configuration['css_class'])) {
-    $content->css_class = $pane->configuration['css_class'];
+  if (!empty($pane->css['css_class'])) {
+    $content->css_class = $pane->css['css_class'];
   }
 
-  if (!empty($content->title)) {
-    // Perform substitutions
-    if (!empty($keywords)) {
-      $content->title = strtr($content->title, $keywords);
-    }
-
-    // Sterilize the title
-    $content->title = filter_xss_admin($content->title);
-
-    // If a link is specified, populate.
-    if (!empty($content->title_link)) {
-      if (!is_array($content->title_link)) {
-        $url = array('href' => $content->title_link);
-      }
-      else {
-        $url = $content->title_link;
-      }
-      // set defaults so we don't bring up notices
-      $url += array('href' => '', 'attributes' => NULL, 'query' => NULL, 'fragment' => NULL, 'absolute' => NULL, 'html' => TRUE);
-      $content->title = l($content->title, $url['href'], $url);
-    }
-  }
   return $content;
 }
 
@@ -233,9 +217,22 @@ function panels_render_pane_content(&$display, &$pane) {
  * $display
  *   The display.
  */
-function panels_render_pane($content, $pane, $display) {
-  if (!empty($pane->configuration['style'])) {
-    $style = panels_get_style($pane->configuration['style']);
+function panels_render_pane($content, $pane, &$display) {
+  if ($display->hide_title == PANELS_TITLE_PANE && !empty($display->title_pane) && $display->title_pane == $pane->pid) {
+
+    // If the user selected to override the title with nothing, and selected
+    // this as the title pane, assume the user actually wanted the original
+    // title to bubble up to the top but not actually be used on the pane.
+    if (empty($content->title) && !empty($content->original_title)) {
+      $display->stored_pane_title = $content->original_title;
+    }
+    else {
+      $display->stored_pane_title = !empty($content->title) ? $content->title : '';
+    }
+  }
+
+  if (!empty($pane->style['style'])) {
+    $style = panels_get_style($pane->style['style']);
 
     if (isset($style) && isset($style['render pane'])) {
       $output = theme($style['render pane'], $content, $pane, $display);
@@ -247,7 +244,7 @@ function panels_render_pane($content, $pane, $display) {
     }
   }
 
-  if (!empty($content)) {
+  if (!empty($content->content)) {
     // fallback
     return theme('panels_pane', $content, $pane, $display);
   }
@@ -262,12 +259,16 @@ function panels_get_panel_style_and_settings($panel_settings, $panel) {
     return array(panels_get_style('default'), array());
   }
 
-  if (empty($panel_settings['individual']) || empty($panel_settings['panel'][$panel]['style'])) {
+  if (empty($panel_settings[$panel]['style']) || $panel_settings[$panel]['style'] == -1) {
+    if (empty($panel_settings['style'])) {
+      return array(panels_get_style('default'), array());
+    }
+
     $style = panels_get_style($panel_settings['style']);
     $style_settings = isset($panel_settings['style_settings']['default']) ? $panel_settings['style_settings']['default'] : array();
   }
   else {
-    $style = panels_get_style($panel_settings['panel'][$panel]['style']);
+    $style = panels_get_style($panel_settings[$panel]['style']);
     $style_settings = isset($panel_settings['style_settings'][$panel]) ? $panel_settings['style_settings'][$panel] : array();
   }
 
@@ -306,65 +307,31 @@ function panels_render_panel($display, $panel, $panes) {
 }
 
 /**
- * @file panels.theme.inc
- * Core theme functions for Panels.
- */
-
-/**
- * Render a panel pane like a block.
+ * Get the title from a display.
  *
- * A panel pane can have the following fields:
+ * The display must have already been rendered, or the setting to set the display's title
+ * from a pane's title will not have worked.
  *
- * $pane->type -- the content type inside this pane
- * $pane->subtype -- The subtype, if applicable. If a view it will be the
- *   view name; if a node it will be the nid, etc.
- * $content->title -- The title of the content
- * $content->content -- The actual content
- * $content->links -- Any links associated with the content
- * $content->more -- An optional 'more' link (destination only)
- * $content->admin_links -- Administrative links associated with the content
- * $content->feeds -- Any feed icons or associated with the content
- * $content->subject -- A legacy setting for block compatibility
- * $content->module -- A legacy setting for block compatibility
- * $content->delta -- A legacy setting for block compatibility
+ * @param $display
+ *   The display to get the title from.
+ *
+ * @return
+ *   The title to use. If NULL, this means to let any default title that may be in use
+ *   pass through. i.e, do not actually set the title.
  */
-function theme_panels_pane($content, $pane, $display) {
-  if (!empty($content->content)) {
-    $idstr = $classstr = '';
-    if (!empty($content->css_id)) {
-      $idstr = ' id="' . $content->css_id . '"';
-    }
-    if (!empty($content->css_class)) {
-      $classstr = ' ' . $content->css_class;
-    }
+function panels_display_get_title($display) {
+  switch ($display->hide_title) {
+    case PANELS_TITLE_NONE:
+      return '';
 
-    $output = "<div class=\"panel-pane$classstr\"$idstr>\n";
-    if (user_access('view pane admin links') && !empty($content->admin_links)) {
-      $output .= "<div class=\"admin-links panel-hide\">" . theme('links', $content->admin_links) . "</div>\n";
-    }
-    if (!empty($content->title)) {
-      $output .= "<h2 class=\"title\">$content->title</h2>\n";
-    }
+    case PANELS_TITLE_PANE:
+      return isset($display->stored_pane_title) ? $display->stored_pane_title : '';
 
-    if (!empty($content->feeds)) {
-      $output .= "<div class=\"feed\">" . implode(' ', $content->feeds) . "</div>\n";
-    }
-
-    $output .= "<div class=\"content\">$content->content</div>\n";
-
-    if (!empty($content->links)) {
-      $output .= "<div class=\"links\">" . theme('links', $content->links) . "</div>\n";
-    }
-
-
-    if (!empty($content->more)) {
-      if (empty($content->more['title'])) {
-        $content->more['title'] = t('more');
+    case PANELS_TITLE_FIXED:
+    case FALSE; // For old exported panels that are not in the database.
+      if (!empty($display->title)) {
+        return filter_xss_admin(ctools_context_keyword_substitute($display->title, array(), $display->context));
       }
-      $output .= "<div class=\"more-link\">" . l($content->more['title'], $content->more['href']) . "</div>\n";
-    }
-
-    $output .= "</div>\n";
-    return $output;
+      return NULL;
   }
 }

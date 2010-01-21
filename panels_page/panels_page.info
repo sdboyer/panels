@@ -1,6 +1,0 @@
-; $Id$
-name = Panel pages
-description = Create pages that are divided into areas of the page.
-core = 6.x
-package = "Panels"
-dependencies[] = panels

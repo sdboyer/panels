@@ -17,10 +17,21 @@ function panels_mini_schema_1() {
   $schema = array();
 
   $schema['panels_mini'] = array(
+    'export' => array(
+      'identifier' => 'mini',
+      'export callback' => 'panels_mini_export',
+      'api' => array(
+        'owner' => 'panels_mini',
+        'api' => 'panels_default',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
     'fields' => array(
       'pid' => array(
         'type' => 'serial',
         'not null' => TRUE,
+        'no export' => TRUE,
       ),
       'name' => array(
         'type' => 'varchar',
@@ -32,6 +43,7 @@ function panels_mini_schema_1() {
       ),
       'did' => array(
         'type' => 'int',
+        'no export' => TRUE,
       ),
       'title' => array(
         'type' => 'varchar',
@@ -40,14 +52,20 @@ function panels_mini_schema_1() {
       'requiredcontexts' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'contexts' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'relationships' => array(
         'type' => 'text',
         'size' => 'big',
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
     ),
     'primary key' => array('pid'),
@@ -89,3 +107,14 @@ function panels_mini_uninstall() {
   drupal_uninstall_schema('panels_mini');
 }
 
+/**
+ * Update all blocks to use 'name' as delta, not 'pid'.
+ */
+function panels_mini_update_6300() {
+  $ret = array();
+  $result = db_query("SELECT name, pid from {panels_mini}");
+  while ($mini = db_fetch_object($result)) {
+    db_query("UPDATE {blocks} SET delta = '%s' WHERE module = 'panels_mini' AND delta = %d", $mini->name, $mini->pid);
+  }
+  return $ret;
+}
