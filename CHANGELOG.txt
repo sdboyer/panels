@@ -1,5 +1,5 @@
-Panels 6.x-3.x-dev
-==================
+Panels 6.x-3.3 (2010-Feb-01)
+==============
 
 #612850: Fix crash bug with panes referencing deleted/missing views.
 #614178: Transition to panels-pane.tpl.php caused empty panes to display again.
@@ -13,14 +13,14 @@ Panels 6.x-3.x-dev
 #543898: Fix notice error when a layout has no regions.
 #647706: Mini panel names can only be 32 characters, but the form failed to restrict the limit.
 
-Panels 6.x-3.2
+Panels 6.x-3.2 (2009-Oct-21)
 ==============
 
 #606980 by Deciphered and sethfreach: Typo caused panel-pane class to disappear if another class was assigned.
 #607242: Using the wrong variable in hook_block can cause title to not be overridable.
 #608062: Visibility rules did not appear in the list when added to a pane (though they still applied).
 
-Panels 6.x-3.1
+Panels 6.x-3.1 (2009-Oct-15)
 ==============
 
 #552846 by eMPee584: Fix notice with tablesorts on mini panels page if no mini panels exist.
@@ -33,7 +33,7 @@ Add a new field to allow setting a panel title from one of its panes.
 #583172 by jacine: Turn panel pane into a template, as it always should have been.
 #604404: Make sure caching does not trigger for form POSTs.
 
-Panels 6.x-3.0
+Panels 6.x-3.0 (2009-Aug-19)
 ==============
 
 #529258 by stella: Attempting to modify CSS properties on mini panel causes ajax failure.
