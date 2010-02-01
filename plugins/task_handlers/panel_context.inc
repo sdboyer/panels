@@ -50,6 +50,7 @@ $plugin = array(
     ),
     'context' => array(
       'title' => t('Contexts'),
+      'ajax' => FALSE,
       'description' => t('Add additional context objects to this variant that can be used by the content.'),
       'form' => array(
         'order' => array(
