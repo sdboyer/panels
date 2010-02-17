@@ -138,3 +138,4 @@ function panels_admin_panel_context_page() {
   panels_load_include('common');
   return drupal_get_form('panels_common_settings', 'panels_page');
 }
+

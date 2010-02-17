@@ -1,0 +1,7 @@
+; $Id$
+name = Panels stylizer
+description = Create custom styles for Panel panes and regions
+core = 6.x
+dependencies[] = ctools
+dependencies[] = panels
+dependencies[] = color

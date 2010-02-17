@@ -12,6 +12,7 @@ Panels 6.x-3.3 (2010-Feb-01)
 #683162: Convert all plugins to use new $plugin = array() format. This is less brittle than the specially named hook.
 #543898: Fix notice error when a layout has no regions.
 #647706: Mini panel names can only be 32 characters, but the form failed to restrict the limit.
+Introduce the Panels stylizer module which builds on the CTools stylizer base to create user definable, recolorable styles.
 
 Panels 6.x-3.2 (2009-Oct-21)
 ==============

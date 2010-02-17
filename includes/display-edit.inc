@@ -1474,9 +1474,9 @@ function panels_edit_style_type_form_submit($form, &$form_state) {
 }
 
 /**
- * Handle the cache settings form
+ * Get the appropriate style from the panel in the cache.
  */
-function panels_ajax_style_settings($type, $cache, $pid = '') {
+function panels_edit_style_get_style($type, &$cache, $pid = '') {
   if (isset($cache->style)) {
     $style = panels_get_style($cache->style);
     $defaults = isset($style['defaults']) ? $style['defaults'] : array();
@@ -1485,13 +1485,11 @@ function panels_ajax_style_settings($type, $cache, $pid = '') {
       case 'display':
         $cache->display->panel_settings['style'] = $cache->style;
         $cache->display->panel_settings['style_settings']['default'] = $defaults;
-        $conf = &$cache->display->panel_settings['style_settings']['default'];
         break;
 
       case 'panel':
         $cache->display->panel_settings[$pid]['style'] = $cache->style;
         $cache->display->panel_settings['style_settings'][$pid] = $defaults;
-        $conf = &$cache->display->panel_settings['style_settings'][$pid];
         break;
 
       case 'pane':
@@ -1518,19 +1516,43 @@ function panels_ajax_style_settings($type, $cache, $pid = '') {
         break;
     }
   }
-  $cache_key = $cache->display->cache_key;
 
   // Set up our $conf reference.
-  // We should only be able to get here after a style has already been set up with
-  // defaults so I think it is safe to not check.
   switch ($type) {
     case 'display':
       $conf = &$cache->display->panel_settings['style_settings']['default'];
-      $title = t('Style settings for @style (display)', array('@style' => $style['title']));
       break;
 
     case 'panel':
       $conf = &$cache->display->panel_settings['style_settings'][$pid];
+      break;
+
+    case 'pane':
+      ctools_include('content');
+      $pane = &$cache->display->content[$pid];
+      $conf = &$pane->style['settings'];
+      break;
+  }
+
+  return array($style, &$conf);
+}
+
+/**
+ * Handle the cache settings form
+ */
+function panels_ajax_style_settings($type, $cache, $pid = '') {
+  $info = panels_edit_style_get_style($type, $cache, $pid);
+  $style = $info[0];
+  $conf = &$info[1];
+
+  $cache_key = $cache->display->cache_key;
+
+  switch ($type) {
+    case 'display':
+      $title = t('Style settings for @style (display)', array('@style' => $style['title']));
+      break;
+
+    case 'panel':
       $layout = panels_get_layout($cache->display->layout);
       $layout_panels = panels_get_panels($layout, $cache->display);
       $title = t('Style settings for style @style (Region "!region")', array('@style' => $style['title'], '!region' => $layout_panels[$pid]));
@@ -1539,7 +1561,6 @@ function panels_ajax_style_settings($type, $cache, $pid = '') {
     case 'pane':
       ctools_include('content');
       $pane = &$cache->display->content[$pid];
-      $conf = &$pane->style['settings'];
       $subtype = ctools_content_get_subtype($pane->type, $pane->subtype);
       $title = t('Style settings for style @style (Pane "!pane")', array('@style' => $style['title'], '!pane' => $subtype['title']));
       break;

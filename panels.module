@@ -7,7 +7,7 @@
  * Core functionality for the Panels engine.
  */
 
-define('PANELS_REQUIRED_CTOOLS_API', '1.3.2');
+define('PANELS_REQUIRED_CTOOLS_API', '1.4');
 
 define('PANELS_TITLE_FIXED', 0); // Hide title use to be true/false. So false remains old behavior.
 define('PANELS_TITLE_NONE', 1); // And true meant no title.
@@ -243,6 +243,7 @@ function panels_menu() {
       }
     }
   }
+
 
   return $items;
 }
