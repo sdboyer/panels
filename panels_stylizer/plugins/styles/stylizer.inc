@@ -21,7 +21,7 @@ $plugin = array(
 );
 
 /**
- * Region callback.
+ * Region render theme.
  */
 function theme_panels_stylizer_stylizer_style_render_region($display, $panel_id, $panes, $style_settings) {
   $output = '';
@@ -31,18 +31,21 @@ function theme_panels_stylizer_stylizer_style_render_region($display, $panel_id,
   }
 
   if ($style_settings['style'] == '$') {
-    $style = $style_settings['settings'];
+    $settings = $style_settings['settings'];
   }
   else {
     $style = panels_stylizer_load($style_settings['style']);
+    if ($style) {
+      $settings = $style->settings;
+    }
   }
 
-  if ($style) {
+  if (!empty($settings)) {
     ctools_include('stylizer');
-    $plugin = ctools_get_style_base($style->settings['style_base']);
-    ctools_stylizer_add_css($plugin, $style->settings);
+    $plugin = ctools_get_style_base($settings['style_base']);
+    ctools_stylizer_add_css($plugin, $settings);
 
-    return theme($plugin['theme'], $style->settings, ctools_stylizer_get_css_class($plugin, $style->settings), $output);
+    return theme($plugin['theme'], $settings, ctools_stylizer_get_css_class($plugin, $settings), $output);
   }
   else {
     // if the style is gone, just display the output.
@@ -51,36 +54,37 @@ function theme_panels_stylizer_stylizer_style_render_region($display, $panel_id,
 }
 
 /**
- * Render callback.
- *
- * @ingroup themeable
+ * Pane render theme
  */
 function theme_panels_stylizer_stylizer_style_render_pane($content, $pane, $display) {
   $style_settings = $pane->style['settings'];
 
   if ($style_settings['style'] == '$') {
-    $style = $style_settings['settings'];
+    $settings = $style_settings['settings'];
   }
   else {
     $style = panels_stylizer_load($style_settings['style']);
+    if ($style) {
+      $settings = $style->settings;
+    }
   }
 
-  if ($style) {
+  if ($settings) {
     ctools_include('stylizer');
-    $plugin = ctools_get_style_base($style->settings['style_base']);
+    $plugin = ctools_get_style_base($settings['style_base']);
 
     if (empty($content->css_class)) {
       $content->css_class = '';
     }
-    $content->css_class .= ctools_stylizer_get_css_class($plugin, $style->settings);
-    ctools_stylizer_add_css($plugin, $style->settings);
+    $content->css_class .= ctools_stylizer_get_css_class($plugin, $settings);
+    ctools_stylizer_add_css($plugin, $settings);
 
     if (isset($plugin['theme'])) {
-      return theme($plugin['theme'], $style->settings, $content, $pane, $display);
+      return theme($plugin['theme'], $settings, $content, $pane, $display);
     }
   }
 
-  // if the style is gone, just display the output.
+  // if the style is gone or has no theme of its own, just display the output.
   return theme('panels_pane', $content, $pane, $display);
 }
 

@@ -760,7 +760,8 @@ function panels_stylizer_pane_add_style($type, $cache, $pid = '', $step = NULL) 
     $output[] = ctools_modal_command_dismiss();
 
     if ($type == 'pane') {
-      $output[] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
+      $pane = &$cache->display->content[$pid];
+      $output[] = ctools_ajax_command_replace("#panel-pane-$pid", panels_show_pane($cache->display, $pane, TRUE));
       $output[] = ctools_ajax_command_changed("#panel-pane-$pid", "div.grabber span.text");
     }
     else if ($type == 'panel') {
