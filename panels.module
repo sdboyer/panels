@@ -511,10 +511,6 @@ class panels_display {
     $next_id = max($id);
     return ++$next_id;
   }
-
-  function render() {
-
-  }
 }
 
 /**
