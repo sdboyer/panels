@@ -22,9 +22,6 @@ function _panels_render_display(&$display) {
     return NULL;
   }
 
-  // TODO: This may not be necessary now. Check this.
-  panels_sanitize_display($display);
-
   $output = '';
 
   // Let modules act just prior to render.

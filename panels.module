@@ -511,41 +511,15 @@ class panels_display {
     $next_id = max($id);
     return ++$next_id;
   }
+
+  function render() {
+
+  }
 }
 
 /**
  * }@ End of 'defgroup mainapi', although other functions are specifically added later
  */
-
-/**
- * Clean up a display object and add some required information, if missing.
- *
- * Currently a display object needs 'args', 'incoming content', 'context'
- * and a 'css_id'.
- *
- * @param &$display
- *   The display object to be sanitized.
- * @return
- *   The sanitized display object.
- */
-function panels_sanitize_display(&$display) {
-  return;
-  if (!isset($display->args)) {
-    $display->args = array();
-  }
-
-  if (!isset($display->incoming_content)) {
-    $display->incoming_content = NULL;
-  }
-
-  if (!isset($display->context)) {
-    $display->context = array();
-  }
-
-  if (!isset($display->css_id)) {
-    $display->css_id = NULL;
-  }
-}
 
 /**
  * Creates a new display, setting the ID to our magic new id.
