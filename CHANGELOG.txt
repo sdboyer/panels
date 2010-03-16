@@ -1,6 +1,7 @@
 Panels 6.x-dev
 ==============
 #655268: Fix a problem retrieving cached content created by #634746.
+Removed the old and crufty panels_print_layout().
 
 Panels 6.x-3.3 (2010-Feb-01)
 ==============

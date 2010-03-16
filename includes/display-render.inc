@@ -41,24 +41,6 @@ function _panels_render_display(&$display) {
 }
 
 /**
- * For external use: Given a layout ID and a $content array, return the
- * panel display. The content array is filled in based upon the content
- * available in the layout. If it's a two column with a content
- * array defined like array('left' => t('Left side'), 'right' =>
- * t('Right side')), then the $content array should be array('left' =>
- * $output_left, 'right' => $output_right)
- * @render
- */
-function _panels_print_layout($id, $content) {
-  $layout = panels_get_layout($id);
-  if (!$layout) {
-    return;
-  }
-
-  return panels_render_layout($layout, $content);
-}
-
-/**
  * Given a full layout structure and a content array, render a panel display.
  * @render
  */
