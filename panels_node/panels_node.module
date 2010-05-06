@@ -46,7 +46,6 @@ function panels_node_menu() {
   );
 
   $items['node/%node/panel_layout'] = array(
-    'path' => $base . 'layout',
     'title' => 'Panel layout',
     'page callback' => 'panels_node_edit_layout',
     'weight' => 2,
