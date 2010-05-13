@@ -2,7 +2,8 @@ Panels 6.x-dev
 ==============
 #655268: Fix a problem retrieving cached content created by #634746.
 Removed the old and crufty panels_print_layout().
-#745808 by Robbert: use number_format() in flexible width calculations to ensure locale settings cannot bork generated CSS. 
+#745808 by Robbert: use number_format() in flexible width calculations to ensure locale settings cannot bork generated CSS.
+#765978 by joshk: Added watchdoggery and a hook to panels_display_save().
 
 Panels 6.x-3.3 (2010-Feb-01)
 ==============

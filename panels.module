@@ -697,6 +697,19 @@ function panels_save_display(&$display) {
   // Clear any cached content for this display.
   panels_clear_cached_content($display);
 
+  // Allow other modules to take action when a display is saved.
+  module_invoke_all('panels_display_save', $display);
+
+  // Log the change to watchdog, using the same style as node.module
+  $watchdog_args = array('%did' => $display->did);
+  if (!empty($display->title)) {
+    $watchdog_args['%title'] = $display->title;
+    watchdog('content', 'Panels: saved display "%title" with display id %did', $watchdog_args, WATCHDOG_NOTICE);
+  }
+  else {
+    watchdog('content', 'Panels: saved display with id %did', $watchdog_args, WATCHDOG_NOTICE);
+  }
+
   // to be nice, even tho we have a reference.
   return $display;
 }
