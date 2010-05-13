@@ -118,3 +118,12 @@ function panels_mini_update_6300() {
   }
   return $ret;
 }
+
+/**
+ * Update all panel mini blocks to not use block caching.
+ */
+function panels_mini_update_6301() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {blocks} SET cache = -1 WHERE module = 'panels_mini'");
+  return $ret;
+}
