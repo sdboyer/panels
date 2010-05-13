@@ -645,7 +645,7 @@ function panels_flexible_get_css_group(&$css, $renderer, $list, $owner_id, $type
         $class = ".panels-flexible-$type-" . $renderer->did . "-$id";
         $css[$class] = array(
           'float' => 'left',
-          'width' => ($renderer->settings['items'][$id]['width'] * $scale) . "%",
+          'width' => number_format($renderer->settings['items'][$id]['width'] * $scale, 4, '.', '') . "%",
         );
 
         // Store this so we can use it later.
