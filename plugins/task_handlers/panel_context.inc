@@ -229,9 +229,6 @@ function &panels_panel_context_get_display(&$handler) {
 
 /**
  * Check selection rules and, if passed, render the contexts.
- *
- * We must first check to ensure the node is of a type we're allowed
- * to render. If not, decline to render it by returning NULL.
  */
 function panels_panel_context_render($handler, $base_contexts, $args, $test = TRUE) {
   // Go through arguments and see if they match.
