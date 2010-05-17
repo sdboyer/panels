@@ -13,7 +13,6 @@ $plugin = array(
   'description' => t('Presents the panes in the form of an HTML list.'),
   'render panel' => 'panels_list_style_render_panel',
   'settings form' => 'panels_list_style_settings_form',
-  'settings validate' => 'panels_list_style_settings_validate',
 );
 
 /**
