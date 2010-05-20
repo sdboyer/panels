@@ -15,6 +15,7 @@ Stopped wasting cycles trying to render a mini panel in a block when we know the
 #798954 by dixon: Pass $form_state to style plugins' validate and submit callbacks.
 #779012 by c960657: implement the callback for a single content_type subtype in panels_mini to improve performance with  large numbers of mini panels.
 #763584 by neclimdul: Add a link to the block configuration page for mini-panels that takes the user to edit that mini- panel.
+Security updates: protect the importer with the 'use PHP for block visibility' permission.
 
 Panels 6.x-3.3 (2010-Feb-01)
 ==============

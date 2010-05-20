@@ -37,6 +37,8 @@ function _panels_mini_menu() {
   $items['admin/build/panel-mini/import'] = array(
     'title' => 'Import',
     'page callback' => 'panels_mini_import_mini',
+    'access callback' => 'ctools_access_multiperm',
+    'access arguments' => array('create mini panels', 'use PHP for block visibility'),
     'type' => MENU_LOCAL_TASK,
   ) + $base;
   $items['admin/build/panel-mini/settings'] = array(
