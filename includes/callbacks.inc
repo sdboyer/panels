@@ -135,7 +135,7 @@ function panels_admin_settings_page() {
  * Settings for panel contexts created by the page manager.
  */
 function panels_admin_panel_context_page() {
-  panels_load_include('common');
+  ctools_include('common', 'panels');
   return drupal_get_form('panels_common_settings', 'panels_page');
 }
 

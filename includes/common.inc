@@ -108,7 +108,7 @@ class panels_allowed_layouts {
    *
    * \n @code
    *  function docdemo_allowed_layouts() {
-   *    panels_load_include('common');
+   *    ctools_include('common', 'panels');
    *    if (!is_a($allowed_layouts = unserialize(variable_get('panels_common_allowed_layouts', serialize(''))), 'panels_allowed_layouts')) {
    *     $allowed_layouts = new panels_allowed_layouts();
    *      $allowed_layouts->allow_new = TRUE;
@@ -213,7 +213,7 @@ class panels_allowed_layouts {
   function list_layouts() {
     static $layouts = array();
     if (empty($layouts)) {
-      panels_load_include('plugins');
+      ctools_include('plugins', 'panels');
       $layouts = array_keys(panels_get_layouts());
     }
     return $layouts;
@@ -225,7 +225,7 @@ class panels_allowed_layouts {
  * any modules that don't already have special requirements.
  */
 function panels_common_settings(&$form_state, $module_name = 'panels_common') {
-  panels_load_include('plugins');
+  ctools_include('plugins', 'panels');
   ctools_include('content');
   $content_types = ctools_get_content_types();
   $skip = FALSE;

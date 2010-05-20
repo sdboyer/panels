@@ -309,7 +309,7 @@ function theme_panels_edit_display_form($form) {
 
   $output .= drupal_render($form);
 
-  panels_load_include('display-render');
+  ctools_include('display-render', 'panels');
   $output .= panels_render_dnd(panels_render_layout_admin($layout, $content, $display));
   $output .= $save_buttons;
   $output .= $preview;

@@ -399,7 +399,7 @@ function panels_update_5209() {
   // This code removed due to call to panels_get_argument(). People with
   // older versions will just have to suffer.
   return $ret;
-  panels_load_include('plugins');
+  ctools_include('plugins', 'panels');
 
   while ($page = db_fetch_object($result)) {
     $args = unserialize($page->arguments);

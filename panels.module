@@ -67,7 +67,7 @@ function panels_theme() {
   );
 
   // Register layout and style themes on behalf of all of these items.
-  panels_load_include('plugins');
+  ctools_include('plugins', 'panels');
 
   // No need to worry about files; the plugin has to already be loaded for us
   // to even know what the theme function is, so files will be auto included.
@@ -231,7 +231,7 @@ function panels_menu() {
     ) + $admin_base;
   }
 
-  panels_load_include('plugins');
+  ctools_include('plugins', 'panels');
   $layouts = panels_get_layouts();
   foreach ($layouts as $name => $data) {
     if (!empty($data['hook menu'])) {
@@ -255,8 +255,8 @@ function panels_menu() {
  * cache object and makes sure it is valid.
  */
 function panels_edit_cache_load($cache_key) {
-  panels_load_include('display-edit');
-  panels_load_include('plugins');
+  ctools_include('display-edit', 'panels');
+  ctools_include('plugins', 'panels');
   ctools_include('ajax');
   ctools_include('modal');
   ctools_include('context');
@@ -275,17 +275,6 @@ function panels_init() {
 
   drupal_add_css(panels_get_path('css/panels.css'));
   drupal_add_js(panels_get_path('js/panels.js'));
-}
-
-/**
- * Load a panels include file.
- */
-function panels_load_include($include, $path = 'includes/') {
-  static $loaded = array();
-  if (empty($loaded["$path$include.inc"])) {
-    require_once './' . panels_get_path("$path$include.inc");
-    $loaded["$path$include.inc"] = TRUE;
-  }
 }
 
 /**
@@ -405,9 +394,9 @@ function panels_cache_clear($obj, $did) {
  *        given in $destination and NO value will be returned.
  */
 function panels_edit($display, $destination = NULL, $content_types = NULL, $title = FALSE) {
-  panels_load_include('display-edit');
+  ctools_include('display-edit', 'panels');
   ctools_include('ajax');
-  panels_load_include('plugins');
+  ctools_include('plugins', 'panels');
   return _panels_edit($display, $destination, $content_types, $title);
 }
 
@@ -450,8 +439,8 @@ function panels_edit($display, $destination = NULL, $content_types = NULL, $titl
  * @see panels_edit()
  */
 function panels_edit_layout($display, $finish, $destination = NULL, $allowed_layouts = NULL) {
-  panels_load_include('display-layout');
-  panels_load_include('plugins');
+  ctools_include('display-layout', 'panels');
+  ctools_include('plugins', 'panels');
   return _panels_edit_layout($display, $finish, $destination, $allowed_layouts);
 }
 
@@ -644,7 +633,7 @@ function panels_save_display(&$display) {
   }
 
   // update all the panes
-  panels_load_include('plugins');
+  ctools_include('plugins', 'panels');
   ctools_include('content');
 
   foreach ($display->panels as $id => $panes) {
@@ -810,8 +799,8 @@ function panels_export_display($display, $prefix = '') {
  * @ingroup hook_invocations
  */
 function panels_render_display(&$display) {
-  panels_load_include('display-render');
-  panels_load_include('plugins');
+  ctools_include('display-render', 'panels');
+  ctools_include('plugins', 'panels');
   ctools_include('context');
 
   if (!empty($display->context)) {
@@ -946,7 +935,7 @@ function panels_get_current_page_display($change = NULL) {
  * panel_context:TASK_NAME:HANDLER_NAME;
  */
 function panel_context_panels_cache_get($key) {
-  panels_load_include('common');
+  ctools_include('common', 'panels');
   ctools_include('context');
   ctools_include('context-task-handler');
   // this loads the panel context inc even if we don't use the plugin.
