@@ -7,7 +7,7 @@
  * need to be broken out into a .inc file, it's convenient that we do so
  * that we don't load code unneccessarily. Plus it demonstrates plugins
  * in modules other than Panels itself.
- * 
+ *
  */
 
 /**

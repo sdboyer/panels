@@ -278,6 +278,20 @@ function panels_init() {
 }
 
 /**
+ * Load a panels include file.
+ *
+ * @deprecated This function is deprecated and should no longer be used.
+ * Instead, use ctools_include().
+ */
+function panels_load_include($include, $path = 'includes/') {
+  static $loaded = array();
+  if (empty($loaded["$path$include.inc"])) {
+    require_once './' . panels_get_path("$path$include.inc");
+    $loaded["$path$include.inc"] = TRUE;
+  }
+}
+
+/**
  * panels path helper function
  */
 function panels_get_path($file, $base_path = FALSE, $module = 'panels') {
