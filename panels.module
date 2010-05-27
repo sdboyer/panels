@@ -828,6 +828,30 @@ function panels_render_display(&$display) {
   return _panels_render_display($display);
 }
 
+
+/**
+ * For external use: Given a layout ID and a $content array, return the
+ * panel display. The content array is filled in based upon the content
+ * available in the layout. If it's a two column with a content
+ * array defined like array('left' => t('Left side'), 'right' =>
+ * t('Right side')), then the $content array should be array('left' =>
+ * $output_left, 'right' => $output_right)
+ *
+ * @deprecated This function represents an old approach to rendering, and is
+ * retained only as a temporary support for other modules still using that
+ * approach. It will be removed in the next major version of Panels.
+ */
+function panels_print_layout($id, $content) {
+  ctools_include('display-render', 'panels');
+  ctools_include('plugins', 'panels');
+  $layout = panels_get_layout($id);
+  if (!$layout) {
+    return;
+  }
+
+  return panels_render_layout($layout, $content);
+}
+
 /**
  * Theme function to render our panel as a form.
  *
@@ -912,6 +936,7 @@ function panels_ctools_plugin_directory($module, $plugin) {
 function panels_ctools_plugin_layouts() {
   return array(
     'load themes' => TRUE,
+    'use hooks' => TRUE,
   );
 }
 
@@ -921,6 +946,7 @@ function panels_ctools_plugin_layouts() {
 function panels_ctools_plugin_styles() {
   return array(
     'load themes' => TRUE,
+    'use hooks' => TRUE,
   );
 }
 
