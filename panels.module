@@ -280,8 +280,8 @@ function panels_init() {
 /**
  * Load a panels include file.
  *
- * @deprecated This function is deprecated and should no longer be used.
- * Instead, use ctools_include().
+ * @deprecated This function is deprecated and should no longer be used. It will
+ * be removed in the next major version of Panels. Use ctools_include() instead.
  */
 function panels_load_include($include, $path = 'includes/') {
   static $loaded = array();
