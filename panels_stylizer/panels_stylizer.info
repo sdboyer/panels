@@ -2,6 +2,7 @@
 name = Panels stylizer
 description = Create custom styles for Panel panes and regions
 core = 6.x
+package = Panels
 dependencies[] = ctools
 dependencies[] = panels
 dependencies[] = color
