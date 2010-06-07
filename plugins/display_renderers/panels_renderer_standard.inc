@@ -226,7 +226,6 @@ class panels_renderer_standard {
    *
    * @return
    *   The rendered HTML for the passed-in panel region.
-   * @render
    */
   function render_region($region_name, $panes) {
     list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $region_name);

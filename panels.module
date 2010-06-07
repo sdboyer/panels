@@ -878,7 +878,6 @@ function panels_export_display($display, $prefix = '') {
  *
  * if $incoming_content is NULL, default content will be applied. Use
  * an empty string to indicate no content.
- * @render
  * @ingroup hook_invocations
  */
 function panels_render_display(&$display) {
