@@ -57,10 +57,12 @@
    * @param {string} cache_key
    */
   function DrupalPanelsIPE(cache_key, cfg) {
+    var ipe = this;
     this.key = cache_key;
     this.state = {};
     this.outermost = $('div#panels-ipe-display-'+cache_key);
     this.control = $('div#panels-ipe-control-'+ cache_key);
+    this.initButton = $('div.panels-ipe-startedit', this.control);
     this.cfg = cfg;
 
     /**
@@ -74,11 +76,19 @@
     
     Drupal.behaviors['PanelsIPE' + cache_key] = this.behaviorsPassthrough;
 
-    this.initEditing = function() {
-      /**
-       * See http://jqueryui.com/demos/sortable/ for details on the configuration
-       * parameters used here.
-       */
+    this.initEditing = function(formdata) {
+      // Perform visual effects in a particular sequence; nonvisual logic async.
+      ipe.control.fadeOut('normal', function() {
+        ipe.initButton.hide();
+        ipe.control.append(formdata);
+        ipe.control.fadeIn('normal', function() {
+          // Show all the hidden IPE elements
+          $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock', ipe.outermost).fadeIn('slow');
+        })
+      });
+      
+      // See http://jqueryui.com/demos/sortable/ for details on the configuration
+      // parameters used here.
       var sortable_options = { // TODO allow the IPE plugin to control these
         revert: true,
         dropOnEmpty: true, // default
@@ -87,16 +97,46 @@
         // forcePlaceholderSize: true,
         items: 'div.panels-ipe-pane',
         handle: 'div.panels-ipe-draghandle',
-        containment: this.outermost,
+        containment: ipe.outermost,
       };
-      $('div.panels-ipe-region', this.outermost).sortable(sortable_options);
+      $('div.panels-ipe-region', ipe.outermost).sortable(sortable_options);
       // Since the connectWith option only does a one-way hookup, iterate over
       // all sortable regions to connect them with one another.
-      $('div.panels-ipe-region', this.outermost).each(function() {
+      $('div.panels-ipe-region', ipe.outermost).each(function() {
         $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
       });
-      // Show all the hidden IPE elements
-      $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock').fadeIn('slow');
+      
+      // bind ajax submit to the form buttons
+      $('form', ipe.control).submit(function() {
+        url = $(this).attr('action');
+        var object = $(this);
+        try {
+          var ajaxOptions = {
+            type: 'POST',
+            url: url,
+            global: true,
+            success: ipe.formRespond,
+            error: function(xhr) {
+              Drupal.CTools.AJAX.handleErrors(xhr, url);
+            },
+            dataType: 'json'
+          };
+          $(this).ajaxSubmit(ajaxOptions);
+        }
+        catch (err) {
+          alert("An error occurred while attempting to process " + url);
+          return false;
+        }
+        return false;
+      });
+    }
+    
+    this.formRespond = function(data) {
+      var i = 'break on me';
+    }
+    
+    this.showEditor = function() {
+
     }
 
     this.endEditing = function() {
@@ -105,7 +145,7 @@
     };
 
     this.saveEditing = function() {
-      $('div.panels-ipe-region', this.outermost).each(function() {
+      $('div.panels-ipe-region', ipe.outermost).each(function() {
         var val = '';
         var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
         $(this).children('div.panels-ipe-pane').each(function() {
@@ -114,33 +154,36 @@
           }
           val += $(this).attr('id').split('panels-ipe-paneid-')[1];
         });
-        $('input#edit-panel-pane-' + region, this.control).val(val);
+        $('input#edit-panel-pane-' + region, ipe.control).val(val);
       });
     };
 
     this.cancelEditing = function() {
 
     };
+    
+    var ajaxOptions = {
+      type: "POST",
+      url: ipe.cfg.formPath,
+      global: true,
+      success: ipe.initEditing,
+      error: function(xhr) {
+        Drupal.CTools.AJAX.handleErrors(xhr, ipe.cfg.formPath);
+      },
+      dataType: 'json'
+    };
 
     $('div.panels-ipe-startedit', this.control).click(function() {
       var $this = $(this);
-      var url = this.cfg.formPath;
-      $.ajax({
-        type: "POST",
-        url: url,
-        global: true,
-        success: function(data) {
-          $this.parent().fadeOut('normal', function() {
-            $this.hide();
-            $this.parent().append(data);
-            $this.parent().fadeIn('normal', this.initEditing());
-          });
-        },
-        error: function(xhr) {
-          Drupal.CTools.AJAX.handleErrors(xhr, url);
-        },
-        dataType: 'json'
-      });
+//      $.ajax($.extend(ajaxOptions, {
+//        success: function(data) {
+//          $this.parent().fadeOut('normal', function() {
+//            $this.hide();
+//            $this.parent().append(data);
+//            $this.parent().fadeIn('normal', callback);
+//          });
+//      }}));
+      $.ajax(ajaxOptions);
     });
   };
 })(jQuery);

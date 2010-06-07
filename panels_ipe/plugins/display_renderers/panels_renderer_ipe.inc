@@ -19,7 +19,7 @@ class panels_renderer_ipe extends panels_renderer_standard {
     drupal_add_css(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.css');
     drupal_add_js(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.js');
     $settings = array(
-      'formPath' => 'panels_ipe/ajax/edit/' . $this->display->cache_key,
+      'formPath' => '/panels_ipe/ajax/edit/' . $this->display->cache_key,
     );
     drupal_add_js(array('PanelsIPECacheKeys' => array($this->display->cache_key)), 'setting');
     drupal_add_js(array('PanelsIPESettings' => array($this->display->cache_key => $settings)), 'setting');
