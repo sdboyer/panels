@@ -185,6 +185,7 @@ $plugin = array(
   'default conf' => array(
     'title' => t('Panel'),
     'no_blocks' => FALSE,
+    'use_ipe' => FALSE,
     'css_id' => '',
     'css' => '',
     'contexts' => array(),
@@ -703,6 +704,8 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
   );
 
   if (module_exists('panels_ipe')) { // Temporary approach till we get something better
+    // Initialize the value if needed...hacky hacky
+    $conf['use_ipe'] = isset($conf['use_ipe']) ? $conf['use_ipe'] : FALSE;
     $form['conf']['use_ipe'] = array(
       '#type' => 'checkbox',
       '#default_value' => $conf['use_ipe'],
@@ -732,6 +735,7 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
  */
 function panels_panel_context_edit_settings_submit(&$form, &$form_state) {
   $form_state['handler']->conf['no_blocks'] = $form_state['values']['no_blocks'];
+  $form_state['handler']->conf['use_ipe'] = $form_state['values']['use_ipe'];
   $form_state['handler']->conf['css_id'] = $form_state['values']['css_id'];
   $form_state['handler']->conf['css'] = $form_state['values']['css'];
   $form_state['handler']->conf['title'] = $form_state['values']['title'];
