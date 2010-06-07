@@ -15,7 +15,7 @@
         .addClass('pane-delete-processed')
         .click(function() {
           if (confirm('Remove this pane?')) {
-            $(this).parents('div.panels-ipe-pane').fadeOut(1000, function() {
+            $(this).parents('div.panels-ipe-portlet-wrapper').fadeOut(1000, function() {
               $(this).empty().remove();
             });
           }
