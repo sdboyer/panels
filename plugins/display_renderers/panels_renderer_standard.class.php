@@ -192,10 +192,10 @@ class panels_renderer_standard {
   }
 
   /**
-   * Attach page metadata (e.g., CSS and JS).
+   * Attach 'out-of-band' page metadata (e.g., CSS and JS).
    *
    * This must be done before render, because panels-within-panels must have
-   * their CSS added in the right order; inner content before outer content.
+   * their CSS added in the right order: inner content before outer content.
    */
   function add_meta() {
     if (!empty($this->plugins['layout']['css'])) {

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Base renderer class for all In-Place Editor (IPE) behavior.
+ *
+ */
 class panels_renderer_ipe extends panels_renderer_standard {
   function render() {
     $output = parent::render();
