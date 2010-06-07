@@ -83,7 +83,6 @@ class panels_renderer_standard {
       }
 
       // If this pane wants to render last, add it to the $later array.
-      // TODO store this on the display to minimize calls (optimization)
       $content_type = ctools_get_content_type($pane->type);
 
       if (!empty($content_type['render last'])) {
@@ -91,11 +90,11 @@ class panels_renderer_standard {
         continue;
       }
 
-      $panes[$pid] = $this->render_pane_content($pane);
+      $panes[$pid] = $this->render_pane($pane);
     }
 
     foreach ($later as $pid => $pane) {
-      $panes[$pid] = $this->render_pane_content($pane);
+      $panes[$pid] = $this->render_pane($pane);
     }
 
     // Loop through all panels, put all panes that belong to the current panel
@@ -124,6 +123,45 @@ class panels_renderer_standard {
     return $content;
   }
 
+  /**
+   * Render a pane using the appropriate style.
+   *
+   * @param object $pane
+   *   The $pane information from the display
+   */
+  function render_pane($pane) {
+    $content = $this->render_pane_content($pane);
+    if ($this->display->hide_title == PANELS_TITLE_PANE && !empty($this->display->title_pane) && $this->display->title_pane == $pane->pid) {
+
+      // If the user selected to override the title with nothing, and selected
+      // this as the title pane, assume the user actually wanted the original
+      // title to bubble up to the top but not actually be used on the pane.
+      if (empty($content->title) && !empty($content->original_title)) {
+        $this->display->stored_pane_title = $content->original_title;
+      }
+      else {
+        $this->display->stored_pane_title = !empty($content->title) ? $content->title : '';
+      }
+    }
+
+    if (!empty($pane->style['style'])) {
+      $style = panels_get_style($pane->style['style']);
+
+      if (isset($style) && isset($style['render pane'])) {
+        $output = theme($style['render pane'], $content, $pane, $this->display);
+
+        // This could be null if no theme function existed.
+        if (isset($output)) {
+          return $output;
+        }
+      }
+    }
+
+    if (!empty($content->content)) {
+      // fallback
+      return theme('panels_pane', $content, $pane, $this->display);
+    }
+  }
 
   /**
    * Render the contents of a single pane.

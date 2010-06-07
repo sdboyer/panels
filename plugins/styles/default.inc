@@ -22,18 +22,17 @@ function theme_panels_default_style_render_panel($display, $panel_id, $panes, $s
   $output = '';
 
   $print_separator = FALSE;
-  foreach ($panes as $pane_id => $content) {
+  foreach ($panes as $pane_id => $pane_output) {
     // Add the separator if we've already displayed a pane.
     if ($print_separator) {
       $output .= '<div class="panel-separator"></div>';
     }
-    $output .= $text = panels_render_pane($content, $display->content[$pane_id], $display);
 
+    $output .= $pane_output;
     // If we displayed a pane, this will become true; if not, it will become
     // false.
-    $print_separator = (bool) $text;
+    $print_separator = (bool) $pane_output;
   }
 
   return $output;
 }
-

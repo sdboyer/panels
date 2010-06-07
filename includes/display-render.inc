@@ -33,49 +33,12 @@ function panels_render_layout_admin($layout, $content, $display) {
 }
 
 /**
- * Render a pane using the appropriate style.
+ * Stub function; this behavior has been moved onto the display renderer object.
+ * The function name here is included for backwards compatibility.
  *
- * $content
- *   The already rendered content via panels_render_pane_content()
- * $pane
- *   The $pane information from the display
- * $display
- *   The display.
- *
- * TODO refactor the render pipeline so that style plugins need not call this
- * in panel region styling
  */
 function panels_render_pane($content, $pane, &$display) {
-  if ($display->hide_title == PANELS_TITLE_PANE && !empty($display->title_pane) && $display->title_pane == $pane->pid) {
-
-    // If the user selected to override the title with nothing, and selected
-    // this as the title pane, assume the user actually wanted the original
-    // title to bubble up to the top but not actually be used on the pane.
-    if (empty($content->title) && !empty($content->original_title)) {
-      $display->stored_pane_title = $content->original_title;
-    }
-    else {
-      $display->stored_pane_title = !empty($content->title) ? $content->title : '';
-    }
-  }
-
-  if (!empty($pane->style['style'])) {
-    $style = panels_get_style($pane->style['style']);
-
-    if (isset($style) && isset($style['render pane'])) {
-      $output = theme($style['render pane'], $content, $pane, $display);
-
-      // This could be null if no theme function existed.
-      if (isset($output)) {
-        return $output;
-      }
-    }
-  }
-
-  if (!empty($content->content)) {
-    // fallback
-    return theme('panels_pane', $content, $pane, $display);
-  }
+  return $content;
 }
 
 /**
