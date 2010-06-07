@@ -129,6 +129,21 @@
         }
         return false;
       });
+      
+      $('input:submit', ipe.control).each(function() {
+        if ($(this).val() == 'Save') {
+          $(this).click(ipe.saveEditing);
+        };
+      });
+      
+      // Perform visual effects in a particular sequence.
+      ipe.control.fadeOut('normal', function() {
+        ipe.initButton.hide();
+        ipe.control.fadeIn('normal', function() {
+          // Show all the hidden IPE elements
+          $('.panels-ipe-on').fadeIn('slow');
+        })
+      });
     }
     
     this.formRespond = function(data) {
@@ -141,7 +156,9 @@
 
     this.endEditing = function() {
       // Re-hide all the IPE meta-elements
-      $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock').hide('slow');
+      $('div.panels-ipe-on').hide('normal');
+      // Re-show all the IPE non-editing meta-elements
+      $('div.panels-ipe-off').show('normal');
     };
 
     this.saveEditing = function() {
@@ -157,7 +174,7 @@
         $('input#edit-panel-pane-' + region, ipe.control).val(val);
       });
     };
-
+    
     this.cancelEditing = function() {
 
     };

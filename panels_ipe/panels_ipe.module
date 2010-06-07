@@ -115,14 +115,14 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
 
   $links = theme('links', $links, $attr);
   $links .= '<div class="panels-ipe-draghandle"><span>DRAGGER</span></div>';
-  $handlebar = '<div class="panels-ipe-handlebar-wrapper clear-block">' . $links . '</div>';
+  $handlebar = '<div class="panels-ipe-handlebar-wrapper panels-ipe-on clear-block">' . $links . '</div>';
   return $handlebar . $output;
 }
 
 function theme_panels_ipe_region_wrapper($output, $region_name, $display) {
   $attr = array('class' => 'ctools-use-modal');
   $link = l(t('add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_name", array('attributes' => $attr));
-  $button = '<div class="panels-ipe-newblock"><div>' . $link . '</div></div>';
+  $button = '<div class="panels-ipe-newblock panels-ipe-on"><div>' . $link . '</div></div>';
   return $output . $button;
 }
 
@@ -225,9 +225,11 @@ function panels_ipe_footer($main = 0) {
   // TODO should be moved into the IPE plugin - WAAAY too hardcoded right now
   $output = "<div id='panels-ipe-control-container' class='clear-block'>";
   $output .= "<div id='panels-ipe-control-$key' class='panels-ipe-control'>";
-  $output .= "<div class='panels-ipe-startedit panels-ipe-pseudobutton'>";
+  $output .= "<div class='panels-ipe-startedit panels-ipe-pseudobutton panels-ipe-off'>";
   $output .= "<span>" . t('Customize this page') . "</span>";
-  $output .= "</div></div></div>";
+  $output .= "</div>";
+  $output .= "<div class='panels-ipe-form-container panels-ipe-on'</div>";
+  $output .= "</div></div>";
   return $output;
 }
 

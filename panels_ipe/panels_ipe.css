@@ -28,10 +28,6 @@ div.panels-ipe-draghandle {
   border-left: 1px solid #AAA;
 }
 
-div.panels-ipe-newblock {
-  display: block;
-}
-
 div.panels-ipe-newblock div {
   text-align: center;
   border: 1px solid #AAA;
@@ -40,10 +36,14 @@ div.panels-ipe-newblock div {
   margin-bottom: 1em;
 }
 
-/* Hide the handlebar initially */
-div.panels-ipe-handlebar-wrapper,
-div.panels-ipe-newblock {
+/* Hide editor-state-on elements initially */
+.panels-ipe-on {
   display: none;
+}
+
+/* Show editor-state-off elements initially */
+.panels-ipe-off {
+  display: block;
 }
 
 div.panels-ipe-handlebar-wrapper li a,
