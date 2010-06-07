@@ -9,8 +9,8 @@
 // Plugin definition
 $plugin = array(
   'title' => t('Rounded corners'),
-  'description' => t('Presents the panes or panels with a rounded corner box around them'),
-  'render panel' => 'panels_rounded_corners_style_render_panel',
+  'description' => t('Presents the panes or panel regions with a rounded corner box around them'),
+  'render region' => 'panels_rounded_corners_style_render_region',
   'render pane' => 'panels_rounded_corners_style_render_pane',
   'settings form' => 'panels_rounded_corners_style_settings_form',
   'hook theme' => array(
@@ -27,7 +27,7 @@ $plugin = array(
  *
  * @ingroup themeable
  */
-function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $panes, $settings) {
+function theme_panels_rounded_corners_style_render_region($display, $region_id, $panes, $settings) {
   $output = '';
 
   // Determine where to put the box. If empty or 'pane' around each pane. If
@@ -39,7 +39,7 @@ function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $p
     if ($pane_output) {
       // Add the separator if we've already displayed a pane.
       if ($print_separator) {
-        $output .= '<div class="panel-separator">&nbsp;</div>';
+        $output .= '<div class="region-separator">&nbsp;</div>';
       }
 
       if ($where == 'pane') {
@@ -183,7 +183,7 @@ $idstr div.admin-links {
   margin-left: -12px;
 }
 
-$idstr .panel-separator {
+$idstr .region-separator {
   background: url($url/shadow-b.png) repeat-x 0 center;
   font-size: 1px;
   height: 30px;

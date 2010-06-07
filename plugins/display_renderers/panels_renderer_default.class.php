@@ -445,6 +445,6 @@ class panels_renderer_default {
       $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $region_id);
+    return theme($style['render region'], $this->display, $owner_id, $panes, $style_settings, $region_id);
   }
 }

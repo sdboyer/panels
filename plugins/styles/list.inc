@@ -11,7 +11,7 @@
 $plugin = array(
   'title' => t('List'),
   'description' => t('Presents the panes in the form of an HTML list.'),
-  'render panel' => 'panels_list_style_render_panel',
+  'render region' => 'panels_list_style_render_region',
   'settings form' => 'panels_list_style_settings_form',
 );
 
@@ -20,11 +20,10 @@ $plugin = array(
  *
  * @ingroup themeable
  */
-function theme_panels_list_style_render_panel($display, $panel_id, $panes, $settings) {
+function theme_panels_list_style_render_region($display, $region_id, $panes, $settings) {
   $items = array();
 
-  foreach ($panes as $pane_id => $content) {
-    $item = panels_render_pane($content, $display->content[$pane_id], $display);
+  foreach ($panes as $pane_id => $item) {
     if (isset($item)) {
       $items[] = $item;
     }

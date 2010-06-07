@@ -10,7 +10,7 @@
 $plugin = array(
   'title' => t('No style'),
   'description' => t('The default panel rendering style; displays each pane with a separator.'),
-  'render panel' => 'panels_default_style_render_panel',
+  'render region' => 'panels_default_style_render_region',
 );
 
 /**
@@ -18,7 +18,7 @@ $plugin = array(
  *
  * @ingroup themeable
  */
-function theme_panels_default_style_render_panel($display, $panel_id, $panes, $settings) {
+function theme_panels_default_style_render_region($display, $region_id, $panes, $settings) {
   $output = '';
 
   $print_separator = FALSE;

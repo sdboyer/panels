@@ -176,18 +176,6 @@ class panels_renderer_legacy {
       $content->css_class = $pane->css['css_class'];
     }
 
-    // Check the style attached to the region in which this pane appears
-    // to see if it needs legacy pane data or not.
-    foreach ($this->display->panels as $panel_name => $pids) {
-      if (in_array($pane->pid, $pids)) {
-        $containing_region = $panel_name;
-      }
-    }
-    list($style, ) = panels_get_panel_style_and_settings($this->display->panel_settings, $containing_region);
-    if (version_compare($style['version'], 2.0, '>=')) {
-      $content = panels_render_pane($content, $pane, $this->display);
-    }
-
     return $content;
   }
 
@@ -207,6 +195,7 @@ class panels_renderer_legacy {
    */
   function render_region($region_name, $panes) {
     list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $region_name);
+    $callback = 'render panel';
 
     // Retrieve the pid (can be a panel page id, a mini panel id, etc.), this
     // might be used (or even necessary) for some panel display styles.
@@ -215,6 +204,19 @@ class panels_renderer_legacy {
       $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $region_name);
+    // Check to see if we're actually running a current style plugin even though
+    // we're in the legacy renderer
+    if (version_compare($style['version'], 2.0, '>=')) {
+      // We are, so pre-render the content as the current version expects
+      foreach($panes as $pane_id => $pane) {
+        $panes[$pane_id] = panels_render_pane($pane, $this->display->content[$pane_id], $this->display);
+      }
+      // And set the callback to the new key
+      $callback = 'render region';
+
+    }
+    dsm($panes);
+
+    return theme($style[$callback], $this->display, $owner_id, $panes, $style_settings, $region_name);
   }
 }
