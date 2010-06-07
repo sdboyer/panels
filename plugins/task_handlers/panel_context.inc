@@ -272,7 +272,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
 
   // TODO this is a temporary, hacky approach to ACLs for the IPE, and will be
   // modified in a later release
-  if (module_exists('panels_ipe') && !empty($handler->conf['use_ipe']) && user_access('administer page manager')) {
+  if (!(variable_get('panels_legacy_rendering_mode', TRUE)) && module_exists('panels_ipe') && !empty($handler->conf['use_ipe']) && user_access('administer page manager')) {
     $renderer = 'panels_renderer_ipe';
   }
 
