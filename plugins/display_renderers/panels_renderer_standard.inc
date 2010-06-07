@@ -14,8 +14,8 @@ class panels_renderer_standard {
   }
 
   /**
-   * Builds inner content, then hands off to layout-specified theme for final
-   * render step.
+   * Builds inner content, then hands off to layout-specified theme function for
+   * final render step.
    *
    * This is the outermost method in the Panels render pipeline. It calls the
    * inner methods, which return a content array, which is in turn passed to the
