@@ -46,6 +46,7 @@
 
   Drupal.behaviors.PanelsIPE = function(context) {
     Drupal.PanelsIPE.addPaneMarker(context);
+    Drupal.PanelsIPE.bindClickDelete(context);
   };
 
   /**
