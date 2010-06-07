@@ -81,6 +81,7 @@
         // forcePlaceholderSize: true,
         items: 'div.panels-ipe-portlet-wrapper',
         handle: 'div.panels-ipe-draghandle',
+        tolerance: 'pointer',
         // containment: ipe.topParent,
       };
       $('div.panels-ipe-region', ipe.topParent).sortable(sortable_options);
@@ -128,10 +129,11 @@
         ipe.initButton.hide();
         ipe.control.fadeIn('normal', function() {
           // Show all the hidden IPE elements
-          $('.panels-ipe-on').show('slow');
+          $('.panels-ipe-on').show('slow', function() {
+        	ipe.topParent.addClass('panels-ipe-editing');
+          });
         })
       });
-      ipe.topParent.addClass('panels-ipe-editing');
     }
     
     this.formRespond = function(data) {

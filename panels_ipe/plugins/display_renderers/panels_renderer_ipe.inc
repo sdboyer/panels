@@ -53,6 +53,7 @@ class panels_renderer_ipe extends panels_renderer_standard {
     // Add an inner layer wrapper to the pane content before placing it into
     // draggable portlet
     $output = "<div class='panels-ipe-portlet-content'>$output</div>";
+    // Hand it off to the plugin/theme for placing draggers/buttons
     $output = theme('panels_ipe_pane_wrapper', $output, $pane, $this->display);
     return "<div id='panels-ipe-paneid-{$pane->pid}' class='panels-ipe-portlet-wrapper'>" . $output . "</div>";
   }

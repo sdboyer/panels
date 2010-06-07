@@ -39,6 +39,10 @@ div.panels-ipe-draghandle {
   display: none;
 }
 
+.panels-ipe-editing .panels-ipe-on {
+	display: block;
+}
+
 /* Show editor-state-off elements initially */
 .panels-ipe-off {
   display: block;
