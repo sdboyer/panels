@@ -58,7 +58,7 @@ div.panels-ipe-newblock div a {
 .ui-sortable-placeholder * { visibility: hidden; }
 
 /* counteract panels_dnd.css - temporary */
-div.panels-ipe-display .panel-pane .pane-title {
+div.panels-ipe-display-container .panel-pane .pane-title {
   padding: 0;
 }
 

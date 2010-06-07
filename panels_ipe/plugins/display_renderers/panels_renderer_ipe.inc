@@ -19,7 +19,8 @@ class panels_renderer_ipe extends panels_renderer_standard {
     drupal_add_css(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.css');
     drupal_add_js(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.js');
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
-    return parent::render();
+    $output = parent::render();
+    return "<div id='panels-ipe-display-{$this->display->cache_key}' class='panels-ipe-display'>$output</div>";
   }
 
   function build_dnd_form() {
