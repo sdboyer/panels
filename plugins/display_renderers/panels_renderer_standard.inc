@@ -8,42 +8,9 @@ class panels_renderer_standard {
   var $display;
   var $plugins = array();
 
-  function panels_renderer_standard($display) {
+  function panels_renderer_standard(&$display, $layout) {
     $this->display = &$display;
-  }
-
-  /**
-   * Render a panel display.
-   *
-   * Alterations to output, or to the display controller object itself, can be
-   * made by implementing the appropriate pre- and post-render hooks.
-   *
-   * This is the main entry point for the Panels rendering pipeline.
-   * @return string
-   *  HTML output that has made its way through the theme layer.
-   */
-  function render() {
-    $this->plugins['layout'] = panels_get_layout($this->display->layout);
-    if (!$this->plugins['layout']) {
-      return NULL;
-    }
-
-    $output = '';
-
-    // Let modules act just prior to render.
-    foreach (module_implements('panels_pre_render') as $module) {
-      $function = $module . '_panels_pre_render';
-      $output .= $function($this->display);
-    }
-
-    $output .= $this->render_layout();
-
-    // Let modules act just after render.
-    foreach (module_implements('panels_post_render') as $module) {
-      $function = $module . '_panels_post_render';
-      $output .= $function($this->display);
-    }
-    return $output;
+    $this->plugins['layout'] = $layout;
   }
 
   /**
@@ -57,15 +24,15 @@ class panels_renderer_standard {
    * @return string
    *  Themed & rendered HTML output.
    */
-  function render_layout() {
+  function render() {
     // TODO can probably make this early-add CSS business go away by making
     // mini panels use a slightly different plugin
-    if (!empty($this->layout_plugin['css'])) {
-      if (file_exists(path_to_theme() . '/' . $this->layout_plugin['css'])) {
-        drupal_add_css(path_to_theme() . '/' . $this->layout_plugin['css']);
+    if (!empty($this->plugins['layout']['css'])) {
+      if (file_exists(path_to_theme() . '/' . $this->plugins['layout']['css'])) {
+        drupal_add_css(path_to_theme() . '/' . $this->plugins['layout']['css']);
       }
       else {
-        drupal_add_css($this->layout_plugin['path'] . '/' . $this->layout_plugin['css']);
+        drupal_add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['css']);
       }
     }
     // This now comes after the CSS is added, because panels-within-panels must
@@ -86,7 +53,7 @@ class panels_renderer_standard {
       $content = $cache->content;
     }
 
-    $output = theme($this->layout_plugin['theme'], check_plain($this->display->css_id), $content, $this->display->layout_settings, $this->display);
+    $output = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $content, $this->display->layout_settings, $this->display);
 
     return $output;
   }
@@ -144,7 +111,7 @@ class panels_renderer_standard {
 
     // Prevent notices by making sure that all panels at least have an entry:
     // TODO refactor to make this unnecessary (optimization)
-    $panels = panels_get_panels($this->layout_data, $this->display);
+    $panels = panels_get_panels($this->plugins['layout'], $this->display);
     foreach ($panels as $id => $panel) {
       if (!isset($content[$id])) {
         $content[$id] = NULL;

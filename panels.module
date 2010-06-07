@@ -473,6 +473,7 @@ class panels_display {
   var $css_id = NULL;
   var $context = array();
   var $did = 'new';
+  var $renderer = 'panels_renderer_standard';
 
   function add_pane($pane, $location = FALSE) {
     $pane->pid = $this->next_new_pid();
@@ -530,6 +531,34 @@ class panels_display {
         }
         return NULL;
     }
+  }
+
+  function render() {
+    $layout = panels_get_layout($display->layout);
+    if (!$layout) {
+      return NULL;
+    }
+
+    $output = '';
+
+    $renderer_class = ctools_plugin_load_class('panels', 'display_renderer', $this->renderer, $this->renderer);
+
+    $renderer = new $renderer_class($this, $layout);
+
+    // Let modules act just prior to render.
+    foreach (module_implements('panels_pre_render') as $module) {
+      $function = $module . '_panels_pre_render';
+      $output .= $function($display, $renderer);
+    }
+
+    $output .= $renderer->render();
+
+    // Let modules act just after render.
+    foreach (module_implements('panels_post_render') as $module) {
+      $function = $module . '_panels_post_render';
+      $output .= $function($display, $renderer);
+    }
+    return $output;
   }
 }
 
@@ -842,7 +871,7 @@ function panels_render_display(&$display) {
       return drupal_render_form($form_context->form_id, $form_context->form);
     }
   }
-  return _panels_render_display($display);
+  return $display->render();
 }
 
 
@@ -964,6 +993,13 @@ function panels_ctools_plugin_styles() {
   return array(
     'load themes' => TRUE,
     'use hooks' => TRUE,
+  );
+}
+
+function panels_ctools_plugin_display_renderers() {
+  return array(
+    'load themes' => TRUE,
+    'cache' => TRUE,
   );
 }
 
