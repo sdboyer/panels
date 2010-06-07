@@ -9,17 +9,21 @@ class panels_renderer_single_pane extends panels_renderer_default {
   var $render_pid;
 
   /**
-   * Modified build method (vs. panels_renderer_default::build()); takes a display and the pid of the pane to render.
+   * Modified build method (vs. panels_renderer_default::build()); takes just
+   * the display, no layout is necessary.
    * @param $display
    */
-  function build(&$display, $pid) {
+  function build(&$display) {
     $this->display = &$display;
-    $this->render_pid = $pid;
+  }
+
+  function prepare($external_settings = NULL) {
+    $this->render_pid = $external_settings;
   }
 
   function render() {
-    // If the requested pid does not exist,
-    if (empty($this->display->content[$this->render_pid])) {
+    // If no requested pid, or requested pid does not exist,
+    if (empty($this->render_pid) || empty($this->display->content[$this->render_pid])) {
       return NULL;
     }
     return $this->render_pane($this->display->content[$this->render_pid]);
