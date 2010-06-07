@@ -24,4 +24,8 @@ class panels_renderer_single_pane extends panels_renderer_standard {
     }
     return $this->render_pane($this->display->content[$this->render_pid]);
   }
+
+  function render_single($pid) {
+    return $this->render_pane($this->display->content[$pid]);
+  }
 }

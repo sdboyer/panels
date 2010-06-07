@@ -6,12 +6,26 @@
 function panels_ipe_menu() {
   $items = array();
 
-  $items['panels/ajax/render-pane/%/%panels_edit_cache'] = array(
-    'page callback' => 'panels_ipe_ajax_render_pane',
+  $base = array(
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
-    'page arguments' => array(3, 4),
+    'page arguments' => array(3),
   );
+
+  $items['panels_ipe/ajax/render-pane/%/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ipe_ajax_render_pane',
+    'page arguments' => array(3, 4),
+  ) + $base;
+  $items['panels_ipe/ajax/add-pane/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ipe_ajax_add_pane_choose',
+  ) + $base;
+  $items['panels_ipe/ajax/add-pane-config/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ipe_ajax_add_pane_config',
+  ) + $base;
+  $items['panels_ipe/ajax/configure/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ipe_ajax_configure_pane',
+  ) + $base;
+
   return $items;
 }
 
@@ -69,7 +83,7 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
   $links = array(
     'edit' => array(
       'title' => t('edit'),
-      'href' => "panels/ajax/configure/$display->cache_key/$pane->pid",
+      'href' => "panels_ipe/ajax/configure/$display->cache_key/$pane->pid",
       'attributes' => array(
         'class' => 'ctools-use-modal',
         // 'id' => "pane-edit-panel-pane-$pane->pid",
@@ -91,19 +105,22 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
   );
 
   $links = theme('links', $links, $attr);
-  $links .= '<div class=panels-ipe-draghandle><span>DRAGGER</span></div>';
+  $links .= '<div class="panels-ipe-draghandle"><span>DRAGGER</span></div>';
   $handlebar = '<div class="panels-ipe-handlebar-wrapper clear-block">' . $links . '</div>';
   return $handlebar . $output;
 }
 
 function theme_panels_ipe_region_wrapper($output, $region_name, $display) {
-  return $output;
+  $attr = array('class' => 'ctools-use-modal');
+  $link = l(t('add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_name", $attr);
+  $button = '<div class="panels-ipe-newblock">' . $link . '</div>';
+  return $output . $button;
 }
 
-function panels_ipe_ajax_render_pane($pid, &$display) {
+function panels_ipe_ajax_render_pane($pid, $cache) {
   $class = ctools_plugin_load_class('panels', 'display_renderers', 'panels_renderer_single_pane', 'handler');
   $renderer = new $class();
-  $renderer->build($display, $pid);
+  $renderer->build($cache->display, $pid);
   $output = array();
   $output[] = ctools_ajax_command_replace("#panels-ipe-paneid-$pid > .panels-ipe-proper-pane", $renderer->render());
 
@@ -124,10 +141,157 @@ function panels_ipe_footer($main = 0) {
  * This duplication will go away...once I figure out how to refactor out the
  * hard-codedness of much of display-edit.inc.
  */
+
+
+/**
+ * Entry point for AJAX: 'Add Content' modal form, from which the user selects the
+ * type of pane to add.
+ *
+ * @param int $cache
+ *  The display id of the $display object currently being edited.
+ * @param string $panel_id
+ *  A string with the name of the panel region to which the selected
+ *  pane type will be added.
+ */
+function panels_ipe_ajax_add_pane_choose($cache, $panel_id = NULL, $category = NULL) {
+  $display = $cache->display;
+  $layout = panels_get_layout($display->layout);
+  $layout_panels = panels_get_panels($layout, $display);
+
+  if ($layout && array_key_exists($panel_id, $layout_panels)) {
+    ctools_modal_render(
+      t('Add content to !s', array('!s' => $layout_panels[$panel_id])),
+      panels_ipe_add_content($cache, $panel_id, $category)
+    );
+  }
+
+  ctools_modal_render(t('Error'), t('Invalid input'));
+}
+
+/**
+ * Display a list of content available.
+ */
+function panels_ipe_add_content($cache, $panel_id, $key) {
+  ctools_include('content');
+  $cache_key = $cache->display->cache_key;
+
+  $category_names = array();
+  $categories = array();
+  $titles     = array();
+
+  foreach ($cache->content_types as $type_name => $subtypes) {
+    if (is_array($subtypes)) {
+      $content_type = ctools_get_content_type($type_name);
+      foreach ($subtypes as $subtype_name => $subtype_info) {
+        $title = filter_xss_admin($subtype_info['title']);
+        $description = isset($subtype_info['description']) ? $subtype_info['description'] : $title;
+
+        $icon = ctools_content_admin_icon($subtype_info);
+
+        if (isset($subtype_info['top level'])) {
+          $category = 'root';
+        }
+        else if (isset($subtype_info['category'])) {
+          if (is_array($subtype_info['category'])) {
+            list($category, $weight) = $subtype_info['category'];
+          }
+          else {
+            $category = $subtype_info['category'];
+          }
+        }
+        else {
+          $category = t('Uncategorized');
+        }
+
+        $category_key = preg_replace('/[^a-z0-9]/', '-', strtolower($category));
+
+        $output = '<div class="content-type-button clear-block">';
+        $url = "panels_ipe/ajax/add-pane-config/$cache_key/$panel_id/$type_name/$subtype_name";
+        $output .= ctools_ajax_image_button($icon, $url, $description, 'panels-modal-add-config');
+        $output .= '<div>' . ctools_ajax_text_button($title, $url, $description, 'panels-modal-add-config') . '</div>';
+        $output .= '</div>';
+        if (!isset($categories[$category_key])) {
+          $category_names[$category_key] = $category;
+          $categories[$category_key] = array();
+          $titles[$category_key] = array();
+        }
+
+        $categories[$category_key][] = $output;
+        $titles[$category_key][] = $title;
+      }
+    }
+  }
+  if (!$categories) {
+    $output = t('There are no content types you may add to this display.');
+  }
+  else {
+    if (!empty($category_names['root'])) {
+      unset($category_names['root']);
+    }
+
+    $output = '<div class="panels-add-content-modal">';
+    natcasesort($category_names);
+    $selector = '<div class="panels-categories-box">';
+
+    // Render our list of categories in column 0.
+    foreach ($category_names as $category => $name) {
+      $class = 'panels-modal-add-category';
+      if ($category == $key) {
+        $class .= ' active';
+      }
+
+      $url = "panels_ipe/ajax/add-pane/$cache_key/$panel_id/$category";
+      $selector .= ctools_ajax_text_button($name, $url, '', $class);
+    }
+
+    $selector .= '</div>';
+    if (!empty($categories['root'])) {
+      foreach ($titles['root'] as $id => $title) {
+        $selector .= $categories['root'][$id];
+      }
+    }
+
+    if (empty($key) || empty($category_names[$key]) || $key == 'root') {
+//      $key = current(array_keys($category_names));
+      $center = '<div class="panels-categories-description">';
+      $center .= t('Content options are divided by category. Please select a category from the left to proceed.');
+      $center .= '</div>';
+    }
+    else {
+      natcasesort($titles[$key]);
+
+      // Fill out the info for our current category.
+      $columns = 2;
+      $col[1] = '';
+      $col[2] = '';
+
+      $col_size = count($titles[$key]) / $columns;
+      $count = 0;
+      foreach ($titles[$key] as $id => $title) {
+        $which = floor($count++ / $col_size) + 1; // we leave 0 for the categories.
+        $col[$which] .= $categories[$key][$id];
+      }
+
+      $center = '';
+      foreach ($col as $id => $column) {
+        $center .= '<div class="panels-section-column panels-section-column-' . $id . '">'
+        . '<div class="inside">' . $column . '</div></div>';
+      }
+      $center .= '</div>'; // columns
+    }
+    $output .= '<div class="panels-section-column panels-section-column-categories">'
+      . '<div class="inside">' . $selector . '</div></div>';
+    $output .= '<div class="panels-section-columns">';
+    $output .= $center;
+    $output .= '</div>'; // categories box
+  }
+  return $output;
+}
+
 /**
  * AJAX entry point for to configure a pane that has just been added.
  */
-function panels_ajax_add_pane_config($cache, $panel_id = NULL, $type_name = NULL, $subtype_name = NULL, $step = NULL) {
+function panels_ipe_ajax_add_pane_config($cache, $panel_id = NULL, $type_name = NULL, $subtype_name = NULL, $step = NULL) {
   ctools_include('content');
   $cache_key = $cache->display->cache_key;
   $content_type = ctools_get_content_type($type_name);
@@ -155,14 +319,14 @@ function panels_ajax_add_pane_config($cache, $panel_id = NULL, $type_name = NULL
   );
 
   $form_info = array(
-    'path' => "panels/ajax/add-pane-config/$cache_key/$panel_id/$type_name/$subtype_name/%step",
-    'next callback' => 'panels_ajax_edit_pane_config_next',
-    'finish callback' => 'panels_ajax_add_pane_config_finish',
+    'path' => "panels_ipe/ajax/add-pane-config/$cache_key/$panel_id/$type_name/$subtype_name/%step",
+    'next callback' => 'panels_ipe_ajax_edit_pane_config_next',
+    'finish callback' => 'panels_ipe_ajax_add_pane_config_finish',
   );
 
   $rc = ctools_content_form('add', $form_info, $form_state, $content_type, $pane->subtype, $subtype, $pane->configuration, $step);
   if ($rc === FALSE) {
-    panels_ajax_add_pane_config_finish($form_state);
+    panels_ipe_ajax_add_pane_config_finish($form_state);
     $form_state['commands'][] = ctools_modal_command_dismiss();
     ctools_ajax_render($form_state['commands']);
   }
@@ -171,7 +335,7 @@ function panels_ajax_add_pane_config($cache, $panel_id = NULL, $type_name = NULL
 /**
  * AJAX entry point for to configure a pane that has just been added.
  */
-function panels_ajax_configure_pane($cache, $pid = NULL, $step = NULL) {
+function panels_ipe_ajax_configure_pane($cache, $pid = NULL, $step = NULL) {
   ctools_include('content');
   $cache_key = $cache->display->cache_key;
   if (empty($cache->display->content[$pid])) {
@@ -194,20 +358,20 @@ function panels_ajax_configure_pane($cache, $pid = NULL, $step = NULL) {
   );
 
   $form_info = array(
-    'path' => "panels/ajax/configure/$cache_key/$pid/%step",
-    'next callback' => 'panels_ajax_edit_pane_config_next',
-    'finish callback' => 'panels_ajax_edit_pane_config_finish',
+    'path' => "panels_ipe/ajax/configure/$cache_key/$pid/%step",
+    'next callback' => 'panels_ipe_ajax_edit_pane_config_next',
+    'finish callback' => 'panels_ipe_ajax_edit_pane_config_finish',
   );
 
   ctools_content_form('edit', $form_info, $form_state, $content_type, $pane->subtype,  $subtype, $pane->configuration, $step);
 }
 
-function panels_ajax_edit_pane_config_next(&$form_state) {
+function panels_ipe_ajax_edit_pane_config_next(&$form_state) {
   $form_state['cache']->new_pane = $form_state['pane'];
   panels_edit_cache_set($form_state['cache']);
 }
 
-function panels_ajax_add_pane_config_finish(&$form_state) {
+function panels_ipe_ajax_add_pane_config_finish(&$form_state) {
   $cache = &$form_state['cache'];
   $pane = $cache->new_pane;
   unset($cache->new_pane);
@@ -221,15 +385,21 @@ function panels_ajax_add_pane_config_finish(&$form_state) {
 
   panels_edit_cache_set($cache);
 
-  $form_state['commands'][] = ctools_ajax_command_append("#panel-pane-$pane->panel", panels_show_pane($cache->display, $pane, TRUE));
-  $form_state['commands'][] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+  $display->render('panels_renderer_ipe');
+  $class = ctools_plugin_load_class('panels', 'display_renderers', 'panels_renderer_ipe', 'handler');
+
+  // $form_state['commands'][] = ctools_ajax_command_append("#panels-ipe-regionid-$pane->panel .'panels-ipe-region-innermost", $renderer->render_pane($pane));
+  $form_state['commands'][] = ctools_ajax_command_append("#panels-ipe-regionid-$pane->panel", $renderer->render_pane($pane));
 }
 
-function panels_ajax_edit_pane_config_finish(&$form_state) {
+function panels_ipe_ajax_edit_pane_config_finish(&$form_state) {
   $cache = &$form_state['cache'];
   $pane = &$form_state['pane'];
   panels_edit_cache_set($cache);
 
-  $form_state['commands'][] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
-  $form_state['commands'][] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+  $class = ctools_plugin_load_class('panels', 'display_renderers', 'panels_renderer_single_pane', 'handler');
+  $renderer = new $class();
+  $renderer->build($cache->display, $pane->pid);
+
+  $form_state['commands'][] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid > .panels-ipe-proper-pane", $renderer->render());
 }
