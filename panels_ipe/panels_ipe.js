@@ -60,7 +60,7 @@
     var ipe = this;
     this.key = cache_key;
     this.state = {};
-    this.outermost = $('div#panels-ipe-display-'+cache_key);
+    this.topParent = $('div#panels-ipe-display-'+cache_key);
     this.control = $('div#panels-ipe-control-'+ cache_key);
     this.initButton = $('div.panels-ipe-startedit', this.control);
     this.cfg = cfg;
@@ -87,12 +87,12 @@
         // forcePlaceholderSize: true,
         items: 'div.panels-ipe-pane',
         handle: 'div.panels-ipe-draghandle',
-        // containment: ipe.outermost,
+        // containment: ipe.topParent,
       };
-      $('div.panels-ipe-region', ipe.outermost).sortable(sortable_options);
+      $('div.panels-ipe-region', ipe.topParent).sortable(sortable_options);
       // Since the connectWith option only does a one-way hookup, iterate over
       // all sortable regions to connect them with one another.
-      $('div.panels-ipe-region', ipe.outermost).each(function() {
+      $('div.panels-ipe-region', ipe.topParent).each(function() {
         $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
       });
       
@@ -135,7 +135,7 @@
           $('.panels-ipe-on').show('slow');
         })
       });
-      ipe.outermost.addClass('panels-ipe-editing');
+      ipe.topParent.addClass('panels-ipe-editing');
     }
     
     this.formRespond = function(data) {
@@ -150,13 +150,13 @@
     this.endEditing = function() {
       // Re-hide all the IPE meta-elements
       $('div.panels-ipe-on').hide('normal');
-      ipe.outermost.removeClass('panels-ipe-editing');
+      ipe.topParent.removeClass('panels-ipe-editing');
       // Re-show all the IPE non-editing meta-elements
       $('div.panels-ipe-off').show('normal');
     };
 
     this.saveEditing = function() {
-      $('div.panels-ipe-region', ipe.outermost).each(function() {
+      $('div.panels-ipe-region', ipe.topParent).each(function() {
         var val = '';
         var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
         $(this).children('div.panels-ipe-pane').each(function() {
