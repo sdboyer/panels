@@ -96,9 +96,17 @@ function panels_theme() {
         'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
       );
     }
-    if (!empty($data['render panel'])) {
-      $theme[$data['render panel']] = array(
-        'arguments' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL),
+    // If we're in legacy mode, include the old callback key for legacy styles.
+    if (variable_get('panels_legacy_rendering_mode', TRUE)) {
+      if (!empty($data['render panel'])) {
+        $theme[$data['render panel']] = array(
+          'arguments' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL),
+        );
+      }
+    }
+    if (!empty($data['render region'])) {
+      $theme[$data['render region']] = array(
+        'arguments' => array('display' => NULL, 'region_id' => NULL, 'panes' => NULL, 'settings' => NULL),
       );
     }
 
