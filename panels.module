@@ -19,7 +19,7 @@ define('PANELS_TITLE_PANE', 2); // And this is the new behavior, where the title
  * @return An array with the major and minor versions
  */
 function panels_api_version() {
-  return array(3, 0);
+  return array(3, 1);
 }
 
 /**
