@@ -40,6 +40,11 @@ div.panels-ipe-newblock div {
   margin-bottom: 1em;
 }
 
+/* Hide the handlebar initially */
+div.panels-ipe-handlebar-wrapper,
+div.panels-ipe-newblock {
+  display: none;
+}
 
 div.panels-ipe-handlebar-wrapper li a,
 div.panels-ipe-draghandle span,
@@ -83,6 +88,11 @@ div.panels-ipe-pseudobutton {
   -webkit-border-radius:5px;
   -webkit-box-shadow: #333 0px 1px 0px;
   padding: 0.3em 0.8em;
+  float: left;
+}
+
+div.panels-ipe-control .form-submit {
+  margin: 0.3em 0.5em;
 }
 
 div#panels-ipe-control-container span.panels-ipe-pseudobutton {
