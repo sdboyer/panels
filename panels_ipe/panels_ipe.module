@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Implementation of hook_ctools_plugin_directory() to let the system know
- * we implement task and task_handler plugins.
+ * Implementation of hook_ctools_plugin_directory().
  */
 function panels_ipe_ctools_plugin_directory($module, $plugin) {
   if ($module == 'panels' && $plugin == 'display_renderers') {
