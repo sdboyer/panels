@@ -1,6 +1,13 @@
 // $Id$
 
 (function($) {
+  // A ready function should be sufficient for this, at least for now
+  $(function() {
+    $.each(Drupal.settings.PanelsIPECacheKeys, function() {
+      Drupal.PanelsIPE.editors[this] = new DrupalPanelsIPE(this, Drupal.settings.PanelsIPESettings[this]);
+    });
+  });
+
   Drupal.PanelsIPE = {
     editors: {},
     bindClickDelete: function(context) {
@@ -38,38 +45,8 @@
   }
 
   Drupal.behaviors.PanelsIPE = function(context) {
-    // the below is very sloppy, 100% temporary
-    if (!$(document.body).hasClass('panels-ipe')) {
-      Drupal.PanelsIPE.initEditing(context);
-    }
     Drupal.PanelsIPE.addPaneMarker(context);
-    $('div.panels-ipe-startedit:not(panels-ipe-startedit-processed)', context)
-      .addClass('panels-ipe-startedit-processed')
-      .click(function() {
-        var $this = $(this);
-        var cache_key = $this.parent().attr('id').split('panels-ipe-control-')[1];
-        // TODO _really_ need to reuse ctools ajax code here
-        var url = '/panels_ipe/ajax/edit/' + cache_key;
-        $.ajax({
-          type: "POST",
-          url: url,
-          global: true,
-          success: function(data) {
-            $this.parent().fadeOut('normal', function() {
-              $this.hide();
-              $this.parent().append(data);
-              $this.parent().show('normal', function() {
-                $this.parent().data(cache_key, new DrupalPanelsIPE(cache_key));
-              });
-            });
-          },
-          error: function(xhr) {
-            Drupal.CTools.AJAX.handleErrors(xhr, url);
-          },
-          dataType: 'json'
-        });
-    });
-  }
+  };
 
   /**
    * Base object (class) definition for the Panels In-Place Editor.
@@ -79,10 +56,12 @@
    *
    * @param {string} cache_key
    */
-  function DrupalPanelsIPE(cache_key) {
+  function DrupalPanelsIPE(cache_key, cfg) {
     this.key = cache_key;
     this.state = {};
     this.outermost = $('div#panels-ipe-display-'+cache_key);
+    this.control = $('div#panels-ipe-control-'+ cache_key);
+    this.cfg = cfg;
 
     /**
      * Passthrough method to be attached to Drupal.behaviors
@@ -92,40 +71,76 @@
     this.behaviorsPassthrough = function(context) {
       Drupal.PanelsIPE.bindClickDelete(context);
     };
+    
+    Drupal.behaviors['PanelsIPE' + cache_key] = this.behaviorsPassthrough;
+
+    this.initEditing = function() {
+      /**
+       * See http://jqueryui.com/demos/sortable/ for details on the configuration
+       * parameters used here.
+       */
+      var sortable_options = { // TODO allow the IPE plugin to control these
+        revert: true,
+        dropOnEmpty: true, // default
+        opacity: 0.75, // opacity of sortable while sorting
+        // placeholder: 'draggable-placeholder',
+        // forcePlaceholderSize: true,
+        items: 'div.panels-ipe-pane',
+        handle: 'div.panels-ipe-draghandle',
+        containment: this.outermost,
+      };
+      $('div.panels-ipe-region', this.outermost).sortable(sortable_options);
+      // Since the connectWith option only does a one-way hookup, iterate over
+      // all sortable regions to connect them with one another.
+      $('div.panels-ipe-region', this.outermost).each(function() {
+        $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
+      });
+      // Show all the hidden IPE elements
+      $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock').fadeIn('slow');
+    }
+
+    this.endEditing = function() {
+      // Re-hide all the IPE meta-elements
+      $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock').hide('slow');
+    };
 
     this.saveEditing = function() {
-
+      $('div.panels-ipe-region', this.outermost).each(function() {
+        var val = '';
+        var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
+        $(this).children('div.panels-ipe-pane').each(function() {
+          if (val) {
+            val += ',';
+          }
+          val += $(this).attr('id').split('panels-ipe-paneid-')[1];
+        });
+        $('input#edit-panel-pane-' + region, this.control).val(val);
+      });
     };
 
     this.cancelEditing = function() {
 
     };
 
-    Drupal.behaviors['PanelsIPE' + cache_key] = this.behaviorsPassthrough;
-
-    // Attach this IPE object into the global list TODO necessary?
-    Drupal.PanelsIPE.editors[cache_key] = this;
-
-    /**
-     * See http://jqueryui.com/demos/sortable/ for details on the configuration
-     * parameters used here.
-     */
-    var sortable_options = { // TODO allow the IPE plugin to control these
-      revert: true,
-      dropOnEmpty: true, // default
-      opacity: 0.75, // opacity of sortable while sorting
-      // placeholder: 'draggable-placeholder',
-      // forcePlaceholderSize: true,
-      items: 'div.panels-ipe-pane',
-      handle: 'div.panels-ipe-draghandle',
-    };
-    $('div.panels-ipe-region').sortable(sortable_options);
-    // Since the connectWith option only does a one-way hookup, iterate over
-    // all sortable regions to connect them with one another.
-    $('div.panels-ipe-region').each(function() {
-      $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
+    $('div.panels-ipe-startedit', this.control).click(function() {
+      var $this = $(this);
+      var url = this.cfg.formPath;
+      $.ajax({
+        type: "POST",
+        url: url,
+        global: true,
+        success: function(data) {
+          $this.parent().fadeOut('normal', function() {
+            $this.hide();
+            $this.parent().append(data);
+            $this.parent().fadeIn('normal', this.initEditing());
+          });
+        },
+        error: function(xhr) {
+          Drupal.CTools.AJAX.handleErrors(xhr, url);
+        },
+        dataType: 'json'
+      });
     });
-    // Show all the hidden IPE elements
-    $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock').show('slow');
-  }
+  };
 })(jQuery);
