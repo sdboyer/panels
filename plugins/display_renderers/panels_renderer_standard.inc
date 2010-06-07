@@ -128,29 +128,13 @@ class panels_renderer_standard {
   /**
    * Render the contents of a single pane.
    *
-   * Primarily a wrapper around $this->get_pane_content(), which manages
-   * caching and actually fires the call to the plugin's render callback
-   * (through ctools).
+   * This method retrieves pane content and produces a ready-to-render content
+   * object. It also manages pane-specific caching.
    *
    * @param stdClass $pane
+   *    A Panels pane object, as loaded from the database.
    */
   function render_pane_content($pane) { // TODO remove this method by collapsing it into $this->render_panes()
-    $content = $this->get_pane_content($pane);
-
-    // Pass long the css_id that is usually available.
-    if (!empty($pane->css['css_id'])) {
-      $content->css_id = $pane->css['css_id'];
-    }
-
-    // Pass long the css_class that is usually available.
-    if (!empty($pane->css['css_class'])) {
-      $content->css_class = $pane->css['css_class'];
-    }
-
-    return $content;
-  }
-
-  function get_pane_content($pane) {
     ctools_include('context');
     // TODO finally safe to remove this check?
     if (!is_array($this->display->context)) {
@@ -177,6 +161,24 @@ class panels_renderer_standard {
         $content = $cache->content;
       }
     }
+
+    $content = $this->get_pane_content($pane);
+
+    // Pass long the css_id that is usually available.
+    if (!empty($pane->css['css_id'])) {
+      $content->css_id = $pane->css['css_id'];
+    }
+
+    // Pass long the css_class that is usually available.
+    if (!empty($pane->css['css_class'])) {
+      $content->css_class = $pane->css['css_class'];
+    }
+
+    return $content;
+  }
+
+  function get_pane_content($pane) {
+
 
     return $content;
   }

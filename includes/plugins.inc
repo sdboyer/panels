@@ -34,50 +34,6 @@ function panels_get_panels($layout, $display) {
 }
 
 /**
- * Get the content from a given pane.
- *
- * @param $pane
- *   The pane to retrieve content from.
- * @param $args
- *   The arguments sent to the display.
- * @param $context
- *   The panels context.
- * @param $incoming_content
- *   Any incoming content if this display is a wrapper.
- */
-function panels_get_pane_content($display, $pane, $keywords, $args = array(), $context = array(), $incoming_content = '') {
-  ctools_include('context');
-  if (!is_array($context)) {
-    $context = array();
-  }
-
-  if (!$incoming_content === '') {
-    $incoming_content = t('Incoming content will be displayed here.');
-  }
-
-  $content = FALSE;
-  $caching = !empty($pane->cache['method']) ? TRUE : FALSE;
-  if ($caching && ($cache = panels_get_cached_content($display, $args, $context, $pane))) {
-    $content = $cache->content;
-  }
-  else {
-    $content = ctools_content_render($pane->type, $pane->subtype, $pane->configuration, $keywords, $args, $context, $incoming_content);
-    foreach (module_implements('panels_pane_content_alter') as $module) {
-      $function = $module . '_panels_pane_content_alter';
-      $function($content, $pane, $args, $context);
-    }
-    if ($caching) {
-      $cache = new panels_cache_object();
-      $cache->set_content($content);
-      panels_set_cached_content($cache, $display, $args, $context, $pane);
-      $content = $cache->content;
-    }
-  }
-
-  return $content;
-}
-
-/**
  * Get cached content for a given display and possibly pane.
  *
  * @return
