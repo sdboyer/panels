@@ -516,6 +516,16 @@ class panels_display {
     return ++$next_id;
   }
 
+  /**
+   * Get the title from a display.
+   *
+   * The display must have already been rendered, or the setting to set the
+   * display's title from a pane's title will not have worked.
+   *
+   * @return
+   *   The title to use. If NULL, this means to let any default title that may be in use
+   *   pass through. i.e, do not actually set the title.
+   */
   function get_title() {
     switch ($this->hide_title) {
       case PANELS_TITLE_NONE:

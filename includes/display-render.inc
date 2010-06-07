@@ -102,33 +102,3 @@ function panels_get_panel_style_and_settings($panel_settings, $panel) {
 
   return array($style, $style_settings);
 }
-
-/**
- * Get the title from a display.
- *
- * The display must have already been rendered, or the setting to set the display's title
- * from a pane's title will not have worked.
- *
- * @param $display
- *   The display to get the title from.
- *
- * @return
- *   The title to use. If NULL, this means to let any default title that may be in use
- *   pass through. i.e, do not actually set the title.
- */
-function panels_display_get_title($display) {
-  switch ($display->hide_title) {
-    case PANELS_TITLE_NONE:
-      return '';
-
-    case PANELS_TITLE_PANE:
-      return isset($display->stored_pane_title) ? $display->stored_pane_title : '';
-
-    case PANELS_TITLE_FIXED:
-    case FALSE; // For old exported panels that are not in the database.
-      if (!empty($display->title)) {
-        return filter_xss_admin(ctools_context_keyword_substitute($display->title, array(), $display->context));
-      }
-      return NULL;
-  }
-}
