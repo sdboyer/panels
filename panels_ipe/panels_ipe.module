@@ -481,7 +481,7 @@ function panels_ipe_ajax_add_pane_config_finish(&$form_state) {
 
   $class = ctools_plugin_load_class('panels', 'display_renderers', 'panels_renderer_ipe', 'handler');
   $renderer = new $class();
-  $renderer->build($cache->display, array());
+  $renderer->build($cache->display);
   panels_edit_cache_set($cache);
 
   $form_state['commands'][] = ctools_ajax_command_append("#panels-ipe-regionid-$pane->panel", $renderer->render_pane($pane));
@@ -493,8 +493,9 @@ function panels_ipe_ajax_edit_pane_config_finish(&$form_state) {
 
   $class = ctools_plugin_load_class('panels', 'display_renderers', 'panels_renderer_single_pane', 'handler');
   $renderer = new $class();
-  $renderer->build($cache->display, $pane->pid);
+  $renderer->build($cache->display);
+  $renderer->prepare($pane->pid);
   panels_edit_cache_set($cache);
 
-  $form_state['commands'][] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid > .panels-ipe-portlet-content", $renderer->render());
+  $form_state['commands'][] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid > .panels-ipe-portlet-content *", $renderer->render());
 }
