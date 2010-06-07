@@ -145,35 +145,15 @@ class panels_renderer_legacy {
    */
   function render_pane($pane) {
     $content = $this->render_pane_content($pane);
-    if ($this->display->hide_title == PANELS_TITLE_PANE && !empty($this->display->title_pane) && $this->display->title_pane == $pane->pid) {
 
-      // If the user selected to override the title with nothing, and selected
-      // this as the title pane, assume the user actually wanted the original
-      // title to bubble up to the top but not actually be used on the pane.
-      if (empty($content->title) && !empty($content->original_title)) {
-        $this->display->stored_pane_title = $content->original_title;
-      }
-      else {
-        $this->display->stored_pane_title = !empty($content->title) ? $content->title : '';
-      }
+    // Pass long the css_id that is usually available.
+    if (!empty($pane->css['css_id'])) {
+      $content->css_id = $pane->css['css_id'];
     }
 
-    if (!empty($pane->style['style'])) {
-      $style = panels_get_style($pane->style['style']);
-
-      if (isset($style) && isset($style['render pane'])) {
-        $output = theme($style['render pane'], $content, $pane, $this->display);
-
-        // This could be null if no theme function existed.
-        if (isset($output)) {
-          return $output;
-        }
-      }
-    }
-
-    if (!empty($content->content)) {
-      // fallback
-      return theme('panels_pane', $content, $pane, $this->display);
+    // Pass long the css_class that is usually available.
+    if (!empty($pane->css['css_class'])) {
+      $content->css_class = $pane->css['css_class'];
     }
   }
 
@@ -240,7 +220,6 @@ class panels_renderer_legacy {
    *
    * @return
    *   The rendered HTML for the passed-in panel region.
-   * @render
    */
   function render_region($region_name, $panes) {
     list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $region_name);
