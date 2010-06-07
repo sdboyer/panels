@@ -84,11 +84,11 @@
         tolerance: 'pointer',
         // containment: ipe.topParent,
       };
-      $('div.panels-ipe-region', ipe.topParent).sortable(sortable_options);
+      $('div.panels-ipe-sort-container', ipe.topParent).sortable(sortable_options);
       // Since the connectWith option only does a one-way hookup, iterate over
       // all sortable regions to connect them with one another.
-      $('div.panels-ipe-region', ipe.topParent)
-        .sortable('option', 'connectWith', ['div.panels-ipe-region']);
+      $('div.panels-ipe-sort-container', ipe.topParent)
+        .sortable('option', 'connectWith', ['div.panels-ipe-sort-container']);
       
       $('.panels-ipe-form-container', ipe.control).append(formdata);
       // bind ajax submit to the form
@@ -182,6 +182,11 @@
       },
       dataType: 'json'
     };
+
+    $('div.panels-ipe-region', this.topParent).each(function() {
+      $('div.panels-ipe-portlet-wrapper', this)
+        .wrapAll('<div class="panels-ipe-sort-container" />');
+    });
 
     $('div.panels-ipe-startedit', this.control).click(function() {
       var $this = $(this);

@@ -55,10 +55,29 @@ function panels_ipe_theme() {
     'panels_ipe_region_wrapper' => array(
       'arguments' => array('output' => NULL, 'region_name' => NULL, 'display' => NULL),
     ),
+    'panels_ipe_add_pane_button' => array(
+      'arguments' => array('region_name' => NULL, 'display' => NULL),
+    ),
+    'panels_ipe_placeholder_pane' => array(
+      'arguments' => array('region_name' => NULL, 'region_title' => NULL),
+    ),
     'panels_ipe_dnd_form_container' => array(
       'arguments' => array('link' => NULL, 'cache_key' => NULL, 'display' => NULL),
     ),
   );
+}
+
+/**
+ * Theme the 'placeholder' pane, which is shown on an active IPE when no panes
+ * live in that region.
+ *
+ * @param string $region_name
+ */
+function theme_panels_ipe_placeholder_pane($region_name, $region_title) {
+  $output = '<div class="panels-ipe-placeholder-content">';
+  $output .= "<h3>$region_title</h3>";
+  $output .= '</div>';
+  return $output;
 }
 
 function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
@@ -93,10 +112,13 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
 }
 
 function theme_panels_ipe_region_wrapper($output, $region_name, $display) {
+  return $output;
+}
+
+function theme_panels_ipe_add_pane_button($region_name, $display) {
   $attr = array('class' => 'ctools-use-modal');
   $link = l(t('add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_name", array('attributes' => $attr));
-  $button = '<div class="panels-ipe-newblock panels-ipe-on">' . $link . '</div>';
-  return $output . $button;
+  return '<div class="panels-ipe-newblock panels-ipe-on">' . $link . '</div>';
 }
 
 function panels_ipe_ajax_render_pane($pid, $cache) {
