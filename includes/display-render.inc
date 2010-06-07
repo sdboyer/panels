@@ -33,26 +33,6 @@ function panels_render_layout_admin($layout, $content, $display) {
 }
 
 /**
- * Render a single pane, identifying its context, and put it into
- * the $panes array.
- */
-function panels_render_pane_content(&$display, &$pane, $keywords) {
-  $content = panels_get_pane_content($display, $pane, $keywords, $display->args, $display->context, $display->incoming_content);
-
-  // Pass long the css_id that is usually available.
-  if (!empty($pane->css['css_id'])) {
-    $content->css_id = $pane->css['css_id'];
-  }
-
-  // Pass long the css_class that is usually available.
-  if (!empty($pane->css['css_class'])) {
-    $content->css_class = $pane->css['css_class'];
-  }
-
-  return $content;
-}
-
-/**
  * Render a pane using the appropriate style.
  *
  * $content

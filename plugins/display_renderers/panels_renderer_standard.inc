@@ -124,8 +124,17 @@ class panels_renderer_standard {
     return $content;
   }
 
-  // TODO remove this method by collapsing it into $this->render_panes()
-  function render_pane_content($pane) {
+
+  /**
+   * Render the contents of a single pane.
+   *
+   * Primarily a wrapper around $this->get_pane_content(), which manages
+   * caching and actually fires the call to the plugin's render callback
+   * (through ctools).
+   *
+   * @param stdClass $pane
+   */
+  function render_pane_content($pane) { // TODO remove this method by collapsing it into $this->render_panes()
     $content = $this->get_pane_content($pane);
 
     // Pass long the css_id that is usually available.
