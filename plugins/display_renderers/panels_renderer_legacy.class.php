@@ -39,8 +39,6 @@ class panels_renderer_legacy {
    *  Themed & rendered HTML output.
    */
   function render() {
-    // TODO can probably make this early-add CSS business go away by making
-    // mini panels use a slightly different plugin
     if (!empty($this->plugins['layout']['css'])) {
       if (file_exists(path_to_theme() . '/' . $this->plugins['layout']['css'])) {
         drupal_add_css(path_to_theme() . '/' . $this->plugins['layout']['css']);
@@ -56,8 +54,6 @@ class panels_renderer_legacy {
       $content = $this->render_regions();
     }
     else {
-      // TODO This whole approach can & probably should be refactored now. Maybe
-      // invert it, and have the caching agent act from the outside?
       $cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context);
       if ($cache === FALSE) {
         $cache = new panels_cache_object();
@@ -89,7 +85,6 @@ class panels_renderer_legacy {
     $later = array();
 
     foreach ($this->display->content as $pid => $pane) {
-      // TODO remove in 7.x and ensure the upgrade path weeds out any stragglers; it's been long enough
       $pane->shown = !empty($pane->shown); // guarantee this field exists.
       // If the user can't see this pane, do not render it.
       if (!$pane->shown || !panels_pane_access($pane, $this->display)) {
@@ -126,7 +121,6 @@ class panels_renderer_legacy {
     }
 
     // Prevent notices by making sure that all panels at least have an entry:
-    // TODO refactor to make this unnecessary (optimization)
     $panels = panels_get_panels($this->plugins['layout'], $this->display);
     foreach ($panels as $id => $panel) {
       if (!isset($content[$id])) {
@@ -166,15 +160,12 @@ class panels_renderer_legacy {
    * @param stdClass $pane
    *    A Panels pane object, as loaded from the database.
    */
-  function render_pane_content($pane) { // TODO remove this method by collapsing it into $this->render_panes()
+  function render_pane_content($pane) {
     ctools_include('context');
-    // TODO finally safe to remove this check?
     if (!is_array($this->display->context)) {
       $this->display->context = array();
     }
 
-    // TODO this should be moved up to fully cache styled output, rather than
-    // just rendered output; no reason to reevaluaate all that every time
     $content = FALSE;
     $caching = !empty($pane->cache['method']) ? TRUE : FALSE;
     if ($caching && ($cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context, $pane))) {
@@ -226,8 +217,6 @@ class panels_renderer_legacy {
 
     // Retrieve the pid (can be a panel page id, a mini panel id, etc.), this
     // might be used (or even necessary) for some panel display styles.
-    // TODO: Got to fix this to use panel page name instead of pid, since pid is
-    // no longer guaranteed. This needs an API to be able to set the final id.
     $owner_id = 0;
     if (isset($this->display->owner) && is_object($this->display->owner) && isset($this->display->owner->id)) {
       $owner_id = $this->display->owner->id;
