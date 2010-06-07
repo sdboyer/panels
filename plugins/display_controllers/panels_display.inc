@@ -44,8 +44,6 @@ class panels_display {
   }
 
   function next_new_pid() {
-    // necessary if/until we use this method and ONLY this method for adding temporary pids.
-    // then we can do it with a nice static var.
     $id = array(0);
     foreach (array_keys($this->content) as $pid) {
       if (!is_numeric($pid)) {
@@ -58,8 +56,6 @@ class panels_display {
 
   /**
    * Render a panel display.
-   *
-   * First,
    *
    * Alterations to output, or to the display controller object itself, can be
    * made by implementing the appropriate pre- and post-render hooks.
