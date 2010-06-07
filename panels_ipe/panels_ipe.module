@@ -61,33 +61,6 @@ function panels_ipe_theme() {
   );
 }
 
-/**
- * Implementation of dynamic ctools plugin registration hook.
- *
- * The definition here fulfills the same purpose as the $plugin = array(...)
- * pattern that now appears in most ctools plugins as a standard.
- */
-function panels_ipe_panels_display_renderers() {
-  $plugins = array();
-  $plugins['panels_renderer_ipe'] = array(
-    'handler' => array(
-      'path' => drupal_get_path('module', 'panels_ipe') . '/plugins/display_renderers',
-      'file' => 'panels_renderer_ipe.inc',
-      'class' => 'panels_renderer_ipe',
-      'parent' => 'panels_renderer_standard',
-    ),
-  );
-  $plugins['panels_renderer_single_pane'] = array(
-    'handler' => array(
-      'path' => drupal_get_path('module', 'panels_ipe') . '/plugins/display_renderers',
-      'file' => 'panels_renderer_single_pane.inc',
-      'class' => 'panels_renderer_single_pane',
-      'parent' => 'panels_renderer_standard',
-    ),
-  );
-  return $plugins;
-}
-
 function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
   $links = array(
     'edit' => array(
