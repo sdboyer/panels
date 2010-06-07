@@ -92,9 +92,8 @@
       $('div.panels-ipe-region', ipe.topParent).sortable(sortable_options);
       // Since the connectWith option only does a one-way hookup, iterate over
       // all sortable regions to connect them with one another.
-      $('div.panels-ipe-region', ipe.topParent).each(function() {
-        $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
-      });
+      $('div.panels-ipe-region', ipe.topParent)
+        .sortable('option', 'connectWith', ['div.panels-ipe-region']);
       
       $('.panels-ipe-form-container', ipe.control).append(formdata);
       // bind ajax submit to the form
@@ -124,6 +123,9 @@
       $('input:submit', ipe.control).each(function() {
         if ($(this).val() == 'Save') {
           $(this).click(ipe.saveEditing);
+        };
+        if ($(this).val() == 'Cancel') {
+          $(this).click(ipe.cancelEditing);
         };
       });
       
@@ -170,7 +172,7 @@
     };
     
     this.cancelEditing = function() {
-
+      $('div.panels-ipe-region', ipe.topParent).sortable('destroy');
     };
     
     var ajaxOptions = {
@@ -187,14 +189,6 @@
 
     $('div.panels-ipe-startedit', this.control).click(function() {
       var $this = $(this);
-//      $.ajax($.extend(ajaxOptions, {
-//        success: function(data) {
-//          $this.parent().fadeOut('normal', function() {
-//            $this.hide();
-//            $this.parent().append(data);
-//            $this.parent().fadeIn('normal', callback);
-//          });
-//      }}));
       $.ajax(ajaxOptions);
     });
   };
