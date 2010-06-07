@@ -1059,6 +1059,32 @@ function panels_plugin_styles_process(&$plugin, $info) {
 }
 
 /**
+ * Gateway to the PanelsLegacyState class/object, which does all legacy state
+ * checks and provides information about the cause of legacy states as needed.
+ *
+ * @return PanelsLegacyState $legacy
+ */
+function panels_get_legacy_state() {
+  static $legacy = NULL;
+  if (!isset($legacy)) {
+    ctools_include('legacy', 'panels');
+    $legacy = new PanelsLegacyState();
+  }
+  return $legacy;
+}
+
+/**
+ * Implementation of hook_flush_caches().
+ *
+ * We implement this so that we can be sure our legacy rendering state setting
+ * in $conf is updated whenever caches are cleared.
+ */
+function panels_flush_caches() {
+  $legacy = panels_get_legacy_state();
+  $legacy->determineStatus();
+}
+
+/**
  * Get the display that is currently being rendered as a page.
  *
  * Unlike in previous versions of this, this only returns the display,

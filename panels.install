@@ -5,11 +5,19 @@
  * Test requirements for installation and running.
  */
 function panels_requirements($phase) {
+  $function = "panels_requirements_$phase";
+  return function_exists($function) ? $function() : array();
+}
+
+/**
+ * Check install-time requirements.
+ */
+function panels_requirements_install() {
   $requirements = array();
   $t = get_t();
   // Assume that if the user is running an installation profile that both
   // Panels and CTools are the same release.
-  if ($phase == 'install' && !(defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install')) {
+  if (!(defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install')) {
     // apparently the install process doesn't include .module files,
     // so we need to force the issue in order for our versioning
     // check to work.
@@ -30,6 +38,33 @@ function panels_requirements($phase) {
          'description' => t('The CTools API version is too old for Panels. Panels needs at least %version.', array('%version' => PANELS_REQUIRED_CTOOLS_API))
        );
     }
+  }
+  return $requirements;
+}
+
+/**
+ * Check runtime requirements (status report).
+ */
+function panels_requirements_runtime() {
+  $requirements = array();
+  $legacy = panels_get_legacy_state();
+  $t = get_t();
+  $state = $legacy->getStatus();
+  if (empty($state)) {
+    $requirements['panels_legacy'] = array(
+      'title' => $t('Panels operating normally'),
+      'severity' => REQUIREMENT_OK,
+      'description' => $t('Panels is operating normally - no out-of-date plugins or modules are forcing it into legacy mode'),
+    );
+  }
+  else {
+    $description = $t("Panels is operating in Legacy mode due to the following issues:\n");
+
+    $requirements['panels_legacy'] = array(
+      'title' => $t('Panels operating in Legacy mode'),
+      'severity' => REQUIREMENT_WARNING,
+      'description' => $description,
+    );
   }
   return $requirements;
 }
@@ -1288,4 +1323,12 @@ function panels_update_6306() {
   }
 
   return $ret;
+}
+
+/**
+ * See if Panels needs to operate in legacy rendering mode, and produce a
+ * warning if it does.
+ */
+function panels_update_6307() {
+
 }
