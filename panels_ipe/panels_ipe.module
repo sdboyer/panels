@@ -474,5 +474,5 @@ function panels_ipe_ajax_edit_pane_config_finish(&$form_state) {
   $renderer = new $class();
   $renderer->build($cache->display, $pane->pid);
 
-  $form_state['commands'][] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid > .panels-ipe-proper-pane", $renderer->render());
+  $form_state['commands'][] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid > .panels-ipe-portlet-content", $renderer->render());
 }
