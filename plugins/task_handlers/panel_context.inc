@@ -272,7 +272,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
     'no_blocks' => !empty($handler->conf['no_blocks']),
   );
 
-  $info['title'] = panels_display_get_title($display);
+  $info['title'] = $display->get_title();
 
   return $info;
 }

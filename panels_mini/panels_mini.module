@@ -77,7 +77,7 @@ function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
     $block = array();
 
     $block['content'] = panels_render_display($panel_mini->display);
-    $block['subject'] = panels_display_get_title($panel_mini->display);
+    $block['subject'] = $panel_mini->display->get_title();
     // If NULL, fall back to this title:
     if (!isset($block['subject'])) {
       $block['subject'] = $panel_mini->title;
