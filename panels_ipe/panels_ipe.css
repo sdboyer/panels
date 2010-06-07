@@ -57,14 +57,13 @@ div.panels-ipe-newblock a {
   border: 1px solid #CCC;
 }
 
-.panels-ipe-editing .panels-ipe-proper-pane {
+.panels-ipe-editing .panels-ipe-portlet-content {
   margin-bottom: 10px;
   border: transparent dotted 1px;
-  
   overflow: hidden;
 }
 
-.panels-ipe-editing .panels-ipe-proper-pane:hover {
+.panels-ipe-editing .panels-ipe-portlet-content:hover {
   border: #FF000A dotted 1px;
 }
 

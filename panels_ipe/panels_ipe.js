@@ -22,12 +22,6 @@
           return false;
         });
     },
-    addPaneMarker: function(context) {
-      // Add a class so that the pane content proper can be more easily identified
-      // FIXME this currently can't use context, since the parent/child logic seems to get borked. makes it inefficient - fix!
-      $('.panels-ipe-pane > div:not(.panels-ipe-handlebar-wrapper,.panels-ipe-processed)')
-        .addClass('panels-ipe-proper-pane panels-ipe-processed');
-    },
     initEditing: function(context) {
       $(document.body).addClass('panels-ipe');
       var draggable_options = {
@@ -45,7 +39,6 @@
   }
 
   Drupal.behaviors.PanelsIPE = function(context) {
-    Drupal.PanelsIPE.addPaneMarker(context);
     Drupal.PanelsIPE.bindClickDelete(context);
   };
 
@@ -86,7 +79,7 @@
         opacity: 0.75, // opacity of sortable while sorting
         // placeholder: 'draggable-placeholder',
         // forcePlaceholderSize: true,
-        items: 'div.panels-ipe-pane',
+        items: 'div.panels-ipe-portlet-wrapper',
         handle: 'div.panels-ipe-draghandle',
         // containment: ipe.topParent,
       };
@@ -162,7 +155,7 @@
       $('div.panels-ipe-region', ipe.topParent).each(function() {
         var val = '';
         var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
-        $(this).children('div.panels-ipe-pane').each(function() {
+        $(this).children('div.panels-ipe-portlet-wrapper').each(function() {
           if (val) {
             val += ',';
           }

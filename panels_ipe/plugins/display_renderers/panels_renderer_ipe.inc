@@ -50,8 +50,11 @@ class panels_renderer_ipe extends panels_renderer_standard {
     if (empty($output)) {
       return;
     }
+    // Add an inner layer wrapper to the pane content before placing it into
+    // draggable portlet
+    $output = "<div class='panels-ipe-portlet-content'>$output</div>";
     $output = theme('panels_ipe_pane_wrapper', $output, $pane, $this->display);
-    return "<div id='panels-ipe-paneid-{$pane->pid}' class='panels-ipe-pane'>" . $output . "</div>";
+    return "<div id='panels-ipe-paneid-{$pane->pid}' class='panels-ipe-portlet-wrapper'>" . $output . "</div>";
   }
 
   function render_region($region_name, $panes) {
