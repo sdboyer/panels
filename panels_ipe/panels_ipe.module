@@ -210,6 +210,7 @@ function panels_ipe_edit_control_form(&$form_state) {
     '#type' => 'submit',
     '#value' => t('Cancel'),
   );
+  return $form;
 }
 
 /**
