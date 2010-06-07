@@ -1015,7 +1015,47 @@ function panels_ctools_plugin_styles() {
   return array(
     'load themes' => TRUE,
     'use hooks' => TRUE,
+    'process' => 'panels_plugin_styles_process',
   );
+}
+
+/**
+ * Implementation of hook_ctools_plugin_api().
+ *
+ * Inform CTools about version information for various plugins implemented by
+ * Panels.
+ *
+ * @param string $owner
+ *   The system name of the module owning the API about which information is
+ *   being requested.
+ * @param string $api
+ *   The name of the API about which information is being requested.
+ */
+function panels_ctools_plugin_api($owner, $api) {
+  if ($owner == 'panels' && $api = 'styles') {
+    // As of 6.x-3.6, Panels has a slightly new system for style plugins.
+    return array('version' => 2.0);
+  }
+}
+
+/**
+ * Perform additional processing on a style plugin.
+ *
+ * Currently this is only being used to apply versioning information to style
+ * plugins in order to ensure the legacy renderer passes the right type of
+ * parameters to a style plugin in a hybrid environment of both new and old
+ * plugins.
+ *
+ * @see _ctools_process_data()
+ *
+ * @param array $plugin
+ *   The style plugin that is being processed.
+ * @param array $info
+ *   The style plugin type info array.
+ */
+function panels_plugin_styles_process(&$plugin, $info) {
+  $compliant_modules = ctools_plugin_api_info('panels', 'styles', 2.0, 2.0);
+  $plugin['version'] = empty($compliant_modules[$plugin['module']]) ? 1.0 : $compliant_modules[$plugin['module']]['version'];
 }
 
 /**

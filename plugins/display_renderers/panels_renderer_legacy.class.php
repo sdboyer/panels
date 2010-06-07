@@ -176,6 +176,18 @@ class panels_renderer_legacy {
       $content->css_class = $pane->css['css_class'];
     }
 
+    // Check the style attached to the region in which this pane appears
+    // to see if it needs legacy pane data or not.
+    foreach ($this->display->panels as $panel_name => $pids) {
+      if (in_array($pane->pid, $pids)) {
+        $containing_region = $panel_name;
+      }
+    }
+    list($style, ) = panels_get_panel_style_and_settings($this->display->panel_settings, $containing_region);
+    if (version_compare($style['version'], 2.0, '>=')) {
+      $content = panels_render_pane($content, $pane, $this->display);
+    }
+
     return $content;
   }
 
