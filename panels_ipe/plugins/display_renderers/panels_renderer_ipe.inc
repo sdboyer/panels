@@ -3,6 +3,6 @@
 $plugin = array(
   'handler' => array(
     'class' => 'panels_renderer_ipe',
-    'parent' => 'panels_renderer_standard',
+    'parent' => 'panels_renderer_default',
   ),
 );

@@ -15,7 +15,7 @@
  *    unrendered datastructures.
  *
  * If your site relies on any of these plugin behaviors, you will need to use
- * this renderer instead of the new panels_renderer_standard() until those
+ * this renderer instead of the new panels_renderer_default() until those
  * plugins are updated.
  */
 class panels_renderer_legacy {

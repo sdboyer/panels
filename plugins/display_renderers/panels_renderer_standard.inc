@@ -2,6 +2,6 @@
 
 $plugin = array(
   'handler' => array(
-    'class' => 'panels_renderer_standard',
+    'class' => 'panels_renderer_default',
   ),
 );

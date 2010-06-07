@@ -5,7 +5,7 @@
  * Base renderer class for all In-Place Editor (IPE) behavior.
  *
  */
-class panels_renderer_ipe extends panels_renderer_standard {
+class panels_renderer_ipe extends panels_renderer_default {
   function render() {
     $output = parent::render();
     return "<div id='panels-ipe-display-{$this->display->cache_key}' class='panels-ipe-display-container'>$output</div>";

@@ -473,7 +473,7 @@ class panels_display {
   var $css_id = NULL;
   var $context = array();
   var $did = 'new';
-  var $renderer = 'panels_renderer_standard';
+  var $renderer = 'panels_renderer_default';
 
   function add_pane($pane, $location = FALSE) {
     $pane->pid = $this->next_new_pid();

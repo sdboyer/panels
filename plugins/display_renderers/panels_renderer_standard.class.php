@@ -10,7 +10,7 @@
  *
  * @code
  *   // given that $display is a fully loaded Panels display object
- *   $renderer = new panels_renderer_standard();
+ *   $renderer = new panels_renderer_default();
  *   $renderer->build($display);
  *   $html_output = $renderer->render();
  * @endcode
@@ -49,7 +49,7 @@
  * with some exceptions (@see panels_renderer_legacy for details). The approach
  * here differs primarily in its friendliness to tweaking via inheritance.
  */
-class panels_renderer_standard {
+class panels_renderer_default {
   /**
    *
    * @var panels_display
@@ -89,7 +89,7 @@ class panels_renderer_standard {
    * Boolean state variable, indicating whether or not the prepare() method has
    * been run.
    *
-   * This state is checked in panels_renderer_standard::render_layouts() to
+   * This state is checked in panels_renderer_default::render_layouts() to
    * determine whether the prepare method should be automatically triggered.
    * @var bool
    */
