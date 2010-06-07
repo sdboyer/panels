@@ -145,6 +145,8 @@ class panels_renderer_standard {
       $this->display->context = array();
     }
 
+    // TODO this should be moved up to fully cache styled output, rather than
+    // just rendered output; no reason to reevaluaate all that every time
     $content = FALSE;
     $caching = !empty($pane->cache['method']) ? TRUE : FALSE;
     if ($caching && ($cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context, $pane))) {
