@@ -11,7 +11,7 @@ class panels_renderer_single_pane extends panels_renderer_default {
   /**
    * Modified build method (vs. panels_renderer_default::build()); takes just
    * the display, no layout is necessary.
-   * @param $display
+   * @param panels_display $display
    */
   function build(&$display) {
     $this->display = &$display;
