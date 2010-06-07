@@ -1,6 +1,6 @@
 Panels 6.x-dev
 ==============
-
+Experimentally introduced the In-Place Editor (IPE).
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
