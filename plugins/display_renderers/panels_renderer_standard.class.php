@@ -1,10 +1,59 @@
 <?php
 
 /**
- * Standard render pipeline for a panels display.
+ * The default render pipeline for a Panels display object.
  *
+ * Given a fully-loaded panels_display object, this class will turn its
+ * combination of layout, panes, and styles into HTML, invoking caching
+ * appropriately along the way. Interacting with the renderer externally is
+ * very simple - just pass it the display object and call the render() method:
+ *
+ * @code
+ *   // given that $display is a fully loaded Panels display object
+ *   $renderer = new panels_renderer_standard();
+ *   $renderer->build($display);
+ *   $html_output = $renderer->render();
+ * @endcode
+ *
+ * Internally, the render pipeline is divided into two phases, prepare and
+ * render:
+ *   - The prepare phase transforms the skeletal data on the provided
+ *     display object into a structure that is expected by the render phase.
+ *     It is divided into a series of discrete sub-methods and operates
+ *     primarily by passing parameters, all with the intention of making
+ *     subclassing easier.
+ *   - The render phase relies primarily on data stored in the renderer object's
+ *     properties, presumably set in the prepare phase. It iterates through the
+ *     rendering of each pane, pane styling, placement in panel regions, region
+ *     styling, and finally the arrangement of rendered regions in the layout.
+ *     Caching, if in use, is triggered per pane, or on the entire display.
+ *
+ * In short: prepare builds conf, render renders conf. Subclasses should respect
+ * this separation of responsibilities by adhering to these loose guidelines,
+ * given a loaded display object:
+ *   - If your renderer needs to modify the datastructure representing what is
+ *     to be rendered (panes and their conf, styles, caching, etc.), it should
+ *     use the prepare phase.
+ *   - If your renderer needs to modify the manner in which that renderable
+ *     datastructure data is rendered, it should use the render phase.
+ *
+ * In the vast majority of use cases, this default renderer will be sufficient
+ * and need not be switched out/subclassed; style plugins and/or layout plugins
+ * accomplish everything needed. If you think you might need a custom
+ * renderer, consider the following criteria/examples:
+ *   - Some additional markup needs to be added to EVERY SINGLE panel.
+ *   - Given a full display object, just render one pane.
+ *   - Show a Panels admin interface.
+ *
+ * The system is almost functionally identical to the old procedural approach,
+ * with some exceptions (@see panels_renderer_legacy for details). The approach
+ * here differs primarily in its friendliness to tweaking via inheritance.
  */
 class panels_renderer_standard {
+  /**
+   *
+   * @var panels_display
+   */
   var $display;
   var $plugins = array();
 
@@ -60,8 +109,16 @@ class panels_renderer_standard {
    * This is the outermost prepare method. It calls several sub-methods as part
    * of the overall preparation process. This compartmentalization is intended
    * to ease the task of modifying renderer behavior in child classes.
+   *
+   * If you override this method, it is important that you either call this
+   * method via parent::prepare(), or manually set $this->prep_run = TRUE.
+   *
+   * @param mixed $external_settings
+   *  An optional parameter allowing external code to pass in additional
+   *  settings for use in the preparation process. Not used in the default
+   *  renderer, but included for interface consistency.
    */
-  function prepare() {
+  function prepare($external_settings = NULL) {
     $this->prepare_panes($this->display->content);
     $this->prepare_regions($this->display->panels, $this->display->panel_settings);
     $this->prepared['empty regions'] = array_diff(array_keys($this->plugins['layout']['panels']), array_keys($this->prepared['regions']));
