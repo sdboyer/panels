@@ -136,6 +136,7 @@ $plugin = array(
 
   'required forms' => array(
     'choose' => t('Choose layout'),
+    'settings' => t('Panel settings'),
     'content' => t('Panel content'),
   ),
 
