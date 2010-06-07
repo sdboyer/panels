@@ -132,22 +132,22 @@ class panels_renderer_standard {
     $regions = array();
     if (empty($settings)) {
       // No display/panel region settings exist, init all with the defaults.
-      foreach ($region_list as $region_name => $panes) {
-        $regions[$region_name] = $default;
-        $regions[$region_name]['pids'] = $panes;
+      foreach ($region_list as $region_id => $panes) {
+        $regions[$region_id] = $default;
+        $regions[$region_id]['pids'] = $panes;
       }
     }
     else {
       // Some settings exist; iterate through each region and set individually
-      foreach ($region_list as $region_name => $panes) {
-        if (empty($settings[$region_name]['style']) || $settings[$region_name]['style'] == -1) {
-          $regions[$region_name] = $default;
+      foreach ($region_list as $region_id => $panes) {
+        if (empty($settings[$region_id]['style']) || $settings[$region_id]['style'] == -1) {
+          $regions[$region_id] = $default;
         }
         else {
-          $regions[$region_name]['style'] = panels_get_style($settings[$region_name]['style']);
-          $regions[$region_name]['style settings'] = isset($settings['style_settings'][$region_name]) ? $settings['style_settings'][$region_name] : array();
+          $regions[$region_id]['style'] = panels_get_style($settings[$region_id]['style']);
+          $regions[$region_id]['style settings'] = isset($settings['style_settings'][$region_id]) ? $settings['style_settings'][$region_id] : array();
         }
-        $regions[$region_name]['pids'] = $panes;
+        $regions[$region_id]['pids'] = $panes;
       }
     }
     $this->prepared['regions'] = $regions;
@@ -318,15 +318,15 @@ class panels_renderer_standard {
     // Initialize the regions array with keys for each region and NULL values
     // for each; this prevents warnings on empty regions later
     $this->rendered['regions'] = array();
-    foreach ($this->plugins['layout']['panels'] as $region_name) {
-      $this->rendered['regions'][$region_name] = NULL;
+    foreach (array_keys($this->plugins['layout']['panels']) as $region_id) {
+      $this->rendered['regions'][$region_id] = NULL;
     }
 
     // Loop through all panel regions, put all panes that belong to the current
     // region in an array, then render the region. Primarily this ensures that
     // the panes are arranged in the proper order.
     $content = array();
-    foreach ($this->prepared['regions'] as $region_name => $conf) {
+    foreach ($this->prepared['regions'] as $region_id => $conf) {
       $region_panes = array();
       foreach ($conf['pids'] as $pid) {
         // Only include panes for region rendering if they had some output.
@@ -334,7 +334,7 @@ class panels_renderer_standard {
           $region_panes[$pid] = $this->rendered['panes'][$pid];
         }
       }
-      $this->rendered['regions'][$region_name] = $this->render_region($region_name, $region_panes);
+      $this->rendered['regions'][$region_id] = $this->render_region($region_id, $region_panes);
     }
 
     return $this->rendered['regions'];
@@ -346,7 +346,7 @@ class panels_renderer_standard {
    * Primarily just a passthrough to the panel region rendering callback
    * specified by the style plugin that is attached to the current panel region.
    *
-   * @param $region_name
+   * @param $region_id
    *   The ID of the panel region being rendered
    * @param $panes
    *   An array of panes that are assigned to the panel that's being rendered.
@@ -354,9 +354,9 @@ class panels_renderer_standard {
    * @return string
    *   The rendered, HTML string output of the passed-in panel region.
    */
-  function render_region($region_name, $panes) {
-    $style = $this->prepared['regions'][$region_name]['style'];
-    $style_settings = $this->prepared['regions'][$region_name]['style settings'];
+  function render_region($region_id, $panes) {
+    $style = $this->prepared['regions'][$region_id]['style'];
+    $style_settings = $this->prepared['regions'][$region_id]['style settings'];
 
     // Retrieve the pid (can be a panel page id, a mini panel id, etc.), this
     // might be used (or even necessary) for some panel display styles.
@@ -367,6 +367,6 @@ class panels_renderer_standard {
       $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $region_name);
+    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $region_id);
   }
 }
