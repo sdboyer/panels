@@ -473,7 +473,7 @@ class panels_display {
   var $css_id = NULL;
   var $context = array();
   var $did = 'new';
-  var $renderer = 'panels_renderer_ipe';
+  var $renderer = 'panels_renderer_standard';
 
   function add_pane($pane, $location = FALSE) {
     $pane->pid = $this->next_new_pid();
@@ -893,7 +893,7 @@ function panels_render_display(&$display) {
       return drupal_render_form($form_context->form_id, $form_context->form);
     }
   }
-  return $display->render();
+  return $display->render($renderer);
 }
 
 
