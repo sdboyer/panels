@@ -561,7 +561,8 @@ class panels_display {
     }
 
     if (!is_object($renderer)) {
-      $renderer_class = ctools_plugin_load_class('panels', 'display_renderers', $this->renderer, 'handler');
+      $renderer = is_string($renderer) ? $renderer : $this->renderer;
+      $renderer_class = ctools_plugin_load_class('panels', 'display_renderers', $renderer, 'handler');
       $renderer = new $renderer_class();
     }
     $renderer->build($this, $layout);
