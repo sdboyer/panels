@@ -33,7 +33,7 @@
 
       // Add a class so that the direct parent container of the panes can be
       // more easily identified
-      // $('div.panels-ipe-pane').parent().addClass('panels-ipe-region-innermost'); WHWHHAHSH
+      // $('div.panels-ipe-pane').parent().addClass('panels-ipe-region-innermost');
 
       /**
        * See http://jqueryui.com/demos/sortable/ for details on the configuration
