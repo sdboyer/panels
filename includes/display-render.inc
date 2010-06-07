@@ -8,39 +8,6 @@
  */
 
 /**
- * Render a display by loading the content into an appropriate
- * array and then passing through to panels_render_layout.
- *
- * if $incoming_content is NULL, default content will be applied. Use
- * an empty string to indicate no content.
- * @render
- * @ingroup hook_invocations
- */
-function _panels_render_display(&$display) {
-  $layout = panels_get_layout($display->layout);
-  if (!$layout) {
-    return NULL;
-  }
-
-  $output = '';
-
-  // Let modules act just prior to render.
-  foreach (module_implements('panels_pre_render') as $module) {
-    $function = $module . '_panels_pre_render';
-    $output .= $function($display);
-  }
-
-  $output .= panels_render_layout($layout, $display, $display->css_id, $display->layout_settings);
-
-  // Let modules act just after render.
-  foreach (module_implements('panels_post_render') as $module) {
-    $function = $module . '_panels_post_render';
-    $output .= $function($display);
-  }
-  return $output;
-}
-
-/**
  * Given a full layout structure and a content array, render a panel display.
  * @render
  */
