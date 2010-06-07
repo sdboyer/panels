@@ -2,6 +2,11 @@
 
 class panels_renderer_ipe extends panels_renderer_standard {
   function render() {
+    $output = parent::render();
+    return "<div id='panels-ipe-display-{$this->display->cache_key}' class='panels-ipe-display-container'>$output</div>";
+  }
+
+  function add_meta() {
     $this->display->cache_key = $this->display->did;
     panels_ipe_get_cache_key($this->display->cache_key);
     panels_load_include('display-edit');
@@ -24,8 +29,7 @@ class panels_renderer_ipe extends panels_renderer_standard {
     drupal_add_js(array('PanelsIPECacheKeys' => array($this->display->cache_key)), 'setting');
     drupal_add_js(array('PanelsIPESettings' => array($this->display->cache_key => $settings)), 'setting');
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
-    $output = parent::render();
-    return "<div id='panels-ipe-display-{$this->display->cache_key}' class='panels-ipe-display-container'>$output</div>";
+    parent::add_meta();
   }
 
   /**

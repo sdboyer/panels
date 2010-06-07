@@ -7,10 +7,115 @@
 class panels_renderer_standard {
   var $display;
   var $plugins = array();
+  /**
+   * An associative array of panes, keyed on their pane ids and sorted in the
+   * order in which they are to be rendered.
+   *
+   * This array is generated internally by the prepare() methods.
+   *
+   * @var array
+   */
+  var $panes = array();
+  /**
+   * An multilevel array of rendered data. The first level of the array
+   * indicates the type of rendered data, typically with up to three keys:
+   * 'layout', 'regions', and 'panes'. The relevant rendered data is stored as
+   * the value for each of these keys as it is generated:
+   *  - 'panes' are an associative array of rendered output, keyed on pane id.
+   *  - 'regions' are an associative array of rendered output, keyed on region
+   *    name.
+   *  - 'layout' is simply the whole of the rendered output.
+   *
+   * @var array
+   */
+  var $rendered = array();
+  var $prepared = array();
+  /**
+   * Boolean state variable, indicating whether or not the prepare() method has
+   * been run.
+   *
+   * This state is checked in panels_renderer_standard::render_layouts() to
+   * determine whether the prepare method should be automatically triggered.
+   * @var bool
+   */
+  var $prep_run = FALSE;
 
   function build(&$display, $layout) {
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
+  }
+
+  /**
+   * Prepare the attached display for rendering.
+   *
+   * This is the outermost prepare method. It calls several sub-methods as part
+   * of the overall preparation process. This compartmentalization is intended
+   * to ease the task of modifying renderer behavior in child classes.
+   */
+  function prepare() {
+    $this->prepare_panes($this->display->content);
+    $this->prepare_regions($this->display->panels);
+    $this->prep_run = TRUE;
+  }
+
+  /**
+   * Prepare the list of panes to be rendered, accounting for visibility/access
+   * settings and rendering order.
+   *
+   * This method represents the standard approach for determining the list of
+   * panes to be rendered that is compatible with all parts of the Panels
+   * architecture. It first applies visibility & access checks, then sorts panes
+   * into their proper rendering order, and returns the result as an array.
+   *
+   * Inheriting classes should override this method if that renderer needs to
+   * regularly make additions to the set of panes that will be rendered.
+   *
+   * @param array $panes
+   *  An associative array of panes, keyed on pane id.
+   * @return array
+   *  An associative array of panes to be rendered, keyed on pane id and sorted
+   *  into proper rendering order.
+   */
+  function prepare_panes($panes) {
+    ctools_include('content');
+    $normal = array();
+    $last = array();
+
+    // Prepare the list of panes to be rendered
+    foreach ($panes as $pid => $pane) {
+      // TODO remove in 7.x and ensure the upgrade path weeds out any stragglers; it's been long enough
+      $pane->shown = !empty($pane->shown); // guarantee this field exists.
+      // If this pane is not visible to the user, skip out and do the next one
+      if (!$pane->shown || !panels_pane_access($pane, $this->display)) {
+        continue;
+      }
+
+      $ct_plugin_def = ctools_get_content_type($pane->type);
+
+      // If this pane wants to render last, add it to the $last array. We allow
+      // this because some panes need to be rendered after other panes,
+      // primarily so they can do things like the leftovers of forms.
+      if (!empty($ct_plugin_def['render last'])) {
+        $last[$pid] = $pane;
+        continue;
+      }
+      // Otherwise, render it in the normal order.
+      else {
+        $normal[$pid] = $pane;
+      }
+    }
+    $this->prepared['panes'] = $normal + $last;
+    return $this->prepared['panes'];
+  }
+
+  function prepare_regions($regions) {
+    $this->prepared['regions'] = $this->display->panels;
+    // Initialize the regions array with keys for each region and NULL values
+    // for each; this prevents warnings on empty regions later
+    $this->rendered['regions'] = array();
+    foreach (array_keys(panels_get_panels($this->plugins['layout'], $this->display)) as $region_name) {
+      $this->rendered['regions'][$panel_name] = NULL;
+    }
   }
 
   /**
@@ -25,8 +130,39 @@ class panels_renderer_standard {
    *  Themed & rendered HTML output.
    */
   function render() {
-    // TODO can probably make this early-add CSS business go away by making
-    // mini panels use a slightly different plugin
+    $this->add_meta();
+    if (empty($this->display->cache['method'])) {
+      return $this->render_layout();
+    }
+    else {
+      $cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context);
+      if ($cache === FALSE) {
+        $cache = new panels_cache_object();
+        $cache->set_content($this->render_layout());
+        panels_set_cached_content($cache, $this->display, $this->display->args, $this->display->context);
+      }
+      return $cache->content;
+    }
+  }
+
+  function render_layout() {
+    if (empty($this->prep_run)) {
+      $this->prepare();
+    }
+    $this->render_panes();
+    $this->render_regions();
+    $this->rendered['layout'] = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $this->rendered['regions'], $this->display->layout_settings, $this->display);
+    dsm($this);
+    return $this->rendered['layout'];
+  }
+
+  /**
+   * Attach page metadata (e.g., CSS and JS).
+   *
+   * This must be done before render, because panels-within-panels must have
+   * their CSS added in the right order; inner content before outer content.
+   */
+  function add_meta() {
     if (!empty($this->plugins['layout']['css'])) {
       if (file_exists(path_to_theme() . '/' . $this->plugins['layout']['css'])) {
         drupal_add_css(path_to_theme() . '/' . $this->plugins['layout']['css']);
@@ -35,99 +171,23 @@ class panels_renderer_standard {
         drupal_add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['css']);
       }
     }
-    // This now comes after the CSS is added, because panels-within-panels must
-    // have their CSS added in the right order; inner content before outer content.
-
-    if (empty($this->display->cache['method'])) {
-      $content = $this->render_regions();
-    }
-    else {
-      // TODO This whole approach can & probably should be refactored now. Maybe
-      // invert it, and have the caching agent act from the outside?
-      $cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context);
-      if ($cache === FALSE) {
-        $cache = new panels_cache_object();
-        $cache->set_content($this->render_regions());
-        panels_set_cached_content($cache, $this->display, $this->display->args, $this->display->context);
-      }
-      $content = $cache->content;
-    }
-
-    $output = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $content, $this->display->layout_settings, $this->display);
-
-    return $output;
   }
 
-  /**
-   * Render all panes in the attached display into their panel regions, then
-   * render those regions.
-   *
-   * @return array $content
-   *    An array of rendered panel regions, keyed on the region name.
-   */
-  function render_regions() {
+  function render_panes() {
     ctools_include('content');
 
-    // First, render all the panes into little boxes. We do this here because
-    // some panes request to be rendered after other panes (primarily so they
-    // can do the leftovers of forms).
-    $panes = array();
-    $later = array();
-
-    foreach ($this->display->content as $pid => $pane) {
-      // TODO remove in 7.x and ensure the upgrade path weeds out any stragglers; it's been long enough
-      $pane->shown = !empty($pane->shown); // guarantee this field exists.
-      // If the user can't see this pane, do not render it.
-      if (!$pane->shown || !panels_pane_access($pane, $this->display)) {
-        continue;
-      }
-
-      // If this pane wants to render last, add it to the $later array.
-      $content_type = ctools_get_content_type($pane->type);
-
-      if (!empty($content_type['render last'])) {
-        $later[$pid] = $pane;
-        continue;
-      }
-
-      $panes[$pid] = $this->render_pane($pane);
+    // First, render all the panes into little boxes.
+    $this->rendered['panes'] = array();
+    foreach ($this->prepared['panes'] as $pid => $pane) {
+      $this->rendered['panes'][$pid] = $this->render_pane($pane);
     }
-
-    foreach ($later as $pid => $pane) {
-      $panes[$pid] = $this->render_pane($pane);
-    }
-
-    // Loop through all panels, put all panes that belong to the current panel
-    // in an array, then render the panel. Primarily this ensures that the
-    // panes are in the proper order.
-    $content = array();
-    foreach ($this->display->panels as $panel_name => $pids) {
-      $panel_panes = array();
-      foreach ($pids as $pid) {
-        if (!empty($panes[$pid])) {
-          $panel_panes[$pid] = $panes[$pid];
-        }
-      }
-      $content[$panel_name] = $this->render_region($panel_name, $panel_panes);
-    }
-
-    // Prevent notices by making sure that all panels at least have an entry:
-    // TODO refactor to make this unnecessary (optimization)
-    $panels = panels_get_panels($this->plugins['layout'], $this->display);
-    foreach ($panels as $id => $panel) {
-      if (!isset($content[$id])) {
-        $content[$id] = NULL;
-      }
-    }
-
-    return $content;
   }
 
   /**
    * Render a pane using the appropriate style.
    *
    * @param object $pane
-   *   The $pane information from the display
+   *  The $pane information from the display
    */
   function render_pane($pane) {
     $content = $this->render_pane_content($pane);
@@ -170,17 +230,16 @@ class panels_renderer_standard {
    * object. It also manages pane-specific caching.
    *
    * @param stdClass $pane
-   *    A Panels pane object, as loaded from the database.
+   *  A Panels pane object, as loaded from the database.
    */
   function render_pane_content($pane) { // TODO remove this method by collapsing it into $this->render_panes()
     ctools_include('context');
     // TODO finally safe to remove this check?
     if (!is_array($this->display->context)) {
+      watchdog('panels', 'renderer:render_pane_content() hit with a non-array for the context', $this->display, WATCHDOG_DEBUG);
       $this->display->context = array();
     }
 
-    // TODO this should be moved up to fully cache styled output, rather than
-    // just rendered output; no reason to reevaluaate all that every time
     $content = FALSE;
     $caching = !empty($pane->cache['method']) ? TRUE : FALSE;
     if ($caching && ($cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context, $pane))) {
@@ -211,6 +270,31 @@ class panels_renderer_standard {
     }
 
     return $content;
+  }
+
+  /**
+   * Render all panes in the attached display into their panel regions, then
+   * render those regions.
+   *
+   * @return array
+   *   An array of rendered panel regions, keyed on the region name.
+   */
+  function render_regions() {
+    // Loop through all panel regions, put all panes that belong to the current
+    // region in an array, then render the region. Primarily this ensures that
+    // the panes are in the proper order.
+    $content = array();
+    foreach ($this->prepared['regions'] as $region_name => $pids) {
+      $region_panes = array();
+      foreach ($pids as $pid) {
+        if (!empty($this->rendered['panes'][$pid])) {
+          $region_panes[$pid] = $this->rendered['panes'][$pid];
+        }
+      }
+      $this->rendered['regions'][$region_name] = $this->render_region($region_name, $region_panes);
+    }
+
+    return $this->rendered['regions'];
   }
 
   /**
