@@ -136,12 +136,12 @@ function panels_ipe_ajax_render_pane($pid, $cache) {
   ctools_ajax_render($output);
 }
 
-function panels_ipe_get_displays($display = NULL) {
-  static $cached;
-  if (isset($display)) {
-    $cached[] = $display->cache_key;
+function panels_ipe_get_cache_key($key = NULL) {
+  static $cache;
+  if (isset($key)) {
+    $cache = $key;
   }
-  return $cached;
+  return $cache;
 }
 
 /**
@@ -217,21 +217,16 @@ function panels_ipe_edit_control_form(&$form_state) {
  * @param unknown_type $main
  */
 function panels_ipe_footer($main = 0) {
-  $keys = panels_ipe_get_displays();
-  if (!isset($keys)) {
+  $key = panels_ipe_get_cache_key();
+  if (!isset($key)) {
     return;
   }
+  // TODO should be moved into the IPE plugin - WAAAY too hardcoded right now
   $output = "<div id='panels-ipe-control-container' class='clear-block'>";
-
-  // Add any/all editor-init items
-  $items = array();
-  foreach ($keys as $cache_key) {
-    $items[$cache_key] = "<div id='panels-ipe-startedit-$cache_key' class='panels-ipe-startedit panels-ipe-pseudobutton'>";
-    $items[$cache_key] .= "<span class='panels-ipe-pseudobutton'>" . t('Customize this page') . "</span></div>";
-    // $items[$cache_key] = l(t('Customize this page'), '#', array('attributes' => array('id' => 'panels-ipe-startedit-' . $cache_key, 'class' => 'panels-ipe-button-startedit')));
-  }
-   $output .= implode('', $items);
-   $output .= "</div>";
+  $output .= "<div id='panels-ipe-control-$key' class='panels-ipe-control'>";
+  $output .= "<div class='panels-ipe-startedit panels-ipe-pseudobutton'>";
+  $output .= "<span>" . t('Customize this page') . "</span>";
+  $output .= "</div></div></div>";
   return $output;
 }
 
