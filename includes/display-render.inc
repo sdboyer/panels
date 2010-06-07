@@ -33,69 +33,6 @@ function panels_render_layout_admin($layout, $content, $display) {
 }
 
 /**
- * Render all the panes in a display into a $content array to be used by
- * the display theme function.
- */
-function panels_render_panes(&$display) {
-  ctools_include('content');
-
-  $keywords = array();
-
-  // First, render all the panes into little boxes. We do this here because
-  // some panes request to be rendered after other panes (primarily so they
-  // can do the leftovers of forms).
-  $panes = array();
-  $later = array();
-
-  foreach ((array) $display->content as $pid => $pane) {
-    $pane->shown = !empty($pane->shown); // guarantee this field exists.
-    // If the user can't see this pane, do not render it.
-    if (!$pane->shown || !panels_pane_access($pane, $display)) {
-      continue;
-    }
-
-    // If this pane wants to render last, add it to the $later array.
-    $content_type = ctools_get_content_type($pane->type);
-
-    if (!empty($content_type['render last'])) {
-      $later[$pid] = $pane;
-      continue;
-    }
-
-    $panes[$pid] = panels_render_pane_content($display, $pane, $keywords);
-  }
-
-  foreach ($later as $pid => $pane) {
-    $panes[$pid] = panels_render_pane_content($display, $pane, $keywords);
-  }
-
-  // Loop through all panels, put all panes that belong to the current panel
-  // in an array, then render the panel. Primarily this ensures that the
-  // panes are in the proper order.
-  $content = array();
-  foreach ($display->panels as $panel_name => $pids) {
-    $panel = array();
-    foreach ($pids as $pid) {
-      if (!empty($panes[$pid])) {
-        $panel[$pid] = $panes[$pid];
-      }
-    }
-    $content[$panel_name] = panels_render_panel($display, $panel_name, $panel);
-  }
-
-  // Prevent notices by making sure that all panels at least have an entry:
-  $layout = panels_get_layout($display->layout);
-  $panels = panels_get_panels($layout, $display);
-  foreach ($panels as $id => $panel) {
-    if (!isset($content[$id])) {
-      $content[$id] = NULL;
-    }
-  }
-
-  return $content;
-}
-
-/**
  * Render a single pane, identifying its context, and put it into
  * the $panes array.
  */

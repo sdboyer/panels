@@ -59,8 +59,11 @@ class panels_renderer_standard {
   }
 
   /**
+   * Render all panes in the attached display into their panel regions, then
+   * render those regions.
    *
-   * @return unknown_type
+   * @return array $content
+   *    An array of rendered panel regions, keyed on the region name.
    */
   function render_regions() {
     ctools_include('content');
