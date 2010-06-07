@@ -880,7 +880,7 @@ function panels_export_display($display, $prefix = '') {
  * an empty string to indicate no content.
  * @ingroup hook_invocations
  */
-function panels_render_display(&$display) {
+function panels_render_display(&$display, $renderer = NULL) {
   ctools_include('display-render', 'panels');
   ctools_include('plugins', 'panels');
   ctools_include('context');
