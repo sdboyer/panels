@@ -120,7 +120,7 @@ class panels_renderer_standard {
     // for each; this prevents warnings on empty regions later
     $this->rendered['regions'] = array();
     foreach (array_keys(panels_get_panels($this->plugins['layout'], $this->display)) as $region_name) {
-      $this->rendered['regions'][$panel_name] = NULL;
+      $this->rendered['regions'][$region_name] = NULL;
     }
   }
 
@@ -317,6 +317,7 @@ class panels_renderer_standard {
    *   The rendered HTML for the passed-in panel region.
    */
   function render_region($region_name, $panes) {
+    // TODO move this settings assembly up into the prep part of the process
     list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $region_name);
 
     // Retrieve the pid (can be a panel page id, a mini panel id, etc.), this
