@@ -82,6 +82,7 @@ div.panels-ipe-pseudobutton {
   -moz-box-shadow: #333 0px 1px 0px;
   -webkit-border-radius:5px;
   -webkit-box-shadow: #333 0px 1px 0px;
+  padding: 0.3em 0.8em;
 }
 
 div#panels-ipe-control-container span.panels-ipe-pseudobutton {

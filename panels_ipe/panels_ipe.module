@@ -26,6 +26,10 @@ function panels_ipe_menu() {
     'page callback' => 'panels_ipe_ajax_configure_pane',
   ) + $base;
   $items['panels_ipe/ajax/save/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ipe_ajax_save_display',
+  ) + $base;
+  $items['panels_ipe/ajax/edit/%panels_edit_cache'] = array(
+    'page callback' => 'panels_ipe_ajax_edit',
   ) + $base;
 
   return $items;
@@ -140,8 +144,72 @@ function panels_ipe_get_displays($display = NULL) {
   return $cached;
 }
 
-function panels_ipe_control_form(&$form_state) {
+/**
+ * AJAX entry point to create the controller form for an IPE.
+ *
+ * TODO this can be moved into the IPE plugin probably
+ */
+function panels_ipe_ajax_edit($cache) {
+  $display = $cache->display;
+  ctools_include('form');
 
+  $form_state = array(
+    'display' => &$display,
+    'content_types' => $cache->content_types,
+    're_render' => FALSE,
+    'no_redirect' => TRUE,
+  );
+
+  $output = ctools_build_form('panels_ipe_edit_control_form', $form_state);
+  // no output == submit
+  if (!$output) {
+    if (!empty($form_state['clicked_button']['#save-display'])) {
+      panels_save_display($display);
+    }
+    panels_cache_clear('display', $display->did);
+    return $form_state['display'];
+  }
+
+  return drupal_json($output);
+}
+
+function panels_ipe_edit_control_form(&$form_state) {
+  $display = &$form_state['display'];
+  $display->cache_key = isset($display->cache_key) ? $display->cache_key : $display->did;
+
+  // Annoyingly, theme doesn't have access to form_state so we have to do this.
+  $form['#display'] = $display;
+
+  $layout = panels_get_layout($display->layout);
+  $layout_panels = panels_get_panels($layout, $display);
+
+  $form['panel'] = array('#tree' => TRUE);
+  $form['panel']['pane'] = array('#tree' => TRUE);
+
+  foreach ($layout_panels as $panel_id => $title) {
+    // Make sure we at least have an empty array for all possible locations.
+    if (!isset($display->panels[$panel_id])) {
+      $display->panels[$panel_id] = array();
+    }
+
+    $form['panel']['pane'][$panel_id] = array(
+      // Use 'hidden' instead of 'value' so the js can access it.
+      '#type' => 'hidden',
+      '#default_value' => implode(',', (array) $display->panels[$panel_id]),
+    );
+  }
+
+  $form['buttons']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#id' => 'panels-ipe-save',
+    '#submit' => array('panels_edit_display_form_submit'),
+    '#save-display' => TRUE,
+  );
+  $form['buttons']['cancel'] = array(
+    '#type' => 'submit',
+    '#value' => t('Cancel'),
+  );
 }
 
 /**
@@ -150,6 +218,9 @@ function panels_ipe_control_form(&$form_state) {
  */
 function panels_ipe_footer($main = 0) {
   $keys = panels_ipe_get_displays();
+  if (!isset($keys)) {
+    return;
+  }
   $output = "<div id='panels-ipe-control-container' class='clear-block'>";
 
   // Add any/all editor-init items

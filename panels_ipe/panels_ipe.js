@@ -68,8 +68,24 @@
     $('div.panels-ipe-startedit:not(panels-ipe-startedit-processed)', context)
       .addClass('panels-ipe-startedit-processed')
       .click(function() {
-        var cache_key = $(this).attr('id').split('panels-ipe-startedit-')[1];
-        $(this).data(cache_key, new DrupalPanelsIPE(cache_key));
+        var $this = $(this);
+        var cache_key = $this.attr('id').split('panels-ipe-startedit-')[1];
+        // TODO _really_ need to reuse ctools ajax code here
+        var url = '/panels_ipe/ajax/edit/' + cache_key;
+        $.ajax({
+          type: "POST",
+          url: url,
+          // data: {'ctools_changed': $(this).val(), 'js': 1, 'ctools_ajax': 1 },
+          global: true,
+          success: function(data) {
+            $this.replaceWith(data);
+            $this.data(cache_key, new DrupalPanelsIPE(cache_key));            
+          },
+          error: function(xhr) {
+            Drupal.CTools.AJAX.handleErrors(xhr, url);
+          },
+          dataType: 'json'
+        });
     });
   }
 
@@ -77,7 +93,7 @@
    * Base object (class) definition for the Panels In-Place Editor.
    *
    *  A new instance of this object is instanciated whenever an IPE is
-   *  initiated.
+   *  initiated, and destroyed when editing is concluded (successfully or not).
    *
    * @param {string} cache_key
    */
