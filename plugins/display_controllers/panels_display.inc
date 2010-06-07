@@ -217,21 +217,4 @@ class panels_renderer_standard {
 
     return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $panel);
   }
-
-  function get_title() {
-    switch ($this->display->hide_title) {
-      case PANELS_TITLE_NONE:
-        return '';
-
-      case PANELS_TITLE_PANE:
-        return isset($this->display->stored_pane_title) ? $this->display->stored_pane_title : '';
-
-      case PANELS_TITLE_FIXED:
-      case FALSE; // For old exported panels that are not in the database.
-        if (!empty($this->display->title)) {
-          return filter_xss_admin(ctools_context_keyword_substitute($this->display->title, array(), $this->display->context));
-        }
-        return NULL;
-    }
-  }
 }
