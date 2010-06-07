@@ -51,10 +51,22 @@
  */
 class panels_renderer_default {
   /**
+   * The Panels display object that is to be rendered.
    *
    * @var panels_display
    */
   var $display;
+
+  /**
+   * An associative array of loaded plugins. Used primarily as a central
+   * location for storing plugins that require additional loading beyond
+   * reading the plugin definition, which is already statically cached by
+   * ctools_get_plugins(). An example is layout plugins, which can optionally
+   * have a callback that determines the set of panel regions available at
+   * runtime.
+   *
+   * @var array
+   */
   var $plugins = array();
 
   /**
