@@ -117,3 +117,119 @@ function panels_ipe_ajax_render_pane($pid, &$display) {
 function panels_ipe_footer($main = 0) {
 
 }
+
+/**
+ * COPIED STRAIGHT OUT OF DISPLAY-EDIT.INC.
+ *
+ * This duplication will go away...once I figure out how to refactor out the
+ * hard-codedness of much of display-edit.inc.
+ */
+/**
+ * AJAX entry point for to configure a pane that has just been added.
+ */
+function panels_ajax_add_pane_config($cache, $panel_id = NULL, $type_name = NULL, $subtype_name = NULL, $step = NULL) {
+  ctools_include('content');
+  $cache_key = $cache->display->cache_key;
+  $content_type = ctools_get_content_type($type_name);
+  $subtype = ctools_content_get_subtype($content_type, $subtype_name);
+
+  if (!isset($step) || !isset($cache->new_pane)) {
+    $pane = panels_new_pane($type_name, $subtype_name);
+    $pane->configuration = ctools_content_get_defaults($content_type, $subtype);
+    $pane->panel = $panel_id;
+    $cache->new_pane = &$pane;
+  }
+  else {
+    $pane = $cache->new_pane;
+  }
+
+  $form_state = array(
+    'display' => &$cache->display,
+    'contexts' => $cache->display->context,
+    'pane' => &$pane,
+    'cache_key' => $cache_key,
+    'cache' => &$cache,
+    'ajax' => TRUE,
+    'modal' => TRUE,
+    'commands' => array(),
+  );
+
+  $form_info = array(
+    'path' => "panels/ajax/add-pane-config/$cache_key/$panel_id/$type_name/$subtype_name/%step",
+    'next callback' => 'panels_ajax_edit_pane_config_next',
+    'finish callback' => 'panels_ajax_add_pane_config_finish',
+  );
+
+  $rc = ctools_content_form('add', $form_info, $form_state, $content_type, $pane->subtype, $subtype, $pane->configuration, $step);
+  if ($rc === FALSE) {
+    panels_ajax_add_pane_config_finish($form_state);
+    $form_state['commands'][] = ctools_modal_command_dismiss();
+    ctools_ajax_render($form_state['commands']);
+  }
+}
+
+/**
+ * AJAX entry point for to configure a pane that has just been added.
+ */
+function panels_ajax_configure_pane($cache, $pid = NULL, $step = NULL) {
+  ctools_include('content');
+  $cache_key = $cache->display->cache_key;
+  if (empty($cache->display->content[$pid])) {
+    ctools_modal_render(t('Error'), t('Invalid pane id.'));
+  }
+
+  $pane = &$cache->display->content[$pid];
+
+  $content_type = ctools_get_content_type($pane->type);
+  $subtype = ctools_content_get_subtype($content_type, $pane->subtype);
+
+  $form_state = array(
+    'display' => &$cache->display,
+    'contexts' => $cache->display->context,
+    'pane' => &$pane,
+    'cache' => &$cache,
+    'ajax' => TRUE,
+    'modal' => TRUE,
+    'commands' => array(),
+  );
+
+  $form_info = array(
+    'path' => "panels/ajax/configure/$cache_key/$pid/%step",
+    'next callback' => 'panels_ajax_edit_pane_config_next',
+    'finish callback' => 'panels_ajax_edit_pane_config_finish',
+  );
+
+  ctools_content_form('edit', $form_info, $form_state, $content_type, $pane->subtype,  $subtype, $pane->configuration, $step);
+}
+
+function panels_ajax_edit_pane_config_next(&$form_state) {
+  $form_state['cache']->new_pane = $form_state['pane'];
+  panels_edit_cache_set($form_state['cache']);
+}
+
+function panels_ajax_add_pane_config_finish(&$form_state) {
+  $cache = &$form_state['cache'];
+  $pane = $cache->new_pane;
+  unset($cache->new_pane);
+
+  // Get a real pid for this pane.
+  $pane->pid = "new-" . $cache->display->next_new_pid();
+  // Put the pane into the display where it belongs
+
+  $cache->display->content[$pane->pid] = $pane;
+  $cache->display->panels[$pane->panel][] = $pane->pid;
+
+  panels_edit_cache_set($cache);
+
+  $form_state['commands'][] = ctools_ajax_command_append("#panel-pane-$pane->panel", panels_show_pane($cache->display, $pane, TRUE));
+  $form_state['commands'][] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+}
+
+function panels_ajax_edit_pane_config_finish(&$form_state) {
+  $cache = &$form_state['cache'];
+  $pane = &$form_state['pane'];
+  panels_edit_cache_set($cache);
+
+  $form_state['commands'][] = ctools_ajax_command_replace("#panel-pane-$pane->pid", panels_show_pane($cache->display, $pane, TRUE));
+  $form_state['commands'][] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+}
