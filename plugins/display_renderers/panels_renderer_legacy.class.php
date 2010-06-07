@@ -22,7 +22,8 @@ class panels_renderer_legacy {
   var $display;
   var $plugins = array();
 
-  function build(&$display, $layout) {
+  function build(&$display) {
+    $layout = panels_get_layout($display->layout);
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
   }
@@ -132,26 +133,6 @@ class panels_renderer_legacy {
   }
 
   /**
-   * Render a pane using the appropriate style.
-   *
-   * @param object $pane
-   *   The $pane information from the display
-   */
-  function render_pane($pane) {
-    $content = $this->render_pane_content($pane);
-
-    // Pass long the css_id that is usually available.
-    if (!empty($pane->css['css_id'])) {
-      $content->css_id = $pane->css['css_id'];
-    }
-
-    // Pass long the css_class that is usually available.
-    if (!empty($pane->css['css_class'])) {
-      $content->css_class = $pane->css['css_class'];
-    }
-  }
-
-  /**
    * Render the contents of a single pane.
    *
    * This method retrieves pane content and produces a ready-to-render content
@@ -160,7 +141,7 @@ class panels_renderer_legacy {
    * @param stdClass $pane
    *    A Panels pane object, as loaded from the database.
    */
-  function render_pane_content($pane) {
+  function render_pane($pane) {
     ctools_include('context');
     if (!is_array($this->display->context)) {
       $this->display->context = array();
