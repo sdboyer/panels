@@ -7,7 +7,7 @@ function panels_ipe_menu() {
   $items = array();
 
   $base = array(
-    'access arguments' => array('access content'), // TODO this clearly needs changing
+    'access arguments' => array('administer page manager'), // TODO this clearly needs changing
     'type' => MENU_CALLBACK,
     'page arguments' => array(3),
   );
