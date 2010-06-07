@@ -8,7 +8,7 @@ class panels_renderer_standard {
   var $display;
   var $plugins = array();
 
-  function panels_renderer_standard(&$display, $layout) {
+  function build(&$display, $layout) {
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
   }
