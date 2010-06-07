@@ -712,7 +712,7 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
       '#title' => t('Use In-Place Editor'),
       '#description' => t('Use the new Panels In-Place Editor on this panel for users with global panel-editing permissions (Warning: EXPERIMENTAL!!)'),
     );
-    if (variable_get('panels_legacy_rendering_mode', FALSE)) {
+    if (variable_get('panels_legacy_rendering_mode', TRUE)) {
       $form['conf']['use_ipe']['#disabled'] = TRUE;
       $form['conf']['use_ipe']['#description'] = t('The IPE cannot be used while Panels is operating in legacy rendering mode. See !link for more information.', array('!link' => l('the status report', 'admin/reports/status')));
     }
