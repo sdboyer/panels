@@ -26,8 +26,8 @@ $plugin = array(
 function theme_panels_stylizer_stylizer_style_render_region($display, $panel_id, $panes, $style_settings) {
   $output = '';
 
-  foreach ($panes as $pane_id => $content) {
-    $output .= panels_render_pane($content, $display->content[$pane_id], $display);
+  foreach ($panes as $pane_id => $pane_output) {
+    $output .= $pane_output;
   }
 
   if ($style_settings['style'] == '$') {

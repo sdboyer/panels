@@ -135,6 +135,23 @@ function panels_stylizer_perm() {
 }
 
 /**
+ * Implementation of hook_ctools_plugin_api().
+ *
+ * Inform CTools that panels_stylizer's style plugins are up-to-date.
+ *
+ * @param string $owner
+ *   The system name of the module owning the API about which information is
+ *   being requested.
+ * @param string $api
+ *   The name of the API about which information is being requested.
+ */
+function panels_stylizer_ctools_plugin_api($owner, $api) {
+  if ($owner == 'panels' && $api = 'styles') {
+    return array('version' => 2.0);
+  }
+}
+
+/**
  * Implementation of hook_theme()
  */
 function panels_stylizer_theme() {
