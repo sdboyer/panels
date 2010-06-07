@@ -156,7 +156,7 @@ function panels_ipe_ajax_edit($cache) {
   $form_state = array(
     'display' => &$display,
     'content_types' => $cache->content_types,
-    're_render' => FALSE,
+    'rerender' => FALSE,
     'no_redirect' => TRUE,
   );
 
@@ -166,11 +166,12 @@ function panels_ipe_ajax_edit($cache) {
     if (!empty($form_state['clicked_button']['#save-display'])) {
       panels_save_display($display);
     }
-    panels_cache_clear('display', $display->did);
-    return $form_state['display'];
+    // panels_cache_clear('display', $display->did);
+    drupal_json(1);
   }
 
-  return drupal_json($output);
+  drupal_json($output);
+  exit;
 }
 
 function panels_ipe_edit_control_form(&$form_state) {

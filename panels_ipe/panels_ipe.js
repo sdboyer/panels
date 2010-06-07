@@ -77,16 +77,6 @@
     Drupal.behaviors['PanelsIPE' + cache_key] = this.behaviorsPassthrough;
 
     this.initEditing = function(formdata) {
-      // Perform visual effects in a particular sequence; nonvisual logic async.
-      ipe.control.fadeOut('normal', function() {
-        ipe.initButton.hide();
-        ipe.control.append(formdata);
-        ipe.control.fadeIn('normal', function() {
-          // Show all the hidden IPE elements
-          $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock', ipe.outermost).fadeIn('slow');
-        })
-      });
-      
       // See http://jqueryui.com/demos/sortable/ for details on the configuration
       // parameters used here.
       var sortable_options = { // TODO allow the IPE plugin to control these
@@ -97,7 +87,7 @@
         // forcePlaceholderSize: true,
         items: 'div.panels-ipe-pane',
         handle: 'div.panels-ipe-draghandle',
-        containment: ipe.outermost,
+        // containment: ipe.outermost,
       };
       $('div.panels-ipe-region', ipe.outermost).sortable(sortable_options);
       // Since the connectWith option only does a one-way hookup, iterate over
@@ -106,14 +96,15 @@
         $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
       });
       
-      // bind ajax submit to the form buttons
-      $('form', ipe.control).submit(function() {
+      $('.panels-ipe-form-container', ipe.control).append(formdata);
+      // bind ajax submit to the form
+      $('form', ipe.control).submit(function(event) {
         url = $(this).attr('action');
-        var object = $(this);
         try {
           var ajaxOptions = {
             type: 'POST',
             url: url,
+            data: { 'js': 1 },
             global: true,
             success: ipe.formRespond,
             error: function(xhr) {
@@ -147,7 +138,7 @@
     }
     
     this.formRespond = function(data) {
-      var i = 'break on me';
+      ipe.endEditing();
     }
     
     this.showEditor = function() {
@@ -182,6 +173,7 @@
     var ajaxOptions = {
       type: "POST",
       url: ipe.cfg.formPath,
+      data: { 'js': 1 },
       global: true,
       success: ipe.initEditing,
       error: function(xhr) {
