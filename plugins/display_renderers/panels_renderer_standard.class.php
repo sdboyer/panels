@@ -7,29 +7,35 @@
 class panels_renderer_standard {
   var $display;
   var $plugins = array();
+
   /**
-   * An associative array of panes, keyed on their pane ids and sorted in the
-   * order in which they are to be rendered.
-   *
-   * This array is generated internally by the prepare() methods.
-   *
-   * @var array
-   */
-  var $panes = array();
-  /**
-   * An multilevel array of rendered data. The first level of the array
+   * A multilevel array of rendered data. The first level of the array
    * indicates the type of rendered data, typically with up to three keys:
    * 'layout', 'regions', and 'panes'. The relevant rendered data is stored as
    * the value for each of these keys as it is generated:
    *  - 'panes' are an associative array of rendered output, keyed on pane id.
    *  - 'regions' are an associative array of rendered output, keyed on region
    *    name.
-   *  - 'layout' is simply the whole of the rendered output.
+   *  - 'layout' is the whole of the rendered output.
    *
    * @var array
    */
   var $rendered = array();
+
+  /**
+   * A multilevel array of data prepared for rendering. The first level of the
+   * array indicates the type of prepared data. The standard renderer populates
+   * and uses two top-level keys, 'panes' and 'regions':
+   *  - 'panes' are an associative array of pane objects to be rendered, keyed
+   *    on pane id and sorted into proper rendering order.
+   *  - 'regions' are an associative array of regions, keyed on region name,
+   *    each of which is itself an indexed array of pane ids in the order in
+   *    which those panes appear in that region.
+   *
+   * @var array
+   */
   var $prepared = array();
+
   /**
    * Boolean state variable, indicating whether or not the prepare() method has
    * been run.
