@@ -75,7 +75,7 @@ class panels_renderer_standard {
       // TODO remove in 7.x and ensure the upgrade path weeds out any stragglers; it's been long enough
       $pane->shown = !empty($pane->shown); // guarantee this field exists.
       // If the user can't see this pane, do not render it.
-      if (!$pane->shown || !panels_pane_access($pane, $display)) {
+      if (!$pane->shown || !panels_pane_access($pane, $this->display)) {
         continue;
       }
 
@@ -100,13 +100,13 @@ class panels_renderer_standard {
     // panes are in the proper order.
     $content = array();
     foreach ($this->display->panels as $panel_name => $pids) {
-      $panel = array();
+      $panel_panes = array();
       foreach ($pids as $pid) {
         if (!empty($panes[$pid])) {
-          $panel[$pid] = $panes[$pid];
+          $panel_panes[$pid] = $panes[$pid];
         }
       }
-      $content[$panel_name] = $this->render_region($panel_name, $panes);
+      $content[$panel_name] = $this->render_region($panel_name, $panel_panes);
     }
 
     // Prevent notices by making sure that all panels at least have an entry:
@@ -182,6 +182,6 @@ class panels_renderer_standard {
       $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $panel);
+    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $panes);
   }
 }

@@ -534,16 +534,17 @@ class panels_display {
   }
 
   function render() {
-    $layout = panels_get_layout($display->layout);
+    $layout = panels_get_layout($this->layout);
     if (!$layout) {
       return NULL;
     }
 
     $output = '';
 
-    $renderer_class = ctools_plugin_load_class('panels', 'display_renderer', $this->renderer, $this->renderer);
+    ctools_get_plugins('panels', 'display_renderers', $this->renderer);
+    // $renderer_class = ctools_plugin_load_class('panels', 'display_renderers', $this->renderer, $this->renderer);
 
-    $renderer = new $renderer_class($this, $layout);
+    $renderer = new $this->renderer($this, $layout);
 
     // Let modules act just prior to render.
     foreach (module_implements('panels_pre_render') as $module) {
