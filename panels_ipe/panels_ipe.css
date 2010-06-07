@@ -57,6 +57,11 @@ div.panels-ipe-newblock div a {
 .ui-sortable-placeholder { margin: 1em; border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 .ui-sortable-placeholder * { visibility: hidden; }
 
+/* counteract panels_dnd.css - temporary */
+div.panels-ipe-display .panel-pane .pane-title {
+  padding: 0;
+}
+
 /** ============================================================================
  * Controller form markup
  */
