@@ -132,12 +132,14 @@
         ipe.initButton.hide();
         ipe.control.fadeIn('normal', function() {
           // Show all the hidden IPE elements
-          $('.panels-ipe-on').fadeIn('slow');
+          $('.panels-ipe-on').show('slow');
         })
       });
+      ipe.outermost.addClass('panels-ipe-editing');
     }
     
     this.formRespond = function(data) {
+      $('.panels-ipe-form-container', ipe.control).empty();
       ipe.endEditing();
     }
     
@@ -148,6 +150,7 @@
     this.endEditing = function() {
       // Re-hide all the IPE meta-elements
       $('div.panels-ipe-on').hide('normal');
+      ipe.outermost.removeClass('panels-ipe-editing');
       // Re-show all the IPE non-editing meta-elements
       $('div.panels-ipe-off').show('normal');
     };

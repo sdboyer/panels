@@ -1,11 +1,9 @@
 div.panels-ipe-handlebar-wrapper {
-  border-bottom: 1px solid #AAA;
-  border-right: 1px solid #AAA;
   margin-top: 1em;
+  border-bottom: #999 solid 1px;
 }
 
 div.panels-ipe-handlebar-wrapper ul {
-  border-left: 1px solid #AAA;
   float: left;
   margin: 0;
   padding: 0;
@@ -15,25 +13,25 @@ div.panels-ipe-handlebar-wrapper ul {
 div.panels-ipe-handlebar-wrapper li,
 div.panels-ipe-draghandle {
   background: none repeat scroll 0 0 transparent;
-  border-right: 1px solid #AAA;
   list-style: none outside none;
   margin: 0;
   padding: 0;
   float: left;
 }
 
+div.panels-ipe-handlebar-wrapper li {
+  border-top: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+}
+
+div.panels-ipe-handlebar-wrapper li.first {
+  border-left: 1px solid #CCC;
+}
+
 div.panels-ipe-draghandle {
   float: right;
   border-right: none;
   border-left: 1px solid #AAA;
-}
-
-div.panels-ipe-newblock div {
-  text-align: center;
-  border: 1px solid #AAA;
-  display: block;
-  margin-top: 2em;
-  margin-bottom: 1em;
 }
 
 /* Hide editor-state-on elements initially */
@@ -48,10 +46,47 @@ div.panels-ipe-newblock div {
 
 div.panels-ipe-handlebar-wrapper li a,
 div.panels-ipe-draghandle span,
-div.panels-ipe-newblock div a {
+div.panels-ipe-newblock a {
   background-color: #f6f6f6;
   display: block;
   padding: 0.2em 0.5em;
+}
+
+div.panels-ipe-newblock a {
+  display: inline;
+  border: 1px solid #CCC;
+}
+
+.panels-ipe-editing .panels-ipe-proper-pane {
+  margin-bottom: 10px;
+  border: transparent dotted 1px;
+  
+  overflow: hidden;
+}
+
+.panels-ipe-editing .panels-ipe-proper-pane:hover {
+  border: #FF000A dotted 1px;
+}
+
+.panels-ipe-editing .panels-ipe-region {
+  border: transparent dotted 1px;
+  float: left;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+div.panels-ipe-draghandle {
+  border: none;
+}
+
+div.panels-ipe-draghandle span {
+  border: none;
+  background: #989896 url(images/dragger.png);
+  text-indent: -9999px;
+  width: 26px;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0.25em;
 }
 
 .ui-sortable-placeholder { margin: 1em; border: 1px dotted black; visibility: visible !important; height: 50px !important; }
@@ -97,8 +132,6 @@ div.panels-ipe-pseudobutton {
 }
 
 div.panels-ipe-control .form-submit {
+  float: left;
   margin: 0.3em 0.5em;
-}
-
-div#panels-ipe-control-container span.panels-ipe-pseudobutton {
 }

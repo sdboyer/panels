@@ -122,7 +122,7 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
 function theme_panels_ipe_region_wrapper($output, $region_name, $display) {
   $attr = array('class' => 'ctools-use-modal');
   $link = l(t('add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_name", array('attributes' => $attr));
-  $button = '<div class="panels-ipe-newblock panels-ipe-on"><div>' . $link . '</div></div>';
+  $button = '<div class="panels-ipe-newblock panels-ipe-on">' . $link . '</div>';
   return $output . $button;
 }
 
@@ -229,7 +229,7 @@ function panels_ipe_footer($main = 0) {
   $output .= "<div class='panels-ipe-startedit panels-ipe-pseudobutton panels-ipe-off'>";
   $output .= "<span>" . t('Customize this page') . "</span>";
   $output .= "</div>";
-  $output .= "<div class='panels-ipe-form-container panels-ipe-on'</div>";
+  $output .= "<div class='panels-ipe-form-container panels-ipe-on clear-block'</div>";
   $output .= "</div></div>";
   return $output;
 }
