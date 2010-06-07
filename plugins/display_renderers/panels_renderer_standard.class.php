@@ -125,7 +125,7 @@ class panels_renderer_standard {
     // Initialize defaults to be used for regions without their own explicit
     // settings. Use display settings if they exist, else hardcoded defaults
     $default = array(
-      'style' => empty($settings['style']) ? $settings['style'] : panels_get_style('default'),
+      'style' => !empty($settings['style']) ? $settings['style'] : panels_get_style('default'),
       'style settings' => isset($settings['style_settings']['default']) ? $settings['style_settings']['default'] : array(),
     );
 
