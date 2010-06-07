@@ -1,4 +1,8 @@
-div.panels-ipe-handlebar-wrapper { border-bottom: 1px solid #AAA;}
+div.panels-ipe-handlebar-wrapper {
+  border-bottom: 1px solid #AAA;
+  border-right: 1px solid #AAA;
+  margin-top: 1em;
+}
 
 div.panels-ipe-handlebar-wrapper ul {
   border-left: 1px solid #AAA;
@@ -8,7 +12,8 @@ div.panels-ipe-handlebar-wrapper ul {
   text-align: right;
 }
 
-div.panels-ipe-handlebar-wrapper li {
+div.panels-ipe-handlebar-wrapper li,
+div.panels-ipe-draghandle {
   background: none repeat scroll 0 0 transparent;
   border-right: 1px solid #AAA;
   list-style: none outside none;
@@ -17,7 +22,14 @@ div.panels-ipe-handlebar-wrapper li {
   float: left;
 }
 
-div.panels-ipe-handlebar-wrapper li a {
+div.panels-ipe-draghandle {
+  float: right;
+  border-right: none;
+  border-left: 1px solid #AAA;
+}
+
+div.panels-ipe-handlebar-wrapper li a,
+div.panels-ipe-draghandle span {
   background-color: #f6f6f6;
   display: block;
   padding: 0.2em 0.5em;

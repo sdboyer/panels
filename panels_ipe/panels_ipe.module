@@ -62,6 +62,7 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
   );
 
   $links = theme('links', $links, $attr);
+  $links .= '<div class=panels-ipe-draghandle><span>DRAGGER</span></div>';
   $handlebar = '<div class="panels-ipe-handlebar-wrapper clear-block">' . $links . '</div>';
   return $handlebar . $output;
 }
