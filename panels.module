@@ -473,7 +473,7 @@ class panels_display {
   var $css_id = NULL;
   var $context = array();
   var $did = 'new';
-  var $renderer = 'panels_renderer_standard';
+  var $renderer = 'panels_renderer_ipe';
 
   function add_pane($pane, $location = FALSE) {
     $pane->pid = $this->next_new_pid();
@@ -550,9 +550,9 @@ class panels_display {
    * display renderer object is spawned and runs its rendering logic.
    *
    * @param mixed $renderer
-   *    An instanciated display renderer object, the name of a display renderer
-   *    plugin to be fetched. Defaults to NULL. When NULL, the predesignated
-   *    display renderer will be used.
+   *    An instanciated display renderer object, or the name of a display
+   *    renderer plugin+class to be fetched. Defaults to NULL. When NULL, the
+   *    predesignated display renderer will be used.
    */
   function render($renderer = NULL) {
     $layout = panels_get_layout($this->layout);
@@ -561,9 +561,8 @@ class panels_display {
     }
 
     if (!is_object($renderer)) {
-      $renderer_class = empty($renderer) ? $this->renderer : $renderer;
-      ctools_get_plugins('panels', 'display_renderers', $renderer_class);
-      $renderer = new $this->renderer();
+      $renderer_class = ctools_plugin_load_class('panels', 'display_renderers', $this->renderer, 'handler');
+      $renderer = new $renderer_class();
     }
     $renderer->build($this, $layout);
 
@@ -1019,14 +1018,7 @@ function panels_ctools_plugin_styles() {
   );
 }
 
-function panels_ctools_plugin_display_renderers() {
-  return array(
-    'load themes' => TRUE,
-    'cache' => TRUE,
-  );
-}
-
-function panels_plugin_display_renderers() {
+function panels_panels_display_renderers() {
   // TODO will it automagically figure out the path?
   $path = drupal_get_path('module', 'panels') . '/plugins/display_renderers';
   $common = array(
@@ -1036,8 +1028,9 @@ function panels_plugin_display_renderers() {
 
   $plugins = array();
   $plugins['panels_renderer_standard'] = array(
-    'class' => array(
+    'handler' => array(
       'path' => $path,
+      'file' => 'panels_renderer_standard.inc',
       'class' => 'panels_renderer_standard',
     ),
   );
