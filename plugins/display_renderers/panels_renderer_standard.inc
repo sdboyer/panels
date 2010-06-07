@@ -185,9 +185,21 @@ class panels_renderer_standard {
 
   /**
    * Render a single panel region.
+   *
+   * Primarily just a passthrough to the panel region rendering callback
+   * specified by the style plugin that is attached to the current panel region.
+   *
+   * @param $region_name
+   *   The ID of the panel region being rendered
+   * @param $panes
+   *   An array of panes that are assigned to the panel that's being rendered.
+   *
+   * @return
+   *   The rendered HTML for the passed-in panel region.
+   * @render
    */
-  function render_region($panel_name, $panes) {
-    list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $panel_name);
+  function render_region($region_name, $panes) {
+    list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $region_name);
 
     // Retrieve the pid (can be a panel page id, a mini panel id, etc.), this
     // might be used (or even necessary) for some panel display styles.
@@ -198,6 +210,6 @@ class panels_renderer_standard {
       $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $panes);
+    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $region_name);
   }
 }
