@@ -150,13 +150,18 @@ function panels_ipe_control_form(&$form_state) {
  */
 function panels_ipe_footer($main = 0) {
   $keys = panels_ipe_get_displays();
-  $links = array();
+  $output = "<div id='panels-ipe-control-container' class='clear-block'>";
 
+  // Add any/all editor-init items
+  $items = array();
   foreach ($keys as $cache_key) {
-    $link[$cache_key] = l(t('Customize this page'), '#', array('attributes' => array('id' => 'panels-ipe-startedit-' . $cache_key, 'class' => 'panels-ipe-button-startedit')));
+    $items[$cache_key] = "<div id='panels-ipe-startedit-$cache_key' class='panels-ipe-startedit panels-ipe-pseudobutton'>";
+    $items[$cache_key] .= "<span class='panels-ipe-pseudobutton'>" . t('Customize this page') . "</span></div>";
+    // $items[$cache_key] = l(t('Customize this page'), '#', array('attributes' => array('id' => 'panels-ipe-startedit-' . $cache_key, 'class' => 'panels-ipe-button-startedit')));
   }
-
-
+   $output .= implode('', $items);
+   $output .= "</div>";
+  return $output;
 }
 
 /**

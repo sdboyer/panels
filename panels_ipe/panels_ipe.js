@@ -2,6 +2,7 @@
 
 (function($) {
   Drupal.PanelsIPE = {
+    editors: {},
     bindClickDelete: function(context) {
       $('a.pane-delete:not(.pane-delete-processed)', context)
         .addClass('pane-delete-processed')
@@ -57,12 +58,35 @@
     }
   }
 
-  Drupal.behaviors.PanelsInPlaceEditor = function(context) {
+  Drupal.behaviors.PanelsIPE = function(context) {
     Drupal.PanelsIPE.bindClickDelete(context);
     // the below is very sloppy, 100% temporary
     if (!$(document.body).hasClass('panels-ipe')) {
       Drupal.PanelsIPE.initEditing(context);
     }
     Drupal.PanelsIPE.addPaneMarker(context);
+    $('div.panels-ipe-startedit:not(panels-ipe-startedit-processed)', context)
+      .addClass('panels-ipe-startedit-processed')
+      .click(function() {
+        var cache_key = $(this).attr('id').split('panels-ipe-startedit-')[1];
+        $(this).data(cache_key, new DrupalPanelsIPE(cache_key));
+    });
+  }
+
+  /**
+   * Base object (class) definition for the Panels In-Place Editor.
+   *
+   *  A new instance of this object is instanciated whenever an IPE is
+   *  initiated.
+   *
+   * @param {string} cache_key
+   */
+  function DrupalPanelsIPE(cache_key) {
+    this.key = cache_key;
+    this.state = {};
+
+    // Attach this IPE object into the global list
+    Drupal.PanelsIPE.editors[cache_key] = this;
+
   }
 })(jQuery);

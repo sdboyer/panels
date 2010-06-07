@@ -2,9 +2,9 @@
 
 class panels_renderer_ipe extends panels_renderer_standard {
   function render() {
+    $this->display->cache_key = $this->display->did;
     panels_ipe_get_displays($this->display);
     panels_load_include('display-edit');
-    $this->display->cache_key = $this->display->did;
     $cache = new stdClass();
     $cache->display = $this->display;
     ctools_include('content');
