@@ -14,6 +14,12 @@
           return false;
         });
     },
+    addPaneMarker: function(context) {
+      // Add a class so that the pane content proper can be more easily identified
+      // FIXME this currently can't use context, since the parent/child logic seems to get borked. makes it inefficient - fix!
+      $('.panels-ipe-pane > div:not(.panels-ipe-handlebar-wrapper,.panels-ipe-processed)')
+        .addClass('panels-ipe-proper-pane panels-ipe-processed');
+    },
     initEditing: function(context) {
       $(document.body).addClass('panels-ipe');
       var draggable_options = {
@@ -23,10 +29,6 @@
         appendTo: 'body',
         handle: 'panels-ipe-draghandle',
       };
-
-      // Add a class so that the pane content proper can be more easily identified
-      $('.panels-ipe-pane > div:not(.panels-ipe-handlebar-wrapper)')
-        .addClass('panels-ipe-proper-pane'); // @todo need this to be re-added on AJAX...
 
       // Add a class so that the direct parent container of the panes can be
       // more easily identified
@@ -61,5 +63,6 @@
     if (!$(document.body).hasClass('panels-ipe')) {
       Drupal.PanelsIPE.initEditing(context);
     }
+    Drupal.PanelsIPE.addPaneMarker(context);
   }
 })(jQuery);
