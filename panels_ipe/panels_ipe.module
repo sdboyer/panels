@@ -7,7 +7,7 @@ function panels_ipe_menu() {
   $items = array();
 
   $base = array(
-    'access arguments' => array('access content'),
+    'access arguments' => array('access content'), // TODO this clearly needs changing
     'type' => MENU_CALLBACK,
     'page arguments' => array(3),
   );
@@ -24,6 +24,8 @@ function panels_ipe_menu() {
   ) + $base;
   $items['panels_ipe/ajax/configure/%panels_edit_cache'] = array(
     'page callback' => 'panels_ipe_ajax_configure_pane',
+  ) + $base;
+  $items['panels_ipe/ajax/save/%panels_edit_cache'] = array(
   ) + $base;
 
   return $items;
@@ -48,6 +50,9 @@ function panels_ipe_theme() {
     ),
     'panels_ipe_region_wrapper' => array(
       'arguments' => array('output' => NULL, 'region_name' => NULL, 'display' => NULL),
+    ),
+    'panels_ipe_dnd_form_container' => array(
+      'arguments' => array('link' => NULL, 'cache_key' => NULL, 'display' => NULL),
     ),
   );
 }
@@ -127,11 +132,30 @@ function panels_ipe_ajax_render_pane($pid, $cache) {
   ctools_ajax_render($output);
 }
 
+function panels_ipe_get_displays($display = NULL) {
+  static $cached;
+  if (isset($display)) {
+    $cached[] = $display->cache_key;
+  }
+  return $cached;
+}
+
+function panels_ipe_control_form(&$form_state) {
+
+}
+
 /**
  * Experimenting with this as a means for outputting the display editor form.
  * @param unknown_type $main
  */
 function panels_ipe_footer($main = 0) {
+  $keys = panels_ipe_get_displays();
+  $links = array();
+
+  foreach ($keys as $cache_key) {
+    $link[$cache_key] = l(t('Customize this page'), '#', array('attributes' => array('id' => 'panels-ipe-startedit-' . $cache_key, 'class' => 'panels-ipe-button-startedit')));
+  }
+
 
 }
 
@@ -385,10 +409,10 @@ function panels_ipe_ajax_add_pane_config_finish(&$form_state) {
 
   panels_edit_cache_set($cache);
 
-  $display->render('panels_renderer_ipe');
   $class = ctools_plugin_load_class('panels', 'display_renderers', 'panels_renderer_ipe', 'handler');
+  $renderer = new $class();
+  $renderer->build($cache->display, array());
 
-  // $form_state['commands'][] = ctools_ajax_command_append("#panels-ipe-regionid-$pane->panel .'panels-ipe-region-innermost", $renderer->render_pane($pane));
   $form_state['commands'][] = ctools_ajax_command_append("#panels-ipe-regionid-$pane->panel", $renderer->render_pane($pane));
 }
 

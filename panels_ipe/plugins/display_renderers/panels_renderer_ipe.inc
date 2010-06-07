@@ -2,8 +2,8 @@
 
 class panels_renderer_ipe extends panels_renderer_standard {
   function render() {
+    panels_ipe_get_displays($this->display);
     panels_load_include('display-edit');
-    $info = page_manager_get_current_page();
     $this->display->cache_key = $this->display->did;
     $cache = new stdClass();
     $cache->display = $this->display;
@@ -20,6 +20,17 @@ class panels_renderer_ipe extends panels_renderer_standard {
     drupal_add_js(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.js');
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
     return parent::render();
+  }
+
+  function build_dnd_form() {
+    ctools_include('form');
+    $form_state = array(
+      'display' => &$this->display,
+      're_render' => FALSE,
+      'no_redirect' => TRUE,
+      'cache key' => $this->display->did,
+    );
+    $output = ctools_build_form('panels_ipe_control_form', $form_state);
   }
 
   /**
