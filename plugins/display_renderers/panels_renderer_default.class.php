@@ -95,7 +95,17 @@ class panels_renderer_default {
    */
   var $prep_run = FALSE;
 
-  function build(&$display, $layout) {
+  /**
+   * Receive and store the display object to be rendered.
+   *
+   * This is a psuedo-constructor that should typically be called immediately
+   * after object construction.
+   *
+   * @param panels_display $display
+   *   The panels display object to be rendered.
+   */
+  function build(&$display) {
+    $layout = panels_get_layout($display->layout);
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
     if (!isset($layout['panels'])) {
@@ -212,7 +222,7 @@ class panels_renderer_default {
   }
 
   /**
-   * Builds inner content, then hands off to layout-specified theme function for
+   * Build inner content, then hand off to layout-specified theme function for
    * final render step.
    *
    * This is the outermost method in the Panels render pipeline. It calls the
@@ -223,7 +233,9 @@ class panels_renderer_default {
    *  Themed & rendered HTML output.
    */
   function render() {
+    // Attach out-of-band data first.
     $this->add_meta();
+
     if (empty($this->display->cache['method'])) {
       return $this->render_layout();
     }
@@ -238,6 +250,15 @@ class panels_renderer_default {
     }
   }
 
+  /**
+   * Perform display/layout-level render operations.
+   *
+   * This method triggers all the inner pane/region rendering processes, passes
+   * that to the layout plugin's theme callback, and returns the rendered HTML.
+   *
+   * If display-level caching is enabled and that cache is warm, this method
+   * will not be called.
+   */
   function render_layout() {
     if (empty($this->prep_run)) {
       $this->prepare();
@@ -249,7 +270,7 @@ class panels_renderer_default {
   }
 
   /**
-   * Attach 'out-of-band' page metadata (e.g., CSS and JS).
+   * Attach out-of-band page metadata (e.g., CSS and JS).
    *
    * This must be done before render, because panels-within-panels must have
    * their CSS added in the right order: inner content before outer content.

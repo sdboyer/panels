@@ -564,8 +564,8 @@ class panels_display {
       $renderer = is_string($renderer) ? $renderer : $this->renderer;
       $renderer_class = ctools_plugin_load_class('panels', 'display_renderers', $renderer, 'handler');
       $renderer = new $renderer_class();
+      $renderer->build($this);
     }
-    $renderer->build($this, $layout);
 
     $output = '';
     // Let modules act just prior to render.
