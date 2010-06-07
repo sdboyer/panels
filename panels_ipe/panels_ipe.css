@@ -22,3 +22,6 @@ div.panels-ipe-handlebar-wrapper li a {
   display: block;
   padding: 0.2em 0.5em;
 }
+
+.ui-sortable-placeholder { margin: 1em; border: 1px dotted black; visibility: visible !important; height: 50px !important; }
+.ui-sortable-placeholder * { visibility: hidden; }
