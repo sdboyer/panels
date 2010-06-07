@@ -34,32 +34,10 @@
       // Add a class so that the direct parent container of the panes can be
       // more easily identified
       // $('div.panels-ipe-pane').parent().addClass('panels-ipe-region-innermost');
-
-      /**
-       * See http://jqueryui.com/demos/sortable/ for details on the configuration
-       * parameters used here.
-       */
-      var sortable_options = {
-        revert: true,
-        dropOnEmpty: true, // default
-        opacity: 0.75, // opacity of sortable while sorting
-        // placeholder: 'draggable-placeholder',
-        // forcePlaceholderSize: true,
-        items: 'div.panels-ipe-pane',
-        handle: 'div.panels-ipe-draghandle',
-      };
-
-      $('div.panels-ipe-region').sortable(sortable_options);
-      // Since the connectWith option only does a one-way hookup, iterate over
-      // all sortable regions to connect them with one another.
-      $('div.panels-ipe-region').each(function() {
-        $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
-      });
     }
   }
 
   Drupal.behaviors.PanelsIPE = function(context) {
-    Drupal.PanelsIPE.bindClickDelete(context);
     // the below is very sloppy, 100% temporary
     if (!$(document.body).hasClass('panels-ipe')) {
       Drupal.PanelsIPE.initEditing(context);
@@ -104,9 +82,50 @@
   function DrupalPanelsIPE(cache_key) {
     this.key = cache_key;
     this.state = {};
+    this.outermost = $('div#panels-ipe-display-'+cache_key);
 
-    // Attach this IPE object into the global list
+    /**
+     * Passthrough method to be attached to Drupal.behaviors
+     *
+     * @param {jQuery} context
+     */
+    this.behaviorsPassthrough = function(context) {
+      Drupal.PanelsIPE.bindClickDelete(context);
+    };
+
+    this.saveEditing = function() {
+
+    };
+
+    this.cancelEditing = function() {
+
+    };
+
+    Drupal.behaviors['PanelsIPE' + cache_key] = this.behaviorsPassthrough;
+
+    // Attach this IPE object into the global list TODO necessary?
     Drupal.PanelsIPE.editors[cache_key] = this;
 
+    /**
+     * See http://jqueryui.com/demos/sortable/ for details on the configuration
+     * parameters used here.
+     */
+    var sortable_options = { // TODO allow the IPE plugin to control these
+      revert: true,
+      dropOnEmpty: true, // default
+      opacity: 0.75, // opacity of sortable while sorting
+      // placeholder: 'draggable-placeholder',
+      // forcePlaceholderSize: true,
+      items: 'div.panels-ipe-pane',
+      handle: 'div.panels-ipe-draghandle',
+    };
+    $('div.panels-ipe-region').sortable(sortable_options);
+    // Since the connectWith option only does a one-way hookup, iterate over
+    // all sortable regions to connect them with one another.
+    $('div.panels-ipe-region').each(function() {
+      $(this).sortable('option', 'connectWith', ['div.panels-ipe-region'])
+    });
+    // Show all the hidden IPE elements
+    $('div.panels-ipe-handlebar-wrapper,.panels-ipe-newblock').show('slow');
   }
 })(jQuery);
