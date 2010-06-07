@@ -486,7 +486,7 @@ class panels_display {
   function panels_display() {
     // Set the default renderer to either the legacy or the standard renderer,
     // depending on the legacy rendering state
-    $this->renderer = variable_get('panels_legacy_rendering_mode', TRUE) ? 'panels_renderer_legacy' : 'panels_renderer_default';
+    $this->renderer = variable_get('panels_legacy_rendering_mode', TRUE) ? 'panels_renderer_legacy' : 'panels_renderer_standard';
   }
 
   function add_pane($pane, $location = FALSE) {

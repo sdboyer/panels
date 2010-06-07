@@ -1,6 +1,6 @@
 <?php
 
-class panels_renderer_single_pane extends panels_renderer_default {
+class panels_renderer_single_pane extends panels_renderer_standard {
   /**
    * The pane id of the pane that will be rendered by a call to the render()
    * method. Numeric int or string (typically if a new-# id has been used).
@@ -9,7 +9,7 @@ class panels_renderer_single_pane extends panels_renderer_default {
   var $render_pid;
 
   /**
-   * Modified build method (vs. panels_renderer_default::build()); takes just
+   * Modified build method (vs. panels_renderer_standard::build()); takes just
    * the display, no layout is necessary.
    * @param panels_display $display
    */

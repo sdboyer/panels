@@ -268,7 +268,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   // With an argument, this actually sets the display.
   panels_get_current_page_display($display);
 
-  $renderer = NULL; // NULL means the default renderer will be used
+  $renderer = NULL; // NULL means the default renderer, set in the panels_display constructor, will be used
 
   // TODO this is a temporary, hacky approach to ACLs for the IPE, and will be
   // modified in a later release

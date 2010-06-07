@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The default render pipeline for a Panels display object.
+ * The standard render pipeline for a Panels display object.
  *
  * Given a fully-loaded panels_display object, this class will turn its
  * combination of layout, panes, and styles into HTML, invoking caching
@@ -10,7 +10,7 @@
  *
  * @code
  *   // given that $display is a fully loaded Panels display object
- *   $renderer = new panels_renderer_default();
+ *   $renderer = new panels_renderer_standard();
  *   $renderer->build($display);
  *   $html_output = $renderer->render();
  * @endcode
@@ -37,7 +37,7 @@
  *   - If your renderer needs to modify the manner in which that renderable
  *     datastructure data is rendered, it should use the render phase.
  *
- * In the vast majority of use cases, this default renderer will be sufficient
+ * In the vast majority of use cases, this standard renderer will be sufficient
  * and need not be switched out/subclassed; style plugins and/or layout plugins
  * accomplish everything needed. If you think you might need a custom
  * renderer, consider the following criteria/examples:
@@ -49,7 +49,7 @@
  * with some exceptions (@see panels_renderer_legacy for details). The approach
  * here differs primarily in its friendliness to tweaking via inheritance.
  */
-class panels_renderer_default {
+class panels_renderer_standard {
   /**
    * The Panels display object that is to be rendered.
    *
@@ -101,7 +101,7 @@ class panels_renderer_default {
    * Boolean state variable, indicating whether or not the prepare() method has
    * been run.
    *
-   * This state is checked in panels_renderer_default::render_layout() to
+   * This state is checked in panels_renderer_standard::render_layout() to
    * determine whether the prepare method should be automatically triggered.
    * @var bool
    */
