@@ -1,13 +1,6 @@
 // $Id$
 
 (function($) {
-  // A ready function should be sufficient for this, at least for now
-  $(function() {
-    $.each(Drupal.settings.PanelsIPECacheKeys, function() {
-      Drupal.PanelsIPE.editors[this] = new DrupalPanelsIPE(this, Drupal.settings.PanelsIPESettings[this]);
-    });
-  });
-
   Drupal.PanelsIPE = {
     editors: {},
     bindClickDelete: function(context) {
@@ -22,21 +15,14 @@
           return false;
         });
     },
-    initEditing: function(context) {
-      $(document.body).addClass('panels-ipe');
-      var draggable_options = {
-        revert: 'invalid',
-        helper: 'clone', // required for "flawless" interoperation with sortables
-        connectToSortable: ($.ui.version === '1.6') ? ['div.panels-ipe-region'] : 'div.panels-ipe-region',
-        appendTo: 'body',
-        handle: 'panels-ipe-draghandle',
-      };
-
-      // Add a class so that the direct parent container of the panes can be
-      // more easily identified
-      // $('div.panels-ipe-pane').parent().addClass('panels-ipe-region-innermost');
-    }
   }
+
+  // A ready function should be sufficient for this, at least for now
+  $(function() {
+    $.each(Drupal.settings.PanelsIPECacheKeys, function() {
+      Drupal.PanelsIPE.editors[this] = new DrupalPanelsIPE(this, Drupal.settings.PanelsIPESettings[this]);
+    });
+  });
 
   Drupal.behaviors.PanelsIPE = function(context) {
     Drupal.PanelsIPE.bindClickDelete(context);
@@ -58,17 +44,6 @@
     this.control = $('div#panels-ipe-control-'+ cache_key);
     this.initButton = $('div.panels-ipe-startedit', this.control);
     this.cfg = cfg;
-
-    /**
-     * Passthrough method to be attached to Drupal.behaviors
-     *
-     * @param {jQuery} context
-     */
-    this.behaviorsPassthrough = function(context) {
-      Drupal.PanelsIPE.bindClickDelete(context);
-    };
-    
-    Drupal.behaviors['PanelsIPE' + cache_key] = this.behaviorsPassthrough;
 
     this.initEditing = function(formdata) {
       // See http://jqueryui.com/demos/sortable/ for details on the configuration
@@ -184,8 +159,8 @@
     };
 
     $('div.panels-ipe-region', this.topParent).each(function() {
-      $('div.panels-ipe-portlet-wrapper', this)
-        .wrapAll('<div class="panels-ipe-sort-container" />');
+      $('div.panels-ipe-portlet-wrapper', this).parent()
+        .wrapInner('<div class="panels-ipe-sort-container" />');
     });
 
     $('div.panels-ipe-startedit', this.control).click(function() {
