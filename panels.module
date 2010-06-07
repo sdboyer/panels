@@ -1026,6 +1026,25 @@ function panels_ctools_plugin_display_renderers() {
   );
 }
 
+function panels_plugin_display_renderers() {
+  // TODO will it automagically figure out the path?
+  $path = drupal_get_path('module', 'panels') . '/plugins/display_renderers';
+  $common = array(
+    'path' => $path,
+    'parent' => 'panels_renderer_standard',
+  );
+
+  $plugins = array();
+  $plugins['panels_renderer_standard'] = array(
+    'class' => array(
+      'path' => $path,
+      'class' => 'panels_renderer_standard',
+    ),
+  );
+
+  return $plugins;
+}
+
 /**
  * Get the display that is currently being rendered as a page.
  *
