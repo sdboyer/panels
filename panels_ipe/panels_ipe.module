@@ -169,8 +169,9 @@ function panels_ipe_ajax_edit($cache) {
     // panels_cache_clear('display', $display->did);
     drupal_json(1);
   }
-
-  drupal_json($output);
+  else {
+    drupal_json($output);
+  }
   exit;
 }
 
