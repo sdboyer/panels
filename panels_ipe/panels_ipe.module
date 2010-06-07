@@ -15,8 +15,8 @@ function panels_ipe_ctools_plugin_directory($module, $plugin) {
  */
 function panels_ipe_theme() {
   return array(
-    'panels_ipe_dnd_additions' => array(
-      'arguments' => array('pane' => NULL, 'content' => NULL),
+    'panels_ipe_pane_wrapper' => array(
+      'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
     ),
   );
 }
@@ -41,8 +41,8 @@ function panels_ipe_panels_display_renderers() {
   return $plugins;
 }
 
-function theme_panels_ipe_droppable_handle($content, $pane) {
-  return $content;
+function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
+  return $output;
 }
 
 /**

@@ -1,7 +1,6 @@
 <?php
 
 class panels_renderer_ipe extends panels_renderer_standard {
-
   function render() {
     //drupal_add_css('path/to/css');
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
@@ -9,19 +8,19 @@ class panels_renderer_ipe extends panels_renderer_standard {
   }
 
   /**
-   * Override & call the parent, then add a class to be caught by the js for dnd
+   * Override & call the parent, then pass output through to the dnd wrapper
+   * theme function.
+   *
    * @param $pane
    */
-  function render_pane_content($pane) {
-    $content = parent::render_pane_content($pane);
-    if (!empty($content->css_class)) {
-      $content->css_class .= ' panel-pane-ipe';
-    }
-    else {
-      $content->css_class = 'panel-pane-ipe';
-    }
+  function render_pane($pane) {
+    $output = parent::render_pane($pane);
+    $output = theme('panels_ipe_pane_wrapper', $output, $pane, $this->display);
+    return "<div id='' class='panels-ipe-draggable'>" . $output . "</div>";
+  }
 
-    $content->content = theme('panels_ipe_dnd_additions', $content->content, $pane);
-    return $content;
+  function render_region($region_name, $panes) {
+    $output = parent::render_region($region_name, $panes);
+    return $output;
   }
 }
