@@ -389,6 +389,30 @@ function panels_get_caches() {
 }
 
 /**
+ * Fetch metadata on a specific display renderer plugin.
+ *
+ * @return
+ *   An array of arrays with information about the requested panels display
+ *   renderer.
+ */
+function panels_get_display_renderer($dr) {
+  ctools_include('plugins');
+  return ctools_get_plugins('panels', 'display_renderers', $dr);
+}
+
+/**
+ * Fetch metadata for all display renderer plugins.
+ *
+ * @return
+ *   An array of arrays with information about all available panels display
+ *   renderer.
+ */
+function panels_get_display_renderers() {
+  ctools_include('plugins');
+  return ctools_get_plugins('panels', 'display_renderers');
+}
+
+/**
  * Get a function from a plugin, if it exists.
  *
  * @param $plugin

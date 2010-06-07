@@ -195,6 +195,9 @@ function panels_render_pane_content(&$display, &$pane, $keywords) {
  *   The $pane information from the display
  * $display
  *   The display.
+ *
+ * TODO refactor the render pipeline so that style plugins need not call this
+ * in panel region styling
  */
 function panels_render_pane($content, $pane, &$display) {
   if ($display->hide_title == PANELS_TITLE_PANE && !empty($display->title_pane) && $display->title_pane == $pane->pid) {

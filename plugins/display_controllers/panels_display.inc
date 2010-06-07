@@ -1,57 +1,15 @@
 <?php
 
-$plugin = array();
-
 /**
- * Forms the basis of a panel display
+ * Standard render pipeline for a panels display.
  *
  */
-class panels_display {
-  var $args = array();
-  var $content = array();
-  var $panels = array();
-  var $incoming_content = NULL;
-  var $css_id = NULL;
-  var $context = array();
-  var $did = 'new';
+class panels_renderer_standard {
+  var $display;
+  var $plugins = array();
 
-  function add_pane($pane, $location = FALSE) {
-    $pane->pid = $this->next_new_pid();
-    if (!$location || !isset($this->panels[$location])) {
-      foreach ($this->panels as $panel_name => $panel) {
-        if (array_key_exists($pane->pid, $panel)) {
-          $this->panels[$panel_name][] = $pane->pid;
-        }
-      }
-    }
-    else {
-      $this->panels[$location][] = $pane->pid;
-    }
-  }
-
-  function duplicate_pane($pid, $location = FALSE) {
-    $pane = $this->clone_pane($pid);
-    $this->add_pane($pane, $location);
-  }
-
-  function clone_pane($pid) {
-    $pane = drupal_clone($this->content[$pid]);
-    foreach (array_keys($this->content) as $pidcheck) {
-      // necessary?
-      unset($pane->position);
-    }
-    return $pane;
-  }
-
-  function next_new_pid() {
-    $id = array(0);
-    foreach (array_keys($this->content) as $pid) {
-      if (!is_numeric($pid)) {
-        $id[] = substr($pid, 4);
-      }
-    }
-    $next_id = max($id);
-    return ++$next_id;
+  function panels_renderer_standard($display) {
+    $this->display = &$display;
   }
 
   /**
@@ -65,8 +23,8 @@ class panels_display {
    *  HTML output that has made its way through the theme layer.
    */
   function render() {
-    $this->layout_plugin = panels_get_layout($this->layout);
-    if (!$this->layout_plugin) {
+    $this->plugins['layout'] = panels_get_layout($this->display->layout);
+    if (!$this->plugins['layout']) {
       return NULL;
     }
 
@@ -75,7 +33,7 @@ class panels_display {
     // Let modules act just prior to render.
     foreach (module_implements('panels_pre_render') as $module) {
       $function = $module . '_panels_pre_render';
-      $output .= $function($this);
+      $output .= $function($this->display);
     }
 
     $output .= $this->render_layout();
@@ -83,7 +41,7 @@ class panels_display {
     // Let modules act just after render.
     foreach (module_implements('panels_post_render') as $module) {
       $function = $module . '_panels_post_render';
-      $output .= $function($this);
+      $output .= $function($this->display);
     }
     return $output;
   }
@@ -113,22 +71,22 @@ class panels_display {
     // This now comes after the CSS is added, because panels-within-panels must
     // have their CSS added in the right order; inner content before outer content.
 
-    if (empty($this->cache['method'])) {
+    if (empty($this->display->cache['method'])) {
       $content = $this->render_regions();
     }
     else {
       // TODO This whole approach can & probably should be refactored now. Maybe
       // invert it, and have the caching agent act from the outside?
-      $cache = panels_get_cached_content($this, $this->args, $this->context);
+      $cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context);
       if ($cache === FALSE) {
         $cache = new panels_cache_object();
         $cache->set_content($this->render_regions());
-        panels_set_cached_content($cache, $this, $this->args, $this->context);
+        panels_set_cached_content($cache, $this->display, $this->display->args, $this->display->context);
       }
       $content = $cache->content;
     }
 
-    $output = theme($this->layout_plugin['theme'], check_plain($this->css_id), $content, $this->layout_settings, $this);
+    $output = theme($this->layout_plugin['theme'], check_plain($this->display->css_id), $content, $this->display->layout_settings, $this->display);
 
     return $output;
   }
@@ -146,7 +104,7 @@ class panels_display {
     $panes = array();
     $later = array();
 
-    foreach ($this->content as $pid => $pane) {
+    foreach ($this->display->content as $pid => $pane) {
       // TODO remove in 7.x and ensure the upgrade path weeds out any stragglers; it's been long enough
       $pane->shown = !empty($pane->shown); // guarantee this field exists.
       // If the user can't see this pane, do not render it.
@@ -174,7 +132,7 @@ class panels_display {
     // in an array, then render the panel. Primarily this ensures that the
     // panes are in the proper order.
     $content = array();
-    foreach ($this->panels as $panel_name => $pids) {
+    foreach ($this->display->panels as $panel_name => $pids) {
       $panel = array();
       foreach ($pids as $pid) {
         if (!empty($panes[$pid])) {
@@ -186,7 +144,7 @@ class panels_display {
 
     // Prevent notices by making sure that all panels at least have an entry:
     // TODO refactor to make this unnecessary (optimization)
-    $panels = panels_get_panels($this->layout_data, $this);
+    $panels = panels_get_panels($this->layout_data, $this->display);
     foreach ($panels as $id => $panel) {
       if (!isset($content[$id])) {
         $content[$id] = NULL;
@@ -216,25 +174,25 @@ class panels_display {
   function get_pane_content($pane) {
     ctools_include('context');
     // TODO finally safe to remove this check?
-    if (!is_array($this->context)) {
-      $this->context = array();
+    if (!is_array($this->display->context)) {
+      $this->display->context = array();
     }
 
     $content = FALSE;
     $caching = !empty($pane->cache['method']) ? TRUE : FALSE;
-    if ($caching && ($cache = panels_get_cached_content($this, $this->args, $this->context, $pane))) {
+    if ($caching && ($cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context, $pane))) {
       $content = $cache->content;
     }
     else {
-      $content = ctools_content_render($pane->type, $pane->subtype, $pane->configuration, array(), $this->args, $this->context);
+      $content = ctools_content_render($pane->type, $pane->subtype, $pane->configuration, array(), $this->display->args, $this->display->context);
       foreach (module_implements('panels_pane_content_alter') as $module) {
         $function = $module . '_panels_pane_content_alter';
-        $function($content, $pane, $args, $context);
+        $function($content, $pane, $this->display->args, $this->display->context);
       }
       if ($caching) {
         $cache = new panels_cache_object();
         $cache->set_content($content);
-        panels_set_cached_content($cache, $this, $args, $context, $pane);
+        panels_set_cached_content($cache, $this->display, $this->display->args, $this->display->context, $pane);
         $content = $cache->content;
       }
     }
@@ -246,32 +204,32 @@ class panels_display {
    * Render a single panel region.
    */
   function render_region($panel_name, $panes) {
-    list($style, $style_settings) = panels_get_panel_style_and_settings($this->panel_settings, $panel_name);
+    list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $panel_name);
 
     // Retrieve the pid (can be a panel page id, a mini panel id, etc.), this
     // might be used (or even necessary) for some panel display styles.
     // TODO: Got to fix this to use panel page name instead of pid, since pid is
     // no longer guaranteed. This needs an API to be able to set the final id.
     $owner_id = 0;
-    if (isset($this->owner) && is_object($this->owner) && isset($this->owner->id)) {
-      $owner_id = $this->owner->id;
+    if (isset($this->display->owner) && is_object($this->display->owner) && isset($this->display->owner->id)) {
+      $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render panel'], $this, $owner_id, $panes, $style_settings, $panel);
+    return theme($style['render panel'], $this->display, $owner_id, $panes, $style_settings, $panel);
   }
 
   function get_title() {
-    switch ($this->hide_title) {
+    switch ($this->display->hide_title) {
       case PANELS_TITLE_NONE:
         return '';
 
       case PANELS_TITLE_PANE:
-        return isset($this->stored_pane_title) ? $this->stored_pane_title : '';
+        return isset($this->display->stored_pane_title) ? $this->display->stored_pane_title : '';
 
       case PANELS_TITLE_FIXED:
       case FALSE; // For old exported panels that are not in the database.
-        if (!empty($this->title)) {
-          return filter_xss_admin(ctools_context_keyword_substitute($this->title, array(), $this->context));
+        if (!empty($this->display->title)) {
+          return filter_xss_admin(ctools_context_keyword_substitute($this->display->title, array(), $this->display->context));
         }
         return NULL;
     }
