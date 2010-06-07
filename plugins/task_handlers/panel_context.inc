@@ -267,8 +267,16 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   // With an argument, this actually sets the display.
   panels_get_current_page_display($display);
 
+  $renderer = NULL; // NULL means the default renderer will be used
+
+  // TODO this is a temporary, hacky approach to ACLs for the IPE, and will be
+  // modified in a later release
+  if (module_exists('panels_ipe') && !empty($handler->conf['use_ipe']) && user_access('administer page manager')) {
+    $renderer = 'panels_renderer_ipe';
+  }
+
   $info = array(
-    'content' => panels_render_display($display),
+    'content' => panels_render_display($display, $renderer),
     'no_blocks' => !empty($handler->conf['no_blocks']),
   );
 
@@ -693,6 +701,15 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
     '#title' => t('Disable Drupal blocks/regions'),
     '#description' => t('Check this to have the page disable all regions displayed in the theme. Note that some themes support this setting better than others. If in doubt, try with stock themes to see.'),
   );
+
+  if (module_exists('panels_ipe')) { // Temporary approach till we get something better
+    $form['conf']['use_ipe'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => $conf['use_ipe'],
+      '#title' => t('Use In-Place Editor'),
+      '#description' => t('Use the new Panels In-Place Editor on this panel for users with global panel-editing permissions (Warning: EXPERIMENTAL!!)'),
+    );
+  }
 
   $form['conf']['css_id'] = array(
     '#type' => 'textfield',
