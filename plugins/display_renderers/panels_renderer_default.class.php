@@ -89,7 +89,7 @@ class panels_renderer_default {
    * Boolean state variable, indicating whether or not the prepare() method has
    * been run.
    *
-   * This state is checked in panels_renderer_default::render_layouts() to
+   * This state is checked in panels_renderer_default::render_layout() to
    * determine whether the prepare method should be automatically triggered.
    * @var bool
    */
