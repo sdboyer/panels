@@ -2,7 +2,8 @@
 
 class panels_renderer_ipe extends panels_renderer_standard {
   function render() {
-    //drupal_add_css('path/to/css');
+    drupal_add_css(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.css');
+    drupal_add_js(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.js');
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
     return parent::render();
   }
@@ -15,12 +16,16 @@ class panels_renderer_ipe extends panels_renderer_standard {
    */
   function render_pane($pane) {
     $output = parent::render_pane($pane);
+    if (empty($output)) {
+      return;
+    }
     $output = theme('panels_ipe_pane_wrapper', $output, $pane, $this->display);
-    return "<div id='' class='panels-ipe-draggable'>" . $output . "</div>";
+    return "<div id='panels-ipe-paneid-{$pane->pid}' class='panels-ipe-pane'>" . $output . "</div>";
   }
 
   function render_region($region_name, $panes) {
     $output = parent::render_region($region_name, $panes);
-    return $output;
+    $output = theme('panels_ipe_region_wrapper', $output, $region_name, $this->display);
+    return "<div id='panels-ipe-regionid-$region_name' class='panels-ipe-region'>" . $output . "</div>";
   }
 }

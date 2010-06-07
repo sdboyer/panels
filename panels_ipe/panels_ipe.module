@@ -18,6 +18,9 @@ function panels_ipe_theme() {
     'panels_ipe_pane_wrapper' => array(
       'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
     ),
+    'panels_ipe_region_wrapper' => array(
+      'arguments' => array('output' => NULL, 'region_name' => NULL, 'display' => NULL),
+    ),
   );
 }
 
@@ -42,6 +45,28 @@ function panels_ipe_panels_display_renderers() {
 }
 
 function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
+  $links = array(
+    'edit' => array(
+      'title' => t('edit'),
+      'href' => 'panels/ajax/blahblah',
+      'html' => TRUE,
+    ),
+    'delete' => array(
+      'title' => t('delete'),
+      'href' => 'panels/ajax/blahblah',
+      'html' => TRUE,
+    ),
+  );
+  $attr = array(
+    'class' => 'panels-ipe-linkbar',
+  );
+
+  $links = theme('links', $links, $attr);
+  $handlebar = '<div class="panels-ipe-handlebar-wrapper clear-block">' . $links . '</div>';
+  return $handlebar . $output;
+}
+
+function theme_panels_ipe_region_wrapper($output, $region_name, $display) {
   return $output;
 }
 
