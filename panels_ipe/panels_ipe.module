@@ -48,13 +48,21 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
   $links = array(
     'edit' => array(
       'title' => t('edit'),
-      'href' => 'panels/ajax/blahblah',
-      'html' => TRUE,
+      'href' => "panels/ajax/configure/$display->cache_key/$pane->pid",
+      'attributes' => array(
+        'class' => 'ctools-use-modal',
+        'id' => "pane-edit-panel-pane-$pane->pid",
+      ),
     ),
+    // Deleting is managed entirely in the js; this is just an attachment point
+    // for it
     'delete' => array(
       'title' => t('delete'),
-      'href' => 'panels/ajax/blahblah',
-      'html' => TRUE,
+      'href' => '#',
+      'attributes' => array(
+        'class' => 'pane-delete',
+        'id' => "pane-delete-panel-pane-$pane->pid",
+      ),
     ),
   );
   $attr = array(

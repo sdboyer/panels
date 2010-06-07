@@ -2,6 +2,15 @@
 
 class panels_renderer_ipe extends panels_renderer_standard {
   function render() {
+    panels_load_include('display-edit');
+    $info = page_manager_get_current_page();
+    $this->display->cache_key = $this->display->did;
+    $cache = new stdClass();
+    $cache->display = $this->display;
+    panels_edit_cache_set($cache);
+    ctools_include('ajax');
+    ctools_include('modal');
+    ctools_modal_add_js();
     drupal_add_css(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.css');
     drupal_add_js(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.js');
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
