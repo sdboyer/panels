@@ -49,6 +49,9 @@ class panels_renderer_standard {
   function build(&$display, $layout) {
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
+    if (!isset($layout['panels'])) {
+      $this->plugins['layout']['panels'] = panels_get_panels($layout, $display);
+    }
   }
 
   /**
@@ -60,7 +63,8 @@ class panels_renderer_standard {
    */
   function prepare() {
     $this->prepare_panes($this->display->content);
-    $this->prepare_regions($this->display->panels);
+    $this->prepare_regions($this->display->panels, $this->display->panel_settings);
+    $this->prepared['empty regions'] = array_diff(array_keys($this->plugins['layout']['panels']), array_keys($this->prepared['regions']));
     $this->prep_run = TRUE;
   }
 
@@ -84,8 +88,8 @@ class panels_renderer_standard {
    */
   function prepare_panes($panes) {
     ctools_include('content');
-    $normal = array();
-    $last = array();
+    // Use local variables as writing to them is very slightly faster
+    $normal = $last = array();
 
     // Prepare the list of panes to be rendered
     foreach ($panes as $pid => $pane) {
@@ -103,7 +107,6 @@ class panels_renderer_standard {
       // primarily so they can do things like the leftovers of forms.
       if (!empty($ct_plugin_def['render last'])) {
         $last[$pid] = $pane;
-        continue;
       }
       // Otherwise, render it in the normal order.
       else {
@@ -114,14 +117,41 @@ class panels_renderer_standard {
     return $this->prepared['panes'];
   }
 
-  function prepare_regions($regions) {
-    $this->prepared['regions'] = $this->display->panels;
-    // Initialize the regions array with keys for each region and NULL values
-    // for each; this prevents warnings on empty regions later
-    $this->rendered['regions'] = array();
-    foreach (array_keys(panels_get_panels($this->plugins['layout'], $this->display)) as $region_name) {
-      $this->rendered['regions'][$region_name] = NULL;
+  /**
+   * @param array $regions
+   * @param array $settings
+   */
+  function prepare_regions($region_list, $settings) {
+    // Initialize defaults to be used for regions without their own explicit
+    // settings. Use display settings if they exist, else hardcoded defaults
+    $default = array(
+      'style' => empty($settings['style']) ? $settings['style'] : panels_get_style('default'),
+      'style settings' => isset($settings['style_settings']['default']) ? $settings['style_settings']['default'] : array(),
+    );
+
+    $regions = array();
+    if (empty($settings)) {
+      // No display/panel region settings exist, init all with the defaults.
+      foreach ($region_list as $region_name => $panes) {
+        $regions[$region_name] = $default;
+        $regions[$region_name]['pids'] = $panes;
+      }
     }
+    else {
+      // Some settings exist; iterate through each region and set individually
+      foreach ($region_list as $region_name => $panes) {
+        if (empty($settings[$region_name]['style']) || $settings[$region_name]['style'] == -1) {
+          $regions[$region_name] = $default;
+        }
+        else {
+          $regions[$region_name]['style'] = panels_get_style($settings[$region_name]['style']);
+          $regions[$region_name]['style settings'] = isset($settings['style_settings'][$region_name]) ? $settings['style_settings'][$region_name] : array();
+        }
+        $regions[$region_name]['pids'] = $panes;
+      }
+    }
+    $this->prepared['regions'] = $regions;
+    return $this->prepared['regions'];
   }
 
   /**
@@ -285,13 +315,21 @@ class panels_renderer_standard {
    *   An array of rendered panel regions, keyed on the region name.
    */
   function render_regions() {
+    // Initialize the regions array with keys for each region and NULL values
+    // for each; this prevents warnings on empty regions later
+    $this->rendered['regions'] = array();
+    foreach ($this->plugins['layout']['panels'] as $region_name) {
+      $this->rendered['regions'][$region_name] = NULL;
+    }
+
     // Loop through all panel regions, put all panes that belong to the current
     // region in an array, then render the region. Primarily this ensures that
-    // the panes are in the proper order.
+    // the panes are arranged in the proper order.
     $content = array();
-    foreach ($this->prepared['regions'] as $region_name => $pids) {
+    foreach ($this->prepared['regions'] as $region_name => $conf) {
       $region_panes = array();
-      foreach ($pids as $pid) {
+      foreach ($conf['pids'] as $pid) {
+        // Only include panes for region rendering if they had some output.
         if (!empty($this->rendered['panes'][$pid])) {
           $region_panes[$pid] = $this->rendered['panes'][$pid];
         }
@@ -313,12 +351,12 @@ class panels_renderer_standard {
    * @param $panes
    *   An array of panes that are assigned to the panel that's being rendered.
    *
-   * @return
-   *   The rendered HTML for the passed-in panel region.
+   * @return string
+   *   The rendered, HTML string output of the passed-in panel region.
    */
   function render_region($region_name, $panes) {
-    // TODO move this settings assembly up into the prep part of the process
-    list($style, $style_settings) = panels_get_panel_style_and_settings($this->display->panel_settings, $region_name);
+    $style = $this->prepared['regions'][$region_name]['style'];
+    $style_settings = $this->prepared['regions'][$region_name]['style settings'];
 
     // Retrieve the pid (can be a panel page id, a mini panel id, etc.), this
     // might be used (or even necessary) for some panel display styles.
