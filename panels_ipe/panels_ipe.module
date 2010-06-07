@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implementation of hook_ctools_plugin_directory() to let the system know
+ * we implement task and task_handler plugins.
+ */
+function panels_ipe_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'panels' && $plugin == 'display_renderers') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function panels_ipe_theme() {
+  return array(
+    'panels_ipe_dnd_additions' => array(
+      'arguments' => array('pane' => NULL, 'content' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implementation of dynamic ctools plugin registration hook.
+ *
+ * The definition here fulfills the same purpose as the $plugin = array(...)
+ * pattern that now appears in most ctools plugins as a standard.
+ */
+function panels_ipe_panels_display_renderers() {
+  $plugins = array();
+  $plugins['panels_renderer_ipe'] = array(
+    'handler' => array(
+      'path' => drupal_get_path('module', 'panels_ipe') . '/plugins/display_renderers',
+      'file' => 'panels_renderer_ipe.inc',
+      'class' => 'panels_renderer_ipe',
+      'parent' => 'panels_renderer_standard',
+    ),
+  );
+
+  return $plugins;
+}
+
+function theme_panels_ipe_droppable_handle($content, $pane) {
+  return $content;
+}
+
+/**
+ * Experimenting with this as a means for outputting the display editor form.
+ * @param unknown_type $main
+ */
+function panels_ipe_footer($main = 0) {
+
+}
