@@ -2,7 +2,7 @@
 
 (function ($) {
   Drupal.PanelsIPE = Drupal.PanelsIPE || {};
-  
+
   Drupal.PanelsIPE.bindClickDelete = function(context) {
     $('a.pane-delete:not(.pane-delete-processed)', context)
       .addClass('pane-delete-processed')
@@ -13,15 +13,8 @@
         return false;
       });
   };
-  
+
   $(function() {
-    var goober = Drupal.PanelsIPE.bindClickDelete;
-    var goober2 = Drupal.PanelsIPE;
-    var tester3 = {};
-    var tester4 = [];
-    // var tester5 = new Drupal.PanelsIPE; // err: Drupal.PanelsIPE is not a constructor
-    function testobj() {};
-    
     var draggable_options = {
       revert: 'invalid',
       helper: 'clone', // required for "flawless" interoperation with sortables
@@ -29,7 +22,7 @@
       appendTo: 'body',
       handle: 'panels-ipe-draghandle',
     }
-  
+
     /**
      * See http://jqueryui.com/demos/sortable/ for details on the configuration
      * parameters used here.
@@ -43,9 +36,8 @@
       items: 'div.panels-ipe-pane',
       handle: 'div.panels-ipe-draghandle',
     }
-    
+
     $('div.panels-ipe-region').sortable(sortable_options);
-    // $('div.panels-ipe-pane').draggable(draggable_options);
     // Since the connectWith option only does a one-way hookup, iterate over
     // all sortable regions to connect them with one another.
     $('div.panels-ipe-region').each(function() {
