@@ -25,7 +25,7 @@ function theme_panels_default_style_render_region($display, $region_id, $panes, 
   foreach ($panes as $pane_id => $pane_output) {
     // Add the separator if we've already displayed a pane.
     if ($print_separator) {
-      $output .= '<div class="region-separator"></div>';
+      $output .= '<div class="panel-region-separator"></div>';
     }
 
     $output .= $pane_output;
