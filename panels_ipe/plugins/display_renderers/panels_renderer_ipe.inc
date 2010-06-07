@@ -7,10 +7,15 @@ class panels_renderer_ipe extends panels_renderer_standard {
     $this->display->cache_key = $this->display->did;
     $cache = new stdClass();
     $cache->display = $this->display;
+    ctools_include('content');
+    // NO good reason for this to need to be set way out here!?
+    $cache->content_types = ctools_content_get_available_types();
     panels_edit_cache_set($cache);
     ctools_include('ajax');
     ctools_include('modal');
     ctools_modal_add_js();
+    drupal_add_css(panels_get_path('css/panels_admin.css'));
+    drupal_add_css(panels_get_path('css/panels_dnd.css'));
     drupal_add_css(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.css');
     drupal_add_js(drupal_get_path('module', 'panels_ipe') . '/panels_ipe.js');
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));

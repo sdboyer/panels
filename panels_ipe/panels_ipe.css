@@ -28,8 +28,22 @@ div.panels-ipe-draghandle {
   border-left: 1px solid #AAA;
 }
 
+div.panels-ipe-newblock {
+  display: block;
+}
+
+div.panels-ipe-newblock div {
+  text-align: center;
+  border: 1px solid #AAA;
+  display: block;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+
 div.panels-ipe-handlebar-wrapper li a,
-div.panels-ipe-draghandle span {
+div.panels-ipe-draghandle span,
+div.panels-ipe-newblock div a {
   background-color: #f6f6f6;
   display: block;
   padding: 0.2em 0.5em;
@@ -37,3 +51,4 @@ div.panels-ipe-draghandle span {
 
 .ui-sortable-placeholder { margin: 1em; border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 .ui-sortable-placeholder * { visibility: hidden; }
+

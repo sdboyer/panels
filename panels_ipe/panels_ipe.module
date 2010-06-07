@@ -112,8 +112,8 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
 
 function theme_panels_ipe_region_wrapper($output, $region_name, $display) {
   $attr = array('class' => 'ctools-use-modal');
-  $link = l(t('add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_name", $attr);
-  $button = '<div class="panels-ipe-newblock">' . $link . '</div>';
+  $link = l(t('add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_name", array('attributes' => $attr));
+  $button = '<div class="panels-ipe-newblock"><div>' . $link . '</div></div>';
   return $output . $button;
 }
 
