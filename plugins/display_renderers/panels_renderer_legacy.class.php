@@ -215,7 +215,6 @@ class panels_renderer_legacy {
       $callback = 'render region';
 
     }
-    dsm($panes);
 
     return theme($style[$callback], $this->display, $owner_id, $panes, $style_settings, $region_name);
   }
