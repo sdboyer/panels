@@ -1326,9 +1326,9 @@ function panels_update_6306() {
 }
 
 /**
- * See if Panels needs to operate in legacy rendering mode, and produce a
- * warning if it does.
+ * This update function does nothing, it was committed in error and is
+ * left in to prevent update problems.
  */
 function panels_update_6307() {
-
+  return array();
 }
