@@ -117,6 +117,8 @@ $plugin = array(
     ),
   ),
 
+  'tab operation' => 'panels_panel_context_tab_operation',
+
   // Callback to render the data.
   'render' => 'panels_panel_context_render',
 
@@ -193,6 +195,15 @@ $plugin = array(
     'relationships' => array(),
   ),
 );
+
+/**
+ * Provide the operation trail for the 'Edit panel' link.
+ *
+ * When editing the panel, go directly to the content tab.
+ */
+function panels_panel_context_tab_operation($handler, $contexts, $args) {
+  return array('handlers', $handler->name, 'content');
+}
 
 /**
  * Get the display for a task handler.
