@@ -229,7 +229,7 @@ function panels_common_settings(&$form_state, $module_name = 'panels_common') {
   ctools_include('content');
   $content_types = ctools_get_content_types();
   $skip = FALSE;
-  
+
   $default_types = variable_get($module_name . '_default', NULL);
   if (!isset($default_types)) {
     $default_types = array('other' => TRUE);
@@ -473,7 +473,7 @@ function panels_common_get_allowed_layouts($module_name) {
 function theme_panels_common_content_list($display) {
   $layout = panels_get_layout($display->layout);
   $content = '<dl class="content-list">';
-  foreach (panels_get_panels($layout, $display) as $panel_id => $title) {
+  foreach (panels_get_regions($layout, $display) as $panel_id => $title) {
     $content .= "<dt>$title</dt><dd>";
     if (!empty($display->panels[$panel_id])) {
       $content .= '<ol>';

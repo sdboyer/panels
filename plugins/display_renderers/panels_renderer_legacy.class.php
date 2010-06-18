@@ -122,7 +122,7 @@ class panels_renderer_legacy {
     }
 
     // Prevent notices by making sure that all panels at least have an entry:
-    $panels = panels_get_panels($this->plugins['layout'], $this->display);
+    $panels = panels_get_regions($this->plugins['layout'], $this->display);
     foreach ($panels as $id => $panel) {
       if (!isset($content[$id])) {
         $content[$id] = NULL;

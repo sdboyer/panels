@@ -77,7 +77,7 @@ function panels_choose_layout(&$form_state) {
   ctools_include('common', 'panels');
 
   $layouts = panels_common_get_allowed_layouts($form_state['allowed_layouts']);
-  
+
   foreach ($layouts as $id => $layout) {
     $options[$id] = panels_print_layout_icon($id, $layout, check_plain($layout['title']));
   }
@@ -137,7 +137,7 @@ function panels_change_layout(&$form_state) {
   $display = &$form_state['display'];
 
   $new_layout = panels_get_layout($form_state['layout']);
-  $new_layout_panels = panels_get_panels($new_layout, $display);
+  $new_layout_panels = panels_get_regions($new_layout, $display);
 
   $options = $new_layout_panels;
   $keys = array_keys($options);
@@ -172,7 +172,7 @@ function panels_change_layout(&$form_state) {
     '#suffix' => '</div>',
   );
 
-  $old_layout_panels = panels_get_panels($old_layout, $display);
+  $old_layout_panels = panels_get_regions($old_layout, $display);
   if (empty($display->panels)) {
     $form['old'] = array(
       '#prefix' => '<div>',

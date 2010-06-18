@@ -21,9 +21,18 @@ function panels_pane_access($pane, $display) {
 }
 
 /**
- * Get a list of panels available in the layout.
+ * Get a list of panel regions available in the layout.
+ *
+ * DEPRECATED. Use panels_get_regions instead.
  */
 function panels_get_panels($layout, $display) {
+  return panels_get_regions($layout, $display);
+}
+
+/**
+ * Get a list of panels available in the layout.
+ */
+function panels_get_regions($layout, $display) {
   if (!empty($layout['panels function']) && function_exists($layout['panels function'])) {
     return $layout['panels function']($display, $display->layout_settings);
   }

@@ -179,7 +179,7 @@ function panels_ipe_edit_control_form(&$form_state) {
   $form['#display'] = $display;
 
   $layout = panels_get_layout($display->layout);
-  $layout_panels = panels_get_panels($layout, $display);
+  $layout_panels = panels_get_regions($layout, $display);
 
   $form['panel'] = array('#tree' => TRUE);
   $form['panel']['pane'] = array('#tree' => TRUE);
@@ -252,7 +252,7 @@ function panels_ipe_footer($main = 0) {
 function panels_ipe_ajax_add_pane_choose($cache, $panel_id = NULL, $category = NULL) {
   $display = $cache->display;
   $layout = panels_get_layout($display->layout);
-  $layout_panels = panels_get_panels($layout, $display);
+  $layout_panels = panels_get_regions($layout, $display);
 
   if ($layout && array_key_exists($panel_id, $layout_panels)) {
     ctools_modal_render(

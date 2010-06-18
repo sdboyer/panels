@@ -121,7 +121,7 @@ class panels_renderer_standard {
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
     if (!isset($layout['panels'])) {
-      $this->plugins['layout']['panels'] = panels_get_panels($layout, $display);
+      $this->plugins['layout']['panels'] = panels_get_regions($layout, $display);
     }
   }
 

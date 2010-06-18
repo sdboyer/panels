@@ -119,7 +119,7 @@ function panels_edit_display_form(&$form_state) {
   $form['#display'] = $display;
 
   $layout = panels_get_layout($display->layout);
-  $layout_panels = panels_get_panels($layout, $display);
+  $layout_panels = panels_get_regions($layout, $display);
 
   $form['panel'] = array('#tree' => TRUE);
   $form['panel']['pane'] = array('#tree' => TRUE);
@@ -280,7 +280,7 @@ function theme_panels_edit_display_form($form) {
   $cache_key = $display->cache_key;
 
   $layout = panels_get_layout($display->layout);
-  $layout_panels = panels_get_panels($layout, $display);
+  $layout_panels = panels_get_regions($layout, $display);
   $save_buttons = drupal_render($form['buttons']);
 
   foreach ($layout_panels as $panel_id => $title) {
@@ -789,7 +789,7 @@ function panels_edit_display_settings_form_submit($form, &$form_state) {
 function panels_ajax_add_pane_choose($cache, $panel_id = NULL, $category = NULL) {
   $display = $cache->display;
   $layout = panels_get_layout($display->layout);
-  $layout_panels = panels_get_panels($layout, $display);
+  $layout_panels = panels_get_regions($layout, $display);
 
   if ($layout && array_key_exists($panel_id, $layout_panels)) {
     ctools_modal_render(
@@ -1336,7 +1336,7 @@ function panels_ajax_style_type($type, $cache, $pid = NULL) {
     case 'panel':
       $style = isset($cache->display->panel_settings[$pid]['style']) ? $cache->display->panel_settings[$pid]['style'] : '-1'; // -1 signifies to use the default setting.
       $layout = panels_get_layout($cache->display->layout);
-      $layout_panels = panels_get_panels($layout, $cache->display);
+      $layout_panels = panels_get_regions($layout, $cache->display);
       $title = t('Panel style for region "!region"', array('!region' => $layout_panels[$pid]));
       break;
 
@@ -1554,7 +1554,7 @@ function panels_ajax_style_settings($type, $cache, $pid = '') {
 
     case 'panel':
       $layout = panels_get_layout($cache->display->layout);
-      $layout_panels = panels_get_panels($layout, $cache->display);
+      $layout_panels = panels_get_regions($layout, $cache->display);
       $title = t('Style settings for style @style (Region "!region")', array('@style' => $style['title'], '!region' => $layout_panels[$pid]));
       break;
 
