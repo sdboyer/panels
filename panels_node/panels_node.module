@@ -121,12 +121,7 @@ function panels_node_add() {
   ctools_include('common', 'panels');
 
   $layouts = panels_common_get_allowed_layouts('panels_node');
-
-  // If no layout selected, present a list of choices.
-  foreach ($layouts as $id => $layout) {
-    $output .= panels_print_layout_link($id, $layout, 'node/add/panel/' . $id, array('query' => $_GET));
-  }
-  return $output;
+  return panels_common_print_layout_links($layouts, 'node/add/panel', array('query' => $_GET));
 }
 
 /**

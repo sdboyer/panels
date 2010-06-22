@@ -343,10 +343,7 @@ function panels_mini_add_page($layout = NULL) {
   $output = '';
 
   if ($layout === NULL) {
-    foreach ($layouts as $id => $layout) {
-      $output .= panels_print_layout_link($id, $layout, $_GET['q'] .'/'. $id);
-    }
-    return $output;
+    return panels_common_print_layout_links($layouts, $_GET['q']);
   }
 
   if (!$layouts[$layout]) {

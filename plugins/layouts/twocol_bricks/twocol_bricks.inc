@@ -9,6 +9,7 @@
 // Plugin definition
 $plugin = array(
   'title' => t('Two column bricks'),
+  'category' => t('Columns: 2'),
   'icon' => 'twocol_bricks.png',
   'theme' => 'panels_twocol_bricks',
   'css' => 'twocol_bricks.css',

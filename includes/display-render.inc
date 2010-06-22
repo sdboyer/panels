@@ -29,7 +29,7 @@ function panels_render_layout_admin($layout, $content, $display) {
   }
 
   $theme = isset($layout['admin theme']) ? $layout['admin theme'] : $layout['theme'];
-  return theme($theme, isset($display->css_id) ? $display->css_id : '', $content, $display->layout_settings, $display);
+  return theme($theme, isset($display->css_id) ? $display->css_id : '', $content, $display->layout_settings, $display, $layout);
 }
 
 /**

@@ -34,7 +34,7 @@ function panels_get_panels($layout, $display) {
  */
 function panels_get_regions($layout, $display) {
   if (!empty($layout['panels function']) && function_exists($layout['panels function'])) {
-    return $layout['panels function']($display, $display->layout_settings);
+    return $layout['panels function']($display, $display->layout_settings, $layout);
   }
   if (!empty($layout['panels'])) {
     return $layout['panels'];
@@ -279,17 +279,47 @@ function panels_pane_select_context($pane, $contexts) {
 }
 
 /**
+ * Ensure a layout has a minimal set of data.
+ */
+function panels_layout_process(&$plugin) {
+  $plugin += array(
+    'category' => t('Miscellaneous'),
+    'description' => '',
+  );
+}
+
+/**
  * Fetch metadata on a specific layout plugin.
  *
  * @param $layout
- *   Name of a panel layout.
+ *   Name of a panel layout. If the layout name contains a ':' this
+ *   indicates that we need to separate the sublayout out and
+ *   load it individually.
  *
  * @return
  *   An array with information about the requested panel layout.
  */
 function panels_get_layout($layout) {
+  // Check the cache to see if all layouts were loaded.
+  $layouts = &ctools_static('panels_get_layouts');
+  if ($layouts && !empty($layouts[$layout])) {
+    return $layouts[$layout];
+  }
+
   ctools_include('plugins');
-  return ctools_get_plugins('panels', 'layouts', $layout);
+  if (strpos($layout, ':') !== FALSE) {
+    list($layout_name, $sublayout) = explode(':', $layout, 2);
+  }
+  else {
+    $layout_name = $layout;
+  }
+
+  $plugin = ctools_get_plugins('panels', 'layouts', $layout_name);
+  if (!empty($sublayout) && function_exists($plugin['sublayout callback'])) {
+    $plugin = $plugin['sublayout callback']($plugin, $layout_name, $sublayout);
+  }
+
+  return $plugin;
 }
 
 /**
@@ -299,8 +329,47 @@ function panels_get_layout($layout) {
  *   An array of arrays with information about all available panel layouts.
  */
 function panels_get_layouts() {
+  $layouts = &ctools_static(__FUNCTION__);
+  if (!isset($layouts)) {
+    $layouts = array();
+    ctools_include('plugins');
+    $plugins = ctools_get_plugins('panels', 'layouts');
+
+    // Go through each and see if there are 'sub' layouts we need to get.
+    foreach ($plugins as $name => $plugin) {
+      if (!empty($plugin['sublayouts callback']) && function_exists($plugin['sublayouts callback'])) {
+        $layouts = array_merge($plugin['sublayouts callback']($plugin, $name));
+      }
+      else {
+        $layouts[$name] = $plugin;
+      }
+    }
+  }
+
+  return $layouts;
+}
+
+/**
+ * Fetch metadata for all layout plugins that provide builders.
+ *
+ * The layout builders allow reusable layouts be stored in the database and
+ * exported. Since there are different methods, we are not limiting this
+ * to just one plugin.
+ *
+ * @return
+ *   An array of arrays with information about panel layouts with builders.
+ */
+function panels_get_layout_builders() {
   ctools_include('plugins');
-  return ctools_get_plugins('panels', 'layouts');
+  $plugins = ctools_get_plugins('panels', 'layouts');
+  $builders = array();
+  foreach ($plugins as $name => $plugin) {
+    if (!empty($plugin['builder'])) {
+      $builders[$name] = $plugin;
+    }
+  }
+
+  return $builders;
 }
 
 /**

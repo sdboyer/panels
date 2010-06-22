@@ -151,7 +151,15 @@ function panels_edit_display_form(&$form_state) {
     );
   }
 
-  $links = panels_edit_display_get_links($display);
+  // The flexible layout maker wants to be able to edit a display without
+  // actually editing a display, so we provide this 'setting' to allow
+  // that to go away.
+  if (empty($form_state['no display settings'])) {
+    $links = panels_edit_display_get_links($display);
+  }
+  else {
+    $links = '';
+  }
 
   $form['hide']['display-settings'] = array(
     '#value' => $links,
@@ -397,11 +405,18 @@ function panels_edit_display_form_preview(&$form, &$form_state) {
   $display->context = ctools_context_replace_placeholders($display->context, $form_state['values']['preview']);
   $output = panels_render_display($display);
 
+  // Add any extra CSS that some layouts may have added specifically for this.
+  if (!empty($display->add_css)) {
+    $output = "<style type=\"text/css\">\n$display->add_css</style>\n" . $output;
+  }
+
+
   $commands = array();
   $commands[] = array(
     'command' => 'panel_preview',
     'output' => $output,
   );
+
   ctools_ajax_render($commands);
 }
 

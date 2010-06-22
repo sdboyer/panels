@@ -456,11 +456,19 @@ function panels_common_get_allowed_layouts($module_name) {
   }
 
   $allowed = array_filter($allowed_layouts->allowed_layout_settings);
-  $layouts = array();
-  foreach ($available_layouts as $layout_key => $layout_settings) {
-    if (!empty($allowed[$layout_key])) {
-      $layouts[$layout_key] = $layout_settings;
+  $order = array();
+  foreach ($available_layouts as $name => $plugin) {
+    if (!empty($allowed[$name])) {
+      $order[$name] = $plugin['category'] . ':' . $plugin['title'];
     }
+  }
+
+  // Sort
+  $layouts = array();
+
+  asort($order);
+  foreach ($order as $name => $junk) {
+    $layouts[$name] = $available_layouts[$name];
   }
 
   return $layouts;
@@ -489,4 +497,76 @@ function theme_panels_common_content_list($display) {
   }
   $content .= '</dl>';
   return $content;
+}
+
+/**
+ * Print a selector of layouts, each linked to the next step.
+ *
+ * Most operations use radio buttons for selecting layouts, but some will
+ * give each layout as a link that goes to the next step. This function
+ * makes it easy to simply provide a list of allowed layouts and the base
+ * path.
+ *
+ * One limitation is that it will only append the layout name to the end, so
+ * if the actual layout name is needed in the middle, that can't happen.
+ *
+ * @return
+ *   The rendered output.
+ */
+function panels_common_print_layout_links($layouts, $base_path, $link_options = array()) {
+  $output = '';
+
+  $categories = array();
+  ctools_include('cleanstring');
+  foreach ($layouts as $id => $layout) {
+    $category = ctools_cleanstring($layout['category']);
+
+    $categories[$category] = $layout['category'];
+    $options[$category][$id] = panels_print_layout_link($id, $layout, $base_path . '/' . $id, $link_options);
+  }
+
+  $form = array();
+  $form['categories'] = array(
+    '#title' => t('Category'),
+    '#type' => 'select',
+    '#options' => $categories,
+    '#name' => 'categories',
+    '#id' => 'edit-categories',
+    '#value' => '',
+    '#parents' => array('categories'),
+  );
+
+  $output .= drupal_render($form);
+
+  $output .= '<div class="panels-choose-layout panels-layouts-checkboxes clear-block">';
+
+  // We're doing these dependencies completely manualy, which is unusual, but
+  // the process code only supports doing them in a form.
+  // @todo modify dependent.inc to make this easier.
+
+  $dependencies = array();
+  foreach ($options as $category => $links) {
+    $dependencies['panels-layout-category-' . $category] = array(
+      'values' => array('edit-categories' => array($category)),
+      'num' => 1,
+      'type' => 'hide',
+    );
+
+    $output .= '<div id="panels-layout-category-' . $category . '-wrapper">';
+    $output .= '<div id="panels-layout-category-' . $category . '" class="form-checkboxes clear-block">';
+    $output .= '<div class="panels-layouts-category">' . $categories[$category] . '</div>';
+
+    foreach ($links as $key => $link) {
+      $output .= $link;
+    }
+    $output .= '</div></div>';
+  }
+
+  $output .= '</div>';
+
+  ctools_add_js('dependent');
+  $js['CTools']['dependent'] = $dependencies;
+  drupal_add_js($js, 'setting');
+
+  return $output;
 }

@@ -3,6 +3,7 @@ Panels 6.x-dev
 Experimentally introduced the In-Place Editor (IPE).
 Updated Panels Stylizer to use CTools' new Export UI.
 Deprecated panels_get_panels() function. This will be eventually disappear. Use panels_get_regions() instead.
+#834084: Reusable flexible layout introduced. Admin UI at admin/build/panels/layouts.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============

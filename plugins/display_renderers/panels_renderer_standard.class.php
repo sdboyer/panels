@@ -277,7 +277,7 @@ class panels_renderer_standard {
     }
     $this->render_panes();
     $this->render_regions();
-    $this->rendered['layout'] = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $this->rendered['regions'], $this->display->layout_settings, $this->display);
+    $this->rendered['layout'] = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $this->rendered['regions'], $this->display->layout_settings, $this->display, $this->plugins['layout']);
     return $this->rendered['layout'];
   }
 

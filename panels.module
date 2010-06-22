@@ -76,7 +76,7 @@ function panels_theme() {
     foreach (array('theme', 'admin theme') as $callback) {
       if (!empty($data[$callback])) {
         $theme[$data[$callback]] = array(
-          'arguments' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL, 'display' => NULL),
+          'arguments' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL, 'display' => NULL, 'layout' => NULL),
           'path' => $data['path'],
         );
 
@@ -317,6 +317,7 @@ function panels_perm() {
     'administer pane visibility',
     'administer pane access',
     'administer advanced pane settings',
+    'administer panels layouts',
     'use panels caching features',
     'use panels dashboard',
   );
@@ -952,7 +953,7 @@ function theme_panels_render_display_form($form) {
 function panels_print_layout_icon($id, $layout, $title = NULL) {
   drupal_add_css(panels_get_path('css/panels_admin.css'));
   $file = $layout['path'] . '/' . $layout['icon'];
-  return theme('panels_layout_icon', $id, theme('image', $file), $title);
+  return theme('panels_layout_icon', $id, theme('image', $file, strip_tags($layout['title']), strip_tags($layout['description'])), $title);
 }
 
 /**
@@ -1007,7 +1008,7 @@ function panels_ctools_plugin_directory($module, $plugin) {
   if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return;
   }
-  if ($module == 'page_manager' || $module == 'panels') {
+  if ($module == 'page_manager' || $module == 'panels' || $module == 'ctools') {
     return 'plugins/' . $plugin;
   }
 }
@@ -1019,6 +1020,7 @@ function panels_ctools_plugin_layouts() {
   return array(
     'load themes' => TRUE,
     'use hooks' => TRUE,
+    'process' => 'panels_layout_process',
   );
 }
 
