@@ -79,14 +79,14 @@ function panels_schema() {
 }
 
 /**
- * Schema that adds the panels_layouts table.
+ * Schema that adds the panels_layout table.
  */
 function panels_schema_3() {
   // Schema 3 is now locked. If you need to make changes, please create
   // schema 4 and add them.
   $schema = panels_schema_2();
 
-  $schema['panels_layouts'] = array(
+  $schema['panels_layout'] = array(
     'description' => 'Contains exportable customized layouts for this site.',
     'export' => array(
       'identifier' => 'layout',
@@ -1402,7 +1402,7 @@ function panels_update_6307() {
 }
 
 /**
- * Add the panels_layouts table
+ * Add the panels_layout table
  */
 function panels_update_6308() {
   $ret = array();
@@ -1410,6 +1410,6 @@ function panels_update_6308() {
   // Schema 3 is locked and should not be changed.
   $schema = panels_schema_3();
 
-  db_create_table($ret, 'panels_layouts', $schema['panels_layouts']);
+  db_create_table($ret, 'panels_layout', $schema['panels_layout']);
   return $ret;
 }

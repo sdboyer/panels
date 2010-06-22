@@ -2,7 +2,7 @@
 // $Id$
 
 $plugin = array(
-  'schema' => 'panels_layouts',
+  'schema' => 'panels_layout',
   'access' => 'administer panels layouts',
 
   'menu' => array(

@@ -77,7 +77,7 @@ function panels_flexible_merge_plugin($plugin, $layout) {
 function panels_flexible_get_sublayout($plugin, $layout_name, $sublayout_name) {
   // Do not worry about caching; Panels is handling that for us.
   ctools_include('export');
-  $item = ctools_export_crud_load('panels_layouts', $sublayout_name);
+  $item = ctools_export_crud_load('panels_layout', $sublayout_name);
   if ($item) {
     return panels_flexible_merge_plugin($plugin, $item);
   }
@@ -89,7 +89,7 @@ function panels_flexible_get_sublayout($plugin, $layout_name, $sublayout_name) {
 function panels_flexible_get_sublayouts($plugin, $layout_name) {
   $layouts[$layout_name] = $plugin;
   ctools_include('export');
-  $items = ctools_export_load_object('panels_layouts', 'conditions', array('plugin' => 'flexible'));
+  $items = ctools_export_load_object('panels_layout', 'conditions', array('plugin' => 'flexible'));
   foreach ($items as $name => $item) {
     $layouts['flexible:' . $name] = panels_flexible_merge_plugin($plugin, $item);
   }
@@ -307,7 +307,7 @@ function panels_flexible_create_renderer($admin, $id, $content, $settings, &$dis
 
 
   // Set up basic classes for all of our components.
-  $renderer->name                 = !empty($layout['layout']) ? $layout['layout']['name'] : $display->did;
+  $renderer->name                 = !empty($layout['layout']) ? $layout['layout']->name : $display->did;
   $renderer->base_class           = $renderer->name;
   $renderer->item_class['column'] = 'panels-flexible-column';
   $renderer->item_class['row']    = 'panels-flexible-row';
@@ -341,6 +341,10 @@ function panels_flexible_create_renderer($admin, $id, $content, $settings, &$dis
     // Use v2 to guarantee all CSS gets regenerated to account for changes in
     // how some divs will be rendered.
     $renderer->css_cache_name = 'flexiblev2:' . $renderer->name;
+    if ($admin) {
+      ctools_include('css');
+      ctools_css_clear($renderer->css_cache_name);
+    }
   }
   return $renderer;
 }
@@ -401,13 +405,6 @@ function theme_panels_flexible_admin($id, $content, $settings, $display, $layout
   panels_flexible_convert_settings($settings, $layout);
   $renderer = panels_flexible_create_renderer(TRUE, $id, $content, $settings, $display, $layout);
 
-  if (!empty($renderer->css_cache_name)) {
-    // Automatically remove any cached CSS for this display since it's
-    // being edited. The next time it's viewed CSS will be auto generated
-    // if necessary.
-    ctools_include('css');
-    ctools_css_clear($renderer->css_cache_name);
-  }
   $css = panels_flexible_render_css($renderer);
 
   // For the administrative view, add CSS directly to head.
@@ -1638,7 +1635,7 @@ function panels_ajax_flexible_edit_reuse($cache) {
   if (empty($output)) {
     // Create the new layout.
     ctools_include('export');
-    $layout = ctools_export_crud_new('panels_layouts');
+    $layout = ctools_export_crud_new('panels_layout');
     $layout->plugin = 'flexible';
     $layout->name = $form_state['values']['name'];
     $layout->admin_title = $form_state['values']['admin_title'];
@@ -1647,7 +1644,7 @@ function panels_ajax_flexible_edit_reuse($cache) {
     $layout->settings = $cache->display->layout_settings;
 
     // Save it.
-    ctools_export_crud_save('panels_layouts', $layout);
+    ctools_export_crud_save('panels_layout', $layout);
 
     if (empty($form_state['values']['keep'])) {
       // Set the actual layout_settings to now use the newly minted layout:
@@ -1716,7 +1713,7 @@ function panels_flexible_reuse_form_validate(&$form, &$form_state) {
     form_error($form['name'], t('You must choose a machine name.'));
   }
 
-  $test = ctools_export_crud_load('panels_layouts', $form_state['values']['name']);
+  $test = ctools_export_crud_load('panels_layout', $form_state['values']['name']);
   if ($test) {
     form_error($form['name'], t('That name is used by another layout: @layout', array('@layout' => $test->admin_title)));
   }

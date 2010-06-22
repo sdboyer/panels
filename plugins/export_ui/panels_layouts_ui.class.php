@@ -63,6 +63,7 @@ class panels_layouts_ui extends ctools_export_ui {
       $cache = new stdClass();
 
       $display = panels_new_display();
+      $display->did = $form_state['item']->name;
       $display->layout = $form_state['item']->plugin;
       $display->layout_settings = $form_state['item']->settings;
       $display->cache_key = $cache_key;
