@@ -24,88 +24,6 @@ function panels_stylizer_menu() {
     'access arguments' => array('administer panels styles'),
   );
 
-  $items['admin/build/panels/style'] = array(
-    'title' => 'Styles',
-    'page callback' => 'panels_stylizer_list_styles_page',
-    'access arguments' => array('access content'),
-    'type' => MENU_LOCAL_TASK,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/list'] = array(
-    'title' => 'List',
-    'page callback' => 'panels_stylizer_list_styles_page',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/add'] = array(
-    'title' => 'Add pane style',
-    'page callback' => 'panels_stylizer_add_style_page',
-    'page arguments' => array('pane'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 0,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/add-region'] = array(
-    'title' => 'Add region style',
-    'page callback' => 'panels_stylizer_add_style_page',
-    'page arguments' => array('region'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 0,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/import'] = array(
-    'title' => 'Import',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('panels_stylizer_import_style_page'),
-    'access callback' => 'ctools_access_multiperm',
-    'access arguments' => array('administer panels styles', 'use PHP for block visibility'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 0,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/edit/%panels_menu_style'] = array(
-    'title' => 'Edit',
-    'page callback' => 'panels_stylizer_edit_style_page',
-    'page arguments' => array(5),
-    'type' => MENU_CALLBACK,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/delete/%panels_menu_style'] = array(
-    'title' => 'delete',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('panels_stylizer_delete_style_page', 5),
-    'type' => MENU_CALLBACK,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/export/%panels_menu_style'] = array(
-    'title' => 'Export',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('panels_stylizer_export_style_page', 5),
-    'type' => MENU_CALLBACK,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/clone/%panels_menu_style'] = array(
-    'title' => 'Clone',
-    'page callback' => 'panels_stylizer_clone_style_page',
-    'page arguments' => array(5),
-    'type' => MENU_CALLBACK,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/enable/%panels_menu_style'] = array(
-    'title' => 'Enable',
-    'page callback' => 'panels_stylizer_enable_style_page',
-    'page arguments' => array(5),
-    'type' => MENU_CALLBACK,
-  ) + $stylizer_base;
-
-  $items['admin/build/panels/style/disable/%panels_menu_style'] = array(
-    'title' => 'Disable',
-    'page callback' => 'panels_stylizer_disable_style_page',
-    'page arguments' => array(5),
-    'type' => MENU_CALLBACK,
-  ) + $stylizer_base;
-
   // On the fly creation of styles in panes.
   $items['admin/build/panels/style/pane-style/%/%panels_edit_cache'] = array(
     'title' => 'Disable',
@@ -194,7 +112,7 @@ function panels_stylizer_ctools_plugin_directory($module, $plugin) {
   if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return;
   }
-  if ($module == 'ctools' && $plugin == 'style_bases' || $module == 'panels' && $plugin == 'styles') {
+  if ($module == 'ctools' || $module == 'panels') {
     return 'plugins/' . $plugin;
   }
 }
