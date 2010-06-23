@@ -69,7 +69,6 @@ class panels_layouts_ui extends ctools_export_ui {
       $display->cache_key = $cache_key;
       $display->editing_layout = TRUE;
 
-
       $cache->display = $display;
       $cache->content_types = $content_types;
       $cache->display_title = FALSE;

@@ -49,6 +49,8 @@ Drupal.behaviors.flexibleAdmin = function(context) {
         Drupal.flexible.splitters.push(new Drupal.flexible.splitter($(this)));
       });
   }
+
+  Drupal.flexible.fixHeight();
 };
 
 Drupal.flexible.splitter = function($splitter) {
@@ -404,3 +406,4 @@ Drupal.CTools.AJAX.commands.flexible_fix_firstlast = function(data) {
   $(data.selector + ' > div > .' + data.base + ':last')
     .addClass(data.base + '-last');
 };
+
