@@ -1048,7 +1048,7 @@ function panels_ctools_plugin_styles() {
  *   The name of the API about which information is being requested.
  */
 function panels_ctools_plugin_api($owner, $api) {
-  if ($owner == 'panels' && $api = 'styles') {
+  if ($owner == 'panels' && $api == 'styles') {
     // As of 6.x-3.6, Panels has a slightly new system for style plugins.
     return array('version' => 2.0);
   }
