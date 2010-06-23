@@ -361,7 +361,7 @@ function theme_panels_flexible($id, $content, $settings, $display, $layout) {
   // positions.
   $css = panels_flexible_render_css($renderer);
 
-  if (!empty($renderer->css_cache_name)) {
+  if (!empty($renderer->css_cache_name) && empty($display->editing_layout)) {
     ctools_include('css');
     // Generate an id based upon rows + columns:
     $filename = ctools_css_retrieve($renderer->css_cache_name);
@@ -373,7 +373,8 @@ function theme_panels_flexible($id, $content, $settings, $display, $layout) {
   else {
     // If the id is 'new' we can't reliably cache the CSS in the filesystem
     // because the display does not truly exist, so we'll stick it in the
-    // head tag.
+    // head tag. We also do this if we've been told we're in the layout
+    // editor so that it always gets fresh CSS.
     drupal_set_html_head("<style type=\"text/css\">\n$css</style>\n");
   }
 
