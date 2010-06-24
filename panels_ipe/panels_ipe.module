@@ -84,7 +84,7 @@ function theme_panels_ipe_placeholder_pane($region_id, $region_title) {
 function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
   $links = array(
     'edit' => array(
-      'title' => t('edit'),
+      'title' => t('Edit'),
       'href' => "panels_ipe/ajax/configure/$display->cache_key/$pane->pid",
       'attributes' => array(
         'class' => 'ctools-use-modal',
@@ -94,7 +94,7 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
     // Deleting is managed entirely in the js; this is just an attachment point
     // for it
     'delete' => array(
-      'title' => t('delete'),
+      'title' => t('Delete'),
       'href' => '#',
       'attributes' => array(
         'class' => 'pane-delete',
@@ -107,7 +107,7 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display) {
   );
 
   $links = theme('links', $links, $attr);
-  $links .= '<div class="panels-ipe-draghandle"><span>DRAGGER</span></div>';
+  $links .= '<div class="panels-ipe-draghandle">&nbsp;</div>';
   $handlebar = '<div class="panels-ipe-handlebar-wrapper panels-ipe-on clear-block">' . $links . '</div>';
   return $handlebar . $output;
 }
@@ -118,8 +118,8 @@ function theme_panels_ipe_region_wrapper($output, $region_id, $display) {
 
 function theme_panels_ipe_add_pane_button($region_id, $display) {
   $attr = array('class' => 'ctools-use-modal');
-  $link = l(t('add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_id", array('attributes' => $attr));
-  return '<div class="panels-ipe-newblock panels-ipe-on">' . $link . '</div>';
+  $link = l(t('Add new pane'), "panels_ipe/ajax/add-pane/$display->cache_key/$region_id", array('attributes' => $attr));
+  return '<div class="panels-ipe-newblock panels-ipe-on panels-ipe-portlet-static">' . $link . '</div>';
 }
 
 function panels_ipe_ajax_render_pane($pid, $cache) {
@@ -487,7 +487,7 @@ function panels_ipe_ajax_add_pane_config_finish(&$form_state) {
   $renderer->build($cache->display);
   panels_edit_cache_set($cache);
 
-  $form_state['commands'][] = ctools_ajax_command_before("#panels-ipe-regionid-$pane->panel .panels-ipe-placeholder", $renderer->render_pane($pane));
+  $form_state['commands'][] = ctools_ajax_command_append("#panels-ipe-regionid-$pane->panel div.panels-ipe-sort-container", $renderer->render_pane($pane));
 }
 
 function panels_ipe_ajax_edit_pane_config_finish(&$form_state) {

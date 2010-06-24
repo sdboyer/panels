@@ -1,6 +1,38 @@
 div.panels-ipe-handlebar-wrapper {
+  border-bottom: #898AAB solid 2px;
+}
+
+.panels-ipe-editing div.panels-ipe-portlet-wrapper {
   margin-top: 1em;
-  border-bottom: #999 solid 1px;
+  border: #898AAB solid 2px;
+  -moz-border-radius-bottomleft:8px;
+  -moz-border-radius-bottomright:8px;
+  -moz-border-radius-topleft:2px;
+  -moz-border-radius-topright:2px;
+
+  -webkit-border-radius-bottomleft:8px;
+  -webkit-border-radius-bottomright:8px;
+  -webkit-border-radius-topleft:2px;
+  -webkit-border-radius-topright:2px;
+}
+
+.panels-ipe-editing div.panels-ipe-portlet-wrapper:hover {
+  border: #FF000A solid 2px;
+}
+
+.panels-ipe-editing .panels-ipe-sort-container .ui-sortable-helper {
+  background: white;
+}
+
+.panels-ipe-editing div.panel-pane div.admin-links {
+  display: none !important;
+}
+
+.panels-ipe-editing .panels-ipe-sort-container .ui-sortable-placeholder {
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border: 1px dotted red;
+  background-color: white;
 }
 
 div.panels-ipe-handlebar-wrapper ul {
@@ -10,13 +42,13 @@ div.panels-ipe-handlebar-wrapper ul {
   text-align: right;
 }
 
-div.panels-ipe-handlebar-wrapper li,
-div.panels-ipe-draghandle {
+div.panels-ipe-handlebar-wrapper li {
   background: none repeat scroll 0 0 transparent;
   list-style: none outside none;
   margin: 0;
   padding: 0;
   float: left;
+  font: 12px/170% Verdana,sans-serif; !important;
 }
 
 div.panels-ipe-handlebar-wrapper li {
@@ -29,9 +61,23 @@ div.panels-ipe-handlebar-wrapper li.first {
 }
 
 div.panels-ipe-draghandle {
-  float: right;
-  border-right: none;
-  border-left: 1px solid #AAA;
+  background: #898AAB url(images/dragger.png) top right no-repeat;
+  cursor: move;
+  height: 24px;
+}
+
+div.panels-ipe-placeholder {
+  border: 1px solid black;
+  padding: .5em;
+  margin-top: .5em;
+  background-color: #f6f6f6;
+  color: black;
+  background-color: white;
+  font: 12px/170% Verdana,sans-serif; !important;
+}
+
+div.panels-ipe-placeholder h3 {
+  font-weight: bold;
 }
 
 /* Hide editor-state-on elements initially */
@@ -52,23 +98,22 @@ div.panels-ipe-handlebar-wrapper li a,
 div.panels-ipe-draghandle span,
 div.panels-ipe-newblock a {
   background-color: #f6f6f6;
+  color: blue;
   display: block;
-  padding: 0.2em 0.5em;
+  padding: 0.1em 0.5em;
+  font: 12px/170% Verdana,sans-serif; !important;
 }
 
 div.panels-ipe-newblock a {
   display: inline;
   border: 1px solid #CCC;
+  color: blue;
 }
 
 .panels-ipe-editing .panels-ipe-portlet-content {
   margin-bottom: 10px;
   border: transparent dotted 1px;
   overflow: hidden;
-}
-
-.panels-ipe-editing .panels-ipe-portlet-content:hover {
-  border: #FF000A dotted 1px;
 }
 
 .panels-ipe-editing .panels-ipe-region {
@@ -80,17 +125,6 @@ div.panels-ipe-newblock a {
 
 div.panels-ipe-draghandle {
   border: none;
-}
-
-div.panels-ipe-draghandle span {
-  border: none;
-  background: #989896 url(images/dragger.png);
-  text-indent: -9999px;
-  width: 26px;
-  height: 17px;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0.25em;
 }
 
 .ui-sortable-placeholder { margin: 1em; border: 1px dotted black; visibility: visible !important; height: 50px !important; }

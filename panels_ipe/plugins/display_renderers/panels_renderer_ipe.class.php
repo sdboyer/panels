@@ -53,7 +53,7 @@ class panels_renderer_ipe extends panels_renderer_standard {
     $output = "<div class='panels-ipe-portlet-content'>$output</div>";
     // Hand it off to the plugin/theme for placing draggers/buttons
     $output = theme('panels_ipe_pane_wrapper', $output, $pane, $this->display);
-    return "<div id='panels-ipe-paneid-{$pane->pid}' class='panels-ipe-portlet-wrapper'>" . $output . "</div>";
+    return "<div id='panels-ipe-paneid-{$pane->pid}' class='panels-ipe-portlet-wrapper panels-ipe-portlet-marker'>" . $output . "</div>";
   }
 
   /**
@@ -65,7 +65,7 @@ class panels_renderer_ipe extends panels_renderer_standard {
     // Generate this region's 'empty' placeholder pane from the IPE plugin.
     $empty_ph = theme('panels_ipe_placeholder_pane', $region_id, $this->plugins['layout']['panels'][$region_id]);
     // Wrap the placeholder in some guaranteed markup.
-    $panes['empty_placeholder'] = '<div class="panels-ipe-placeholder panels-ipe-on panels-ipe-portlet-wrapper">' . $empty_ph . "</div>";
+    $panes['empty_placeholder'] = '<div class="panels-ipe-placeholder panels-ipe-on panels-ipe-portlet-marker panels-ipe-portlet-static">' . $empty_ph . "</div>";
     // Generate this region's add new pane button. FIXME waaaaay too hardcoded
     $panes['add_button'] = theme('panels_ipe_add_pane_button', $region_id, $this->display);
 

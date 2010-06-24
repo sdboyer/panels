@@ -51,7 +51,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // See http://jqueryui.com/demos/sortable/ for details on the configuration
     // parameters used here.
     var sortable_options = { // TODO allow the IPE plugin to control these
-      revert: true,
+      revert: 200,
       dropOnEmpty: true, // default
       opacity: 0.75, // opacity of sortable while sorting
       // placeholder: 'draggable-placeholder',
@@ -59,6 +59,8 @@ function DrupalPanelsIPE(cache_key, cfg) {
       items: 'div.panels-ipe-portlet-wrapper',
       handle: 'div.panels-ipe-draghandle',
       tolerance: 'pointer',
+      cursorAt: 'top',
+      scroll: true
       // containment: ipe.topParent,
     };
     $('div.panels-ipe-sort-container', ipe.topParent).sortable(sortable_options);
@@ -169,8 +171,17 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   $('div.panels-ipe-region', this.topParent).each(function() {
-    $('div.panels-ipe-portlet-wrapper', this).parent()
+    $('div.panels-ipe-portlet-marker', this).parent()
       .wrapInner('<div class="panels-ipe-sort-container" />');
+
+    // Move our gadgets outside of the sort container so that sortables
+    // cannot be placed after them.
+    $('div.panels-ipe-portlet-static', this).each(function() {
+      $(this).appendTo($(this).parent().parent());
+    });
+
+    // Add a marker so we can drag things to empty containers.
+    $('div.panels-ipe-sort-container', this).append('<div>&nbsp;</div>');
   });
 
   $('div.panels-ipe-startedit', this.control).click(function() {
