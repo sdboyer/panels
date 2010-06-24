@@ -143,7 +143,6 @@ class panels_renderer_standard {
   function prepare($external_settings = NULL) {
     $this->prepare_panes($this->display->content);
     $this->prepare_regions($this->display->panels, $this->display->panel_settings);
-    $this->prepared['empty regions'] = array_diff(array_keys($this->plugins['layout']['panels']), array_keys($this->prepared['regions']));
     $this->prep_run = TRUE;
   }
 
@@ -211,14 +210,18 @@ class panels_renderer_standard {
     $regions = array();
     if (empty($settings)) {
       // No display/panel region settings exist, init all with the defaults.
-      foreach ($region_list as $region_id => $panes) {
+      foreach ($this->plugins['layout']['panels'] as $region_id => $title) {
+        $panes = !empty($region_list[$region_id]) ? $region_list[$region_id] : array();
+
         $regions[$region_id] = $default;
         $regions[$region_id]['pids'] = $panes;
       }
     }
     else {
       // Some settings exist; iterate through each region and set individually
-      foreach ($region_list as $region_id => $panes) {
+      foreach ($this->plugins['layout']['panels'] as $region_id => $title) {
+        $panes = !empty($region_list[$region_id]) ? $region_list[$region_id] : array();
+
         if (empty($settings[$region_id]['style']) || $settings[$region_id]['style'] == -1) {
           $regions[$region_id] = $default;
         }
@@ -229,6 +232,7 @@ class panels_renderer_standard {
         $regions[$region_id]['pids'] = $panes;
       }
     }
+
     $this->prepared['regions'] = $regions;
     return $this->prepared['regions'];
   }
@@ -405,12 +409,7 @@ class panels_renderer_standard {
    *   An array of rendered panel regions, keyed on the region name.
    */
   function render_regions() {
-    // Initialize the regions array with keys for each region and NULL values
-    // for each; this prevents warnings on empty regions later
     $this->rendered['regions'] = array();
-    foreach (array_keys($this->plugins['layout']['panels']) as $region_id) {
-      $this->rendered['regions'][$region_id] = NULL;
-    }
 
     // Loop through all panel regions, put all panes that belong to the current
     // region in an array, then render the region. Primarily this ensures that

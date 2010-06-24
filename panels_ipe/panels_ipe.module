@@ -148,12 +148,15 @@ function panels_ipe_get_cache_key($key = NULL) {
 function panels_ipe_ajax_edit($cache) {
   $display = $cache->display;
   ctools_include('form');
+  ctools_include('plugins', 'panels');
 
   $form_state = array(
     'display' => &$display,
     'content_types' => $cache->content_types,
     'rerender' => FALSE,
     'no_redirect' => TRUE,
+    // Panels needs this to make sure that the layout gets callbacks
+    'layout' => panels_get_layout($display->layout),
   );
 
   $output = ctools_build_form('panels_ipe_edit_control_form', $form_state);
@@ -484,7 +487,7 @@ function panels_ipe_ajax_add_pane_config_finish(&$form_state) {
   $renderer->build($cache->display);
   panels_edit_cache_set($cache);
 
-  $form_state['commands'][] = ctools_ajax_command_append("#panels-ipe-regionid-$pane->panel", $renderer->render_pane($pane));
+  $form_state['commands'][] = ctools_ajax_command_before("#panels-ipe-regionid-$pane->panel .panels-ipe-placeholder", $renderer->render_pane($pane));
 }
 
 function panels_ipe_ajax_edit_pane_config_finish(&$form_state) {

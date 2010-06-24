@@ -65,20 +65,14 @@ class panels_renderer_ipe extends panels_renderer_standard {
     // Generate this region's 'empty' placeholder pane from the IPE plugin.
     $empty_ph = theme('panels_ipe_placeholder_pane', $region_id, $this->plugins['layout']['panels'][$region_id]);
     // Wrap the placeholder in some guaranteed markup.
-    $panes['empty_placeholder'] = '<div class="panels-ipe-placeholder panels-ipe-on">' . $empty_ph . "</div>";
+    $panes['empty_placeholder'] = '<div class="panels-ipe-placeholder panels-ipe-on panels-ipe-portlet-wrapper">' . $empty_ph . "</div>";
     // Generate this region's add new pane button. FIXME waaaaay too hardcoded
     $panes['add_button'] = theme('panels_ipe_add_pane_button', $region_id, $this->display);
 
     $output = parent::render_region($region_id, $panes);
     $output = theme('panels_ipe_region_wrapper', $output, $region_id, $this->display);
     $classes = 'panels-ipe-region';
-    // Use the canonical list of empty regions to determine whether or not this
-    // region should initially be marked empty. It is important that we use the
-    // list instead of introspecting on render data so that this behavior is
-    // easily controlled externally.
-    if (array_search($region_id, $this->prepared['empty regions'])) {
-      $classes .= ' panels-ipe-region-empty';
-    }
+
     return "<div id='panels-ipe-regionid-$region_id' class='panels-ipe-region'>" . $output . "</div>";
   }
 }

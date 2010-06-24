@@ -66,7 +66,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // all sortable regions to connect them with one another.
     $('div.panels-ipe-sort-container', ipe.topParent)
       .sortable('option', 'connectWith', ['div.panels-ipe-sort-container']);
-    
+
     $('.panels-ipe-form-container', ipe.control).append(formdata);
     // bind ajax submit to the form
     $('form', ipe.control).submit(function(event) {
@@ -91,7 +91,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
       }
       return false;
     });
-    
+
     $('input:submit', ipe.control).each(function() {
       if ($(this).val() == 'Save') {
         $(this).click(ipe.saveEditing);
@@ -102,11 +102,11 @@ function DrupalPanelsIPE(cache_key, cfg) {
     });
 
     // Perform visual effects in a particular sequence.
-    ipe.control.fadeOut('normal', function() {
+    ipe.control.fadeOut('fast', function() {
       ipe.initButton.hide();
-      ipe.control.fadeIn('normal', function() {
+      ipe.control.fadeIn('fast', function() {
         // Show all the hidden IPE elements
-        $('.panels-ipe-on').show('slow', function() {
+        $('.panels-ipe-on').show('fast', function() {
           ipe.topParent.addClass('panels-ipe-editing');
         });
       })
@@ -124,21 +124,24 @@ function DrupalPanelsIPE(cache_key, cfg) {
 
   this.endEditing = function() {
     // Re-hide all the IPE meta-elements
-    $('div.panels-ipe-on').hide('normal');
+    $('div.panels-ipe-on').hide('fast');
     ipe.topParent.removeClass('panels-ipe-editing');
     // Re-show all the IPE non-editing meta-elements
-    $('div.panels-ipe-off').show('normal');
+    $('div.panels-ipe-off').show('fast');
   };
 
   this.saveEditing = function() {
     $('div.panels-ipe-region', ipe.topParent).each(function() {
       var val = '';
       var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
-      $(this).children('div.panels-ipe-portlet-wrapper').each(function() {
-        if (val) {
-          val += ',';
+      $(this).find('div.panels-ipe-portlet-wrapper').each(function() {
+        var id = $(this).attr('id').split('panels-ipe-paneid-')[1];
+        if (id) {
+          if (val) {
+            val += ',';
+          }
+          val += id;
         }
-        val += $(this).attr('id').split('panels-ipe-paneid-')[1];
       });
       $('input#edit-panel-pane-' + region, ipe.control).val(val);
     });

@@ -8,6 +8,11 @@ Clean up flexible. Attempt to reduce the use of unnecessary divs.
 Add more ability to control flexible classes.
 Add ability to fix flexible canvas to a set width.
 Allow disabling of scaling for IE6 in flexible.
+Fixes to IPE:
+  Add pane would add the new pane outside region styling
+  Add pane would not appear in empty regions
+  Panes could not be dragged to empty regions
+  Save would lose content if they were inside stylizer styled regions
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
