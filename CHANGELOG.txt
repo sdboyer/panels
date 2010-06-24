@@ -13,6 +13,7 @@ Fixes to IPE:
   Add pane would not appear in empty regions
   Panes could not be dragged to empty regions
   Save would lose content if they were inside stylizer styled regions
+#822234 by Amitaibu: Missing url() caused IPE to not work on sites not using top level URLs.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
