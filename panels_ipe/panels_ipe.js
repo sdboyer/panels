@@ -102,15 +102,11 @@ function DrupalPanelsIPE(cache_key, cfg) {
     });
 
     // Perform visual effects in a particular sequence.
-    ipe.control.fadeOut('fast', function() {
-      ipe.initButton.hide();
-      ipe.control.fadeIn('fast', function() {
-        // Show all the hidden IPE elements
-        $('.panels-ipe-on').show('fast', function() {
-          ipe.topParent.addClass('panels-ipe-editing');
-        });
-      })
-    });
+    ipe.initButton.css('position', 'absolute');
+    ipe.initButton.fadeOut('normal');
+    $('.panels-ipe-on').show('normal');
+//    $('.panels-ipe-on').fadeIn('normal');
+    ipe.topParent.addClass('panels-ipe-editing');
   }
 
   this.formRespond = function(data) {
@@ -123,11 +119,13 @@ function DrupalPanelsIPE(cache_key, cfg) {
   }
 
   this.endEditing = function() {
-    // Re-hide all the IPE meta-elements
-    $('div.panels-ipe-on').hide('fast');
-    ipe.topParent.removeClass('panels-ipe-editing');
     // Re-show all the IPE non-editing meta-elements
     $('div.panels-ipe-off').show('fast');
+
+    // Re-hide all the IPE meta-elements
+    $('div.panels-ipe-on').hide('fast');
+    ipe.initButton.css('position', 'normal');
+    ipe.topParent.removeClass('panels-ipe-editing');
   };
 
   this.saveEditing = function() {

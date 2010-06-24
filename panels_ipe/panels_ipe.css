@@ -114,6 +114,10 @@ div#panels-ipe-control-container {
   display: block;
   background-color: #000;
   padding: 0.5em 1em;
+  min-width: 9.5em;
+  max-width: 12.5em;
+  min-height: 2em;
+  max-height: 2.5em;
   -moz-border-radius-topleft:5px;
   -moz-border-radius-topright:5px;
   -moz-box-shadow: #333 0px 1px 0px;
@@ -138,4 +142,11 @@ div.panels-ipe-pseudobutton {
 div.panels-ipe-control .form-submit {
   float: left;
   margin: 0.3em 0.5em;
+}
+
+div.panels-ipe-form-container {
+  min-width: 12.5em;
+  min-height: 2em;
+  margin-left: auto;
+  margin-right: auto;
 }
