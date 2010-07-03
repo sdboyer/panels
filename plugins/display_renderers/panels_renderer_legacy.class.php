@@ -22,7 +22,8 @@ class panels_renderer_legacy {
   var $display;
   var $plugins = array();
 
-  function build(&$display) {
+  function init($plugin, &$display) {
+    $this->plugin = $plugin;
     $layout = panels_get_layout($display->layout);
     $this->display = &$display;
     $this->plugins['layout'] = $layout;

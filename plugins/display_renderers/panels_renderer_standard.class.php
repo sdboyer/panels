@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 /**
  * The standard render pipeline for a Panels display object.
@@ -10,8 +11,7 @@
  *
  * @code
  *   // given that $display is a fully loaded Panels display object
- *   $renderer = new panels_renderer_standard();
- *   $renderer->build($display);
+ *   $renderer = panels_get_renderer_handler('standard', $display)
  *   $html_output = $renderer->render();
  * @endcode
  *
@@ -108,15 +108,29 @@ class panels_renderer_standard {
   var $prep_run = FALSE;
 
   /**
+   * The plugin that defines this handler.
+   */
+  var $plugin = FALSE;
+
+  /**
+   * TRUE if this renderer is rendering in administrative mode
+   * which will allow layouts to have extra functionality.
+   */
+  var $admin = FALSE;
+
+  /**
    * Receive and store the display object to be rendered.
    *
    * This is a psuedo-constructor that should typically be called immediately
    * after object construction.
    *
+   * @param array $plugin
+   *   The definition of the renderer plugin.
    * @param panels_display $display
    *   The panels display object to be rendered.
    */
-  function build(&$display) {
+  function init($plugin, &$display) {
+    $this->plugin = $plugin;
     $layout = panels_get_layout($display->layout);
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
@@ -281,7 +295,14 @@ class panels_renderer_standard {
     }
     $this->render_panes();
     $this->render_regions();
-    $this->rendered['layout'] = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $this->rendered['regions'], $this->display->layout_settings, $this->display, $this->plugins['layout']);
+
+    if ($this->admin && !empty($this->plugins['layout']['admin theme'])) {
+      $theme = $this->plugins['layout']['admin theme'];
+    }
+    else {
+      $theme = $this->plugins['layout']['theme'];
+    }
+    $this->rendered['layout'] = theme($theme, check_plain($this->display->css_id), $this->rendered['regions'], $this->display->layout_settings, $this->display, $this->plugins['layout'], $this);
     return $this->rendered['layout'];
   }
 
@@ -300,6 +321,11 @@ class panels_renderer_standard {
         drupal_add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['css']);
       }
     }
+
+    if ($this->admin && isset($this->plugins['layout']['admin css'])) {
+      drupal_add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['admin css']);
+    }
+
   }
 
   function render_panes() {

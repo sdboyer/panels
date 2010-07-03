@@ -20,12 +20,6 @@ $plugin = array(
   'title' => t('Panel'),
   'admin summary' =>'panels_panel_context_admin_summary',
   'admin title' => 'panels_panel_context_title',
-  'admin css' => array(
-    panels_get_path('css/panels_admin.css'),
-  ),
-  'admin js' => array(
-    panels_get_path('js/layout.js'),
-  ),
   'operations' => array(
     'settings' => array(
       'title' => t('General'),
@@ -285,7 +279,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   // TODO this is a temporary, hacky approach to ACLs for the IPE, and will be
   // modified in a later release
   if (!(variable_get('panels_legacy_rendering_mode', TRUE)) && module_exists('panels_ipe') && !empty($handler->conf['use_ipe']) && user_access('administer page manager')) {
-    $renderer = 'panels_renderer_ipe';
+    $renderer = 'ipe';
   }
 
   $info = array(
@@ -663,6 +657,9 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
   ctools_include('context-task-handler');
 
   $cache = panels_edit_cache_get('panel_context:' . $form_state['task_name'] . ':' . $form_state['handler_id']);
+
+  $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
+  $form_state['renderer']->cache = &$cache;
 
   $form_state['display'] = &$cache->display;
   $form_state['content_types'] = $cache->content_types;

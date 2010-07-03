@@ -30,6 +30,18 @@ Drupal.behaviors.PanelsIPE = function(context) {
   Drupal.PanelsIPE.bindClickDelete(context);
 };
 
+Drupal.CTools.AJAX.commands.initIPE = function(data) {
+  if (Drupal.PanelsIPE.editors[data.key]) {
+    Drupal.PanelsIPE.editors[data.key].initEditing(data.data);
+  }
+};
+
+Drupal.CTools.AJAX.commands.endIPE = function(data) {
+  if (Drupal.PanelsIPE.editors[data.key]) {
+    Drupal.PanelsIPE.editors[data.key].endEditing(data.data);
+  }
+};
+
 /**
  * Base object (class) definition for the Panels In-Place Editor.
  *
@@ -46,10 +58,13 @@ function DrupalPanelsIPE(cache_key, cfg) {
   this.control = $('div#panels-ipe-control-'+ cache_key);
   this.initButton = $('div.panels-ipe-startedit', this.control);
   this.cfg = cfg;
+  this.changed = false;
 
   this.initEditing = function(formdata) {
     // See http://jqueryui.com/demos/sortable/ for details on the configuration
     // parameters used here.
+    this.changed = false;
+
     var sortable_options = { // TODO allow the IPE plugin to control these
       revert: 200,
       dropOnEmpty: true, // default
@@ -60,6 +75,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
       handle: 'div.panels-ipe-draghandle',
       tolerance: 'pointer',
       cursorAt: 'top',
+      update: this.setChanged,
       scroll: true
       // containment: ipe.topParent,
     };
@@ -69,6 +85,8 @@ function DrupalPanelsIPE(cache_key, cfg) {
     $('div.panels-ipe-sort-container', ipe.topParent)
       .sortable('option', 'connectWith', ['div.panels-ipe-sort-container']);
 
+    $('div.panels-ipe-sort-container').bind('sortupdate', function() { ipe.changed = true; });
+
     $('.panels-ipe-form-container', ipe.control).append(formdata);
     // bind ajax submit to the form
     $('form', ipe.control).submit(function(event) {
@@ -77,9 +95,9 @@ function DrupalPanelsIPE(cache_key, cfg) {
         var ajaxOptions = {
           type: 'POST',
           url: url,
-          data: { 'js': 1 },
+          data: { 'js': 1, 'key': ipe.key },
           global: true,
-          success: ipe.formRespond,
+          success: Drupal.CTools.AJAX.respond,
           error: function(xhr) {
             Drupal.CTools.AJAX.handleErrors(xhr, url);
           },
@@ -111,16 +129,8 @@ function DrupalPanelsIPE(cache_key, cfg) {
     ipe.topParent.addClass('panels-ipe-editing');
   }
 
-  this.formRespond = function(data) {
-    $('.panels-ipe-form-container', ipe.control).empty();
-    ipe.endEditing();
-  }
-
-  this.showEditor = function() {
-
-  }
-
   this.endEditing = function() {
+    $('.panels-ipe-form-container', ipe.control).empty();
     // Re-show all the IPE non-editing meta-elements
     $('div.panels-ipe-off').show('fast');
 
@@ -148,7 +158,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.cancelEditing = function() {
-    if (confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
+    if (!this.changed || confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
       window.location.reload(); // trigger a page refresh.
       // $('div.panels-ipe-region', ipe.topParent).sortable('destroy');
     }
@@ -161,9 +171,9 @@ function DrupalPanelsIPE(cache_key, cfg) {
   var ajaxOptions = {
     type: "POST",
     url: ipe.cfg.formPath,
-    data: { 'js': 1 },
+    data: { 'js': 1, 'key': ipe.key },
     global: true,
-    success: ipe.initEditing,
+    success: Drupal.CTools.AJAX.respond,
     error: function(xhr) {
       Drupal.CTools.AJAX.handleErrors(xhr, ipe.cfg.formPath);
     },

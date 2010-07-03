@@ -12,11 +12,15 @@ $plugin = array(
   'description' => t('Allows choice of a stylizer style'),
 
   'render pane' => 'panels_stylizer_stylizer_style_render_pane',
-  'pane settings form' => 'panels_stylizer_stylizer_style_pane_settings_form',
+  'pane settings form' => 'panels_stylizer_stylizer_style_settings_form',
 
   'render region' => 'panels_stylizer_stylizer_style_render_region',
-  'settings form' => 'panels_stylizer_stylizer_style_region_settings_form',
+  'settings form' => 'panels_stylizer_stylizer_style_settings_form',
 
+  // Set up an AJAX callback for the style
+  'ajax' => array(
+    'custom' => 'panels_stylizer_pane_add_style',
+  ),
 //  'settings validate' => 'panels_stylizer_stylizer_style_settings_validate',
 );
 
@@ -88,25 +92,12 @@ function theme_panels_stylizer_stylizer_style_render_pane($content, $pane, $disp
   return theme('panels_pane', $content, $pane, $display);
 }
 
-function panels_stylizer_stylizer_style_region_settings_form($style_settings) {
-  return panels_stylizer_stylizer_style_settings_form($style_settings, 'region');
-}
-
-function panels_stylizer_stylizer_style_pane_settings_form($style_settings) {
-  return panels_stylizer_stylizer_style_settings_form($style_settings, 'pane');
-}
-
 /**
  * Settings form callback.
  */
-function panels_stylizer_stylizer_style_settings_form($style_settings, $style_type = 'region') {
-  $type = arg(3);
-  $cache_key = arg(4);
-  $pid = arg(5);
+function panels_stylizer_stylizer_style_settings_form($style_settings, $display, $pid, $type, $renderer) {
   if (!empty($style_settings['style']) && $style_settings['style'] == '$') {
-    module_load_include('inc', 'panels_stylizer', 'panels_stylizer.admin');
-    $cache = panels_edit_cache_load($cache_key);
-    panels_stylizer_pane_add_style($type, $cache, $pid, 'settings');
+    panels_stylizer_pane_add_style($renderer, array(), $style_settings, $type, $pid, 'settings');
   }
 
   ctools_include('stylizer');
@@ -121,7 +112,7 @@ function panels_stylizer_stylizer_style_settings_form($style_settings, $style_ty
     }
 
     $plugin = $plugins[$style->settings['style_base']];
-    if ($plugin['type'] == $style_type) {
+    if ($plugin['type'] == $type) {
       $options[$name] = $style->admin_title;
     }
   }
@@ -137,7 +128,8 @@ function panels_stylizer_stylizer_style_settings_form($style_settings, $style_ty
   // of the data necessary to do this through. It's one of the older plugins and
   // its form treatment goes all the way back to 4.7 and hasn't changed much.
 
-  $path = 'admin/build/panels/style/pane-style/' . arg(3) . '/' . arg(4) . '/' . arg(5);
+  $path = $renderer->get_url('style', 'custom', $type, $pid);
+//  $path = 'admin/build/panels/style/pane-style/' . arg(3) . '/' . arg(4) . '/' . arg(5);
   $form['new'] = array(
     '#value' => '<div>' . l(t('Or create a custom style...'), $path, array('attributes' => array('class' => 'ctools-use-ajax'))) . '</div>',
   );
@@ -145,3 +137,81 @@ function panels_stylizer_stylizer_style_settings_form($style_settings, $style_ty
   return $form;
 }
 
+
+/**
+ * Allow on-the-fly creation of styles in panes.
+ */
+function panels_stylizer_pane_add_style(&$renderer, $plugin, &$conf, $type, $pid, $step = NULL) {
+  if (!user_access('administer panels styles')) {
+    return;
+  }
+
+  ctools_include('stylizer');
+  $js = FALSE;
+
+  $path = $renderer->get_url('style', 'custom', $type, $pid, '%step');
+
+  $info = array(
+    'module' => 'panels',
+    'type' => $type,
+    'path' => $path,
+    'modal' => t('Create custom style'),
+    'owner form' => 'panels_stylizer_edit_pane_style_form',
+    'owner form validate' => 'panels_stylizer_edit_pane_style_form_validate',
+    'owner form submit' => 'panels_stylizer_edit_pane_style_form_submit',
+    'owner settings' => array('preconfigured' => FALSE, 'name' => '', 'admin_title' => '', 'admin_description' => ''),
+    'cache' => &$renderer->cache,
+    'conf' => &$conf,
+    'pid' => $pid,
+  );
+
+  if (!empty($conf['settings'])) {
+    $info['settings'] = $conf['settings'];
+  }
+
+  $output = ctools_stylizer_edit_style($info, TRUE, $step);
+  if (!empty($info['complete'])) {
+    if (isset($cache->style)) {
+      unset($cache->style);
+    }
+
+    if (!empty($info['owner settings']['preconfigured'])) {
+      $style = panels_stylizer_new();
+      $style->name = $info['settings']['name'];
+      $style->admin_title = $info['owner settings']['admin_title'];
+      $style->admin_description = $info['owner settings']['admin_description'];
+      $style->settings = $info['settings'];
+      panels_stylizer_save($style);
+      $conf['style'] = $info['settings']['name'];
+      if (isset($conf['settings'])) {
+        unset($conf['settings']);
+      }
+    }
+    else {
+      $conf['style'] = '$';
+      $conf['settings'] = $info['settings'];
+    }
+
+    // Be sure to unset the temporary if the style was just changed.
+    if (isset($renderer->cache->style)) {
+      unset($renderer->cache->style);
+    }
+    // $conf was a reference so it should just modify.
+    panels_edit_cache_set($renderer->cache);
+
+    $renderer->commands[] = ctools_modal_command_dismiss();
+
+    if ($type == 'pane') {
+      $renderer->command_update_pane($pid);
+    }
+    else if ($type == 'region') {
+      $renderer->command_update_region_links($pid);
+    }
+    else {
+      $renderer->command_update_display_links();
+    }
+  }
+  else {
+    $renderer->commands = $output;
+  }
+}

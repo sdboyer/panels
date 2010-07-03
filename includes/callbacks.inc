@@ -13,8 +13,8 @@ function panels_admin_page() {
 }
 
 function template_preprocess_panels_dashboard(&$vars) {
-  drupal_add_css(panels_get_path('css/panels-dashboard.css'));
-  $vars['image_path'] = url(panels_get_path('images'));
+  ctools_add_css('panels-dashboard', 'panels');
+  $vars['image_path'] = ctools_image_path('', 'panels');
 
   $vars['panel_page_description'] = t('Panel pages can be used as landing pages. They have a URL path, accept arguments and can have menu entries.');
   $vars['panel_override_description'] = t('Customize an already existing page within your site.');

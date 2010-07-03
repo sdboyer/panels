@@ -499,7 +499,9 @@ html.js div.panels-display-links div.ctools-dropdown-container {
   -moz-border-radius: 0.333em;
   -webkit-box-shadow: 0.333em 0.333em 0.333em rgba(0, 0, 0, 0.25);
   font-size: 0.9em;
+  font-weight: bold;
 }
+
 html.js #panels-dnd-main div.ctools-dropdown div.ctools-dropdown-container ul li,
 html.js div.panels-display-links div.ctools-dropdown-container ul li {
 

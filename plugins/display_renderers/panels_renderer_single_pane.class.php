@@ -11,9 +11,15 @@ class panels_renderer_single_pane extends panels_renderer_standard {
   /**
    * Modified build method (vs. panels_renderer_standard::build()); takes just
    * the display, no layout is necessary.
+   *
+   * @param array $plugin
+   *   The definition of the renderer plugin.
+   *
    * @param panels_display $display
+   *   The panels display object to be rendered.
    */
-  function build(&$display) {
+  function init($plugin, &$display) {
+    $this->plugin = $plugin;
     $this->display = &$display;
   }
 

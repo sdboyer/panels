@@ -14,6 +14,7 @@ Fixes to IPE:
   Panes could not be dragged to empty regions
   Save would lose content if they were inside stylizer styled regions
 #822234 by Amitaibu: Missing url() caused IPE to not work on sites not using top level URLs.
+#844062: Turned the normal drag and drop editor into a renderer plugin, made the IPE part of it. Also some fairly serious code reorganization.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============

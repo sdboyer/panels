@@ -96,7 +96,7 @@ function panels_choose_layout(&$form_state) {
     }
   }
 
-  drupal_add_js(panels_get_path('js/layout.js'));
+  ctools_add_js('layout', 'panels');
 
   $form['categories'] = array(
     '#title' => t('Category'),

@@ -385,7 +385,7 @@ function panels_mini_edit($panel_mini) {
 function panels_mini_edit_form(&$form_state, $panel_mini) {
   ctools_include('common', 'panels');
   ctools_include('plugins', 'panels');
-  drupal_add_css(panels_get_path('css/panels_admin.css'));
+  ctools_add_css('panels_admin', 'panels');
 
   $form['pid'] = array(
     '#type' => 'value',
@@ -562,7 +562,7 @@ function panels_mini_edit_context($panel_mini, $next = NULL) {
  * Form to edit the context settings of a mini panel.
  */
 function panels_mini_context_form(&$form_state, $panel_mini, $next = NULL) {
-  drupal_add_css(panels_get_path('css/panels_admin.css'));
+  ctools_add_css('panels_admin', 'panels');
   ctools_include('plugins', 'panels');
   $layout = panels_get_layout($panel_mini->display->layout);
 
