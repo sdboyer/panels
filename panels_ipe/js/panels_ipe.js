@@ -141,19 +141,13 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.saveEditing = function() {
-    $('div.panels-ipe-region', ipe.topParent).each(function() {
+    $('div.panels-ipe-sort-container', ipe.topParent).each(function() {
       var val = '';
-      var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
-      $(this).find('div.panels-ipe-portlet-wrapper').each(function() {
-        var id = $(this).attr('id').split('panels-ipe-paneid-')[1];
-        if (id) {
-          if (val) {
-            val += ',';
-          }
-          val += id;
-        }
+      $.each($(this).sortable('toArray'), function(i, v) {
+        v = v.replace('panels-ipe-paneid-', '');
+        val += val ? ',' + v : v;
       });
-      $('input#edit-panel-pane-' + region, ipe.control).val(val);
+      $('input#edit-panel-pane-' + $(this).attr('id').replace('panels-ipe-regionid-', ''), ipe.control).val(val);
     });
   };
 
