@@ -1,6 +1,6 @@
 // $Id$
 
-// Ensure the $ alias is owned by jQuery
+// Ensure the $ alias is owned by jQuery.
 (function($) {
 
 Drupal.PanelsIPE = {

@@ -67,7 +67,8 @@ class panels_renderer_ipe extends panels_renderer_editor {
   }
 
   /**
-   * Add an 'empty' pane placeholder above all the normal panes, and
+   * Add an 'empty' pane placeholder above all the normal panes.
+   *
    * @param $region_id
    * @param $panes
    */

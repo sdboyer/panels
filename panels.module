@@ -23,7 +23,7 @@ function panels_api_version() {
 }
 
 // --------------------------------------------------------------------------
-// Core Drupal hooks
+// Core Drupal hook implementations
 
 /**
  * Implementation of hook_theme()
@@ -255,7 +255,7 @@ function panels_flush_caches() {
 }
 
 // ---------------------------------------------------------------------------
-// CTools hooks
+// CTools hook implementations
 //
 // These aren't core Drupal hooks but they are just as important.
 
@@ -452,7 +452,7 @@ function panels_edit_layout($display, $finish, $destination = NULL, $allowed_lay
 }
 
 // ---------------------------------------------------------------------------
-// panels database functions
+// Panels database functions
 
 /**
  * Forms the basis of a panel display
@@ -1060,7 +1060,7 @@ function template_preprocess_panels_pane($vars) {
  * Panels' AJAX is controlled mostly by renderer objects. This menu callback
  * accepts the incoming request, figures out which object should handle the
  * request, and attempts to route it. If no object can be found, the default
- * Panels' editor object is used.
+ * Panels editor object is used.
  *
  * Calls are routed via the ajax_* method space. For example, if visiting
  * panels/ajax/add-pane then $renderer::ajax_add_pane() will be called.
