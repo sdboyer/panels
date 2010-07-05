@@ -217,6 +217,9 @@ function panels_edit_cache_load($cache_key) {
 function panels_init() {
   // Safety: go away if CTools is not at an appropriate version.
   if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    if (user_access('administer site configuration')) {
+      drupal_set_message(t('Panels is enabled but CTools is out of date. All Panels modules are disabled until CTools is updated. See the status page for more information.'), 'error');
+    }
     return;
   }
 
