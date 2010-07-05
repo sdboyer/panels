@@ -85,6 +85,8 @@ class panels_renderer_ipe extends panels_renderer_editor {
     $output = parent::render_region($region_id, $panes);
     $output = theme('panels_ipe_region_wrapper', $output, $region_id, $this->display);
     $classes = 'panels-ipe-region';
+
+    ctools_include('cleanstring');
     $region_id = ctools_cleanstring($region_id);
     return "<div id='panels-ipe-regionid-$region_id' class='panels-ipe-region'>$output</div>";
   }
@@ -156,6 +158,8 @@ class panels_renderer_ipe extends panels_renderer_editor {
     else {
       $pane = $this->display->content[$pid];
     }
+
+    ctools_include('cleanstring');
     $region_id = ctools_cleanstring($pane->panel);
     $this->commands[] = ctools_ajax_command_append("#panels-ipe-regionid-$region_id div.panels-ipe-sort-container", $this->render_pane($pane));
 //    $this->commands[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
