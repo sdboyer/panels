@@ -182,7 +182,7 @@ $plugin = array(
   'default conf' => array(
     'title' => t('Panel'),
     'no_blocks' => FALSE,
-    'use_ipe' => FALSE,
+    'pipeline' => 'standard',
     'css_id' => '',
     'css' => '',
     'contexts' => array(),
@@ -241,6 +241,8 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   // Go through arguments and see if they match.
   ctools_include('context');
   ctools_include('context-task-handler');
+  ctools_include('plugins', 'panels');
+
   // Add my contexts
   $contexts = ctools_context_handler_get_handler_contexts($base_contexts, $handler);
 
@@ -274,13 +276,12 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   // With an argument, this actually sets the display.
   panels_get_current_page_display($display);
 
-  $renderer = NULL; // NULL means the default renderer, set in the panels_display constructor, will be used
-
-  // TODO this is a temporary, hacky approach to ACLs for the IPE, and will be
-  // modified in a later release
-  if (!(variable_get('panels_legacy_rendering_mode', TRUE)) && module_exists('panels_ipe') && !empty($handler->conf['use_ipe']) && user_access('administer page manager')) {
-    $renderer = 'ipe';
+  // Handle backward compatibility with the IPE checkbox.
+  if (empty($handler->conf['pipeline'])) {
+    $handler->conf['pipeline'] = !empty($handler->conf['use_ipe']) ? 'ipe' : 'standard';
   }
+
+  $renderer = panels_get_renderer($handler->conf['pipeline'], $display);
 
   $info = array(
     'content' => panels_render_display($display, $renderer),
@@ -712,19 +713,36 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
     '#description' => t('Check this to have the page disable all regions displayed in the theme. Note that some themes support this setting better than others. If in doubt, try with stock themes to see.'),
   );
 
-  if (module_exists('panels_ipe')) { // Temporary approach till we get something better
-    // Initialize the value if needed...hacky hacky
-    $conf['use_ipe'] = isset($conf['use_ipe']) ? $conf['use_ipe'] : FALSE;
-    $form['conf']['use_ipe'] = array(
-      '#type' => 'checkbox',
-      '#default_value' => $conf['use_ipe'],
-      '#title' => t('Use In-Place Editor'),
-      '#description' => t('Use the new Panels In-Place Editor on this panel for users with global panel-editing permissions (Warning: EXPERIMENTAL!!)'),
+  ctools_include('plugins', 'panels');
+  $pipelines = panels_get_renderer_pipelines();
+
+  // Handle backward compatibility with the IPE checkbox.
+  if (empty($conf['pipeline'])) {
+    $conf['pipeline'] = !empty($conf['use_ipe']) ? 'ipe' : 'standard';
+  }
+
+  // If there are no pipelines, that probably means we're operating in
+  // legacy mode.
+  if (empty($pipelines)) {
+    // We retain the original pipeline so we don't wreck things by installing
+    // old modules.
+    $form['conf']['pipeline'] = array(
+      '#type' => 'value',
+      '#value' => $conf['pipeline'],
     );
-    if (variable_get('panels_legacy_rendering_mode', TRUE)) {
-      $form['conf']['use_ipe']['#disabled'] = TRUE;
-      $form['conf']['use_ipe']['#description'] = t('The IPE cannot be used while Panels is operating in legacy rendering mode. See !link for more information.', array('!link' => l('the status report', 'admin/reports/status')));
+  }
+  else {
+    $options = array();
+    foreach ($pipelines as $name => $pipeline) {
+      $options[$name] = check_plain($pipeline->admin_title) . '<div class="description">' . check_plain($pipeline->admin_description) . '</div>';
     }
+
+    $form['conf']['pipeline'] = array(
+      '#type' => 'radios',
+      '#options' => $options,
+      '#title' => t('Renderer'),
+      '#default_value' => $conf['pipeline'],
+    );
   }
 
   $form['conf']['css_id'] = array(
@@ -748,10 +766,15 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
  */
 function panels_panel_context_edit_settings_submit(&$form, &$form_state) {
   $form_state['handler']->conf['no_blocks'] = $form_state['values']['no_blocks'];
-  $form_state['handler']->conf['use_ipe'] = $form_state['values']['use_ipe'];
+  $form_state['handler']->conf['pipeline'] = $form_state['values']['pipeline'];
   $form_state['handler']->conf['css_id'] = $form_state['values']['css_id'];
   $form_state['handler']->conf['css'] = $form_state['values']['css'];
   $form_state['handler']->conf['title'] = $form_state['values']['title'];
+
+  // Unset the old checkbox so we don't store needless data.
+  if (isset($form_state['handler']->conf['use_ipe'])) {
+    unset($form_state['handler']->conf['use_ipe']);
+  }
 }
 
 /**

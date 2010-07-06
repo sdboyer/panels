@@ -99,6 +99,59 @@ function panels_schema_3() {
   // schema 4 and add them.
   $schema = panels_schema_2();
 
+  $schema['panels_renderer_pipeline'] = array(
+    'description' => 'Contains renderer pipelines for Panels. Each pipeline contains one or more renderers and access rules to select which renderer gets used.',
+    'export' => array(
+      'identifier' => 'pipeline',
+      'bulk export' => TRUE,
+      'primary key' => 'rpid',
+      'api' => array(
+        'owner' => 'panels',
+        'api' => 'pipelines',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
+    'fields' => array(
+      'rpid' => array(
+        'type' => 'serial',
+        'description' => 'A database primary key to ensure uniqueness.',
+        'not null' => TRUE,
+        'no export' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'description' => 'Unique ID for this content. Used to identify it programmatically.',
+      ),
+      'admin_title' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'description' => 'Administrative title for this pipeline.',
+      ),
+      'admin_description' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Administrative description for this pipeline.',
+        'object default' => '',
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'default' => 0,
+      ),
+      'settings' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Serialized settings for the actual pipeline. The contents of this field are up to the plugin that uses it.',
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+    ),
+    'primary key' => array('rpid'),
+  );
+
+
   $schema['panels_layout'] = array(
     'description' => 'Contains exportable customized layouts for this site.',
     'export' => array(
@@ -107,7 +160,7 @@ function panels_schema_3() {
       'primary key' => 'lid',
       'api' => array(
         'owner' => 'panels',
-        'api' => 'panels_layouts',
+        'api' => 'layouts',
         'minimum_version' => 1,
         'current_version' => 1,
       ),
@@ -115,7 +168,7 @@ function panels_schema_3() {
     'fields' => array(
       'lid' => array(
         'type' => 'serial',
-        'description' => 'A database primary key to ensure uniqueness',
+        'description' => 'A database primary key to ensure uniqueness.',
         'not null' => TRUE,
         'no export' => TRUE,
       ),
@@ -1424,5 +1477,18 @@ function panels_update_6308() {
   $schema = panels_schema_3();
 
   db_create_table($ret, 'panels_layout', $schema['panels_layout']);
+  return $ret;
+}
+
+/**
+ * Add the panels_renderer_pipeline table
+ */
+function panels_update_6309() {
+  $ret = array();
+
+  // Schema 3 is locked and should not be changed.
+  $schema = panels_schema_3();
+
+  db_create_table($ret, 'panels_renderer_pipeline', $schema['panels_renderer_pipeline']);
   return $ret;
 }

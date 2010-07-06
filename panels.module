@@ -240,6 +240,7 @@ function panels_perm() {
     'administer panels layouts',
     'use panels caching features',
     'use panels dashboard',
+    'use panels in place editing',
   );
 }
 
@@ -311,6 +312,13 @@ function panels_ctools_plugin_api($owner, $api) {
   if ($owner == 'panels' && $api == 'styles') {
     // As of 6.x-3.6, Panels has a slightly new system for style plugins.
     return array('version' => 2.0);
+  }
+
+  if ($owner == 'panels' && $api == 'pipelines') {
+    return array(
+      'version' => 1,
+      'path' => drupal_get_path('module', 'panels') . '/includes',
+    );
   }
 }
 

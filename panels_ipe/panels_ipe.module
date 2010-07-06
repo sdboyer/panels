@@ -10,6 +10,27 @@ function panels_ipe_ctools_plugin_directory($module, $plugin) {
 }
 
 /**
+ * Implementation of hook_ctools_plugin_api().
+ *
+ * Inform CTools about version information for various plugins implemented by
+ * Panels.
+ *
+ * @param string $owner
+ *   The system name of the module owning the API about which information is
+ *   being requested.
+ * @param string $api
+ *   The name of the API about which information is being requested.
+ */
+function panels_ipe_ctools_plugin_api($owner, $api) {
+  if ($owner == 'panels' && $api == 'pipelines') {
+    return array(
+      'version' => 1,
+      'path' => drupal_get_path('module', 'panels_ipe') . '/includes',
+    );
+  }
+}
+
+/**
  * Implementation of hook_theme().
  */
 function panels_ipe_theme() {

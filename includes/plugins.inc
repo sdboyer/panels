@@ -450,7 +450,7 @@ function panels_get_display_renderers() {
  * Get and initialize the class to handle rendering a display.
  *
  * @return
- *   Either the lister class or FALSE if one could not be had.
+ *   Either the instantiated renderer or FALSE if one could not be found.
  */
 function panels_get_renderer_handler($plugin, &$display) {
   if (is_string($plugin)) {
@@ -463,6 +463,88 @@ function panels_get_renderer_handler($plugin, &$display) {
     $renderer->init($plugin, $display);
     return $renderer;
   }
+
+  return FALSE;
+}
+
+/**
+ * Choose a renderer for a display based on a render pipeline setting.
+ */
+function panels_get_renderer($pipeline_name, &$display) {
+  // If operating in legacy mode, only the legacy renderer is available:
+  if (variable_get('panels_legacy_rendering_mode', TRUE)) {
+    return panels_get_renderer_handler('legacy', $display);
+  }
+
+  // Load the pipeline
+  ctools_include('export');
+  $pipeline = ctools_export_crud_load('panels_renderer_pipeline', $pipeline_name);
+
+  // If we can't, or it has no renderers, default.
+  if (!$pipeline || empty($pipeline->settings['renderers'])) {
+    return panels_get_renderer_handler('standard', $display);
+  }
+
+  // Get contexts set on the pipeline:
+  $contexts = array();
+  if (!empty($pipeline->settings['contexts'])) {
+    $contexts = ctools_context_load_contexts($pipeline->settings['context']);
+  }
+
+  // Cycle through our renderers and see.
+  foreach ($pipeline->settings['renderers'] as $candidate) {
+    // See if this passes selection criteria.
+    if (!ctools_access($candidate['access'], $contexts)) {
+      continue;
+    }
+
+    $renderer = panels_get_renderer_handler($candidate['renderer'], $display);
+
+    if (!empty($candidate['options'])) {
+      $renderer->set_options($candidate['options']);
+    }
+
+    return $renderer;
+  }
+
+  // Fall through. If no renderer is selected, use the standard renderer
+  return panels_get_renderer_handler('standard', $display);
+}
+
+/**
+ * Sort callback for sorting renderer pipelines.
+ *
+ * Sort first by weight, then by title.
+ */
+function _panels_renderer_pipeline_sort($a, $b) {
+  if ($a->weight == $b->weight) {
+      if ($a->admin_title == $b->admin_title) {
+        return 0;
+      }
+    return ($a->admin_title < $b->admin_title) ? -1 : 1;
+  }
+  return ($a->weight < $b->weight) ? -1 : 1;
+}
+
+/**
+ * Get a list of available renderer pipelines.
+ *
+ * This can be used to form a select or radios widget by enabling
+ * sorting. Descriptions are left in.
+ */
+function panels_get_renderer_pipelines($sort = TRUE) {
+  // If operating in legacy mode, only the legacy renderer is available:
+  if (variable_get('panels_legacy_rendering_mode', TRUE)) {
+    return array();
+  }
+
+  ctools_include('export');
+  $pipelines = ctools_export_crud_load_all('panels_renderer_pipeline');
+  if ($sort) {
+    uasort($pipelines, '_panels_renderer_pipeline_sort');
+  }
+
+  return $pipelines;
 }
 
 /**
