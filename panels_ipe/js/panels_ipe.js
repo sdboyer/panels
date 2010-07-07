@@ -57,7 +57,7 @@ Drupal.CTools.AJAX.commands.unlockIPE = function(data) {
 
 Drupal.CTools.AJAX.commands.endIPE = function(data) {
   if (Drupal.PanelsIPE.editors[data.key]) {
-    Drupal.PanelsIPE.editors[data.key].endEditing(data.data);
+    Drupal.PanelsIPE.editors[data.key].endEditing(data);
   }
 };
 
@@ -73,17 +73,16 @@ function DrupalPanelsIPE(cache_key, cfg) {
   var ipe = this;
   this.key = cache_key;
   this.state = {};
-  this.topParent = $('div#panels-ipe-display-' + cache_key);
   this.control = $('div#panels-ipe-control-' + cache_key);
   this.initButton = $('div.panels-ipe-startedit', this.control);
   this.cfg = cfg;
   this.changed = false;
 
   this.initEditing = function(formdata) {
+    this.topParent = $('div#panels-ipe-display-' + cache_key);
     // See http://jqueryui.com/demos/sortable/ for details on the configuration
     // parameters used here.
     this.changed = false;
-    this.backup = this.topParent.clone();
 
     this.sortable_options = { // TODO allow the IPE plugin to control these
       revert: 200,
@@ -153,7 +152,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     ipe.topParent.addClass('panels-ipe-editing');
   }
 
-  this.endEditing = function() {
+  this.endEditing = function(data) {
     $('.panels-ipe-form-container', ipe.control).empty();
     // Re-show all the IPE non-editing meta-elements
     $('div.panels-ipe-off').show('fast');
@@ -162,6 +161,20 @@ function DrupalPanelsIPE(cache_key, cfg) {
     $('div.panels-ipe-on').hide('fast');
     ipe.initButton.css('position', 'normal');
     ipe.topParent.removeClass('panels-ipe-editing');
+
+    var replacement = $('<div></div>').html(data.output);
+    replacement.hide();
+
+    if (data.output) {
+      ipe.topParent.fadeOut('normal', function() {
+        ipe.topParent.replaceWith(replacement);
+        ipe.topParent = replacement; // $('div#panels-ipe-display-' + ipe.key);
+        ipe.createSortContainers();
+        ipe.topParent.fadeIn('normal');
+
+        Drupal.attachBehaviors();
+      });
+    }
   };
 
   this.saveEditing = function() {
@@ -180,39 +193,29 @@ function DrupalPanelsIPE(cache_key, cfg) {
       ipe.changed = true;
     }
 
-    if (!ipe.changed || confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
-      ipe.topParent.fadeOut('medium', function() {
-        ipe.topParent.replaceWith(ipe.backup.clone());
-        ipe.topParent = $('div#panels-ipe-display-' + ipe.key);
-
-        // Processing of these things got lost in the cloning, but the classes remained behind.
-        // @todo this isn't ideal but I can't seem to figure out how to keep an unprocessed backup
-        // that will later get processed.
-        $('.ctools-use-modal-processed', ipe.topParent).removeClass('ctools-use-modal-processed');
-        $('.pane-delete-processed', ipe.topParent).removeClass('pane-delete-processed');
-        ipe.topParent.fadeIn('medium');
-        Drupal.attachBehaviors();
-      });
-    }
-    else {
-      // Cancel the submission.
+    if (ipe.changed && !confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
+      // Cancel the submission, which means the cancel won't be sent.
       return false;
     }
   };
 
-  $('div.panels-ipe-region', this.topParent).each(function() {
-    $('div.panels-ipe-portlet-marker', this).parent()
-      .wrapInner('<div class="panels-ipe-sort-container" />');
+  this.createSortContainers = function() {
+    $('div.panels-ipe-region', this.topParent).each(function() {
+      $('div.panels-ipe-portlet-marker', this).parent()
+        .wrapInner('<div class="panels-ipe-sort-container" />');
 
-    // Move our gadgets outside of the sort container so that sortables
-    // cannot be placed after them.
-    $('div.panels-ipe-portlet-static', this).each(function() {
-      $(this).appendTo($(this).parent().parent());
+      // Move our gadgets outside of the sort container so that sortables
+      // cannot be placed after them.
+      $('div.panels-ipe-portlet-static', this).each(function() {
+        $(this).appendTo($(this).parent().parent());
+      });
+
+      // Add a marker so we can drag things to empty containers.
+      $('div.panels-ipe-sort-container', this).append('<div>&nbsp;</div>');
     });
+  }
 
-    // Add a marker so we can drag things to empty containers.
-    $('div.panels-ipe-sort-container', this).append('<div>&nbsp;</div>');
-  });
+  this.createSortContainers();
 
   var ajaxOptions = {
     type: "POST",
