@@ -1133,7 +1133,7 @@ function panels_ajax_router() {
 // When editing displays and the like, Panels has a caching system that relies
 // on a callback to determine where to get the actual cache.
 
-// @todo Uhis system needs to be better documented so that it can be
+// @todo This system needs to be better documented so that it can be
 // better used.
 
 /**
