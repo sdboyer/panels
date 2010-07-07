@@ -55,8 +55,8 @@ function DrupalPanelsIPE(cache_key, cfg) {
   var ipe = this;
   this.key = cache_key;
   this.state = {};
-  this.topParent = $('div#panels-ipe-display-'+cache_key);
-  this.control = $('div#panels-ipe-control-'+ cache_key);
+  this.topParent = $('div#panels-ipe-display-' + cache_key);
+  this.control = $('div#panels-ipe-control-' + cache_key);
   this.initButton = $('div.panels-ipe-startedit', this.control);
   this.cfg = cfg;
   this.changed = false;
@@ -66,7 +66,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // parameters used here.
     this.changed = false;
 
-    var sortable_options = { // TODO allow the IPE plugin to control these
+    this.sortable_options = { // TODO allow the IPE plugin to control these
       revert: 200,
       dropOnEmpty: true, // default
       opacity: 0.75, // opacity of sortable while sorting
@@ -80,13 +80,17 @@ function DrupalPanelsIPE(cache_key, cfg) {
       scroll: true
       // containment: ipe.topParent,
     };
-    $('div.panels-ipe-sort-container', ipe.topParent).sortable(sortable_options);
+
+    $('div.panels-ipe-sort-container', ipe.topParent).sortable(ipe.sortable_options);
+
     // Since the connectWith option only does a one-way hookup, iterate over
     // all sortable regions to connect them with one another.
     $('div.panels-ipe-sort-container', ipe.topParent)
       .sortable('option', 'connectWith', ['div.panels-ipe-sort-container']);
 
-    $('div.panels-ipe-sort-container').bind('sortupdate', function() { ipe.changed = true; });
+    $('div.panels-ipe-sort-container', ipe.topParent).bind('sortupdate', function() {
+      ipe.changed = true;
+    });
 
     $('.panels-ipe-form-container', ipe.control).append(formdata);
     // bind ajax submit to the form
@@ -121,6 +125,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
         $(this).click(ipe.cancelEditing);
       };
     });
+    this.backup = this.topParent.clone();
 
     // Perform visual effects in a particular sequence.
     ipe.initButton.css('position', 'absolute');
@@ -153,13 +158,18 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.cancelEditing = function() {
-    if ($('#panels-ipe-display-' + ipe.key).hasClass('changed')) {
-      this.changed = true;
+    if (ipe.topParent.hasClass('changed')) {
+      ipe.changed = true;
     }
 
-    if (!this.changed || confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
-      window.location.reload(); // trigger a page refresh.
+    if (!ipe.changed || confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
+//      window.location.reload(); // trigger a page refresh.
       // $('div.panels-ipe-region', ipe.topParent).sortable('destroy');
+      ipe.topParent.fadeOut('medium', function() {
+        ipe.topParent.replaceWith(ipe.backup.clone());
+        ipe.topParent = $('div#panels-ipe-display-' + ipe.key);
+        ipe.topParent.fadeIn('medium');
+      });
     }
     else {
       // Cancel the submission.
