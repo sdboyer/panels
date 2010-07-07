@@ -13,6 +13,7 @@ Drupal.PanelsIPE = {
           $(this).parents('div.panels-ipe-portlet-wrapper').fadeOut(1000, function() {
             $(this).empty().remove();
           });
+          $(this).parents('div.panels-ipe-display-container').addClass('changed');
         }
         return false;
       });
@@ -152,6 +153,10 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.cancelEditing = function() {
+    if ($('#panels-ipe-display-' + ipe.key).hasClass('changed')) {
+      this.changed = true;
+    }
+
     if (!this.changed || confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
       window.location.reload(); // trigger a page refresh.
       // $('div.panels-ipe-region', ipe.topParent).sortable('destroy');

@@ -145,7 +145,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
     }
 
     $this->commands[] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid", $this->render_pane($pane));
-//    $this->commands[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->display->cache_key}");
   }
 
   /**
@@ -162,7 +162,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
     ctools_include('cleanstring');
     $region_id = ctools_cleanstring($pane->panel);
     $this->commands[] = ctools_ajax_command_append("#panels-ipe-regionid-$region_id div.panels-ipe-sort-container", $this->render_pane($pane));
-//    $this->commands[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->display->cache_key}");
   }
 }
 
