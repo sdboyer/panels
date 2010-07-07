@@ -37,6 +37,24 @@ Drupal.CTools.AJAX.commands.initIPE = function(data) {
   }
 };
 
+Drupal.CTools.AJAX.commands.unlockIPE = function(data) {
+  if (confirm(data.message)) {
+    var ajaxOptions = {
+      type: "POST",
+      url: data.break_path,
+      data: { 'js': 1 },
+      global: true,
+      success: Drupal.CTools.AJAX.respond,
+      error: function(xhr) {
+        Drupal.CTools.AJAX.handleErrors(xhr, ipe.cfg.formPath);
+      },
+      dataType: 'json'
+    };
+
+    $.ajax(ajaxOptions);
+  };
+};
+
 Drupal.CTools.AJAX.commands.endIPE = function(data) {
   if (Drupal.PanelsIPE.editors[data.key]) {
     Drupal.PanelsIPE.editors[data.key].endEditing(data.data);
@@ -65,6 +83,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // See http://jqueryui.com/demos/sortable/ for details on the configuration
     // parameters used here.
     this.changed = false;
+    this.backup = this.topParent.clone();
 
     this.sortable_options = { // TODO allow the IPE plugin to control these
       revert: 200,
@@ -100,7 +119,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
         var ajaxOptions = {
           type: 'POST',
           url: url,
-          data: { 'js': 1, 'key': ipe.key },
+          data: { 'js': 1 },
           global: true,
           success: Drupal.CTools.AJAX.respond,
           error: function(xhr) {
@@ -125,7 +144,6 @@ function DrupalPanelsIPE(cache_key, cfg) {
         $(this).click(ipe.cancelEditing);
       };
     });
-    this.backup = this.topParent.clone();
 
     // Perform visual effects in a particular sequence.
     ipe.initButton.css('position', 'absolute');
@@ -163,30 +181,23 @@ function DrupalPanelsIPE(cache_key, cfg) {
     }
 
     if (!ipe.changed || confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
-//      window.location.reload(); // trigger a page refresh.
-      // $('div.panels-ipe-region', ipe.topParent).sortable('destroy');
       ipe.topParent.fadeOut('medium', function() {
         ipe.topParent.replaceWith(ipe.backup.clone());
         ipe.topParent = $('div#panels-ipe-display-' + ipe.key);
+
+        // Processing of these things got lost in the cloning, but the classes remained behind.
+        // @todo this isn't ideal but I can't seem to figure out how to keep an unprocessed backup
+        // that will later get processed.
+        $('.ctools-use-modal-processed', ipe.topParent).removeClass('ctools-use-modal-processed');
+        $('.pane-delete-processed', ipe.topParent).removeClass('pane-delete-processed');
         ipe.topParent.fadeIn('medium');
+        Drupal.attachBehaviors();
       });
     }
     else {
       // Cancel the submission.
       return false;
     }
-  };
-
-  var ajaxOptions = {
-    type: "POST",
-    url: ipe.cfg.formPath,
-    data: { 'js': 1, 'key': ipe.key },
-    global: true,
-    success: Drupal.CTools.AJAX.respond,
-    error: function(xhr) {
-      Drupal.CTools.AJAX.handleErrors(xhr, ipe.cfg.formPath);
-    },
-    dataType: 'json'
   };
 
   $('div.panels-ipe-region', this.topParent).each(function() {
@@ -202,6 +213,18 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // Add a marker so we can drag things to empty containers.
     $('div.panels-ipe-sort-container', this).append('<div>&nbsp;</div>');
   });
+
+  var ajaxOptions = {
+    type: "POST",
+    url: ipe.cfg.formPath,
+    data: { 'js': 1 },
+    global: true,
+    success: Drupal.CTools.AJAX.respond,
+    error: function(xhr) {
+      Drupal.CTools.AJAX.handleErrors(xhr, ipe.cfg.formPath);
+    },
+    dataType: 'json'
+  };
 
   $('div.panels-ipe-startedit', this.control).click(function() {
     var $this = $(this);

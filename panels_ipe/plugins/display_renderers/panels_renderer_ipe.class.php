@@ -10,21 +10,23 @@ class panels_renderer_ipe extends panels_renderer_editor {
 
   function render() {
     $output = parent::render();
-    return "<div id='panels-ipe-display-{$this->display->cache_key}' class='panels-ipe-display-container'>$output</div>";
+    return "<div id='panels-ipe-display-{$this->clean_key}' class='panels-ipe-display-container'>$output</div>";
   }
 
   function add_meta() {
     ctools_include('display-edit', 'panels');
     ctools_include('content');
 
-    $this->display->cache_key = $this->display->did;
-    panels_ipe_get_cache_key($this->display->cache_key);
-    $cache = new stdClass();
-    $cache->display = $this->display;
+    if (empty($this->display->cache_key)) {
+      $this->cache = panels_edit_cache_get_default($this->display);
+    }
+    // @todo we may need an else to load the cache, but I am not sure we
+    // actually need to load it if we already have our cache key, and doing
+    // so is a waste of resources.
 
-    // NO good reason for this to need to be set way out here!?
-    $cache->content_types = ctools_content_get_available_types();
-    panels_edit_cache_set($cache);
+    ctools_include('cleanstring');
+    $this->clean_key = ctools_cleanstring($this->display->cache_key);
+    panels_ipe_get_cache_key($this->clean_key);
 
     ctools_include('ajax');
     ctools_include('modal');
@@ -38,8 +40,8 @@ class panels_renderer_ipe extends panels_renderer_editor {
     $settings = array(
       'formPath' => url($this->get_url('save-form')),
     );
-    drupal_add_js(array('PanelsIPECacheKeys' => array($this->display->cache_key)), 'setting');
-    drupal_add_js(array('PanelsIPESettings' => array($this->display->cache_key => $settings)), 'setting');
+    drupal_add_js(array('PanelsIPECacheKeys' => array($this->clean_key)), 'setting');
+    drupal_add_js(array('PanelsIPESettings' => array($this->clean_key => $settings)), 'setting');
 
     jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
     parent::add_meta();
@@ -94,8 +96,27 @@ class panels_renderer_ipe extends panels_renderer_editor {
   /**
    * AJAX entry point to create the controller form for an IPE.
    */
-  function ajax_save_form() {
+  function ajax_save_form($break = NULL) {
     ctools_include('form');
+    if (!empty($this->cache->locked)) {
+      if ($break != 'break') {
+        $account  = user_load($this->cache->locked->uid);
+        $name     = theme('username', $account);
+        $lock_age = format_interval(time() - $this->cache->locked->updated);
+
+        $message = t("This panel is being edited by user !user, and is therefore locked from editing by others. This lock is !age old.\n\nClick OK to break this lock and discard any changes made by !user.", array('!user' => $name, '!age' => $lock_age));
+
+        $this->commands[] = array(
+          'command' => 'unlockIPE',
+          'message' => $message,
+          'break_path' => url($this->get_url('save-form', 'break'))
+        );
+        return;
+      }
+
+      // Break the lock.
+      panels_edit_cache_break_lock($this->cache);
+    }
 
     $form_state = array(
       'display' => &$this->display,
@@ -108,9 +129,11 @@ class panels_renderer_ipe extends panels_renderer_editor {
 
     $output = ctools_build_form('panels_ipe_edit_control_form', $form_state);
     if ($output) {
+      // At this point, we want to save the cache to ensure that we have a lock.
+      panels_edit_cache_set($this->cache);
       $this->commands[] = array(
         'command' => 'initIPE',
-        'key' => $this->display->cache_key,
+        'key' => $this->clean_key,
         'data' => $output,
       );
       return;
@@ -119,16 +142,16 @@ class panels_renderer_ipe extends panels_renderer_editor {
     // no output == submit
     if (!empty($form_state['clicked_button']['#save-display'])) {
       // saved
-      panels_save_display($this->display);
+      panels_edit_cache_save($this->cache);
     }
     else {
       // canceled
-      panels_cache_clear($this->display->cache_key);
+      panels_edit_cache_clear($this->cache);
     }
 
     $this->commands[] = array(
       'command' => 'endIPE',
-      'key' => $this->display->cache_key,
+      'key' => $this->clean_key,
       'data' => $output,
     );
   }
@@ -145,7 +168,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
     }
 
     $this->commands[] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid", $this->render_pane($pane));
-    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->display->cache_key}");
+    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->clean_key}");
   }
 
   /**
@@ -162,7 +185,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
     ctools_include('cleanstring');
     $region_id = ctools_cleanstring($pane->panel);
     $this->commands[] = ctools_ajax_command_append("#panels-ipe-regionid-$region_id div.panels-ipe-sort-container", $this->render_pane($pane));
-    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->display->cache_key}");
+    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->clean_key}");
   }
 }
 
@@ -171,7 +194,8 @@ class panels_renderer_ipe extends panels_renderer_editor {
  */
 function panels_ipe_edit_control_form(&$form_state) {
   $display = &$form_state['display'];
-  $display->cache_key = isset($display->cache_key) ? $display->cache_key : $display->did;
+  // @todo -- this should be unnecessary as we ensure cache_key is set in add_meta()
+//  $display->cache_key = isset($display->cache_key) ? $display->cache_key : $display->did;
 
   // Annoyingly, theme doesn't have access to form_state so we have to do this.
   $form['#display'] = $display;

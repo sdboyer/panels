@@ -27,22 +27,13 @@ function _panels_edit($display, $destination, $content_types, $title = FALSE) {
     $display = $cache->display;
   }
   else {
-    if (empty($content_types)) {
-      $content_types = ctools_content_get_available_types();
-    }
-
-    $display->cache_key = $did;
-    panels_cache_clear('display', $did);
-    $cache = new stdClass();
-    $cache->display = $display;
-    $cache->content_types = $content_types;
-    $cache->display_title = $title;
-    panels_edit_cache_set($cache);
+    $cache = panels_edit_cache_get_default($display, $content_types, $title);
   }
 
   // Get a renderer.
   $renderer = panels_get_renderer_handler('editor', $display);
   $renderer->cache = $cache;
+
   $output = $renderer->edit();
   if (is_object($output) && $destination) {
     return drupal_goto($destination);

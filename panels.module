@@ -1117,6 +1117,9 @@ function panels_ajax_router() {
   }
 
   $renderer->cache = &$cache;
+  ctools_include('cleanstring');
+  $renderer->clean_key = ctools_cleanstring($cache_key);
+
   $output = call_user_func_array(array($renderer, $method), $args);
   if (empty($output) && !empty($renderer->commands)) {
     return ctools_ajax_render($renderer->commands);
@@ -1129,6 +1132,9 @@ function panels_ajax_router() {
 //
 // When editing displays and the like, Panels has a caching system that relies
 // on a callback to determine where to get the actual cache.
+
+// @todo Uhis system needs to be better documented so that it can be
+// better used.
 
 /**
  * Get an object from cache.
@@ -1155,6 +1161,30 @@ function panels_cache_set($obj, $did, $cache) {
 function panels_cache_clear($obj, $did) {
   ctools_include('object-cache');
   return ctools_object_cache_clear($obj, 'panels_display:' . $did);
+}
+
+/**
+ * Create the default cache for editing panel displays.
+ *
+ * If an application is using the Panels display editor without having
+ * specified a cache key, this method can be used to create the default
+ * cache.
+ */
+function panels_edit_cache_get_default(&$display, $content_types = NULL, $title = FALSE) {
+  if (empty($content_types)) {
+    $content_types = ctools_content_get_available_types();
+  }
+
+  $display->cache_key = $display->did;
+  panels_cache_clear('display', $display->did);
+
+  $cache = new stdClass();
+  $cache->display = &$display;
+  $cache->content_types = $content_types;
+  $cache->display_title = $title;
+
+  panels_edit_cache_set($cache);
+  return $cache;
 }
 
 /**
@@ -1185,6 +1215,69 @@ function panels_edit_cache_set($cache) {
   // Fall back to our normal method:
   return panels_cache_set('display', $cache_key, $cache);
 }
+
+/**
+ * Method to allow modules to provide their own mechanism to write the
+ * cache used in the display editor.
+ */
+function panels_edit_cache_save($cache) {
+  $cache_key = $cache->display->cache_key;
+  if (strpos($cache_key, ':') !== FALSE) {
+    list($module, $argument) = explode(':', $cache_key, 2);
+    if (function_exists($module . '_panels_cache_save')) {
+      return module_invoke($module, 'panels_cache_save', $argument, $cache);
+    }
+  }
+
+  // Fall back to our normal method:
+  return panels_save_display($cache->display);
+}
+
+/**
+ * Method to allow modules to provide their own mechanism to clear the
+ * cache used in the display editor.
+ */
+function panels_edit_cache_clear($cache) {
+  $cache_key = $cache->display->cache_key;
+  if (strpos($cache_key, ':') !== FALSE) {
+    list($module, $argument) = explode(':', $cache_key, 2);
+    if (function_exists($module . '_panels_cache_clear')) {
+      return module_invoke($module, 'panels_cache_clear', $argument, $cache);
+    }
+  }
+
+  // Fall back to our normal method:
+  return panels_cache_clear($cache_key);
+}
+
+/**
+ * Method to allow modules to provide a mechanism to break locks.
+ */
+function panels_edit_cache_break_lock($cache) {
+  if (empty($cache->locked)) {
+    return;
+  }
+
+  $cache_key = $cache->display->cache_key;
+  if (strpos($cache_key, ':') !== FALSE) {
+    list($module, $argument) = explode(':', $cache_key, 2);
+    if (function_exists($module . '_panels_cache_break_lock')) {
+      return module_invoke($module, 'panels_cache_break_lock', $argument, $cache);
+    }
+  }
+
+  // Normal panel display editing has no locks, so we do nothing if there is
+  // no fallback.
+  return;
+}
+
+// --------------------------------------------------------------------------
+// Callbacks on behalf of the panel_context plugin.
+//
+// The panel_context plugin lets Panels be used in page manager. These
+// callbacks allow the display editing system to use the page manager
+// cache rather than the default display cache. They are routed by the cache
+// key via panels_edit_cache_* functions.
 
 /**
  * Get display edit cache on behalf of panel context.
@@ -1218,14 +1311,15 @@ function panel_context_panels_cache_get($key) {
   $cache->display->cache_key = 'panel_context:' . $key;
   $cache->content_types = panels_common_get_allowed_types('panels_page', $cache->display->context);
   $cache->display_title = TRUE;
+  $cache->locked = $page->locked;
 
   return $cache;
 }
 
 /**
- * Store a display edit in progress in the page cache.
+ * Get the Page Manager cache for the panel_context plugin.
  */
-function panel_context_panels_cache_set($key, $cache) {
+function _panel_context_panels_cache_get_page_cache($key, $cache) {
   list($task_name, $handler_name) = explode(':', $key, 2);
   $page = page_manager_get_page_cache($task_name);
   $page->display_cache[$handler_name] = $cache;
@@ -1236,7 +1330,32 @@ function panel_context_panels_cache_set($key, $cache) {
   else {
     $page->new_handler->conf['display'] = $cache->display;
   }
+
+  return $page;
+}
+
+/**
+ * Store a display edit in progress in the page cache.
+ */
+function panel_context_panels_cache_set($key, $cache) {
+  $page = _panel_context_panels_cache_get_page_cache($key, $cache);
   page_manager_set_page_cache($page);
+}
+
+/**
+ * Save all changes made to a display using the Page Manager page cache.
+ */
+function panel_context_panels_cache_save($key, $cache) {
+  $page = _panel_context_panels_cache_get_page_cache($key, $cache);
+  page_manager_save_page_cache($page);
+}
+
+/**
+ * Break the lock on a page manager page.
+ */
+function panel_context_panels_cache_break_lock($key, $cache) {
+  $page = _panel_context_panels_cache_get_page_cache($key, $cache);
+  ctools_object_cache_clear_all('page_manager_page', $page->task_name);
 }
 
 // --------------------------------------------------------------------------
