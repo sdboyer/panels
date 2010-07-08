@@ -18,6 +18,7 @@ Fixes to IPE:
 Improve the renderer selection framework. This framework has no UI, but it utilizes exportables and new choices can be hand crafted.
 Improve the IPE to use the proper cache if it is set, and to respect locking.
 #847784: IPE displayed "Edit" link when no such link should have existed.
+#843758: Legacy renderer caused "missing argument" warning when rendering.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============

@@ -65,7 +65,7 @@ class panels_renderer_legacy {
       $content = $cache->content;
     }
 
-    $output = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $content, $this->display->layout_settings, $this->display);
+    $output = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $content, $this->display->layout_settings, $this->display, $this->plugins['layout'], $this);
 
     return $output;
   }
