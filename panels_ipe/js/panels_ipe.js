@@ -10,7 +10,7 @@ Drupal.PanelsIPE = {
       .addClass('pane-delete-processed')
       .click(function() {
         if (confirm('Remove this pane?')) {
-          $(this).parents('div.panels-ipe-portlet-wrapper').fadeOut(1000, function() {
+          $(this).parents('div.panels-ipe-portlet-wrapper').fadeOut('medium', function() {
             $(this).empty().remove();
           });
           $(this).parents('div.panels-ipe-display-container').addClass('changed');
@@ -169,15 +169,21 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // Put our button in.
     this.form.clk = this;
 
-    $('div.panels-ipe-sort-container', ipe.topParent).each(function() {
+    $('div.panels-ipe-region', ipe.topParent).each(function() {
       var val = '';
-      $.each($(this).sortable('toArray'), function(i, v) {
-        v = v.replace('panels-ipe-paneid-', '');
-        val += val ? ',' + v : v;
+      var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
+      $(this).find('div.panels-ipe-portlet-wrapper').each(function() {
+        var id = $(this).attr('id').split('panels-ipe-paneid-')[1];
+        if (id) {
+          if (val) {
+            val += ',';
+          }
+          val += id;
+        }
       });
-      $('input#edit-panel-pane-' + $(this).attr('id').replace('panels-ipe-regionid-', ''), ipe.control).val(val);
+      $('input#edit-panel-pane-' + region, ipe.control).val(val);
     });
-  };
+  }
 
   this.cancelEditing = function() {
     // Put our button in.
