@@ -141,11 +141,11 @@ class panels_renderer_ipe extends panels_renderer_editor {
 
     // no output == submit
     if (!empty($form_state['clicked_button']['#save-display'])) {
-      // saved
+      // Saved. Save the cache.
       panels_edit_cache_save($this->cache);
     }
     else {
-      // canceled
+      // Cancelled. Clear the cache.
       panels_edit_cache_clear($this->cache);
     }
 
@@ -153,7 +153,6 @@ class panels_renderer_ipe extends panels_renderer_editor {
       'command' => 'endIPE',
       'key' => $this->clean_key,
       'data' => $output,
-      'output' => $this->render(),
     );
   }
 

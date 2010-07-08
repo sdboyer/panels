@@ -1247,7 +1247,7 @@ function panels_edit_cache_clear($cache) {
   }
 
   // Fall back to our normal method:
-  return panels_cache_clear($cache_key);
+  return panels_cache_clear('display', $cache_key);
 }
 
 /**
@@ -1340,6 +1340,14 @@ function _panel_context_panels_cache_get_page_cache($key, $cache) {
 function panel_context_panels_cache_set($key, $cache) {
   $page = _panel_context_panels_cache_get_page_cache($key, $cache);
   page_manager_set_page_cache($page);
+}
+
+/**
+ * Save all changes made to a display using the Page Manager page cache.
+ */
+function panel_context_panels_cache_clear($key, $cache) {
+  $page = _panel_context_panels_cache_get_page_cache($key, $cache);
+  page_manager_clear_page_cache($page->task_name);
 }
 
 /**

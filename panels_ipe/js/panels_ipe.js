@@ -80,6 +80,8 @@ function DrupalPanelsIPE(cache_key, cfg) {
 
   this.initEditing = function(formdata) {
     this.topParent = $('div#panels-ipe-display-' + cache_key);
+    this.backup = this.topParent.clone();
+
     // See http://jqueryui.com/demos/sortable/ for details on the configuration
     // parameters used here.
     this.changed = false;
@@ -161,23 +163,12 @@ function DrupalPanelsIPE(cache_key, cfg) {
     $('div.panels-ipe-on').hide('fast');
     ipe.initButton.css('position', 'normal');
     ipe.topParent.removeClass('panels-ipe-editing');
-
-    var replacement = $('<div></div>').html(data.output);
-    replacement.hide();
-
-    if (data.output) {
-      ipe.topParent.fadeOut('normal', function() {
-        ipe.topParent.replaceWith(replacement);
-        ipe.topParent = replacement; // $('div#panels-ipe-display-' + ipe.key);
-        ipe.createSortContainers();
-        ipe.topParent.fadeIn('normal');
-
-        Drupal.attachBehaviors();
-      });
-    }
   };
 
   this.saveEditing = function() {
+    // Put our button in.
+    this.form.clk = this;
+
     $('div.panels-ipe-sort-container', ipe.topParent).each(function() {
       var val = '';
       $.each($(this).sortable('toArray'), function(i, v) {
@@ -189,12 +180,29 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.cancelEditing = function() {
+    // Put our button in.
+    this.form.clk = this;
+
     if (ipe.topParent.hasClass('changed')) {
       ipe.changed = true;
     }
 
-    if (ipe.changed && !confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
-      // Cancel the submission, which means the cancel won't be sent.
+    if (!ipe.changed || confirm(Drupal.t('This will discard all unsaved changes. Are you sure?'))) {
+      ipe.topParent.fadeOut('medium', function() {
+        ipe.topParent.replaceWith(ipe.backup.clone());
+        ipe.topParent = $('div#panels-ipe-display-' + ipe.key);
+
+        // Processing of these things got lost in the cloning, but the classes remained behind.
+        // @todo this isn't ideal but I can't seem to figure out how to keep an unprocessed backup
+        // that will later get processed.
+        $('.ctools-use-modal-processed', ipe.topParent).removeClass('ctools-use-modal-processed');
+        $('.pane-delete-processed', ipe.topParent).removeClass('pane-delete-processed');
+        ipe.topParent.fadeIn('medium');
+        Drupal.attachBehaviors();
+      });
+    }
+	  else {
+      // Cancel the submission.
       return false;
     }
   };
