@@ -79,29 +79,28 @@ function DrupalPanelsIPE(cache_key, cfg) {
   this.initButton = $('div.panels-ipe-startedit', this.control);
   this.cfg = cfg;
   this.changed = false;
+  this.sortable_options = $.extend({
+    revert: 200,
+    dropOnEmpty: true, // default
+    opacity: 0.75, // opacity of sortable while sorting
+    // placeholder: 'draggable-placeholder',
+    // forcePlaceholderSize: true,
+    items: 'div.panels-ipe-portlet-wrapper',
+    handle: 'div.panels-ipe-draghandle',
+    tolerance: 'pointer',
+    cursorAt: 'top',
+    update: this.setChanged,
+    scroll: true
+    // containment: ipe.topParent,
+  }, cfg.sortable_options || {});
 
   this.initEditing = function(formdata) {
-    this.topParent = $('div#panels-ipe-display-' + cache_key);
-    this.backup = this.topParent.clone();
+    ipe.topParent = $('div#panels-ipe-display-' + cache_key);
+    ipe.backup = this.topParent.clone();
 
     // See http://jqueryui.com/demos/sortable/ for details on the configuration
     // parameters used here.
-    this.changed = false;
-
-    this.sortable_options = { // TODO allow the IPE plugin to control these
-      revert: 200,
-      dropOnEmpty: true, // default
-      opacity: 0.75, // opacity of sortable while sorting
-      // placeholder: 'draggable-placeholder',
-      // forcePlaceholderSize: true,
-      items: 'div.panels-ipe-portlet-wrapper',
-      handle: 'div.panels-ipe-draghandle',
-      tolerance: 'pointer',
-      cursorAt: 'top',
-      update: this.setChanged,
-      scroll: true
-      // containment: ipe.topParent,
-    };
+    ipe.changed = false;
 
     $('div.panels-ipe-sort-container', ipe.topParent).sortable(ipe.sortable_options);
 
@@ -209,7 +208,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
         Drupal.attachBehaviors();
       });
     }
-	  else {
+    else {
       // Cancel the submission.
       return false;
     }

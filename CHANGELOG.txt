@@ -19,6 +19,7 @@ Improve the renderer selection framework. This framework has no UI, but it utili
 Improve the IPE to use the proper cache if it is set, and to respect locking.
 #847784: IPE displayed "Edit" link when no such link should have existed.
 #843758: Legacy renderer caused "missing argument" warning when rendering.
+Made it possible to override jQuery UI sortable options via settings in the renderer plugin.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
