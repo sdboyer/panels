@@ -79,7 +79,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
   this.initButton = $('div.panels-ipe-startedit', this.control);
   this.cfg = cfg;
   this.changed = false;
-  this.sortable_options = $.extend({
+  this.sortableOptions = $.extend({
     revert: 200,
     dropOnEmpty: true, // default
     opacity: 0.75, // opacity of sortable while sorting
@@ -92,7 +92,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     update: this.setChanged,
     scroll: true
     // containment: ipe.topParent,
-  }, cfg.sortable_options || {});
+  }, cfg.sortableOptions || {});
 
   this.initEditing = function(formdata) {
     ipe.topParent = $('div#panels-ipe-display-' + cache_key);
