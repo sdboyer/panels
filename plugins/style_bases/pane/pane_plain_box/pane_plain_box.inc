@@ -48,7 +48,7 @@ $plugin = array(
 
   // This just uses theme_panels_pane because all we need is the class.
 //  'theme' => 'pane_plain_box',
-  'preview' => 'panels_stylizer_pane_preview',
+//  'preview' => 'panels_stylizer_pane_preview',
 
   'settings form' => 'panels_pane_plain_box_style_settings',
   'settings form submit' => 'panels_pane_plain_box_style_settings_submit',

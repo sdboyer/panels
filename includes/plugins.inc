@@ -21,15 +21,6 @@ function panels_pane_access($pane, $display) {
 }
 
 /**
- * Get a list of panel regions available in the layout.
- *
- * DEPRECATED. Use panels_get_regions instead.
- */
-function panels_get_panels($layout, $display) {
-  return panels_get_regions($layout, $display);
-}
-
-/**
  * Get a list of panels available in the layout.
  */
 function panels_get_regions($layout, $display) {
@@ -263,22 +254,6 @@ function panels_get_pane_title(&$pane, $context = array(), $incoming_content = N
 }
 
 /**
- * Select a context for a pane.
- *
- * @param $pane
- *   A fully populated pane.
- * @param $contexts
- *   A keyed array of available contexts.
- *
- * @return
- *   The matching contexts or NULL if none or necessary, or FALSE if
- *   requirements can't be met.
- */
-function panels_pane_select_context($pane, $contexts) {
-  return ctools_content_select_context($pane->type, $pane->subtype, $pane->configuration, $contexts);
-}
-
-/**
  * Ensure a layout has a minimal set of data.
  */
 function panels_layout_process(&$plugin) {
@@ -381,9 +356,54 @@ function panels_get_layout_builders() {
  * @return
  *   An array with information about the requested panel style.
  */
+//function panels_get_style($style) {
+//  ctools_include('plugins');
+//  return ctools_get_plugins('panels', 'styles', $style);
+//}
+
+/**
+ * Fetch metadata for all style plugins.
+ *
+ * @return
+ *   An array of arrays with information about all available panel styles.
+ */
+//function panels_get_styles() {
+//  ctools_include('plugins');
+//  return ctools_get_plugins('panels', 'styles');
+//}
+
+/**
+ * Fetch metadata on a specific style plugin.
+ *
+ * @param $style
+ *   Name of a panel style. If the style name contains a ':' this
+ *   indicates that we need to separate the substyle out and
+ *   load it individually.
+ *
+ * @return
+ *   An array with information about the requested panel style.
+ */
 function panels_get_style($style) {
+  // Check the cache to see if all styles were loaded.
+  $styles = &ctools_static('panels_get_styles');
+  if ($styles && !empty($styles[$style])) {
+    return $styles[$style];
+  }
+
   ctools_include('plugins');
-  return ctools_get_plugins('panels', 'styles', $style);
+  if (strpos($style, ':') !== FALSE) {
+    list($style_name, $substyle) = explode(':', $style, 2);
+  }
+  else {
+    $style_name = $style;
+  }
+
+  $plugin = ctools_get_plugins('panels', 'styles', $style_name);
+  if (!empty($substyle) && function_exists($plugin['substyle callback'])) {
+    $plugin = $plugin['substyle callback']($plugin, $style_name, $substyle);
+  }
+
+  return $plugin;
 }
 
 /**
@@ -393,8 +413,24 @@ function panels_get_style($style) {
  *   An array of arrays with information about all available panel styles.
  */
 function panels_get_styles() {
-  ctools_include('plugins');
-  return ctools_get_plugins('panels', 'styles');
+  $styles = &ctools_static(__FUNCTION__);
+  if (!isset($styles)) {
+    $styles = array();
+    ctools_include('plugins');
+    $plugins = ctools_get_plugins('panels', 'styles');
+
+    // Go through each and see if there are 'sub' styles we need to get.
+    foreach ($plugins as $name => $plugin) {
+      if (!empty($plugin['substyles callback']) && function_exists($plugin['substyles callback'])) {
+        $styles = array_merge($plugin['substyles callback']($plugin, $name), $styles);
+      }
+      else {
+        $styles[$name] = $plugin;
+      }
+    }
+  }
+
+  return $styles;
 }
 
 /**
@@ -573,6 +609,7 @@ function panels_plugin_get_function($plugin, $which, $function_name) {
 
 }
 
+// @todo these are DEPRECATED and can probably be removed.
 // These are placeholders to prevent crashes from the former plugins
 class panels_required_context { function filter() { } };
 class panels_optional_context extends panels_required_context {};

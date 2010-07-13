@@ -20,6 +20,7 @@ Improve the IPE to use the proper cache if it is set, and to respect locking.
 #847784: IPE displayed "Edit" link when no such link should have existed.
 #843758: Legacy renderer caused "missing argument" warning when rendering.
 Made it possible to override jQuery UI sortable options via settings in the renderer plugin.
+Moved Panels stylizer to CTools. You must update CTools at the same time as Panels.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============

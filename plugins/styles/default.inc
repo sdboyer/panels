@@ -11,6 +11,7 @@ $plugin = array(
   'title' => t('No style'),
   'description' => t('The default panel rendering style; displays each pane with a separator.'),
   'render region' => 'panels_default_style_render_region',
+  'weight' => -15,
 );
 
 /**

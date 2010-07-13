@@ -363,7 +363,7 @@ class panels_renderer_standard {
       $style = panels_get_style($pane->style['style']);
 
       if (isset($style) && isset($style['render pane'])) {
-        $output = theme($style['render pane'], $content, $pane, $this->display);
+        $output = theme($style['render pane'], $content, $pane, $this->display, $style);
 
         // This could be null if no theme function existed.
         if (isset($output)) {
@@ -482,6 +482,6 @@ class panels_renderer_standard {
       $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render region'], $this->display, $owner_id, $panes, $style_settings, $region_id);
+    return theme($style['render region'], $this->display, $owner_id, $panes, $style_settings, $region_id, $style);
   }
 }

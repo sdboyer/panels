@@ -217,6 +217,6 @@ class panels_renderer_legacy {
 
     }
 
-    return theme($style[$callback], $this->display, $owner_id, $panes, $style_settings, $region_name);
+    return theme($style[$callback], $this->display, $owner_id, $panes, $style_settings, $region_name, $style);
   }
 }

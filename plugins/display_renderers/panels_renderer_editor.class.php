@@ -164,34 +164,48 @@ class panels_renderer_editor extends panels_renderer_standard {
   }
 
   /**
+   * Get the style links.
+   *
+   * This is abstracted out since we have styles on both panes and regions.
+   */
+  function get_style_links($type, $id = NULL) {
+    $info = $this->get_style($type, $id);
+    $style = $info[0];
+    $conf = $info[1];
+
+    $style_title = isset($style['title']) ? $style['title'] : t('Default');
+
+    $style_links[] = array(
+      'title' => $style_title,
+      'attributes' => array('class' => 'panels-text'),
+    );
+
+    $style_links[] = array(
+      'title' => t('Change'),
+      'href' => $this->get_url('style-type', $type, $id),
+      'attributes' => array('class' => 'ctools-use-modal'),
+    );
+
+    $function = $type != 'pane' ? 'settings form' : 'pane settings form';
+    if (panels_plugin_get_function('styles', $style, $function)) {
+      $style_links[] = array(
+        'title' => t('Settings'),
+        'href' => $this->get_url('style-settings', $type, $id),
+        'attributes' => array('class' => 'ctools-use-modal'),
+      );
+    }
+
+    return $style_links;
+  }
+
+  /**
    * Get the links for a panel display.
    *
    * This is abstracted out for easy ajax replacement.
    */
   function get_display_links() {
     $links = array();
-
-    $panel_settings = $this->display->panel_settings;
-    $style = panels_get_style((!empty($panel_settings['style'])) ? $panel_settings['style'] : 'default');
-
-    $style_links[] = array(
-      'title' => $style['title'],
-      'attributes' => array('class' => 'panels-text'),
-    );
-
-    $style_links[] = array(
-      'title' => t('Change'),
-      'href' => $this->get_url('style-type', 'display'),
-      'attributes' => array('class' => 'ctools-use-modal'),
-    );
-
-    if (panels_plugin_get_function('styles', $style, 'settings form')) {
-      $style_links[] = array(
-        'title' => t('Settings'),
-        'href' => $this->get_url('style-settings', 'display'),
-        'attributes' => array('class' => 'ctools-use-modal'),
-      );
-    }
+    $style_links = $this->get_style_links('display');
 
     $links[] = array(
       'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links($style_links),
@@ -254,28 +268,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       'html' => TRUE,
     );
 
-    $panel_settings = $this->display->panel_settings;
-    $style = panels_get_style((!empty($panel_settings[$region_id]['style'])) ? $panel_settings[$region_id]['style'] : '-1');
-    $style_title = isset($style['title']) ? $style['title'] : t('Default');
-
-    $style_links[] = array(
-      'title' => $style_title,
-      'attributes' => array('class' => 'panels-text'),
-    );
-
-    $style_links[] = array(
-      'title' => t('Change'),
-      'href' => $this->get_url('style-type', 'region', $region_id),
-      'attributes' => array('class' => 'ctools-use-modal'),
-    );
-
-    if (panels_plugin_get_function('styles', $style, 'settings form')) {
-      $style_links[] = array(
-        'title' => t('Settings'),
-        'href' => $this->get_url('style-settings', 'region', $region_id),
-        'attributes' => array('class' => 'ctools-use-modal'),
-      );
-    }
+    $style_links = $this->get_style_links('region', $region_id);
 
     $links[] = array(
       'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links($style_links),
@@ -342,26 +335,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       'html' => TRUE,
     );
 
-    $style = panels_get_style((!empty($pane->style['style'])) ? $pane->style['style'] : 'default');
-
-    $style_links[] = array(
-      'title' => $style['title'],
-      'attributes' => array('class' => 'panels-text'),
-    );
-
-    $style_links[] = array(
-      'title' => t('Change'),
-      'href' => $this->get_url('style-type', 'pane', $pane->pid),
-      'attributes' => array('class' => 'ctools-use-modal'),
-    );
-
-    if (panels_plugin_get_function('styles', $style, 'pane settings form')) {
-      $style_links[] = array(
-        'title' => t('Settings'),
-        'href' => $this->get_url('style-settings', 'pane', $pane->pid),
-        'attributes' => array('class' => 'ctools-use-modal'),
-      );
-    }
+    $style_links = $this->get_style_links('pane', $pane->pid);
 
     $links[] = array(
       'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links($style_links),
@@ -1004,6 +978,15 @@ class panels_renderer_editor extends panels_renderer_standard {
       default:
         ctools_modal_render(t('Error'), t('Invalid pane id.'));
     }
+    $info = $this->get_style($type, $pid);
+    $style_plugin = $info[0];
+    $style_settings = $info[1];
+
+    // Backward compatibility: Translate old-style stylizer to new style
+    // stylizer.
+    if ($style == 'stylizer' && !empty($style_settings['style']) && $style_settings['style'] != '$') {
+      $style = 'stylizer:' . $style_settings['style'];
+    }
 
     $form_state = array(
       'display' => &$this->display,
@@ -1107,16 +1090,16 @@ class panels_renderer_editor extends panels_renderer_standard {
     else {
       switch ($type) {
         case 'display':
-          $style = panels_get_style($this->display->panel_settings['style']);
+          $style = panels_get_style((!empty($this->display->panel_settings['style'])) ? $this->display->panel_settings['style'] : 'default');
           break;
 
         case 'region':
-          $style = panels_get_style($this->display->panel_settings[$pid]['style']);
+          $style = panels_get_style((!empty($this->display->panel_settings[$pid]['style'])) ? $this->display->panel_settings[$pid]['style'] : '-1');
           break;
 
         case 'pane':
           $pane = &$this->display->content[$pid];
-          $style = panels_get_style($pane->style['style']);
+          $style = panels_get_style(!empty($pane->style['style']) ? $pane->style['style'] : 'default');
           break;
       }
     }
@@ -1136,6 +1119,12 @@ class panels_renderer_editor extends panels_renderer_standard {
         $pane = &$this->display->content[$pid];
         $conf = &$pane->style['settings'];
         break;
+    }
+
+    // Backward compatibility: Translate old-style stylizer to new style
+    // stylizer.
+    if ($style['name'] == 'stylizer' && !empty($conf['style']) && $conf['style'] != '$') {
+      $style = panels_get_style('stylizer:' . $conf['style']);
     }
 
     return array($style, &$conf);
@@ -1457,7 +1446,7 @@ class panels_renderer_editor extends panels_renderer_standard {
    * Create a command to update the links on a display after a change was made.
    */
   function command_update_display_links() {
-    $this->commands[] = ctools_ajax_command_replace('.panels-display-links', panels_edit_display_get_links($this->display));
+    $this->commands[] = ctools_ajax_command_replace('.panels-display-links', $this->get_display_links());
   }
 
   /**
@@ -1609,6 +1598,23 @@ function panels_edit_cache_settings_form_submit($form, &$form_state) {
 }
 
 /**
+ * Sort callback for sorting styles
+ *
+ * Sort first by weight, then by title.
+ */
+function _panels_edit_style_sort($a, $b) {
+  if ($a['weight'] == $b['weight']) {
+    $a_title = strtolower($a['title']);
+    $b_title = strtolower($b['title']);
+    if ($a_title == $b_title) {
+      return 0;
+    }
+    return ($a_title < $b_title) ? -1 : 1;
+  }
+  return ($a['weight'] < $b['weight']) ? -1 : 1;
+}
+
+/**
  * Choose style form
  */
 function panels_edit_style_type_form(&$form_state) {
@@ -1624,13 +1630,13 @@ function panels_edit_style_type_form(&$form_state) {
     $options[-1] = t('Use display default style');
   }
 
+  uasort($styles, '_panels_edit_style_sort');
+
   foreach ($styles as $id => $info) {
     if (empty($info['hidden']) && (!empty($info[$function]) || $id == 'default')) {
       $options[$id] = check_plain($info['title']);
     }
   }
-
-  asort($options);
 
   $form['style'] = array(
     '#prefix' => '<div class="no-float">',
@@ -1678,7 +1684,7 @@ function panels_edit_style_settings_form(&$form_state) {
 
   $function = panels_plugin_get_function('styles', $style, ($type == 'pane') ? 'pane settings form' : 'settings form');
 
-  $form['settings'] = $function($conf, $display, $pid, $type, $form_state['renderer']);
+  $form['settings'] = $function($conf, $display, $pid, $type, $form_state);
   $form['settings']['#tree'] = TRUE;
 
   $form['submit'] = array(

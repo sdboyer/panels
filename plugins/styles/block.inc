@@ -11,6 +11,7 @@ $plugin = array(
   'title' => t('System block'),
   'description' => t('Display the pane as a system block; this is more restrictive than the default.'),
   'render pane' => 'panels_block_style_render_pane',
+  'weight' => -10,
 );
 
 /**

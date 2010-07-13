@@ -52,7 +52,7 @@ $plugin = array(
 
   'theme' => 'pane_rounded_shadow',
   'build' => 'panels_rounded_shadow_style_base_build',
-  'preview' => 'panels_stylizer_pane_preview',
+//  'preview' => 'panels_stylizer_pane_preview',
 
   'settings form' => 'panels_pane_rounded_shadow_style_settings',
   'settings form submit' => 'panels_pane_rounded_shadow_style_settings_submit',

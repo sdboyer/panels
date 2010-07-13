@@ -1492,3 +1492,18 @@ function panels_update_6309() {
   db_create_table($ret, 'panels_renderer_pipeline', $schema['panels_renderer_pipeline']);
   return $ret;
 }
+
+/**
+ * Move stylizer data from Panels to CTools.
+ */
+function panels_update_6310() {
+  $ret = array();
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    $ret['#abort'] = array('success' => FALSE, 'query' => t('Panels cannot be updated because CTools 1.7 (API v1.7.2) is required. Please update CTools and then try update.php again.'));
+    return $ret;
+  }
+
+  // Enable the stylizer module to make everything as seamless as possible.
+  drupal_install_modules(array('stylizer'));
+}

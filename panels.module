@@ -7,7 +7,7 @@
  * Core functionality for the Panels engine.
  */
 
-define('PANELS_REQUIRED_CTOOLS_API', '1.7');
+define('PANELS_REQUIRED_CTOOLS_API', '1.7.2');
 
 define('PANELS_TITLE_FIXED', 0); // Hide title use to be true/false. So false remains old behavior.
 define('PANELS_TITLE_NONE', 1); // And true meant no title.
@@ -88,20 +88,20 @@ function panels_theme() {
   foreach ($styles as $name => $data) {
     if (!empty($data['render pane'])) {
       $theme[$data['render pane']] = array(
-        'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
+        'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL, 'style' => NULL),
       );
     }
     // If we're in legacy mode, include the old callback key for legacy styles.
     if (variable_get('panels_legacy_rendering_mode', TRUE)) {
       if (!empty($data['render panel'])) {
         $theme[$data['render panel']] = array(
-          'arguments' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL),
+          'arguments' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
         );
       }
     }
     if (!empty($data['render region'])) {
       $theme[$data['render region']] = array(
-        'arguments' => array('display' => NULL, 'region_id' => NULL, 'panes' => NULL, 'settings' => NULL),
+        'arguments' => array('display' => NULL, 'region_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
       );
     }
 
@@ -338,8 +338,71 @@ function panels_ctools_plugin_api($owner, $api) {
  *   The style plugin type info array.
  */
 function panels_plugin_styles_process(&$plugin, $info) {
+  $plugin += array(
+    'weight' => 0,
+  );
+
   $compliant_modules = ctools_plugin_api_info('panels', 'styles', 2.0, 2.0);
   $plugin['version'] = empty($compliant_modules[$plugin['module']]) ? 1.0 : $compliant_modules[$plugin['module']]['version'];
+}
+
+/**
+ * Declare what style types Panels uses.
+ */
+function panels_ctools_style_base_types() {
+  return array(
+    'region' => array(
+      'title' => t('Panel region'),
+      'preview' => 'panels_stylizer_region_preview',
+      'theme arguments' => array('settings' => NULL, 'classes' => NULL, 'content' => NULL),
+    ),
+    'pane' => array(
+      'title' => t('Panel pane'),
+      'preview' => 'panels_stylizer_pane_preview',
+      'theme arguments' => array('settings' => NULL, 'content' => NULL, 'pane' => NULL, 'display' => NULL),
+    ),
+  );
+}
+
+function panels_stylizer_lipsum() {
+  return "
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at velit dolor. Donec egestas tellus sit amet urna rhoncus adipiscing. Proin nec porttitor sem. Maecenas aliquam, purus nec tempus dignissim, nulla arcu aliquam diam, non tincidunt massa ante vel dolor. Aliquam sapien sapien, tincidunt id tristique at, pretium sagittis libero.</p>
+
+    <p>Nulla facilisi. Curabitur lacinia, tellus sed tristique consequat, diam lorem scelerisque felis, at dictum purus augue facilisis lorem. Duis pharetra dignissim rutrum. Curabitur ac elit id dui dapibus tincidunt. Nulla eget sem quam, non eleifend eros. Cras porttitor tempus lectus ac scelerisque. Curabitur vehicula bibendum lorem, vitae ornare ligula venenatis ut.</p>
+  ";
+}
+
+/**
+ * Generate a preview given the current settings.
+ */
+function panels_stylizer_region_preview($plugin, $settings) {
+  ctools_stylizer_add_css($plugin, $settings);
+  return theme($plugin['theme'], $settings, ctools_stylizer_get_css_class($plugin, $settings), panels_stylizer_lipsum());
+}
+
+/**
+ * Generate a preview given the current settings.
+ */
+function panels_stylizer_pane_preview($plugin, $settings) {
+  ctools_stylizer_add_css($plugin, $settings);
+  $pane = new stdClass();
+
+  $content = new stdClass;
+  $content->title = t('Lorem ipsum');
+  $content->content = panels_stylizer_lipsum();
+  $content->type = 'dummy';
+  $content->subtype = 'dummy';
+
+  $content->css_class = ctools_stylizer_get_css_class($plugin, $settings);
+
+  $display = new panels_display();
+
+  if (!empty($plugin['theme'])) {
+    return theme($plugin['theme'], $settings, $content, $pane, $display);
+  }
+  else {
+    return theme('panels_pane', $content, $pane, $display);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1416,4 +1479,32 @@ function panels_print_layout($id, $content) {
   }
 
   return panels_render_layout($layout, $content);
+}
+
+/**
+ * Get a list of panel regions available in the layout.
+ *
+ * DEPRECATED. Use panels_get_regions instead.
+ */
+function panels_get_panels($layout, $display) {
+  return panels_get_regions($layout, $display);
+}
+
+
+/**
+ * Select a context for a pane.
+ *
+ * @param $pane
+ *   A fully populated pane.
+ * @param $contexts
+ *   A keyed array of available contexts.
+ *
+ * @return
+ *   The matching contexts or NULL if none or necessary, or FALSE if
+ *   requirements can't be met.
+ *
+ * @deprecated this function will be removed.
+ */
+function panels_pane_select_context($pane, $contexts) {
+  return ctools_content_select_context($pane->type, $pane->subtype, $pane->configuration, $contexts);
 }
