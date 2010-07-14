@@ -1849,6 +1849,12 @@ function panels_edit_configure_access_test_form(&$form_state) {
     $function($form, $form_state, $test['settings']);
   }
 
+  $form['not'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Reverse (NOT)'),
+    '#default_value' => !empty($test['not']),
+  );
+
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -1893,5 +1899,6 @@ function panels_edit_configure_access_test_form_submit(&$form, &$form_state) {
   if (isset($form_state['values']['context'])) {
     $form_state['test']['context'] = $form_state['values']['context'];
   }
+  $form_state['test']['not'] = !empty($form_state['values']['not']);
 }
 
