@@ -14,7 +14,6 @@ class panels_renderer_editor extends panels_renderer_standard {
    */
   var $commands = array();
   var $admin = TRUE;
-
   // -------------------------------------------------------------------------
   // Display edit rendering.
 

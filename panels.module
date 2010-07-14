@@ -286,6 +286,16 @@ function panels_ctools_plugin_layouts() {
 }
 
 /**
+ * Ensure a layout has a minimal set of data.
+ */
+function panels_layout_process(&$plugin) {
+  $plugin += array(
+    'category' => t('Miscellaneous'),
+    'description' => '',
+  );
+}
+
+/**
  * Inform CTools that the style plugin can be loaded from themes.
  */
 function panels_ctools_plugin_styles() {
@@ -1484,7 +1494,7 @@ function panels_print_layout($id, $content) {
 /**
  * Get a list of panel regions available in the layout.
  *
- * DEPRECATED. Use panels_get_regions instead.
+ * @deprecated Use panels_get_regions instead.
  */
 function panels_get_panels($layout, $display) {
   return panels_get_regions($layout, $display);

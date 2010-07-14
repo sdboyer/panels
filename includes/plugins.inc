@@ -254,16 +254,6 @@ function panels_get_pane_title(&$pane, $context = array(), $incoming_content = N
 }
 
 /**
- * Ensure a layout has a minimal set of data.
- */
-function panels_layout_process(&$plugin) {
-  $plugin += array(
-    'category' => t('Miscellaneous'),
-    'description' => '',
-  );
-}
-
-/**
  * Fetch metadata on a specific layout plugin.
  *
  * @param $layout

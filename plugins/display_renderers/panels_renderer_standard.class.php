@@ -185,11 +185,13 @@ class panels_renderer_standard {
 
     // Prepare the list of panes to be rendered
     foreach ($panes as $pid => $pane) {
-      // TODO remove in 7.x and ensure the upgrade path weeds out any stragglers; it's been long enough
-      $pane->shown = !empty($pane->shown); // guarantee this field exists.
-      // If this pane is not visible to the user, skip out and do the next one
-      if (!$pane->shown || !panels_pane_access($pane, $this->display)) {
-        continue;
+      if (empty($this->admin)) {
+        // TODO remove in 7.x and ensure the upgrade path weeds out any stragglers; it's been long enough
+        $pane->shown = !empty($pane->shown); // guarantee this field exists.
+        // If this pane is not visible to the user, skip out and do the next one
+        if (!$pane->shown || !panels_pane_access($pane, $this->display)) {
+          continue;
+        }
       }
 
       $ct_plugin_def = ctools_get_content_type($pane->type);
