@@ -4,14 +4,14 @@
 class panels_layouts_ui extends ctools_export_ui {
   var $lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas congue nibh, vel dictum ante posuere vitae. Cras gravida massa tempor metus eleifend sed elementum tortor scelerisque. Vivamus egestas, tortor quis luctus tristique, sem velit adipiscing risus, et tempus enim felis in massa. Morbi viverra, nisl quis rhoncus imperdiet, turpis massa vestibulum turpis, egestas faucibus nibh metus vel nunc. In hac habitasse platea dictumst. Nunc sit amet nisi quis ipsum tincidunt semper. Donec ac urna enim, et placerat arcu. Morbi eu laoreet justo. Nullam nec velit eu neque mattis pulvinar sed non libero. Sed sed vulputate erat. Fusce sit amet dui nibh.";
 
-  function init($plugin) {
+  function hook_menu(&$items) {
     // Change the item to a tab on the Panels page.
-    $plugin['menu']['items']['list callback']['type'] = MENU_LOCAL_TASK;
+    $this->plugin['menu']['items']['list callback']['type'] = MENU_LOCAL_TASK;
 
     // Establish a base for adding plugins
-    $base = $plugin['menu']['items']['add'];
+    $base = $this->plugin['menu']['items']['add'];
     // Remove the default 'add' menu item.
-    unset($plugin['menu']['items']['add']);
+    unset($this->plugin['menu']['items']['add']);
 
     ctools_include('plugins', 'panels');
     $this->builders = panels_get_layout_builders();
@@ -22,10 +22,10 @@ class panels_layouts_ui extends ctools_export_ui {
       $item['title'] = !empty($builder['builder tab title']) ? $builder['builder tab title'] : 'Add ' . $builder['title'];
       $item['page arguments'][] = $name;
       $item['path'] = 'add-' . $name;
-      $plugin['menu']['items']['add ' . $name] = $item;
+      $this->plugin['menu']['items']['add ' . $name] = $item;
     }
 
-    parent::init($plugin);
+    parent::hook_menu(&$items);
   }
 
   function edit_form(&$form, &$form_state) {
@@ -118,6 +118,8 @@ class panels_layouts_ui extends ctools_export_ui {
   }
 
   function list_form(&$form, &$form_state) {
+    ctools_include('plugins', 'panels');
+    $this->builders = panels_get_layout_builders();
     parent::list_form($form, $form_state);
 
     $categories = $plugins = array('all' => t('- All -'));
