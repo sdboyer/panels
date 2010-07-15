@@ -25,7 +25,7 @@ class panels_layouts_ui extends ctools_export_ui {
       $this->plugin['menu']['items']['add ' . $name] = $item;
     }
 
-    parent::hook_menu(&$items);
+    parent::hook_menu($items);
   }
 
   function edit_form(&$form, &$form_state) {
