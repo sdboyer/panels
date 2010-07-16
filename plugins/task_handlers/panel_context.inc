@@ -273,7 +273,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
     if (!$filename) {
       $filename = ctools_css_store($css_id, $handler->conf['css']);
     }
-    drupal_add_css($filename);
+    ctools_css_add_css($filename);
   }
 
   // With an argument, this actually sets the display.

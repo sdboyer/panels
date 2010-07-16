@@ -119,7 +119,7 @@ function panels_rounded_corners_css($display) {
     $filename = ctools_css_store($css_id, _panels_rounded_corners_css($idstr), FALSE);
   }
 
-  drupal_add_css($filename, 'module', 'all', FALSE);
+  ctools_css_add_css($filename, 'module', 'all', FALSE);
 }
 
 /**
