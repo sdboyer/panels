@@ -1770,7 +1770,7 @@ function panels_edit_configure_access_settings_form(&$form_state) {
     '#type' => 'radios',
     '#options' => array(
       'and' => t('All criteria must pass.'),
-      'or' => t('Only one criteria must pass.'),
+      'or' => t('Only one criterion must pass.'),
     ),
     '#default_value' => isset($pane->access['logic']) ? $pane->access['logic'] : 'and',
   );
