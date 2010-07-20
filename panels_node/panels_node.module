@@ -342,12 +342,16 @@ function panels_node_get_context(&$node) {
 }
 
 /**
- * hook_export_node_alter() - integegrate with export.module for saving
- *                            panel_nodes into code.
+ * Implementation of hook_export_node_alter()
+ *
+ * Integrate with export.module for saving panel_nodes into code.
  */
 function panels_node_export_node_alter(&$node, $original_node, $method) {
   if ($method == 'export') {
-    drupal_set_message(t("NOTE: in order to import panel_nodes you must first set the export.module settings to \"Save as a new node then edit\", otherwise it won't work."));
+    $node_export_omitted = variable_get('node_export_omitted', array());
+    if (variable_get('node_export_method', '') != 'save-edit' && (array_key_exists('panel', $node_export_omitted) && !$node_export_omitted['panel'])) {
+      drupal_set_message(t("NOTE: in order to import panel_nodes you must first set the export.module settings to \"Save as a new node then edit\", otherwise it won't work."));
+    }
     $display = panels_load_display($node->panels_node['did']);
     $export = panels_export_display($display);
     $node->export_display = $export;
