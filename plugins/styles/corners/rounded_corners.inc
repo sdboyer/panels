@@ -136,18 +136,18 @@ function _panels_rounded_corners_css($idstr) {
   zoom: 1;
 }
 $idstr .t-edge {
-  background: url($url/shadow-t.png) repeat-x 0 top;
+  background: url('$url/shadow-t.png') repeat-x 0 top;
   font-size: 1px;
 }
 $idstr .b-edge {
-  background: url($url/shadow-b.png) repeat-x 0 bottom;
+  background: url('$url/shadow-b.png') repeat-x 0 bottom;
   font-size: 1px;
 }
 $idstr .l-edge {
-  background: url($url/shadow-l.png) repeat-y 0 0;
+  background: url('$url/shadow-l.png') repeat-y 0 0;
 }
 $idstr .r-edge {
-  background: url($url/shadow-r.png) repeat-y right 0;
+  background: url('$url/shadow-r.png') repeat-y right 0;
 }
 $idstr .wrap-corner {
   background: #fff !important;
@@ -160,7 +160,7 @@ $idstr .wrap-corner .l, $idstr .wrap-corner .r {
   top: 0;
   height: 11px;
   width: 11px;
-  background-image: url($url/corner-bits.png);
+  background-image: url('$url/corner-bits.png');
 }
 $idstr .wrap-corner .l {
   left: 0;
@@ -184,7 +184,7 @@ $idstr div.admin-links {
 }
 
 $idstr .panel-region-separator {
-  background: url($url/shadow-b.png) repeat-x 0 center;
+  background: url('$url/shadow-b.png') repeat-x 0 center;
   font-size: 1px;
   height: 30px;
 }

@@ -27,6 +27,7 @@ Moved Panels stylizer to CTools. You must update CTools at the same time as Pane
 #690814 by neclimdul: Panels mini edit form could overwrite page title.
 #675220 by dereine: Provide a watchdog message if a layout can't be loaded when rendering a panel.
 #713526 by psynaptic: Omit top and bottom region divs in stacked layouts if regions are empty.
+#823216 by jonathan1055: Put quotes around url() in rounded corners CSS.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
