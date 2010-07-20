@@ -73,6 +73,7 @@ function panels_theme() {
         $theme[$data[$callback]] = array(
           'arguments' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL, 'display' => NULL, 'layout' => NULL, 'renderer' => NULL),
           'path' => $data['path'],
+          'file' => $data['file'],
         );
 
         // if no theme function exists, assume template.
@@ -89,6 +90,8 @@ function panels_theme() {
     if (!empty($data['render pane'])) {
       $theme[$data['render pane']] = array(
         'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL, 'style' => NULL),
+        'path' => $data['path'],
+        'file' => $data['file'],
       );
     }
     // If we're in legacy mode, include the old callback key for legacy styles.
@@ -96,12 +99,16 @@ function panels_theme() {
       if (!empty($data['render panel'])) {
         $theme[$data['render panel']] = array(
           'arguments' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
+          'path' => $data['path'],
+          'file' => $data['file'],
         );
       }
     }
     if (!empty($data['render region'])) {
       $theme[$data['render region']] = array(
         'arguments' => array('display' => NULL, 'region_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
+        'path' => $data['path'],
+        'file' => $data['file'],
       );
     }
 

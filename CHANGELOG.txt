@@ -30,6 +30,7 @@ Moved Panels stylizer to CTools. You must update CTools at the same time as Pane
 #823216 by jonathan1055: Put quotes around url() in rounded corners CSS.
 #603150 by hefox: Protect against the panels node add form being used in unusual places.
 #841824 by levacjeep: Extend panels_edit and panels_edit_layout to allow more options with the $destination.
+#842976 by drewish: Make sure the theme knows path and file information for plugin supplied themes.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
