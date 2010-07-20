@@ -360,7 +360,7 @@ function panels_mini_add_page($layout = NULL) {
   $panel_mini->category = '';
 
   drupal_set_title(t('Add mini panel'));
-  return panels_mini_edit($panel_mini);
+  return drupal_get_form('panels_mini_edit_form', $panel_mini);
 }
 
 /**
