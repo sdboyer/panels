@@ -36,7 +36,7 @@ function _panels_edit($display, $destination, $content_types, $title = FALSE) {
 
   $output = $renderer->edit();
   if (is_object($output) && $destination) {
-    return drupal_goto($destination);
+    return panels_goto($destination);
   }
   return $output;
 }

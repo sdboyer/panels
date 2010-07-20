@@ -1441,6 +1441,28 @@ function panel_context_panels_cache_break_lock($key, $cache) {
 }
 
 // --------------------------------------------------------------------------
+// General utility functions
+
+/**
+ * Perform a drupal_goto on a destination that may be an array like url().
+ */
+function panels_goto($destination) {
+  if (!is_array($destination)) {
+    return drupal_goto($destination);
+  }
+  else {
+    // Prevent notices by adding defaults
+    $destination += array(
+      'query' => NULL,
+      'fragment' => NULL,
+      'http_response_code' => NULL,
+    );
+
+    return drupal_goto($destination['path'], $destination['query'], $destination['fragment'], $destination['http_response_code']);
+  }
+}
+
+// --------------------------------------------------------------------------
 // Deprecated functions
 //
 // Everything below this line will eventually go away.

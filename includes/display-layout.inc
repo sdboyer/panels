@@ -59,7 +59,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
       }
 
       if ($destination) {
-        return drupal_goto($destination);
+        return panels_goto($destination);
       }
       return $change_form_state['display'];
     }
