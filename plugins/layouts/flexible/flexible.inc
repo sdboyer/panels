@@ -972,6 +972,11 @@ function panels_ajax_flexible_edit_settings($handler, $id) {
       $output[] = ctools_ajax_command_replace(".$class h2.label",
         '<h2 class="label">' . check_plain($item['title']) . '</h2>');
     }
+
+    // Rerender our links in case something changed.
+    $output[] = ctools_ajax_command_replace('.flexible-links-' . $id,
+      panels_flexible_render_item_links($renderer, $id, $item));
+
     // If editing the canvas, reset the CSS width
     if ($id == 'canvas') {
       if (!empty($item['fixed_width']) && intval($item['fixed_width'])) {
