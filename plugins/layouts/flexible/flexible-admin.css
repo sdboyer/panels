@@ -73,6 +73,7 @@
   position: absolute;
   z-index: 1000;
   background: white;
+  color: black;
   border: 1px solid black;
   width: 60px;
   height: 2em;
