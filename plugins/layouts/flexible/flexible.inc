@@ -913,7 +913,6 @@ function panels_flexible_get_css_group(&$css, $renderer, $list, $owner_id, $type
  *   The display renderer handler object.
  */
 function panels_ajax_flexible_edit_settings($handler, $id) {
-  dsm(func_get_args());
   $settings = &$handler->display->layout_settings;
   panels_flexible_convert_settings($settings, $handler->plugins['layout']);
 

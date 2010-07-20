@@ -22,6 +22,7 @@ Improve the IPE to use the proper cache if it is set, and to respect locking.
 Made it possible to override jQuery UI sortable options via settings in the renderer plugin.
 Moved Panels stylizer to CTools. You must update CTools at the same time as Panels.
 #737602: Generic NOT checkbox for all access tests.
+#369628: Sort results by export key when bulk exporting.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
