@@ -19,9 +19,12 @@
  */
 ?>
 <div class="panel-display panel-3col-stacked clear-block" <?php if (!empty($css_id)) { print "id=\"$css_id\""; } ?>>
-  <div class="panel-panel panel-col-top">
-    <div class="inside"><?php print $content['top']; ?></div>
-  </div>
+  <?php if ($content['top']): ?>
+    <div class="panel-panel panel-col-top">
+      <div class="inside"><?php print $content['top']; ?></div>
+    </div>    
+  <?php endif ?>
+
   <div class="center-wrapper">
     <div class="panel-panel panel-col-first">
       <div class="inside"><?php print $content['left']; ?></div>
@@ -35,7 +38,10 @@
       <div class="inside"><?php print $content['right']; ?></div>
     </div>
   </div>
-  <div class="panel-panel panel-col-bottom">
-    <div class="inside"><?php print $content['bottom']; ?></div>
-  </div>
+
+  <?php if ($content['bottom']): ?>
+    <div class="panel-panel panel-col-bottom">
+      <div class="inside"><?php print $content['bottom']; ?></div>
+    </div>    
+  <?php endif ?>
 </div>
