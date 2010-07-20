@@ -36,6 +36,9 @@ function theme_panels_block_style_render_pane($content, $pane, $display) {
     $content->delta = $content->subtype;
   }
 
+  // If using per pane classes, $block->css_class will need to be added in your
+  // preprocess or template, along with any other Panels specific field you
+  // might want to utilize.
   return theme('block', $content);
 }
 
