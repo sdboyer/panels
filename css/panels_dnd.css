@@ -100,7 +100,7 @@ div.panels-set-title-hide .panel-pane-is-title {
   background: #f8f8f8;
 }
 
-.panel-portlet .content {
+.panel-portlet .pane-content {
   margin: .5em 0 .5em 0;
   padding: 0 .25em 0 .25em;
   display: none; /* initially hidden */
