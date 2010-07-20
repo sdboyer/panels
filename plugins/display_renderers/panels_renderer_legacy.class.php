@@ -24,9 +24,11 @@ class panels_renderer_legacy {
 
   function init($plugin, &$display) {
     $this->plugin = $plugin;
-    $layout = panels_get_layout($display->layout);
+    $this->plugins['layout'] = panels_get_layout($display->layout);
+    if (empty($this->plugins['layout'])) {
+      watchdog('panels', "Layout: @layout couldn't been found, maybe the theme is disabled.", array('@layout' => $display->layout));
+    }
     $this->display = &$display;
-    $this->plugins['layout'] = $layout;
   }
 
   /**

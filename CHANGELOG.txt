@@ -24,7 +24,8 @@ Moved Panels stylizer to CTools. You must update CTools at the same time as Pane
 #737602: Generic NOT checkbox for all access tests.
 #369628: Sort results by export key when bulk exporting.
 #690902: Improvement to export.module integration of panel nodes.
-#690814: Panels mini edit form could overwrite page title.
+#690814 by neclimdul: Panels mini edit form could overwrite page title.
+#675220 by dereine: Provide a watchdog message if a layout can't be loaded when rendering a panel.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============

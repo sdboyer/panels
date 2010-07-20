@@ -137,6 +137,10 @@ class panels_renderer_standard {
     if (!isset($layout['panels'])) {
       $this->plugins['layout']['panels'] = panels_get_regions($layout, $display);
     }
+
+    if (empty($this->plugins['layout'])) {
+      watchdog('panels', "Layout: @layout couldn't been found, maybe the theme is disabled.", array('@layout' => $display->layout));
+    }
   }
 
   /**
