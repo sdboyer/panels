@@ -212,7 +212,10 @@ class panels_renderer_legacy {
     if (version_compare($style['version'], 2.0, '>=')) {
       // We are, so pre-render the content as the current version expects
       foreach($panes as $pane_id => $pane) {
-        $panes[$pane_id] = panels_render_pane($pane, $this->display->content[$pane_id], $this->display);
+        $content = panels_render_pane($pane, $this->display->content[$pane_id], $this->display);
+        if ($content) {
+          $panes[$pane_id] = $content;
+        }
       }
       // And set the callback to the new key
       $callback = 'render region';

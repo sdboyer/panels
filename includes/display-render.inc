@@ -60,20 +60,20 @@ function panels_render_pane($content, $pane, &$display) {
     }
   }
 
-  if (!empty($pane->style['style'])) {
-    $style = panels_get_style($pane->style['style']);
+  if (!empty($content->content)) {
+    if (!empty($pane->style['style'])) {
+      $style = panels_get_style($pane->style['style']);
 
-    if (isset($style) && isset($style['render pane'])) {
-      $output = theme($style['render pane'], $content, $pane, $display);
+      if (isset($style) && isset($style['render pane'])) {
+        $output = theme($style['render pane'], $content, $pane, $display);
 
-      // This could be null if no theme function existed.
-      if (isset($output)) {
-        return $output;
+        // This could be null if no theme function existed.
+        if (isset($output)) {
+          return $output;
+        }
       }
     }
-  }
 
-  if (!empty($content)) {
     // fallback
     return theme('panels_pane', $content, $pane, $display);
   }

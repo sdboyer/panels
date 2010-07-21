@@ -340,7 +340,10 @@ class panels_renderer_standard {
     // First, render all the panes into little boxes.
     $this->rendered['panes'] = array();
     foreach ($this->prepared['panes'] as $pid => $pane) {
-      $this->rendered['panes'][$pid] = $this->render_pane($pane);
+      $content = $this->render_pane($pane);
+      if ($content) {
+        $this->rendered['panes'][$pid] = $content;
+      }
     }
   }
 
@@ -365,20 +368,20 @@ class panels_renderer_standard {
       }
     }
 
-    if (!empty($pane->style['style'])) {
-      $style = panels_get_style($pane->style['style']);
+    if (!empty($content->content)) {
+      if (!empty($pane->style['style'])) {
+        $style = panels_get_style($pane->style['style']);
 
-      if (isset($style) && isset($style['render pane'])) {
-        $output = theme($style['render pane'], $content, $pane, $this->display, $style);
+        if (isset($style) && isset($style['render pane'])) {
+          $output = theme($style['render pane'], $content, $pane, $this->display, $style);
 
-        // This could be null if no theme function existed.
-        if (isset($output)) {
-          return $output;
+          // This could be null if no theme function existed.
+          if (isset($output)) {
+            return $output;
+          }
         }
       }
-    }
 
-    if (!empty($content->content)) {
       // fallback
       return theme('panels_pane', $content, $pane, $this->display);
     }
