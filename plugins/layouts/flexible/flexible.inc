@@ -640,7 +640,7 @@ function panels_flexible_render_item_links($renderer, $id, $item) {
       $settings = t('Row settings');
     }
     if (empty($item['children'])) {
-      if ($item != 'canvas') {
+      if ($id != 'canvas') {
         $remove = t('Remove row');
       }
       $add = $item['contains'] == 'region' ? t('Add region') : t('Add column');

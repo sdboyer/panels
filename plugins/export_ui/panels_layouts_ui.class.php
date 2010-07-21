@@ -29,6 +29,7 @@ class panels_layouts_ui extends ctools_export_ui {
   }
 
   function edit_form(&$form, &$form_state) {
+    ctools_include('plugins', 'panels');
     // If the plugin is not set, then it should be provided as an argument:
     if (!isset($form_state['item']->plugin)) {
       $form_state['item']->plugin = $form_state['function args'][2];
@@ -101,6 +102,9 @@ class panels_layouts_ui extends ctools_export_ui {
     $form_state['cache_key'] = $cache_key;
     $form_state['content_types'] = $cache->content_types;
     $form_state['display_title'] = FALSE;
+
+    $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
+    $form_state['renderer']->cache = &$cache;
 
     $form = array_merge($form, panels_edit_display_form($form_state));
     // Make sure the theme will work since our form id is different.
