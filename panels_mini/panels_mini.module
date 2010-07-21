@@ -127,35 +127,62 @@ function panels_mini_new() {
  * Load a single mini panel.
  */
 function panels_mini_load($name) {
-  ctools_include('export');
-  $result = ctools_export_load_object('panels_mini', 'names', array($name));
-  if (isset($result[$name])) {
-    if (empty($result[$name]->display)) {
-      $result[$name]->display = panels_load_display($result[$name]->did);
+  $cache = &ctools_static('panels_mini_load_all', array());
+
+  // We use array_key_exists because failed loads will be NULL and
+  // isset() will try to load it again.
+  if (!array_key_exists($name, $cache)) {
+    ctools_include('export');
+    $result = ctools_export_load_object('panels_mini', 'names', array($name));
+    if (isset($result[$name])) {
+      if (empty($result[$name]->display)) {
+        $result[$name]->display = panels_load_display($result[$name]->did);
+      }
+      $cache[$name] = $result[$name];
     }
-    return $result[$name];
+    else {
+      $cache[$name] = NULL;
+    }
+  }
+
+  if (isset($cache[$name])) {
+    return $cache[$name];
   }
 }
 
 /**
  * Load all mini panels.
  */
-function panels_mini_load_all() {
-  ctools_include('export');
-  $minis = ctools_export_load_object('panels_mini');
-  $dids = array();
-  foreach ($minis as $mini) {
-    if (!empty($mini->did)) {
-      $dids[$mini->did] = $mini->name;
+function panels_mini_load_all($reset = FALSE) {
+  $cache = &ctools_static('panels_mini_load_all', array());
+  static $all_loaded = FALSE;
+
+  // We check our own private static because individual minis could have
+  // been loaded prior to load all and we need to know that.
+  if (!$all_loaded || $reset) {
+    $all_loaded = TRUE;
+    if ($reset) {
+      $cache = array();
+    }
+
+    ctools_include('export');
+    $minis = ctools_export_load_object('panels_mini');
+    $dids = array();
+    foreach ($minis as $mini) {
+      if (!empty($mini->did) && empty($cache[$mini->name])) {
+        $dids[$mini->did] = $mini->name;
+      }
+    }
+
+    dsm($dids);
+    $displays = panels_load_displays(array_keys($dids));
+    foreach ($displays as $did => $display) {
+      $cache[$dids[$did]] = $minis[$dids[$did]];
+      $cache[$dids[$did]]->display = $display;
     }
   }
 
-  $displays = panels_load_displays(array_keys($dids));
-  foreach ($displays as $did => $display) {
-    $minis[$dids[$did]]->display = $display;
-  }
-
-  return $minis;
+  return $cache;
 }
 
 /**

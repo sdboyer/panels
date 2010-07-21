@@ -35,6 +35,8 @@ Moved Panels stylizer to CTools. You must update CTools at the same time as Pane
 #532900: Flexible sometimes did not update links when region settings changed.
 #723036: Node pane previews did not include node content as they should.
 #831216: It should not be possible to remove the Canvas.
+#216076: Make sure that empty panes are not rendered. Note: Legacy mode region styles can still render empty panes anyway.
+#609626: Static caching loading mini panels.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
