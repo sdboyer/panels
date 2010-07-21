@@ -118,9 +118,9 @@ function panels_mini_get_id($name) {
 /**
  * Create a new page with defaults appropriately set from schema.
  */
-function panels_mini_new() {
+function panels_mini_new($set_defaults = TRUE) {
   ctools_include('export');
-  return ctools_export_new_object('panels_mini');
+  return ctools_export_new_object('panels_mini', $set_defaults);
 }
 
 /**
@@ -172,12 +172,11 @@ function panels_mini_load_all($reset = FALSE) {
       if (!empty($mini->did) && empty($cache[$mini->name])) {
         $dids[$mini->did] = $mini->name;
       }
+      $cache[$mini->name] = $mini;
     }
 
-    dsm($dids);
     $displays = panels_load_displays(array_keys($dids));
     foreach ($displays as $did => $display) {
-      $cache[$dids[$did]] = $minis[$dids[$did]];
       $cache[$dids[$did]]->display = $display;
     }
   }
@@ -232,32 +231,87 @@ function panels_mini_ctools_block_info($module, $delta, &$info) {
 }
 
 /**
- * Menu callback to check to see if a mini panel is valid as part
- * of a path, and if it is, return the mini.
- */
-function panels_mini_admin_load($name) {
-  $mini = panels_mini_load($name);
-  if ($mini && empty($mini->disabled)) {
-    return $mini;
-  }
-}
-
-/**
  * Implementation of hook_ctools_plugin_directory() to let the system know
  * we implement task and task_handler plugins.
  */
 function panels_mini_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'ctools' && $plugin == 'content_types') {
+  if ($module == 'ctools' && ($plugin == 'content_types' || $plugin == 'export_ui')) {
     return 'plugins/' . $plugin;
   }
 }
 
-function panels_mini_panels_mini_list() {
-  $all_panels = panels_mini_load_all();
-  $list = array();
-
-  foreach ($all_panels as $name => $panel) {
-    $list[$name] = check_plain($name) . ' (' . check_plain($panel->title) . ')';
+/**
+ * Get the Page Manager cache for the panels_mini plugin.
+ */
+function _panels_mini_panels_cache_get($key) {
+  ctools_include('export-ui');
+  $plugin = ctools_get_export_ui('panels_mini');
+  $handler = ctools_export_ui_get_handler($plugin);
+  if (!$handler) {
+    return;
   }
-  return $list;
+
+  $item = $handler->edit_cache_get($key);
+  if (!$item) {
+    $item = ctools_export_crud_load($handler->plugin['schema'], $key);
+  }
+
+  return array($handler, $item);
+}
+
+/**
+ * Get display edit cache for the panels mini export UI
+ *
+ * The key is the second half of the key in this form:
+ * panels_mini:TASK_NAME:HANDLER_NAME;
+ */
+function panels_mini_panels_cache_get($key) {
+  ctools_include('common', 'panels');
+  list($handler, $item) = _panels_mini_panels_cache_get($key);
+
+  $cache = new stdClass();
+  $cache->display = $item->display;
+  $cache->display->context = ctools_context_load_contexts($item);
+  $cache->display->cache_key = 'panels_mini:' . $key;
+  $cache->content_types = panels_common_get_allowed_types('panels_mini', $cache->display->context);
+  $cache->display_title = FALSE;
+
+  // @TODO support locking
+  $cache->locked = FALSE;
+
+  return $cache;
+}
+
+/**
+ * Store a display edit in progress in the page cache.
+ */
+function panels_mini_panels_cache_set($key, $cache) {
+  list($handler, $item) = _panels_mini_panels_cache_get($key);
+  $item->display = $cache->display;
+  $handler->edit_cache_set_key($item, $key);
+}
+
+/**
+ * Save all changes made to a display using the Page Manager page cache.
+ */
+function panels_mini_panels_cache_clear($key, $cache) {
+  list($handler, $item) = _panels_mini_panels_cache_get($key);
+  $handler->edit_cache_clear($item);
+}
+
+/**
+ * Save all changes made to a display using the Page Manager page cache.
+ */
+function panels_mini_panels_cache_save($key, $cache) {
+  list($handler, $item) = _panels_mini_panels_cache_get($key);
+  $item->display = $cache->display;
+  panels_mini_save($item);
+
+  $handler->edit_cache_clear($item);
+}
+
+/**
+ * Break the lock on a page manager page.
+ */
+function panels_mini_panels_cache_break_lock($key, $cache) {
 }

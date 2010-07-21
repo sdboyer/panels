@@ -19,6 +19,10 @@ function panels_mini_schema_1() {
   $schema['panels_mini'] = array(
     'export' => array(
       'identifier' => 'mini',
+      'load callback' => 'panels_mini_load',
+      'load all callback' => 'panels_mini_load_all',
+      'save callback' => 'panels_mini_save',
+      'delete callback' => 'panels_mini_delete',
       'export callback' => 'panels_mini_export',
       'api' => array(
         'owner' => 'panels_mini',
@@ -32,40 +36,54 @@ function panels_mini_schema_1() {
         'type' => 'serial',
         'not null' => TRUE,
         'no export' => TRUE,
+        'description' => 'The primary key for uniqueness.',
       ),
       'name' => array(
         'type' => 'varchar',
         'length' => '255',
+        'description' => 'The unique name of the mini panel.',
       ),
       'category' => array(
         'type' => 'varchar',
         'length' => '64',
+        'description' => 'The category this mini panel appears in on the add content pane.',
       ),
       'did' => array(
         'type' => 'int',
         'no export' => TRUE,
+        'description' => 'The display ID of the panel.',
       ),
       'title' => array(
         'type' => 'varchar',
         'length' => '128',
+        'description' => 'The title of the mini panel.',
+      ),
+      'admin_description' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Administrative title of this mini panel.',
+        'object default' => '',
       ),
       'requiredcontexts' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'description' => 'An array of required contexts.',
       ),
       'contexts' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'description' => 'An array of contexts embedded into the panel.',
       ),
       'relationships' => array(
         'type' => 'text',
         'size' => 'big',
         'serialize' => TRUE,
         'object default' => array(),
+        'description' => 'An array of relationships embedded into the panel.',
       ),
     ),
     'primary key' => array('pid'),
@@ -125,5 +143,21 @@ function panels_mini_update_6300() {
 function panels_mini_update_6301() {
   $ret = array();
   $ret[] = update_sql("UPDATE {blocks} SET cache = -1 WHERE module = 'panels_mini'");
+  return $ret;
+}
+
+/**
+ * Add the admin description field.
+ */
+function panels_mini_update_6302() {
+  $ret = array();
+  $field = array(
+    'type' => 'text',
+    'size' => 'big',
+    'description' => 'Administrative title of this mini panel.',
+    'object default' => '',
+  );
+
+  db_add_field($ret, 'panels_mini', 'admin_description', $field);
   return $ret;
 }
