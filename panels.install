@@ -151,7 +151,6 @@ function panels_schema_3() {
     'primary key' => array('rpid'),
   );
 
-
   $schema['panels_layout'] = array(
     'description' => 'Contains exportable customized layouts for this site.',
     'export' => array(
@@ -1506,4 +1505,5 @@ function panels_update_6310() {
 
   // Enable the stylizer module to make everything as seamless as possible.
   drupal_install_modules(array('stylizer'));
+  return $ret;
 }
