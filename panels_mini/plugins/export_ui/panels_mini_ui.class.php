@@ -127,7 +127,7 @@ class panels_mini_ui extends ctools_export_ui {
   /**
    * Validate submission of the mini panel edit form.
    */
-  function edit_form_validate($form, &$form_state) {
+  function edit_form_basic_validate($form, &$form_state) {
     parent::edit_form_validate($form, $form_state);
     if (preg_match("/[^A-Za-z0-9 ]/", $form_state['values']['category'])) {
       form_error($form['category'], t('Categories may contain only alphanumerics or spaces.'));
@@ -157,7 +157,7 @@ class panels_mini_ui extends ctools_export_ui {
     // Set this up and we can use CTools' Export UI's built in wizard caching,
     // which already has callbacks for the context cache under this name.
     $module = 'ctools_export_ui-' . $this->plugin['name'];
-    $name = $form_state['op'] == 'edit' ? $form_state['item']->{$this->plugin['export']['key']} : '$new$';
+    $name = $this->edit_cache_get_key($form_state['item'], $form_state['form type']);
 
     ctools_context_add_context_form($module, $form, $form_state, $form['right']['contexts_table'], $form_state['item'], $name);
     ctools_context_add_required_context_form($module, $form, $form_state, $form['left']['required_contexts_table'], $form_state['item'], $name);
@@ -242,7 +242,13 @@ class panels_mini_ui extends ctools_export_ui {
     ctools_include('display-edit', 'panels');
     ctools_include('context');
 
-    $cache = panels_edit_cache_get('panels_mini:' . $this->edit_cache_get_key($form_state['item'], $form_state['op']));
+    // If we are cloning an item, we MUST have this cached for this to work,
+    // so make sure:
+    if ($form_state['form type'] == 'clone' && empty($form_state['item']->export_ui_item_is_cached)) {
+      $this->edit_cache_set($form_state['item'], 'clone');
+    }
+
+    $cache = panels_edit_cache_get('panels_mini:' . $this->edit_cache_get_key($form_state['item'], $form_state['form type']));
 
     $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
     $form_state['renderer']->cache = &$cache;
