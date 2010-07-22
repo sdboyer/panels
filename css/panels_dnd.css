@@ -440,7 +440,7 @@ a.close img {
 }
 
 
-div.panel-pane div.ctools-dropdown-container-wrapper {
+#panels-dnd-main div.panel-pane div.ctools-dropdown-container-wrapper {
   margin-left: -158px;
   margin-top: -4px;
 }
@@ -459,22 +459,22 @@ html.js div.panels-display-links div.ctools-dropdown-container ul li a {
 }
 */
 
-.panel-pane .pane-title {
+#panels-dnd-main .panel-pane .pane-title {
   padding: 0.25em 0.5em;
 }
-.panel-pane .pane-title:after {
+#panels-dnd-main .panel-pane .pane-title:after {
   font-size: 0.8em;
   color: crimson;
   letter-spacing: normal;
   display: block;
 }
-.panel-pane.hidden-pane .pane-title:after {
+#panels-dnd-main .panel-pane.hidden-pane .pane-title:after {
   content: " status: hidden";
 }
-.panel-pane.changed .pane-title:after {
+#panels-dnd-main .panel-pane.changed .pane-title:after {
   content: " status: changes not saved";
 }
-.panel-pane.hidden-pane.changed .pane-title:after {
+#panels-dnd-main .panel-pane.hidden-pane.changed .pane-title:after {
   content: " status: hidden & changed";
 }
 

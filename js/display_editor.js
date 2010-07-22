@@ -453,7 +453,7 @@
     // Show javascript only items.
     $('span#panels-js-only').css('display', 'inline');
 
-    $('div.panel-pane:not(.panel-portlet)', context)
+    $('#panels-dnd-main div.panel-pane:not(.panel-portlet)')
       .addClass('panel-portlet')
       .each(Drupal.Panels.bindPortlet);
 
