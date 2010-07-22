@@ -234,6 +234,8 @@ function panels_edit_display_settings_form(&$form_state) {
 
       // We have to create a manual fieldset because fieldsets do not support IDs.
       // Use 'hidden' instead of 'markup' so that the process will run.
+      // Add js for collapsible fieldsets manually
+      drupal_add_js('misc/collapse.js');
       $form['display_title']['contexts_prefix'] = array(
         '#type' => 'hidden',
         '#id' => 'edit-display-substitutions',
@@ -253,7 +255,9 @@ function panels_edit_display_settings_form(&$form_state) {
       }
 
       $header = array(t('Keyword'), t('Value'));
-      $form['display_title']['contexts']['context'] = array('#value' => theme('table', $header, $rows));
+      $form['display_title']['contexts'] = array(
+        '#value' => theme('table', $header, $rows),
+      );
       $form['display_title']['contexts_suffix'] = array(
         '#value' => '</fieldset></div>',
       );
