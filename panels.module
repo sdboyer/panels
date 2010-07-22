@@ -61,6 +61,12 @@ function panels_theme() {
     'template' => 'panels-dashboard',
   );
 
+
+  // We don't need layout and style themes in maintenance mode.
+  if (defined('MAINTENANCE_MODE')) {
+    return $theme;
+  }
+
   // Register layout and style themes on behalf of all of these items.
   ctools_include('plugins', 'panels');
 
