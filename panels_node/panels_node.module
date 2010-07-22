@@ -133,6 +133,8 @@ function panels_node_add() {
  * Implementation of hook_form().
  */
 function panels_node_form(&$node, &$param) {
+  ctools_include('plugins', 'panels');
+
   $form['panels_node']['#tree'] = TRUE;
   if (empty($node->nid) && arg(0) == 'node' && arg(1) == 'add') {
     // Grab our selected layout from the $node, If it doesn't exist, try arg(3)
@@ -144,7 +146,6 @@ function panels_node_form(&$node, &$param) {
       return drupal_goto('node/add/panel/choose-layout', $opts);
     }
 
-    ctools_include('plugins', 'panels');
     $layout = panels_get_layout($panel_layout);
     if (empty($layout)) {
       return drupal_not_found();
@@ -189,6 +190,35 @@ function panels_node_form(&$node, &$param) {
     '#description' => t('An ID that can be used by CSS to style the panel.'),
     '#default_value' => $css_id,
   );
+
+  // Support for different rendering pipelines
+  // Mostly borrowed from panel_context.inc
+  $pipelines = panels_get_renderer_pipelines();
+
+  // If there are no pipelines, that probably means we're operating in
+  // legacy mode.
+  if (empty($pipelines)) {
+    // We retain the original pipeline so we don't wreck things by installing
+    // old modules.
+    $form['panels_node']['pipeline'] = array(
+      '#type' => 'value',
+      '#value' => $node->panels_node['pipeline'],
+    );
+  }
+  else {
+    $options = array();
+    foreach ($pipelines as $name => $pipeline) {
+      $options[$name] = check_plain($pipeline->admin_title) . '<div class="description">' . check_plain($pipeline->admin_description) . '</div>';
+    }
+
+    $form['panels_node']['pipeline'] = array(
+      '#type' => 'radios',
+      '#options' => $options,
+      '#title' => t('Renderer'),
+      '#default_value' => $node->panels_node['pipeline'] ? $node->panels_node['pipeline'] : 'standard',
+    );
+  }
+
   return $form;
 }
 
@@ -233,7 +263,7 @@ function panels_node_insert(&$node) {
   panels_save_display($display);
   $css_id = $node->panels_node['css_id'];
 
-  db_query("INSERT INTO {panels_node} (nid, did, css_id) VALUES (%d, %d, '%s')", $node->nid, $display->did, $node->panels_node['css_id']);
+  db_query("INSERT INTO {panels_node} (nid, did, css_id, pipeline) VALUES (%d, %d, '%s', '%s')", $node->nid, $display->did, $node->panels_node['css_id'], $node->panels_node['pipeline']);
 
   $node->panels_node['did'] = $display->did;
 }
@@ -252,7 +282,7 @@ function panels_node_delete(&$node) {
  * Implementation of hook_update().
  */
 function panels_node_update($node) {
-  db_query("UPDATE {panels_node} SET css_id = '%s' WHERE nid = %d", $node->panels_node['css_id'], $node->nid);
+  db_query("UPDATE {panels_node} SET css_id = '%s', pipeline = '%s' WHERE nid = %d", $node->panels_node['css_id'], $node->panels_node['pipeline'], $node->nid);
 }
 
 /**
@@ -281,9 +311,8 @@ function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
       $display->css_id = $node->panels_node['css_id'];
       // TODO: Find a way to make sure this can't node_view.
       $display->context = panels_node_get_context($node);
-
       $node->content['body'] = array(
-        '#value' => panels_render_display($display),
+        '#value' => panels_render_display($display, $node->panels_node['pipeline']),
         '#weight' => 0,
       );
     }
