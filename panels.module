@@ -61,6 +61,19 @@ function panels_theme() {
     'template' => 'panels-dashboard',
   );
 
+  $theme['panels_dashboard_link'] = array(
+    'arguments' => array('link' => array()),
+    'path' => drupal_get_path('module', 'panels') . '/templates',
+    'file' => '../includes/callbacks.inc',
+    'template' => 'panels-dashboard-link',
+  );
+
+  $theme['panels_dashboard_block'] = array(
+    'arguments' => array('block' => array()),
+    'path' => drupal_get_path('module', 'panels') . '/templates',
+    'file' => '../includes/callbacks.inc',
+    'template' => 'panels-dashboard-block',
+  );
 
   // We don't need layout and style themes in maintenance mode.
   if (defined('MAINTENANCE_MODE')) {
@@ -156,7 +169,7 @@ function panels_menu() {
   $items['admin/build/panels'] = array(
     'title' => 'Panels',
     'page callback' => 'panels_admin_page',
-    'description' => 'Administer items related to the Panels module.',
+    'description' => 'Get a bird\'s eye view of items related to Panels.',
   ) + $admin_base;
 
   $items['admin/build/panels/dashboard'] = array(

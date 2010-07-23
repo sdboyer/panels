@@ -391,3 +391,16 @@ function panels_node_export_node_alter(&$node, $original_node, $method) {
     $node->export_display = $export;
   }
 }
+
+/**
+ * Implementation of hook_panels_dashboard_blocks().
+ *
+ * Adds panel nodes information to the Panels dashboard.
+ */
+function panels_node_panels_dashboard_blocks(&$vars) {
+  $vars['links']['panels_node'] = array(
+    'title' => l(t('Panel node'), 'node/add/panel'),
+    'description' => t('Panel nodes are node content and appear in your searches, but are more limited than panel pages.'),
+    'weight' => -1,
+  );
+}

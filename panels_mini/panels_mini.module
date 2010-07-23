@@ -315,3 +315,64 @@ function panels_mini_panels_cache_save($key, $cache) {
  */
 function panels_mini_panels_cache_break_lock($key, $cache) {
 }
+
+/**
+ * Alter default mini panels to ensure they have new fields and avoid warnings.
+ */
+function panels_mini_default_panels_mini_alter(&$minis) {
+  foreach ($minis as $name => $mini) {
+    if (!isset($mini->admin_description)) {
+      $minis[$name]->admin_description = '';
+    }
+  }
+}
+
+/**
+ * Implementation of hook_panels_dashboard_blocks().
+ *
+ * Adds mini panels information to the Panels dashboard.
+ */
+function panels_mini_panels_dashboard_blocks(&$vars) {
+  $vars['links']['panels_mini'] = array(
+    'title' => l(t('Mini panel'), 'admin/build/mini-panels/add'),
+    'description' => t('Mini panels are small content areas exposed as blocks, for when you need to have complex block layouts or layouts within layouts.'),
+    'weight' => -1,
+  );
+
+  // Load all mini panels and their displays.
+  $panel_minis = panels_mini_load_all();
+  $count = 0;
+  $rows = array();
+
+  foreach ($panel_minis as $panel_mini) {
+    $rows[] = array(
+      check_plain($panel_mini->title),
+      array(
+        'data' => l(t('Edit'), "admin/build/mini-panels/list/$panel_mini->name/edit"),
+        'class' => 'links',
+      ),
+    );
+
+    // Only show 10.
+    if (++$count >= 10) {
+      break;
+    }
+  }
+
+  if ($rows) {
+    $content = theme('table', array(), $rows, array('class' => 'panels-manage'));
+  }
+  else {
+    $content = '<p>' . t('There are no mini panels.') . '</p>';
+  }
+
+  $vars['blocks']['panels_mini'] = array(
+    'weight' => -100,
+    'title' => t('Manage mini panels'),
+    'link' => l(t('Go to list'), 'admin/build/mini-panels'),
+    'content' => $content,
+    'class' => 'dashboard-mini-panels',
+    'section' => 'left',
+  );
+
+}

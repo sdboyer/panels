@@ -1597,23 +1597,6 @@ function panels_edit_cache_settings_form_submit($form, &$form_state) {
 }
 
 /**
- * Sort callback for sorting styles
- *
- * Sort first by weight, then by title.
- */
-function _panels_edit_style_sort($a, $b) {
-  if ($a['weight'] == $b['weight']) {
-    $a_title = strtolower($a['title']);
-    $b_title = strtolower($b['title']);
-    if ($a_title == $b_title) {
-      return 0;
-    }
-    return ($a_title < $b_title) ? -1 : 1;
-  }
-  return ($a['weight'] < $b['weight']) ? -1 : 1;
-}
-
-/**
  * Choose style form
  */
 function panels_edit_style_type_form(&$form_state) {
@@ -1629,7 +1612,7 @@ function panels_edit_style_type_form(&$form_state) {
     $options[-1] = t('Use display default style');
   }
 
-  uasort($styles, '_panels_edit_style_sort');
+  uasort($styles, 'ctools_plugin_sort');
 
   foreach ($styles as $id => $info) {
     if (empty($info['hidden']) && (!empty($info[$function]) || $id == 'default')) {

@@ -134,7 +134,7 @@ class panels_layouts_ui extends ctools_export_ui {
 
     $categories = $plugins = array('all' => t('- All -'));
     foreach ($this->items as $item) {
-      $categories[$item->category] = $item->category;
+      $categories[$item->category] = $item->category ? $item->category : t('Miscellaneous');
     }
 
     $form['top row']['category'] = array(
@@ -194,7 +194,7 @@ class panels_layouts_ui extends ctools_export_ui {
         $this->sorts[$item->name] = $item->name;
         break;
       case 'category':
-        $this->sorts[$item->name] = $item->category . $item->admin_title;
+        $this->sorts[$item->name] = ($item->category ? $item->category : t('Miscellaneous')) . $item->admin_title;
         break;
       case 'plugin':
         $this->sorts[$item->name] = $item->plugin;
@@ -205,12 +205,13 @@ class panels_layouts_ui extends ctools_export_ui {
     }
 
     $type = !empty($this->builders[$item->plugin]) ? $this->builders[$item->plugin]['title'] : t('Broken/missing plugin');
+    $category = $item->category ? check_plain($item->category) : t('Miscellaneous');
     $this->rows[$item->name] = array(
       'data' => array(
         array('data' => check_plain($type), 'class' => 'ctools-export-ui-type'),
         array('data' => check_plain($item->name), 'class' => 'ctools-export-ui-name'),
         array('data' => check_plain($item->admin_title), 'class' => 'ctools-export-ui-title'),
-        array('data' => check_plain($item->category), 'class' => 'ctools-export-ui-category'),
+        array('data' => $category, 'class' => 'ctools-export-ui-category'),
         array('data' => theme('links', $operations), 'class' => 'ctools-export-ui-operations'),
       ),
       'title' => check_plain($item->admin_description),

@@ -595,7 +595,6 @@ function panels_update_5209() {
         // Give it an identifier if it doesn't already have one
         if (empty($argument['identifier'])) {
           $argument['identifier'] = $info['title'] . ($id > 1 ? ' ' . $id : '');
-          error_log($argument['identifier']);
         }
 
         // Give it a unique keyword if it doesn't already have one
@@ -607,7 +606,6 @@ function panels_update_5209() {
           }
           $keywords[$keyword] = TRUE;
           $argument['keyword'] = $keyword;
-          error_log($argument['keyword']);
         }
         $arguments[$id] = $argument;
       }
