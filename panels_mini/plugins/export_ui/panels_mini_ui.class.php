@@ -164,6 +164,10 @@ class panels_mini_ui extends ctools_export_ui {
     ctools_context_add_relationship_form($module, $form, $form_state, $form['right']['relationships_table'], $form_state['item'], $name);
   }
 
+  function edit_form_context_submit(&$form, &$form_state) {
+    // Prevent this from going to edit_form_submit();
+  }
+
   function edit_form_layout(&$form, &$form_state) {
     ctools_include('common', 'panels');
     ctools_include('display-layout', 'panels');
@@ -171,6 +175,10 @@ class panels_mini_ui extends ctools_export_ui {
 
     // @todo -- figure out where/how to deal with this.
     $form_state['allowed_layouts'] = 'panels_mini';
+
+    if ($form_state['op'] == 'add' && empty($form_state['item']->display)) {
+      $form_state['item']->display = panels_new_display();
+    }
 
     $form_state['display'] = &$form_state['item']->display;
 
@@ -181,7 +189,9 @@ class panels_mini_ui extends ctools_export_ui {
     $form['#id'] = 'panels-choose-layout';
     $form = array_merge($form, panels_choose_layout($form_state));
 
-    $form['buttons']['next']['#value'] = t('Change');
+    if ($form_state['op'] == 'edit') {
+      $form['buttons']['next']['#value'] = t('Change');
+    }
   }
 
   /**
@@ -189,12 +199,13 @@ class panels_mini_ui extends ctools_export_ui {
    */
   function edit_form_layout_validate(&$form, &$form_state) {
     $display = &$form_state['display'];
-
     if (empty($form_state['values']['layout'])) {
       form_error($form['layout'], t('You must select a layout.'));
     }
-    if ($form_state['values']['layout'] == $display->layout) {
-      form_error($form['layout'], t('You must select a different layout if you wish to change layouts.'));
+    if ($form_state['op'] == 'edit') {
+      if ($form_state['values']['layout'] == $display->layout) {
+        form_error($form['layout'], t('You must select a different layout if you wish to change layouts.'));
+      }
     }
   }
 
@@ -203,9 +214,14 @@ class panels_mini_ui extends ctools_export_ui {
    */
   function edit_form_layout_submit(&$form, &$form_state) {
     $display = &$form_state['display'];
-    if ($form_state['values']['layout'] != $display->layout) {
-      $form_state['item']->temp_layout = $form_state['values']['layout'];
-      $form_state['clicked_button']['#next'] = 'move';
+    if ($form_state['op'] == 'edit') {
+      if ($form_state['values']['layout'] != $display->layout) {
+        $form_state['item']->temp_layout = $form_state['values']['layout'];
+        $form_state['clicked_button']['#next'] = 'move';
+      }
+    }
+    else {
+      $form_state['item']->display->layout = $form_state['values']['layout'];
     }
   }
 
