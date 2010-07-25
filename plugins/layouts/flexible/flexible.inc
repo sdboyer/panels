@@ -23,8 +23,8 @@ $plugin = array(
   'builder' => TRUE,
   'builder tab title' => 'Add flexible layout', // menu so translated elsewhere
 
-  'sublayout callback' => 'panels_flexible_get_sublayout',
-  'sublayouts callback' => 'panels_flexible_get_sublayouts',
+  'get child' => 'panels_flexible_get_sublayout',
+  'get children' => 'panels_flexible_get_sublayouts',
 
   // Define ajax callbacks
   'ajax' => array(

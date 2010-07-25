@@ -19,8 +19,8 @@ $plugin = array(
   'settings form' => 'panels_stylizer_stylizer_style_settings_form',
 
   // We offer substyles so provide callbacks to do so.
-  'substyle callback' => 'panels_stylizer_get_substyle',
-  'substyles callback' => 'panels_stylizer_get_substyles',
+  'get child' => 'panels_stylizer_get_substyle',
+  'get children' => 'panels_stylizer_get_substyles',
 
   // Set up an AJAX callback for the style
   'ajax' => array(

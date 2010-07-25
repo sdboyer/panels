@@ -308,6 +308,7 @@ function panels_ctools_plugin_layouts() {
     'load themes' => TRUE,
     'use hooks' => TRUE,
     'process' => 'panels_layout_process',
+    'child plugins' => TRUE,
   );
 }
 
@@ -329,6 +330,7 @@ function panels_ctools_plugin_styles() {
     'load themes' => TRUE,
     'use hooks' => TRUE,
     'process' => 'panels_plugin_styles_process',
+    'child plugins' => TRUE,
   );
 }
 

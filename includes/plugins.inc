@@ -265,26 +265,8 @@ function panels_get_pane_title(&$pane, $context = array(), $incoming_content = N
  *   An array with information about the requested panel layout.
  */
 function panels_get_layout($layout) {
-  // Check the cache to see if all layouts were loaded.
-  $layouts = &ctools_static('panels_get_layouts');
-  if ($layouts && !empty($layouts[$layout])) {
-    return $layouts[$layout];
-  }
-
   ctools_include('plugins');
-  if (strpos($layout, ':') !== FALSE) {
-    list($layout_name, $sublayout) = explode(':', $layout, 2);
-  }
-  else {
-    $layout_name = $layout;
-  }
-
-  $plugin = ctools_get_plugins('panels', 'layouts', $layout_name);
-  if (!empty($sublayout) && function_exists($plugin['sublayout callback'])) {
-    $plugin = $plugin['sublayout callback']($plugin, $layout_name, $sublayout);
-  }
-
-  return $plugin;
+  return ctools_get_plugins('panels', 'layouts', $layout);
 }
 
 /**
@@ -294,24 +276,8 @@ function panels_get_layout($layout) {
  *   An array of arrays with information about all available panel layouts.
  */
 function panels_get_layouts() {
-  $layouts = &ctools_static(__FUNCTION__);
-  if (!isset($layouts)) {
-    $layouts = array();
-    ctools_include('plugins');
-    $plugins = ctools_get_plugins('panels', 'layouts');
-
-    // Go through each and see if there are 'sub' layouts we need to get.
-    foreach ($plugins as $name => $plugin) {
-      if (!empty($plugin['sublayouts callback']) && function_exists($plugin['sublayouts callback'])) {
-        $layouts = array_merge($plugin['sublayouts callback']($plugin, $name), $layouts);
-      }
-      else {
-        $layouts[$name] = $plugin;
-      }
-    }
-  }
-
-  return $layouts;
+  ctools_include('plugins');
+  return ctools_get_plugins('panels', 'layouts');
 }
 
 /**
@@ -346,54 +312,9 @@ function panels_get_layout_builders() {
  * @return
  *   An array with information about the requested panel style.
  */
-//function panels_get_style($style) {
-//  ctools_include('plugins');
-//  return ctools_get_plugins('panels', 'styles', $style);
-//}
-
-/**
- * Fetch metadata for all style plugins.
- *
- * @return
- *   An array of arrays with information about all available panel styles.
- */
-//function panels_get_styles() {
-//  ctools_include('plugins');
-//  return ctools_get_plugins('panels', 'styles');
-//}
-
-/**
- * Fetch metadata on a specific style plugin.
- *
- * @param $style
- *   Name of a panel style. If the style name contains a ':' this
- *   indicates that we need to separate the substyle out and
- *   load it individually.
- *
- * @return
- *   An array with information about the requested panel style.
- */
 function panels_get_style($style) {
-  // Check the cache to see if all styles were loaded.
-  $styles = &ctools_static('panels_get_styles');
-  if ($styles && !empty($styles[$style])) {
-    return $styles[$style];
-  }
-
   ctools_include('plugins');
-  if (strpos($style, ':') !== FALSE) {
-    list($style_name, $substyle) = explode(':', $style, 2);
-  }
-  else {
-    $style_name = $style;
-  }
-
-  $plugin = ctools_get_plugins('panels', 'styles', $style_name);
-  if (!empty($substyle) && function_exists($plugin['substyle callback'])) {
-    $plugin = $plugin['substyle callback']($plugin, $style_name, $substyle);
-  }
-
-  return $plugin;
+  return ctools_get_plugins('panels', 'styles', $style);
 }
 
 /**
@@ -403,24 +324,8 @@ function panels_get_style($style) {
  *   An array of arrays with information about all available panel styles.
  */
 function panels_get_styles() {
-  $styles = &ctools_static(__FUNCTION__);
-  if (!isset($styles)) {
-    $styles = array();
-    ctools_include('plugins');
-    $plugins = ctools_get_plugins('panels', 'styles');
-
-    // Go through each and see if there are 'sub' styles we need to get.
-    foreach ($plugins as $name => $plugin) {
-      if (!empty($plugin['substyles callback']) && function_exists($plugin['substyles callback'])) {
-        $styles = array_merge($plugin['substyles callback']($plugin, $name), $styles);
-      }
-      else {
-        $styles[$name] = $plugin;
-      }
-    }
-  }
-
-  return $styles;
+  ctools_include('plugins');
+  return ctools_get_plugins('panels', 'styles');
 }
 
 /**
