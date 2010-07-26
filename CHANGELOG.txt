@@ -1,4 +1,4 @@
-Panels 6.x-dev
+Panels 6.x-3.7 (2010-Jul-26)
 ==============
 Experimentally introduced the In-Place Editor (IPE).
 Updated Panels Stylizer to use CTools' new Export UI.
