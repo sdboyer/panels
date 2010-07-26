@@ -313,7 +313,8 @@ class panels_renderer_editor extends panels_renderer_standard {
       );
     }
 
-    if (isset($content_type['edit form'])) {
+    $subtype = ctools_content_get_subtype($content_type, $pane->subtype);
+    if (!empty($content_type['edit form']) || !empty($subtype['edit form'])) {
       $links[] = array(
         'title' => isset($content_type['edit text']) ? $content_type['edit text'] : t('Settings'),
         'href' => $this->get_url('edit-pane', $pane->pid),

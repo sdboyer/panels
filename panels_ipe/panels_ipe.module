@@ -69,11 +69,12 @@ function theme_panels_ipe_placeholder_pane($region_id, $region_title) {
 
 function theme_panels_ipe_pane_wrapper($output, $pane, $display, $renderer) {
   $content_type = ctools_get_content_type($pane->type);
+  $subtype = ctools_content_get_subtype($content_type, $pane->subtype);
   $links = array();
 
-  if (!empty($content_type['edit form'])) {
+  if (!empty($content_type['edit form']) || !empty($subtype['edit form'])) {
     $links['edit'] = array(
-      'title' => t('Edit'),
+      'title' => isset($content_type['edit text']) ? $content_type['edit text'] : t('Settings'),
       'href' => $renderer->get_url('edit-pane', $pane->pid),
       'attributes' => array(
         'class' => 'ctools-use-modal',
