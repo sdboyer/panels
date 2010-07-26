@@ -157,7 +157,7 @@ function theme_panels_stylizer_stylizer_style_render_pane($content, $pane, $disp
  */
 function panels_stylizer_stylizer_style_settings_form($style_settings, $display, $pid, $type, $form_state) {
   // Just redirect this to the custom style settings ajax.
-  panels_stylizer_pane_add_style($form_state['renderer'], array(), $style_settings, $type, $pid, 'settings');
+  panels_stylizer_pane_add_style($form_state['renderer'], array(), $style_settings, $type, $pid);
   ctools_ajax_render($form_state['renderer']->commands);
 }
 

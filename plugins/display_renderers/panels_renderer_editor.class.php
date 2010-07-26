@@ -1006,6 +1006,10 @@ class panels_renderer_editor extends panels_renderer_standard {
     $style = panels_get_style($form_state['style']);
     $function = panels_plugin_get_function('styles', $style, ($type == 'pane') ? 'pane settings form' : 'settings form');
     if (!$function) {
+      if (isset($this->cache->style)) {
+        unset($this->cache->style);
+      }
+
       // If there's no settings form, just change the style and exit.
       switch($type) {
         case 'display':
