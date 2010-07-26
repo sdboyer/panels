@@ -310,6 +310,13 @@ function panels_flexible_create_renderer($admin, $id, $content, $settings, &$dis
     }
   }
 
+  // Get the separation values out of the canvas settings.
+  $renderer->column_separation = !empty($settings['items']['canvas']['column_separation']) ? $settings['items']['canvas']['column_separation'] : '0.5em';
+
+  $renderer->region_separation = !empty($settings['items']['canvas']['region_separation']) ? $settings['items']['canvas']['region_separation'] : '0.5em';
+
+  $renderer->row_separation = !empty($settings['items']['canvas']['row_separation']) ? $settings['items']['canvas']['row_separation'] : '0.5em';
+
   // Make some appended classes so it's easier to reference them.
 
   $renderer->base['column'] = $renderer->item_class['column'] . '-' . $renderer->base_class;
@@ -717,8 +724,8 @@ function panels_flexible_render_css_group($renderer, $list, $owner_id, $type, $i
   );
 
   $css['.' . $renderer->item_class['region'] . '-inside'] = array(
-    'padding-right' => '.5em',
-    'padding-left' => '.5em',
+    'padding-right' => $renderer->region_separation,
+    'padding-left' => $renderer->region_separation,
   );
 
   $css['.' . $renderer->item_class['region'] . '-inside-first'] = array(
@@ -734,8 +741,8 @@ function panels_flexible_render_css_group($renderer, $list, $owner_id, $type, $i
   );
 
   $css['.' . $renderer->item_class['column'] . '-inside'] = array(
-    'padding-right' => '.5em',
-    'padding-left' => '.5em',
+    'padding-right' => $renderer->column_separation,
+    'padding-left' => $renderer->column_separation,
   );
 
   $css['.' . $renderer->item_class['column'] . '-inside-first'] = array(
@@ -748,7 +755,7 @@ function panels_flexible_render_css_group($renderer, $list, $owner_id, $type, $i
 
   // And properly pad rows too
   $css['.' . $renderer->item_class['row']] = array(
-    'padding' => '0 0 .5em 0',
+    'padding' => '0 0 ' . $renderer->row_separation . ' 0',
     'margin' => '0',
   );
 
@@ -979,11 +986,28 @@ function panels_ajax_flexible_edit_settings($handler, $id) {
 
     // If editing the canvas, reset the CSS width
     if ($id == 'canvas') {
+      // update canvas CSS.
+      $css = array(
+        '.' . $renderer->item_class['column'] . '-inside' => array(
+          'padding-left' => $renderer->column_separation,
+          'padding-right' => $renderer->column_separation,
+        ),
+        '.' . $renderer->item_class['region'] . '-inside' => array(
+          'padding-left' => $renderer->region_separation,
+          'padding-right' => $renderer->region_separation,
+        ),
+        '.' . $renderer->item_class['row'] => array(
+          'padding-bottom' => $renderer->row_separation,
+        ),
+      );
       if (!empty($item['fixed_width']) && intval($item['fixed_width'])) {
-        $output[] = ctools_ajax_command_css('.' . $renderer->base['canvas'], array('width' => intval($item['fixed_width']) . 'px'));
+        $css['.' . $renderer->base['canvas']] = array('width' => intval($item['fixed_width']) . 'px');
       }
       else {
-        $output[] = ctools_ajax_command_css('.' . $renderer->base['canvas'], array('width' => 'auto'));
+        $css['.' . $renderer->base['canvas']] = array('width' => 'auto');
+      }
+      foreach ($css as $selector => $data) {
+        $output[] = ctools_ajax_command_css($selector, $data);
       }
     }
 
@@ -1056,6 +1080,27 @@ function panels_flexible_config_item_form(&$form_state) {
       '#title' => t('Fixed width'),
       '#description' => t('If a value is entered, the layout canvas will be fixed to the given pixel width.'),
       '#default_value' => isset($item['fixed_width']) ? $item['fixed_width'] : '',
+    );
+
+    $form['column_separation'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Column separation'),
+      '#description' => t('How much padding to put on columns that are that are next to other columns. Note that this is put on both columns so the real amount is doubled.'),
+      '#default_value' => isset($item['column_separation']) ? $item['column_separation'] : '0.5em',
+    );
+
+    $form['region_separation'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Region separation'),
+      '#description' => t('How much padding to put on regions that are that are next to other regions. Note that this is put on both regions so the real amount is doubled.'),
+      '#default_value' => isset($item['region_separation']) ? $item['region_separation'] : '0.5em',
+    );
+
+    $form['row_separation'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Row separation'),
+      '#description' => t('How much padding to put on beneath rows to separate them from each other. Because this is placed only on the bottom, not hte top, this is NOT doubled like column/region separation.'),
+      '#default_value' => isset($item['row_separation']) ? $item['row_separation'] : '0.5em',
     );
   }
   else {
@@ -1137,6 +1182,9 @@ function panels_flexible_config_item_form_submit(&$form, &$form_state) {
     // it to make it simpler to default to scaling.
     $item['no_scale'] = !$form_state['values']['no_scale'];
     $item['fixed_width'] = $form_state['values']['fixed_width'];
+    $item['column_separation'] = $form_state['values']['column_separation'];
+    $item['region_separation'] = $form_state['values']['region_separation'];
+    $item['row_separation'] = $form_state['values']['row_separation'];
   }
   else if ($item['type'] != 'row') {
     $item['width_type'] = $form_state['values']['width_type'];
