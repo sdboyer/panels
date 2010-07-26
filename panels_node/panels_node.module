@@ -101,15 +101,15 @@ function panels_node_node_info() {
  * Implementation of hook_access().
  */
 function panels_node_access($op, $node, $account) {
-  if (user_access('administer panel-nodes')) {
+  if (user_access('administer panel-nodes', $account)) {
     return TRUE;
   }
 
-  if ($op == 'create' && user_access('create panel-nodes')) {
+  if ($op == 'create' && user_access('create panel-nodes', $account)) {
     return TRUE;
   }
 
-  if ($op == 'update' && (user_access('edit any panel-nodes') || $node->uid == $account->uid && user_access('edit own panel-nodes'))) {
+  if ($op == 'update' && (user_access('edit any panel-nodes', $account) || $node->uid == $account->uid && user_access('edit own panel-nodes', $account))) {
     return TRUE;
   }
 
