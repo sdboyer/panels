@@ -59,13 +59,32 @@ class panels_renderer_ipe extends panels_renderer_editor {
       return;
     }
 
-    // Add an inner layer wrapper to the pane content before placing it into
-    // draggable portlet
-    $output = "<div class='panels-ipe-portlet-content'>$output</div>";
-
+    if (empty($pane->IPE_empty)) {
+      // Add an inner layer wrapper to the pane content before placing it into
+      // draggable portlet
+      $output = "<div class=\"panels-ipe-portlet-content\">$output</div>";
+    }
+    else {
+      $output = "<div class=\"panels-ipe-portlet-content panels-ipe-empty-pane\">$output</div>";
+    }
     // Hand it off to the plugin/theme for placing draggers/buttons
     $output = theme('panels_ipe_pane_wrapper', $output, $pane, $this->display, $this);
-    return "<div id='panels-ipe-paneid-{$pane->pid}' class='panels-ipe-portlet-wrapper panels-ipe-portlet-marker'>" . $output . "</div>";
+    return "<div id=\"panels-ipe-paneid-{$pane->pid}\" class=\"panels-ipe-portlet-wrapper panels-ipe-portlet-marker\">" . $output . "</div>";
+  }
+
+  function render_pane_content(&$pane) {
+    $content = parent::render_pane_content($pane);
+    // Ensure that empty panes have some content.
+    if (empty($content->content)) {
+      // Get the administrative title.
+      $content_type = ctools_get_content_type($pane->type);
+      $title = ctools_content_admin_title($content_type, $pane->subtype, $pane->configuration, $this->display->context);
+
+      $content->content = t('Placeholder for empty "@title"', array('@title' => $title));
+      $pane->IPE_empty = TRUE;
+    }
+
+    return $content;
   }
 
   /**

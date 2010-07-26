@@ -65,7 +65,7 @@ function panels_render_pane($content, $pane, &$display) {
       $style = panels_get_style($pane->style['style']);
 
       if (isset($style) && isset($style['render pane'])) {
-        $output = theme($style['render pane'], $content, $pane, $display);
+        $output = theme($style['render pane'], $content, $pane, $display, $style);
 
         // This could be null if no theme function existed.
         if (isset($output)) {

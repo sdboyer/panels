@@ -16,6 +16,16 @@ div.panels-ipe-handlebar-wrapper {
   -webkit-border-radius-topright:2px;
 }
 
+/* Hide empty panes when not editing them. */
+.panels-ipe-empty-pane {
+  display: none;
+}
+
+.panels-ipe-editing .panels-ipe-empty-pane {
+  display: block;
+}
+
+
 .panels-ipe-editing div.panels-ipe-portlet-wrapper:hover {
   border: #FF000A solid 2px;
 }
@@ -102,6 +112,8 @@ div.panels-ipe-newblock a {
   display: block;
   padding: 0.1em 0.5em;
   font: 12px/170% Verdana,sans-serif; !important;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 div.panels-ipe-newblock a {

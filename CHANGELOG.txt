@@ -40,6 +40,7 @@ Moved Panels stylizer to CTools. You must update CTools at the same time as Pane
 #848712 by josh_k: Use panel nodes with IPE.
 #860306 by jcmarco: "Substitutions" fieldset would not open due to missing js.
 #856964: "Custom style" selection was not working.
+#863302: Allow IPE to cope with empty panes.
 
 Panels 6.x-3.5 (2010-May-28)
 ==============
