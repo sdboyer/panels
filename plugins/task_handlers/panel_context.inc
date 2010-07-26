@@ -795,6 +795,7 @@ function panels_panel_context_edit_preview(&$form, &$form_state) {
   if (empty($form['preview'])) {
     $display = panels_panel_context_get_display($form_state['handler']);
     $display->context = $contexts;
+    $display->skip_cache = TRUE;
     $output = panels_render_display($display);
     if (isset($form['buttons'])) {
       unset($form['buttons']);

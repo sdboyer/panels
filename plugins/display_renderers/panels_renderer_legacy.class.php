@@ -54,7 +54,7 @@ class panels_renderer_legacy {
     // This now comes after the CSS is added, because panels-within-panels must
     // have their CSS added in the right order; inner content before outer content.
 
-    if (empty($this->display->cache['method'])) {
+    if (empty($this->display->cache['method']) || !empty($this->display->skip_cache)) {
       $content = $this->render_regions();
     }
     else {
@@ -151,7 +151,7 @@ class panels_renderer_legacy {
     }
 
     $content = FALSE;
-    $caching = !empty($pane->cache['method']) ? TRUE : FALSE;
+    $caching = !empty($pane->cache['method']) && empty($this->display->skip_cache);
     if ($caching && ($cache = panels_get_cached_content($this->display, $this->display->args, $this->display->context, $pane))) {
       $content = $cache->content;
     }
@@ -220,9 +220,9 @@ class panels_renderer_legacy {
           unset($panes[$pane_id]);
         }
       }
-
       // And set the callback to the new key
       $callback = 'render region';
+
     }
 
     return theme($style[$callback], $this->display, $owner_id, $panes, $style_settings, $region_name, $style);

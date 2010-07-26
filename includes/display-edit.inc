@@ -175,6 +175,7 @@ function panels_edit_display_form_preview(&$form, &$form_state) {
   ctools_include('ajax');
 
   $display->context = ctools_context_replace_placeholders($display->context, $form_state['values']['preview']);
+  $display->skip_cache = TRUE;
   $output = panels_render_display($display);
 
   // Add any extra CSS that some layouts may have added specifically for this.
