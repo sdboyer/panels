@@ -216,10 +216,13 @@ class panels_renderer_legacy {
         if ($content) {
           $panes[$pane_id] = $content;
         }
+        else {
+          unset($panes[$pane_id]);
+        }
       }
+
       // And set the callback to the new key
       $callback = 'render region';
-
     }
 
     return theme($style[$callback], $this->display, $owner_id, $panes, $style_settings, $region_name, $style);
