@@ -682,7 +682,7 @@ class panels_display {
     // Let modules act just prior to render.
     foreach (module_implements('panels_pre_render') as $module) {
       $function = $module . '_panels_pre_render';
-      $output .= $function($display, $renderer);
+      $output .= $function($this, $renderer);
     }
 
     $output .= $renderer->render();
@@ -690,7 +690,7 @@ class panels_display {
     // Let modules act just after render.
     foreach (module_implements('panels_post_render') as $module) {
       $function = $module . '_panels_post_render';
-      $output .= $function($display, $renderer);
+      $output .= $function($this, $renderer);
     }
     return $output;
   }
