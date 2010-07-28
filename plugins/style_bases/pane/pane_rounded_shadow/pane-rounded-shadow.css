@@ -15,7 +15,7 @@
 
 %style .rounded-shadow-background {
   margin: 10px;
-  background: url(rounded-shadow-background.png) repeat;
+  background: %background url(rounded-shadow-background.png) repeat;
 }
 
 %style .rounded-shadow-wrap-corner {
