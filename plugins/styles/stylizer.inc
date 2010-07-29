@@ -243,7 +243,7 @@ function panels_stylizer_pane_add_style(&$renderer, $plugin, &$conf, $type, $pid
  * preconfigured style.
  */
 function panels_stylizer_edit_pane_style_form(&$form, &$form_state) {
-  if (!user_access('administer panels styles')) {
+  if (!user_access('administer panels styles') || !module_exists('stylizer')) {
     return;
   }
   ctools_include('dependent');
