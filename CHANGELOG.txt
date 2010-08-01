@@ -3,6 +3,7 @@ Panels 6.x-dev
 hook_panels_pre_render() and hook_panels_post_render() getting empty displays.
 #865704: Editing mini panels styles failed badly due to missing piece of cache.
 Custom style could crash if trying to enable style reuse without first enabling stylizer.module.
+In Flexible, the "class" would not stick when adding a new region/row/column but would when editing.
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============

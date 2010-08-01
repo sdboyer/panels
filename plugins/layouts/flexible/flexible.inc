@@ -1468,6 +1468,8 @@ function panels_flexible_add_item_form_submit(&$form, &$form_state) {
   $location = &$form_state['location'];
   $settings = &$form_state['settings'];
 
+  $item['class'] = $form_state['values']['class'];
+
   if ($item['type'] == 'region') {
     $item['title'] = $form_state['values']['title'];
   }
