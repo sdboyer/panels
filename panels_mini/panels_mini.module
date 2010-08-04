@@ -171,8 +171,8 @@ function panels_mini_load_all($reset = FALSE) {
     foreach ($minis as $mini) {
       if (!empty($mini->did) && empty($cache[$mini->name])) {
         $dids[$mini->did] = $mini->name;
+        $cache[$mini->name] = $mini;
       }
-      $cache[$mini->name] = $mini;
     }
 
     $displays = panels_load_displays(array_keys($dids));
