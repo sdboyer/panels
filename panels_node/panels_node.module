@@ -311,8 +311,9 @@ function panels_node_view($node, $teaser = FALSE, $page = FALSE) {
       $display->css_id = $node->panels_node['css_id'];
       // TODO: Find a way to make sure this can't node_view.
       $display->context = panels_node_get_context($node);
+      $renderer = panels_get_renderer($node->panels_node['pipeline'], $display);
       $node->content['body'] = array(
-        '#value' => panels_render_display($display, $node->panels_node['pipeline']),
+        '#value' => panels_render_display($display, $renderer),
         '#weight' => 0,
       );
     }
