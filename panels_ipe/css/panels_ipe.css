@@ -71,7 +71,7 @@ div.panels-ipe-handlebar-wrapper li.first {
 }
 
 div.panels-ipe-draghandle {
-  background: #898AAB url(images/dragger.png) top right no-repeat;
+  background: #898AAB url(../images/dragger.png) top right no-repeat;
   cursor: move;
   height: 24px;
 }
