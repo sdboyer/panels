@@ -7,6 +7,7 @@ In Flexible, the "class" would not stick when adding a new region/row/column but
 #861426: Editing a mini panel while that same mini panel is displayed on the page resulted in a crash.
 #871730: Panel nodes with IPE enabled let anyone use IPE.
 #877810: Multiple "Add flexible layout" tabs appearing based on number of flexible layouts stored.
+#873224 by thsutton: hook_requirements() could cause notice error.
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============

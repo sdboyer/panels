@@ -53,6 +53,7 @@ function panels_requirements_runtime() {
   if (empty($state)) {
     $requirements['panels_legacy'] = array(
       'title' => $t('Panels operating normally'),
+      'value' => NULL,
       'severity' => REQUIREMENT_OK,
       'description' => $t('Panels is operating normally - no out-of-date plugins or modules are forcing it into legacy mode'),
     );
