@@ -8,6 +8,7 @@ In Flexible, the "class" would not stick when adding a new region/row/column but
 #871730: Panel nodes with IPE enabled let anyone use IPE.
 #877810: Multiple "Add flexible layout" tabs appearing based on number of flexible layouts stored.
 #873224 by thsutton: hook_requirements() could cause notice error.
+#867340 by cedarm: Restore removed but deprecated panels_render_layout() function.
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============
