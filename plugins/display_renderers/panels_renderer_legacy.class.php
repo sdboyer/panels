@@ -12,7 +12,8 @@
  *    panels_render_pane() on all contained panes; rendered pane HTML is now
  *    passed in directly.
  *  - Cache plugins are now triggered on rendered HTML, rather than on
- *    unrendered datastructures.
+ *    unrendered datastructures, when acting at the display level. When acting
+ *    at the pane level, they still receive the unrendered datastructure.
  *
  * If your site relies on any of these plugin behaviors, you will need to use
  * this renderer instead of the new panels_renderer_standard() until those
