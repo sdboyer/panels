@@ -66,7 +66,7 @@ class panels_mini_ui extends ctools_export_ui {
     // Set up sorting
     switch ($form_state['values']['order']) {
       case 'disabled':
-        $this->sorts[$item->name] = empty($item->disabled) . $item->title;
+        $this->sorts[$item->name] = empty($item->disabled) . $item->admin_title;
         break;
       case 'title':
         $this->sorts[$item->name] = $item->admin_title;
@@ -90,7 +90,7 @@ class panels_mini_ui extends ctools_export_ui {
 
     $this->rows[$item->name] = array(
       'data' => array(
-        array('data' => check_plain($item->title), 'class' => 'ctools-export-ui-title'),
+        array('data' => check_plain($item->admin_title), 'class' => 'ctools-export-ui-title'),
         array('data' => check_plain($item->name), 'class' => 'ctools-export-ui-name'),
         array('data' => $category, 'class' => 'ctools-export-ui-category'),
         array('data' => $layout, 'class' => 'ctools-export-ui-layout'),

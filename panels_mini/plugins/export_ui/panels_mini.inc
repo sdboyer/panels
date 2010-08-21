@@ -5,10 +5,6 @@ $plugin = array(
   'schema' => 'panels_mini',
   'access' => 'administer mini panels',
   'create access' => 'create mini panels',
-  // The usual administrative title is just 'title' for us.
-  'export' => array(
-    'admin_title' => 'title',
-  ),
 
   'menu' => array(
     'menu item' => 'mini-panels',

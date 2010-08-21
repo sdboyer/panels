@@ -53,10 +53,10 @@ function panels_mini_schema_1() {
         'no export' => TRUE,
         'description' => 'The display ID of the panel.',
       ),
-      'title' => array(
+      'admin_title' => array(
         'type' => 'varchar',
         'length' => '128',
-        'description' => 'The title of the mini panel.',
+        'description' => 'The administrative title of the mini panel.',
       ),
       'admin_description' => array(
         'type' => 'text',
@@ -154,10 +154,33 @@ function panels_mini_update_6302() {
   $field = array(
     'type' => 'text',
     'size' => 'big',
-    'description' => 'Administrative title of this mini panel.',
+    'description' => 'Administrative description of this mini panel.',
     'object default' => '',
   );
 
   db_add_field($ret, 'panels_mini', 'admin_description', $field);
+  return $ret;
+}
+
+/**
+ * Add the admin description field.
+ */
+function panels_mini_update_6303() {
+  $ret = array();
+  $field = array(
+    'type' => 'varchar',
+    'length' => '128',
+    'description' => 'The administrative title of the mini panel.',
+  );
+
+  db_add_field($ret, 'panels_mini', 'admin_title', $field);
+
+  $result = db_query("SELECT pid, did, title FROM {panels_mini}");
+  while ($mini = db_fetch_object($result)) {
+    db_query("UPDATE {panels_mini} SET admin_title = '%s' WHERE pid = %d", $mini->title, $mini->pid);
+    db_query("UPDATE {panels_display} SET title = '%s' WHERE did = %d", $mini->title, $mini->pid);
+  }
+
+  db_drop_field($ret, 'panels_mini', 'title');
   return $ret;
 }
