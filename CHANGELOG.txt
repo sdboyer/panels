@@ -11,6 +11,7 @@ In Flexible, the "class" would not stick when adding a new region/row/column but
 #867340 by cedarm: Restore removed but deprecated panels_render_layout() function.
 #871942 by dwatson: Invalid CSS made dragger image not appear during IPE.
 #867864: Fix a admin title and edit link problems with custom content types.
+#570194: Add support for the "checkall" module in the content permissions page.
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============
