@@ -79,6 +79,10 @@
   padding: 3px 19px;
 }
 
+%style .panel-pane {
+  position: relative; top: -6px;
+}
+
 /*
 %style div.admin-links {
   margin-top: -19px;

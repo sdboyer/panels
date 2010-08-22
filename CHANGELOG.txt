@@ -12,6 +12,8 @@ In Flexible, the "class" would not stick when adding a new region/row/column but
 #871942 by dwatson: Invalid CSS made dragger image not appear during IPE.
 #867864: Fix a admin title and edit link problems with custom content types.
 #570194: Add support for the "checkall" module in the content permissions page.
+#696846: Mini panels conflated displayed title with admin title.
+#889824: Custom class could would cause stylizer class to become malformed.
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============
