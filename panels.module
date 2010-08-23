@@ -361,6 +361,16 @@ function panels_ctools_plugin_api($owner, $api) {
 }
 
 /**
+ * Implementation of hook_views_api().
+ */
+function panels_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'panels') . '/plugins/views',
+  );
+}
+
+/**
  * Perform additional processing on a style plugin.
  *
  * Currently this is only being used to apply versioning information to style
@@ -1526,6 +1536,8 @@ function panels_print_layout($layout, $content, $meta = 'standard') {
 
   // Get our simple renderer
   $renderer = panels_get_renderer_handler('simple', $display);
+  $renderer->meta_location = $meta;
+
   return $renderer->render();
 }
 

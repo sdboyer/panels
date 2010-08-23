@@ -402,9 +402,9 @@ class panels_renderer_standard {
   }
 
   function add_css($filename, $type = 'module', $media = 'all', $preprocess = TRUE) {
+    $path = file_create_path($filename);
     switch ($this->meta_location) {
       case 'standard':
-        $path = file_create_path($filename);
         if ($path) {
           // Use CTools CSS add because it can handle temporary CSS in private
           // filesystem.
@@ -416,7 +416,13 @@ class panels_renderer_standard {
         }
         break;
       case 'inline':
-        $url = file_create_url($filename);
+        if ($path) {
+          $url = file_create_url($filename);
+        }
+        else {
+          $url = base_path() . $filename;
+        }
+
         $this->prefix .= '<link type="text/css" rel="stylesheet" media="' . $media . '" href="' . $url . '" />'."\n";
         break;
     }
