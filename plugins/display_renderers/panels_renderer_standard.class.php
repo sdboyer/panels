@@ -129,6 +129,30 @@ class panels_renderer_standard {
   var $admin = FALSE;
 
   /**
+   * Where to add standard meta information. There are three possibilities:
+   * - standard: Put the meta information in the normal location. Default.
+   * - inline: Put the meta information directly inline. This will
+   *   not work for javascript.
+   *
+   * @var string
+   */
+  var $meta_location = 'standard';
+
+  /**
+   * Include rendered HTML prior to the layout.
+   *
+   * @var string
+   */
+  var $prefix = '';
+
+  /**
+   * Include rendered HTML after the layout.
+   *
+   * @var string
+   */
+  var $suffix = '';
+
+  /**
    * Receive and store the display object to be rendered.
    *
    * This is a psuedo-constructor that should typically be called immediately
@@ -353,7 +377,7 @@ class panels_renderer_standard {
       $theme = $this->plugins['layout']['theme'];
     }
     $this->rendered['layout'] = theme($theme, check_plain($this->display->css_id), $this->rendered['regions'], $this->display->layout_settings, $this->display, $this->plugins['layout'], $this);
-    return $this->rendered['layout'];
+    return $this->prefix . $this->rendered['layout'] . $this->suffix;
   }
 
   /**
@@ -365,15 +389,36 @@ class panels_renderer_standard {
   function add_meta() {
     if (!empty($this->plugins['layout']['css'])) {
       if (file_exists(path_to_theme() . '/' . $this->plugins['layout']['css'])) {
-        drupal_add_css(path_to_theme() . '/' . $this->plugins['layout']['css']);
+        $this->add_css(path_to_theme() . '/' . $this->plugins['layout']['css']);
       }
       else {
-        drupal_add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['css']);
+        $this->add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['css']);
       }
     }
 
     if ($this->admin && isset($this->plugins['layout']['admin css'])) {
-      drupal_add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['admin css']);
+      $this->add_css($this->plugins['layout']['path'] . '/' . $this->plugins['layout']['admin css']);
+    }
+  }
+
+  function add_css($filename, $type = 'module', $media = 'all', $preprocess = TRUE) {
+    switch ($this->meta_location) {
+      case 'standard':
+        $path = file_create_path($filename);
+        if ($path) {
+          // Use CTools CSS add because it can handle temporary CSS in private
+          // filesystem.
+          ctools_include('css');
+          ctools_css_add_css($filename, $type, $media, $preprocess);
+        }
+        else {
+          drupal_add_css($filename, $type, $media, $preprocess);
+        }
+        break;
+      case 'inline':
+        $url = file_create_url($filename);
+        $this->prefix .= '<link type="text/css" rel="stylesheet" media="' . $media . '" href="' . $url . '" />'."\n";
+        break;
     }
   }
 

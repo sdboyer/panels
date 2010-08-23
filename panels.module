@@ -1490,6 +1490,45 @@ function panels_goto($destination) {
   }
 }
 
+
+/**
+ * For external use: Given a layout ID and a $content array, return the
+ * panel display.
+ *
+ * The content array is filled in based upon the content available in the
+ * layout. If it's a two column with a content array defined like
+ * @code
+ *   array(
+ *    'left' => t('Left side'),
+ *    'right' => t('Right side')
+ *  ),
+ * @endcode
+ *
+ * Then the $content array should be
+ * @code
+ * array(
+ *   'left' => $output_left,
+ *   'right' => $output_right,
+ * )
+ * @endcode
+ *
+ * The output within each panel region can be either a single rendered
+ * HTML string or an array of rendered HTML strings as though they were
+ * panes. They will simply be concatenated together without separators.
+ */
+function panels_print_layout($layout, $content, $meta = 'standard') {
+  ctools_include('plugins', 'panels');
+
+  // Create a temporary display for this.
+  $display = panels_new_display();
+  $display->layout = is_array($layout) ? $layout['name'] : $layout;
+  $display->content = $content;
+
+  // Get our simple renderer
+  $renderer = panels_get_renderer_handler('simple', $display);
+  return $renderer->render();
+}
+
 // --------------------------------------------------------------------------
 // Deprecated functions
 //
@@ -1515,29 +1554,6 @@ function panels_load_include($include, $path = 'includes/') {
 function panels_get_path($file, $base_path = FALSE, $module = 'panels') {
   $output = $base_path ? base_path() : '';
   return $output . drupal_get_path('module', $module) . '/' . $file;
-}
-
-/**
- * For external use: Given a layout ID and a $content array, return the
- * panel display. The content array is filled in based upon the content
- * available in the layout. If it's a two column with a content
- * array defined like array('left' => t('Left side'), 'right' =>
- * t('Right side')), then the $content array should be array('left' =>
- * $output_left, 'right' => $output_right)
- *
- * @deprecated This function represents an old approach to rendering, and is
- * retained only as a temporary support for other modules still using that
- * approach. It will be removed in the next major version of Panels.
- */
-function panels_print_layout($id, $content) {
-  ctools_include('display-render', 'panels');
-  ctools_include('plugins', 'panels');
-  $layout = panels_get_layout($id);
-  if (!$layout) {
-    return;
-  }
-
-  return panels_render_layout($layout, $content);
 }
 
 /**
