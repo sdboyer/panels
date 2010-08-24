@@ -366,7 +366,7 @@ function panels_mini_panels_dashboard_blocks(&$vars) {
 
   foreach ($panel_minis as $panel_mini) {
     $rows[] = array(
-      check_plain($panel_mini->title),
+      check_plain($panel_mini->admin_title),
       array(
         'data' => l(t('Edit'), "admin/build/mini-panels/list/$panel_mini->name/edit"),
         'class' => 'links',
