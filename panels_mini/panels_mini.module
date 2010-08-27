@@ -258,7 +258,7 @@ function panels_mini_ctools_plugin_directory($module, $plugin) {
 }
 
 /**
- * Get the Page Manager cache for the panels_mini plugin.
+ * Get the display cache for the panels_mini plugin.
  */
 function _panels_mini_panels_cache_get($key) {
   ctools_include('export-ui');
@@ -312,7 +312,7 @@ function panels_mini_panels_cache_set($key, $cache) {
 }
 
 /**
- * Save all changes made to a display using the Page Manager page cache.
+ * Save all changes made to a display using the panels mini UI cache.
  */
 function panels_mini_panels_cache_clear($key, $cache) {
   list($handler, $item) = _panels_mini_panels_cache_get($key);
@@ -320,7 +320,7 @@ function panels_mini_panels_cache_clear($key, $cache) {
 }
 
 /**
- * Save all changes made to a display using the Page Manager page cache.
+ * Save all changes made to a display using the panels mini UI cache.
  */
 function panels_mini_panels_cache_save($key, $cache) {
   list($handler, $item) = _panels_mini_panels_cache_get($key);
@@ -331,7 +331,7 @@ function panels_mini_panels_cache_save($key, $cache) {
 }
 
 /**
- * Break the lock on a page manager page.
+ * Break the lock on a panels mini page.
  */
 function panels_mini_panels_cache_break_lock($key, $cache) {
 }
