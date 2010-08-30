@@ -85,6 +85,8 @@ function panels_panels_dashboard_blocks(&$vars) {
 
 function template_preprocess_panels_dashboard(&$vars) {
   ctools_add_css('panels-dashboard', 'panels');
+  ctools_include('plugins');
+
   $vars['image_path'] = ctools_image_path('', 'panels');
 
   $vars['links'] = array();
@@ -97,6 +99,34 @@ function template_preprocess_panels_dashboard(&$vars) {
 
   // Add in any default links for modules that are not active
   panels_dashboard_final_blocks($vars);
+
+  // If page manager module is enabled, add a very low eight block to
+  // list the page wizards.
+  if (module_exists('page_manager')) {
+    $vars['blocks']['wizards'] = array(
+      'weight' => -101,
+      'section' => 'right',
+      'title' => t('Page wizards'),
+      'content' => '',
+      'class' => 'dashboard-wizards',
+    );
+
+    ctools_include('page-wizard');
+    $plugins = page_manager_get_page_wizards();
+    uasort($plugins, 'ctools_plugin_sort');
+
+    foreach ($plugins as $id => $plugin) {
+      if (isset($plugin['type']) && $plugin['type'] == 'panels') {
+        $link = array(
+          'title' => l($plugin['title'], 'admin/build/pages/wizard/' . $id),
+          'description' => $plugin['description'],
+        );
+
+        $vars['blocks']['wizards']['content'] .= theme('panels_dashboard_link', $link);
+      }
+    }
+
+  }
 
   uasort($vars['links'], 'ctools_plugin_sort');
 

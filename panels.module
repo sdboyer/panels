@@ -1479,6 +1479,53 @@ function panel_context_panels_cache_break_lock($key, $cache) {
 }
 
 // --------------------------------------------------------------------------
+// Callbacks on behalf of the panels page wizards
+//
+// The page wizards are a pluggable set of 'wizards' to make it easy to create
+// specific types of pages based upon whatever someone felt like putting
+// together. Since they will very often have content editing, we provide
+// a generic mechanism to allow them to store their editing cache in the
+// wizard cache.
+//
+// For them to use this mechanism, they just need to use:
+//   $cache = panels_edit_cache_get('panels_page_wizard:' . $plugin['name']);
+
+/**
+ * Get display edit cache for the panels mini export UI
+ *
+ * The key is the second half of the key in this form:
+ * panels_page_wizard:TASK_NAME:HANDLER_NAME;
+ */
+function panels_page_wizard_panels_cache_get($key) {
+  ctools_include('page-wizard');
+  ctools_include('context');
+  $wizard_cache = page_manager_get_wizard_cache($key);
+  if (isset($wizard_cache->display_cache)) {
+    return $wizard_cache->display_cache;
+  }
+
+  ctools_include('common', 'panels');
+  $cache = new stdClass();
+  $cache->display = $wizard_cache->display;
+  $cache->display->context = !empty($wizard_cache->context) ? $wizard_cache->context : array();
+  $cache->display->cache_key = 'panels_page_wizard:' . $key;
+  $cache->content_types = panels_common_get_allowed_types('panels_page', $cache->display->context);
+  $cache->display_title = TRUE;
+
+  return $cache;
+}
+
+/**
+ * Store a display edit in progress in the page cache.
+ */
+function panels_page_wizard_panels_cache_set($key, $cache) {
+  ctools_include('page-wizard');
+  $wizard_cache = page_manager_get_wizard_cache($key);
+  $wizard_cache->display_cache = $cache;
+  page_manager_set_wizard_cache($wizard_cache);
+}
+
+// --------------------------------------------------------------------------
 // General utility functions
 
 /**
