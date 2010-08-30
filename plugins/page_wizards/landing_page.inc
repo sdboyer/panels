@@ -16,7 +16,6 @@
 $plugin = array(
   'title' => t('Landing page'),
   'page title' => t('Landing page wizard'),
-  'shortcut' => t('Create a new landing page (wizard)'),
   'description' => t('Landing pages are simple pages that have a path, possibly a visible menu entry, and a panel layout with simple content.'),
 
   'type' => 'panels',

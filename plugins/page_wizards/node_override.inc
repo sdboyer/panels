@@ -14,7 +14,6 @@
 $plugin = array(
   'title' => t('Node template'),
   'page title' => t('Node template wizard'),
-  'shortcut' => t('Override a node page (wizard)'),
   'description' => t('The node page wizard can help you override the node page for a type of node.'),
 
   'type' => 'panels',
