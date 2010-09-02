@@ -16,6 +16,7 @@ In Flexible, the "class" would not stick when adding a new region/row/column but
 #889824: Custom class could would cause stylizer class to become malformed.
 Add a simple "Panels" row style to Views that lets you put fields in a panel layout.
 Add two new Page Wizards to more easily create some of the most commonly used Panel pages.
+#869766 by rupl: flexible layout builder could fail with multiple columns in only one row. (Needs clear cache to see changes in generated CSS.)
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============
