@@ -19,6 +19,7 @@ Add two new Page Wizards to more easily create some of the most commonly used Pa
 #869766 by rupl: flexible layout builder could fail with multiple columns in only one row. (Needs clear cache to see changes in generated CSS.)
 #897214: Mini panel uninstall tried to order mini panels by a non-existing field.
 #893456 by omerida: Change FAPI definition of panel node "body" field to be more consistent with other node body fields.
+#812658 by naxoc: Caching should take language into account.
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============
