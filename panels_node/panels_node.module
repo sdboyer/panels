@@ -166,7 +166,9 @@ function panels_node_form(&$node, &$param) {
   );
 
   if (!empty($type->body_label)) {
-    $form['body'] = array(
+    $form['body_field']['#prefix'] = '<div class="body-field-wrapper">';
+    $form['body_field']['#suffix'] = '</div>';
+    $form['body_field']['body'] = array(
       '#type' => 'textarea',
       '#title' => check_plain($type->body_label),
       '#rows' => 10,
@@ -174,7 +176,7 @@ function panels_node_form(&$node, &$param) {
       '#description' => t('The teaser is a piece of text to describe when the panel is listed (such as when promoted to front page); the actual content will only be displayed on the full node view.'),
       '#default_value' => $node->body,
     );
-    $form['format'] = filter_form($node->format); // Now we can set the format!
+    $form['body_field']['format'] = filter_form($node->format); // Now we can set the format!
   }
 
 //  drupal_set_message('<pre>' . check_plain(var_export($node, true)) . '</pre>');
