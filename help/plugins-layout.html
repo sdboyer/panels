@@ -23,8 +23,8 @@ The name of our .inc file is going to be the key to the entire layout plugin.</p
 
 <h2>The .inc File:</h2>
 <p>We will start with the first_layout.inc file as it's the most important file we're dealing with here. First_layout.inc will look similar to the following:
-<pre>function layout_sample_first_layout_panels_layouts() {
-  $items['first_layout'] = array(
+<pre>
+  $plugin  = array(
     'title' => t('First Layout'),
     'icon' => 'first_layout.png',
     'theme' => 'layout_sample_first_layout',
@@ -34,8 +34,7 @@ The name of our .inc file is going to be the key to the entire layout plugin.</p
       'right' => t('Right region'),
     ),
   );
-  return $items;
-}</pre>
+</pre>
 The include file defines all the other files that our layout will utilize in order to be truly useful.  The array is fairly self explanitory but for the sake of specificity:
 <ol>
 <li><strong>Title:</strong><br />The title of our layout. (Utilized within the panels administration screens)</li>
@@ -45,8 +44,8 @@ The include file defines all the other files that our layout will utilize in ord
 <li><strong>Panels:</strong><br />Defines all the various regions within your panel.  This will be further utilized within our tpl.php file.</li>
 </ol>
 There are many additional properties that can be added to the include file. For purposes of this document we'll also make mention of the 'admin css' property. 'Admin css' is especially useful when utilizing a fixed width layout with fixed with panel regions.  This can break under most administrative circumstances, and panels provides you with the ability to give an additional css layout for the administrative section. It's a simple nicety and looks like this:
-<pre>function layout_sample_first_layout_panels_layouts() {
-  $items['first_layout'] = array(
+<pre>
+  $plugin = array(
     'title' => t('First Layout'),
     'icon' => 'first_layout.png',
     'theme' => 'layout_sample_first_layout',
@@ -57,7 +56,6 @@ There are many additional properties that can be added to the include file. For 
       'right' => t('Right region'),
     ),
   );
-  return $items;
 </pre>
 </p>
 
