@@ -1748,6 +1748,7 @@ function panels_flexible_reuse_form_validate(&$form, &$form_state) {
     form_error($form['name'], t('You must choose a machine name.'));
   }
 
+  ctools_include('export');
   $test = ctools_export_crud_load('panels_layout', $form_state['values']['name']);
   if ($test) {
     form_error($form['name'], t('That name is used by another layout: @layout', array('@layout' => $test->admin_title)));
