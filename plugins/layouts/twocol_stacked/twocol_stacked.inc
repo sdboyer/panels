@@ -4,6 +4,7 @@
 // Plugin definition
 $plugin = array(
   'title' => t('Two column stacked'),
+  'category' => t('Columns: 2'),
   'icon' => 'twocol_stacked.png',
   'theme' => 'panels_twocol_stacked',
   'css' => 'twocol_stacked.css',

@@ -20,12 +20,6 @@ $plugin = array(
   'title' => t('Panel'),
   'admin summary' =>'panels_panel_context_admin_summary',
   'admin title' => 'panels_panel_context_title',
-  'admin css' => array(
-    panels_get_path('css/panels_admin.css'),
-  ),
-  'admin js' => array(
-    panels_get_path('js/layout.js'),
-  ),
   'operations' => array(
     'settings' => array(
       'title' => t('General'),
@@ -50,6 +44,7 @@ $plugin = array(
     ),
     'context' => array(
       'title' => t('Contexts'),
+      'ajax' => FALSE,
       'description' => t('Add additional context objects to this variant that can be used by the content.'),
       'form' => array(
         'order' => array(
@@ -116,6 +111,8 @@ $plugin = array(
     ),
   ),
 
+  'tab operation' => 'panels_panel_context_tab_operation',
+
   // Callback to render the data.
   'render' => 'panels_panel_context_render',
 
@@ -135,6 +132,7 @@ $plugin = array(
 
   'required forms' => array(
     'choose' => t('Choose layout'),
+    'settings' => t('Panel settings'),
     'content' => t('Panel content'),
   ),
 
@@ -184,12 +182,22 @@ $plugin = array(
   'default conf' => array(
     'title' => t('Panel'),
     'no_blocks' => FALSE,
+    'pipeline' => 'standard',
     'css_id' => '',
     'css' => '',
     'contexts' => array(),
     'relationships' => array(),
   ),
 );
+
+/**
+ * Provide the operation trail for the 'Edit panel' link.
+ *
+ * When editing the panel, go directly to the content tab.
+ */
+function panels_panel_context_tab_operation($handler, $contexts, $args) {
+  return array('handlers', $handler->name, 'content');
+}
 
 /**
  * Get the display for a task handler.
@@ -228,14 +236,13 @@ function &panels_panel_context_get_display(&$handler) {
 
 /**
  * Check selection rules and, if passed, render the contexts.
- *
- * We must first check to ensure the node is of a type we're allowed
- * to render. If not, decline to render it by returning NULL.
  */
 function panels_panel_context_render($handler, $base_contexts, $args, $test = TRUE) {
   // Go through arguments and see if they match.
   ctools_include('context');
   ctools_include('context-task-handler');
+  ctools_include('plugins', 'panels');
+
   // Add my contexts
   $contexts = ctools_context_handler_get_handler_contexts($base_contexts, $handler);
 
@@ -254,6 +261,9 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   $display->context = $contexts;
   $display->args = $args;
   $display->css_id = $handler->conf['css_id'];
+  $task_name = page_manager_make_task_name($handler->task, $handler->subtask);
+
+  $display->cache_key = 'panel_context:' . $task_name . ':' . $handler->name;
 
   // Check to see if there is any CSS.
   if (!empty($handler->conf['css'])) {
@@ -263,18 +273,25 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
     if (!$filename) {
       $filename = ctools_css_store($css_id, $handler->conf['css']);
     }
-    drupal_add_css($filename);
+    ctools_css_add_css($filename);
   }
 
   // With an argument, this actually sets the display.
   panels_get_current_page_display($display);
 
+  // Handle backward compatibility with the IPE checkbox.
+  if (empty($handler->conf['pipeline'])) {
+    $handler->conf['pipeline'] = !empty($handler->conf['use_ipe']) ? 'ipe' : 'standard';
+  }
+
+  $renderer = panels_get_renderer($handler->conf['pipeline'], $display);
+
   $info = array(
-    'content' => panels_render_display($display),
+    'content' => panels_render_display($display, $renderer),
     'no_blocks' => !empty($handler->conf['no_blocks']),
   );
 
-  $info['title'] = panels_display_get_title($display);
+  $info['title'] = $display->get_title();
 
   return $info;
 }
@@ -377,7 +394,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
 
   $display = panels_panel_context_get_display($handler);
 
-  panels_load_include('plugins');
+  ctools_include('plugins', 'panels');
   ctools_include('context');
   ctools_include('context-task-handler');
 
@@ -447,9 +464,9 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
   $content_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'content'))) . ']';
   $context_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'context'))) . ']';
 
-
   $info = theme('table', array(), $rows, array('class' => 'page-manager-handler-summary'));
 
+/*
   $content = theme('panels_common_content_list', $display);
   if (empty($contents)) {
     $contents = t('This panel has no content.');
@@ -458,6 +475,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
   if (empty($contexts)) {
     $contexts = t('This panel has no contexts.');
   }
+*/
 
   $title = $handler->conf['title'];
   if ($title != t('Panel')) {
@@ -514,9 +532,9 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
  * variant is called to change a pre-existing layout.
  */
 function panels_panel_context_edit_choose(&$form, &$form_state) {
-  panels_load_include('common');
-  panels_load_include('display-layout');
-  panels_load_include('plugins');
+  ctools_include('common', 'panels');
+  ctools_include('display-layout', 'panels');
+  ctools_include('plugins', 'panels');
 
   // @todo -- figure out where/how to deal with this.
   $form_state['allowed_layouts'] = 'panels_page';
@@ -560,9 +578,9 @@ function panels_panel_context_edit_choose_submit(&$form, &$form_state) {
  * directly.
  */
 function panels_panel_context_edit_layout(&$form, &$form_state) {
-  panels_load_include('common');
-  panels_load_include('display-layout');
-  panels_load_include('plugins');
+  ctools_include('common', 'panels');
+  ctools_include('display-layout', 'panels');
+  ctools_include('plugins', 'panels');
 
   // @todo -- figure out where/how to deal with this.
   $form_state['allowed_layouts'] = 'panels_page';
@@ -609,9 +627,9 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
   $form_state['display'] = &panels_panel_context_get_display($form_state['handler']);
   $form_state['layout'] = $form_state['handler']->conf['temp_layout'];
 
-  panels_load_include('common');
-  panels_load_include('display-layout');
-  panels_load_include('plugins');
+  ctools_include('common', 'panels');
+  ctools_include('display-layout', 'panels');
+  ctools_include('plugins', 'panels');
 
   // Tell the Panels form not to display buttons.
   $form_state['no buttons'] = TRUE;
@@ -638,12 +656,15 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
  */
 function panels_panel_context_edit_content(&$form, &$form_state) {
   ctools_include('ajax');
-  panels_load_include('plugins');
-  panels_load_include('common');
+  ctools_include('plugins', 'panels');
+  ctools_include('common', 'panels');
   ctools_include('context');
   ctools_include('context-task-handler');
 
   $cache = panels_edit_cache_get('panel_context:' . $form_state['task_name'] . ':' . $form_state['handler_id']);
+
+  $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
+  $form_state['renderer']->cache = &$cache;
 
   $form_state['display'] = &$cache->display;
   $form_state['content_types'] = $cache->content_types;
@@ -696,6 +717,38 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
     '#description' => t('Check this to have the page disable all regions displayed in the theme. Note that some themes support this setting better than others. If in doubt, try with stock themes to see.'),
   );
 
+  ctools_include('plugins', 'panels');
+  $pipelines = panels_get_renderer_pipelines();
+
+  // Handle backward compatibility with the IPE checkbox.
+  if (empty($conf['pipeline'])) {
+    $conf['pipeline'] = !empty($conf['use_ipe']) ? 'ipe' : 'standard';
+  }
+
+  // If there are no pipelines, that probably means we're operating in
+  // legacy mode.
+  if (empty($pipelines)) {
+    // We retain the original pipeline so we don't wreck things by installing
+    // old modules.
+    $form['conf']['pipeline'] = array(
+      '#type' => 'value',
+      '#value' => $conf['pipeline'],
+    );
+  }
+  else {
+    $options = array();
+    foreach ($pipelines as $name => $pipeline) {
+      $options[$name] = check_plain($pipeline->admin_title) . '<div class="description">' . check_plain($pipeline->admin_description) . '</div>';
+    }
+
+    $form['conf']['pipeline'] = array(
+      '#type' => 'radios',
+      '#options' => $options,
+      '#title' => t('Renderer'),
+      '#default_value' => $conf['pipeline'],
+    );
+  }
+
   $form['conf']['css_id'] = array(
     '#type' => 'textfield',
     '#size' => 35,
@@ -717,9 +770,15 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
  */
 function panels_panel_context_edit_settings_submit(&$form, &$form_state) {
   $form_state['handler']->conf['no_blocks'] = $form_state['values']['no_blocks'];
+  $form_state['handler']->conf['pipeline'] = $form_state['values']['pipeline'];
   $form_state['handler']->conf['css_id'] = $form_state['values']['css_id'];
   $form_state['handler']->conf['css'] = $form_state['values']['css'];
   $form_state['handler']->conf['title'] = $form_state['values']['title'];
+
+  // Unset the old checkbox so we don't store needless data.
+  if (isset($form_state['handler']->conf['use_ipe'])) {
+    unset($form_state['handler']->conf['use_ipe']);
+  }
 }
 
 /**
@@ -737,6 +796,7 @@ function panels_panel_context_edit_preview(&$form, &$form_state) {
   if (empty($form['preview'])) {
     $display = panels_panel_context_get_display($form_state['handler']);
     $display->context = $contexts;
+    $display->skip_cache = TRUE;
     $output = panels_render_display($display);
     if (isset($form['buttons'])) {
       unset($form['buttons']);

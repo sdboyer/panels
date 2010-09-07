@@ -100,6 +100,10 @@ function panels_simple_cache_get_id($conf, $display, $args, $contexts, $pane) {
         }
       }
   }
+  if (module_exists('locale')) {
+    global $language;
+    $id .= ':' . $language->language;
+  }
   return $id;
 }
 

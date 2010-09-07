@@ -10,7 +10,7 @@
 }
 
 .panel-flexible-edit-layout .panels-flexible-column-inside {
-  margin: 5px;
+/*  margin: 5px; */
   border: 1px dotted green;
 }
 
@@ -73,6 +73,7 @@
   position: absolute;
   z-index: 1000;
   background: white;
+  color: black;
   border: 1px solid black;
   width: 60px;
   height: 2em;
@@ -80,4 +81,8 @@
   line-height: 2em;
 }
 
+#panels-edit-display .panel-pane,
+#panels-edit-display .helperclass {
+  margin: .5em;
 }
+

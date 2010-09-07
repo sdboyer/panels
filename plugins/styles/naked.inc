@@ -11,6 +11,7 @@ $plugin = array(
   'title' => t('No markup at all'),
   'description' => t('Display the pane with no markup, not even a title.'),
   'render pane' => 'panels_naked_style_render_pane',
+  'weight' => -5,
 );
 
 /**
