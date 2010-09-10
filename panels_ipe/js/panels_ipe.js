@@ -164,6 +164,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     $('div.panels-ipe-on').hide('fast');
     ipe.initButton.css('position', 'static');
     ipe.topParent.removeClass('panels-ipe-editing');
+   $('div.panels-ipe-sort-container', ipe.topParent).sortable("destroy");
   };
 
   this.saveEditing = function() {
