@@ -139,8 +139,7 @@ class panels_renderer_legacy {
     // First, render all the panes into little boxes. We do this here because
     // some panes request to be rendered after other panes (primarily so they
     // can do the leftovers of forms).
-    $panes = array();
-    $later = array();
+    $panes = $first = $normal = $last = array();
 
     foreach ($this->display->content as $pid => $pane) {
       $pane->shown = !empty($pane->shown); // guarantee this field exists.
@@ -149,18 +148,27 @@ class panels_renderer_legacy {
         continue;
       }
 
-      // If this pane wants to render last, add it to the $later array.
       $content_type = ctools_get_content_type($pane->type);
 
+      // If this pane wants to render last, add it to the $last array. We allow
+      // this because some panes need to be rendered after other panes,
+      // primarily so they can do things like the leftovers of forms.
       if (!empty($content_type['render last'])) {
-        $later[$pid] = $pane;
-        continue;
+        $last[$pid] = $pane;
       }
-
-      $panes[$pid] = $this->render_pane($pane);
+      // If it wants to render first, add it to the $first array. This is used
+      // by panes that need to do some processing before other panes are
+      // rendered.
+      else if (!empty($content_type['render first'])) {
+        $first[$pid] = $pane;
+      }
+      // Otherwise, render it in the normal order.
+      else {
+        $normal[$pid] = $pane;
+      }
     }
 
-    foreach ($later as $pid => $pane) {
+    foreach (($first + $normal + $last) as $pid => $pane) {
       $panes[$pid] = $this->render_pane($pane);
     }
 
