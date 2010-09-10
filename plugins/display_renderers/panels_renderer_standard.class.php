@@ -401,6 +401,18 @@ class panels_renderer_standard {
     }
   }
 
+  /**
+   * Add CSS information to the renderer.
+   *
+   * To facilitate previews over Views, CSS can now be added in a manner
+   * that does not necessarily mean just using drupal_add_css. Therefore,
+   * during the panel rendering process, this method can be used to add
+   * css and make certain that ti gets to the proper location.
+   *
+   * The arguments should exactly match drupal_add_css().
+   *
+   * @see drupal_add_css
+   */
   function add_css($filename, $type = 'module', $media = 'all', $preprocess = TRUE) {
     $path = file_create_path($filename);
     switch ($this->meta_location) {

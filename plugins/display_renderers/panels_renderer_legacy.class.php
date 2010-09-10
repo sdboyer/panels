@@ -23,6 +23,20 @@ class panels_renderer_legacy {
   var $display;
   var $plugins = array();
 
+  /**
+   * Include rendered HTML prior to the layout.
+   *
+   * @var string
+   */
+  var $prefix = '';
+
+  /**
+   * Include rendered HTML after the layout.
+   *
+   * @var string
+   */
+  var $suffix = '';
+
   function init($plugin, &$display) {
     $this->plugin = $plugin;
     $this->plugins['layout'] = panels_get_layout($display->layout);
@@ -30,6 +44,45 @@ class panels_renderer_legacy {
       watchdog('panels', "Layout: @layout couldn't been found, maybe the theme is disabled.", array('@layout' => $display->layout));
     }
     $this->display = &$display;
+  }
+
+  /**
+   * Add CSS information to the renderer.
+   *
+   * To facilitate previews over Views, CSS can now be added in a manner
+   * that does not necessarily mean just using drupal_add_css. Therefore,
+   * during the panel rendering process, this method can be used to add
+   * css and make certain that ti gets to the proper location.
+   *
+   * The arguments should exactly match drupal_add_css().
+   *
+   * @see drupal_add_css
+   */
+  function add_css($filename, $type = 'module', $media = 'all', $preprocess = TRUE) {
+    $path = file_create_path($filename);
+    switch ($this->meta_location) {
+      case 'standard':
+        if ($path) {
+          // Use CTools CSS add because it can handle temporary CSS in private
+          // filesystem.
+          ctools_include('css');
+          ctools_css_add_css($filename, $type, $media, $preprocess);
+        }
+        else {
+          drupal_add_css($filename, $type, $media, $preprocess);
+        }
+        break;
+      case 'inline':
+        if ($path) {
+          $url = file_create_url($filename);
+        }
+        else {
+          $url = base_path() . $filename;
+        }
+
+        $this->prefix .= '<link type="text/css" rel="stylesheet" media="' . $media . '" href="' . $url . '" />'."\n";
+        break;
+    }
   }
 
   /**
@@ -70,7 +123,7 @@ class panels_renderer_legacy {
 
     $output = theme($this->plugins['layout']['theme'], check_plain($this->display->css_id), $content, $this->display->layout_settings, $this->display, $this->plugins['layout'], $this);
 
-    return $output;
+    return $this->prefix . $output . $this->suffix;
   }
 
   /**
