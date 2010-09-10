@@ -219,7 +219,7 @@ class panels_renderer_standard {
   function prepare_panes($panes) {
     ctools_include('content');
     // Use local variables as writing to them is very slightly faster
-    $normal = $last = array();
+    $first = $normal = $last = array();
 
     // Prepare the list of panes to be rendered
     foreach ($panes as $pid => $pane) {
@@ -232,20 +232,26 @@ class panels_renderer_standard {
         }
       }
 
-      $ct_plugin_def = ctools_get_content_type($pane->type);
+      $content_type = ctools_get_content_type($pane->type);
 
       // If this pane wants to render last, add it to the $last array. We allow
       // this because some panes need to be rendered after other panes,
       // primarily so they can do things like the leftovers of forms.
-      if (!empty($ct_plugin_def['render last'])) {
+      if (!empty($content_type['render last'])) {
         $last[$pid] = $pane;
+      }
+      // If it wants to render first, add it to the $first array. This is used
+      // by panes that need to do some processing before other panes are
+      // rendered.
+      else if (!empty($content_type['render first'])) {
+        $first[$pid] = $pane;
       }
       // Otherwise, render it in the normal order.
       else {
         $normal[$pid] = $pane;
       }
     }
-    $this->prepared['panes'] = $normal + $last;
+    $this->prepared['panes'] = $first + $normal + $last;
     return $this->prepared['panes'];
   }
 
