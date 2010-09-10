@@ -21,6 +21,7 @@ Add two new Page Wizards to more easily create some of the most commonly used Pa
 #893456 by omerida: Change FAPI definition of panel node "body" field to be more consistent with other node body fields.
 #812658 by naxoc: Caching should take language into account.
 #890086: Possible crash in flexible layout by not having CTools export.inc loaded.
+#899456 by yareckon: IPE customize button needs to be reset to "static" instead of "normal".
 
 Panels 6.x-3.7 (2010-Jul-26)
 ==============

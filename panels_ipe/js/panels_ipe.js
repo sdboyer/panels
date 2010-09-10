@@ -162,7 +162,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
 
     // Re-hide all the IPE meta-elements
     $('div.panels-ipe-on').hide('fast');
-    ipe.initButton.css('position', 'normal');
+    ipe.initButton.css('position', 'static');
     ipe.topParent.removeClass('panels-ipe-editing');
   };
 
