@@ -1,6 +1,18 @@
 ; $Id$
 name = Panels
 description = Core Panels display functions; provides no external UI, at least one other Panels module should be enabled.
-core = 6.x
+core = 7.x
 package = "Panels"
+configure = admin/build/panels
 dependencies[] = ctools
+files[] = panels.module
+files[] = includes/common.inc
+files[] = includes/legacy.inc
+files[] = includes/plugins.inc
+files[] = plugins/export_ui/panels_layouts_ui.class.php
+files[] = plugins/views/panels_views_plugin_row_fields.inc
+files[] = plugins/display_renderers/panels_renderer_standard.class.php
+files[] = plugins/display_renderers/panels_renderer_simple.class.php
+files[] = plugins/display_renderers/panels_renderer_editor.class.php
+files[] = plugins/display_renderers/panels_renderer_single_pane.class.php
+files[] = plugins/display_renderers/panels_renderer_legacy.class.php
