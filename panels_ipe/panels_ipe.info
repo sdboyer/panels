@@ -4,5 +4,5 @@ description = Provide a UI for managing some Panels directly on the frontend, in
 package = "Panels"
 dependencies[] = panels
 core = 7.x
-configure = admin/build/panels
+configure = admin/structure/panels
 files[] = panels_ipe.module

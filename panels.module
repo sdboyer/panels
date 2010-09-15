@@ -166,27 +166,27 @@ function panels_menu() {
     'access arguments' => array('use panels dashboard'),
   );
   // Provide a nice location for a panels admin panel.
-  $items['admin/build/panels'] = array(
+  $items['admin/structure/panels'] = array(
     'title' => 'Panels',
     'page callback' => 'panels_admin_page',
     'description' => 'Get a bird\'s eye view of items related to Panels.',
   ) + $admin_base;
 
-  $items['admin/build/panels/dashboard'] = array(
+  $items['admin/structure/panels/dashboard'] = array(
     'title' => 'Dashboard',
     'page callback' => 'panels_admin_page',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   ) + $admin_base;
 
-  $items['admin/build/panels/settings'] = array(
+  $items['admin/structure/panels/settings'] = array(
     'title' => 'Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_admin_settings_page'),
     'type' => MENU_LOCAL_TASK,
   ) + $admin_base;
 
-  $items['admin/build/panels/settings/general'] = array(
+  $items['admin/structure/panels/settings/general'] = array(
     'title' => 'General',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('panels_admin_settings_page'),
@@ -196,7 +196,7 @@ function panels_menu() {
   ) + $admin_base;
 
   if (module_exists('page_manager')) {
-    $items['admin/build/panels/settings/panel-page'] = array(
+    $items['admin/structure/panels/settings/panel-page'] = array(
       'title' => 'Panel pages',
       'page callback' => 'panels_admin_panel_context_page',
       'type' => MENU_LOCAL_TASK,

@@ -29,7 +29,7 @@ function panels_node_menu() {
     return array();
   }
 
-  $items['admin/build/panels/settings/panel-node'] = array(
+  $items['admin/structure/panels/settings/panel-node'] = array(
     'title' => 'Panel nodes',
     'description' => 'Configure which content is available to add to panel node displays.',
     'access arguments' => array('administer panel-nodes'),

@@ -6,7 +6,7 @@ $plugin = array(
   'access' => 'administer panels layouts',
 
   'menu' => array(
-    'menu prefix' => 'admin/build/panels',
+    'menu prefix' => 'admin/structure/panels',
     'menu item' => 'layouts',
     'menu title' => 'Layouts',
     'menu description' => 'Add, edit or delete custom content layouts.',

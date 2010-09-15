@@ -1702,7 +1702,7 @@ function panels_flexible_reuse_form(&$form_state) {
   $form['markup'] = array(
     '#prefix' => '<div class="description">',
     '#suffix' => '</div>',
-    '#value' => t('If you save this layout for reuse it will appear in the list of reusable layouts at admin/build/panels/layouts, and you will need to go there to edit it. This layout will then become an option for all future panels you make.'),
+    '#value' => t('If you save this layout for reuse it will appear in the list of reusable layouts at admin/structure/panels/layouts, and you will need to go there to edit it. This layout will then become an option for all future panels you make.'),
   );
 
   $form['admin_title'] = array(

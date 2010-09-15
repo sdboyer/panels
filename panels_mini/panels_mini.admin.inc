@@ -18,13 +18,13 @@ function _panels_mini_menu() {
     'file' => 'panels_mini.admin.inc',
   );
 
-  $items['admin/build/mini-panels/settings'] = array(
+  $items['admin/structure/mini-panels/settings'] = array(
     'title' => 'Settings',
     'page callback' => 'panels_mini_settings',
     'type' => MENU_LOCAL_TASK,
   ) + $base;
   // Also provide settings on the main panel UI
-  $items['admin/build/panels/settings/panels-mini'] = array(
+  $items['admin/structure/panels/settings/panels-mini'] = array(
     'title' => 'Mini panels',
     'page callback' => 'panels_mini_settings',
     'type' => MENU_LOCAL_TASK,
