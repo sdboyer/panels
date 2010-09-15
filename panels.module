@@ -301,14 +301,27 @@ function panels_ctools_plugin_directory($module, $plugin) {
 }
 
 /**
- * Inform CTools that the layout plugin can be loaded from themes.
+ * Implements hook_ctools_plugin_type().
+ *
+ * Register layout, style, cache, and display_renderer plugin types, declaring
+ * relevant plugin type information as necessary.
  */
-function panels_ctools_plugin_layouts() {
+function panels_ctools_plugin_type() {
   return array(
-    'load themes' => TRUE,
-    'use hooks' => TRUE,
-    'process' => 'panels_layout_process',
-    'child plugins' => TRUE,
+    'layouts' => array(
+      'load themes' => TRUE, // Can define layouts in themes
+      'process' => 'panels_layout_process',
+      'child plugins' => TRUE,
+    ),
+    'styles' => array(
+      'load themes' => TRUE,
+      'process' => 'panels_plugin_styles_process',
+      'child plugins' => TRUE,
+    ),
+    'cache' => array(),
+    'display_renderers' => array(
+      'classes' => 'renderer',
+    ),
   );
 }
 
@@ -319,18 +332,6 @@ function panels_layout_process(&$plugin) {
   $plugin += array(
     'category' => t('Miscellaneous'),
     'description' => '',
-  );
-}
-
-/**
- * Inform CTools that the style plugin can be loaded from themes.
- */
-function panels_ctools_plugin_styles() {
-  return array(
-    'load themes' => TRUE,
-    'use hooks' => TRUE,
-    'process' => 'panels_plugin_styles_process',
-    'child plugins' => TRUE,
   );
 }
 

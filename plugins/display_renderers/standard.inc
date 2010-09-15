@@ -1,7 +1,5 @@
 <?php
 
 $plugin = array(
-  'handler' => array(
-    'class' => 'panels_renderer_standard',
-  ),
+  'renderer' => 'panels_renderer_standard',
 );

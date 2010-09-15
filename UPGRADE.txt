@@ -1,0 +1,4 @@
+Upgrading from Panels-6.x-3.x to Panels-7.x-3.x
+
+  - Style and layout plugins may no longer be registered by a central hook.
+    Only the plugin directories method may be used.

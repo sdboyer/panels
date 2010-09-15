@@ -4,8 +4,5 @@
  * already rendered, not in panes.
  */
 $plugin = array(
-  'handler' => array(
-    'class' => 'panels_renderer_simple',
-    'parent' => 'standard',
-  ),
+  'renderer' => 'panels_renderer_simple',
 );

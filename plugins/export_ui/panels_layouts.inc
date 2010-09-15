@@ -17,9 +17,6 @@ $plugin = array(
   'title plural' => t('layouts'),
   'title plural proper' => t('Layouts'),
 
-  'handler' => array(
-    'class' => 'panels_layouts_ui',
-    'parent' => 'ctools_export_ui',
-  ),
+  'class' => 'panels_layouts_ui',
 );
 
