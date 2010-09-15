@@ -6,28 +6,30 @@
  * Definition of the 'stylizer' panel style.
  */
 
-// Plugin definition
-$plugin = array(
-  'title' => t('Custom style'),
-  'weight' => -10,
-  'description' => t('Allows choice of a stylizer style'),
+if (module_exists('stylizer')) {
+  // Plugin definition
+  $plugin = array(
+    'title' => t('Custom style'),
+    'weight' => -10,
+    'description' => t('Allows choice of a stylizer style'),
 
-  'render pane' => 'panels_stylizer_stylizer_style_render_pane',
-  'pane settings form' => 'panels_stylizer_stylizer_style_settings_form',
+    'render pane' => 'panels_stylizer_stylizer_style_render_pane',
+    'pane settings form' => 'panels_stylizer_stylizer_style_settings_form',
 
-  'render region' => 'panels_stylizer_stylizer_style_render_region',
-  'settings form' => 'panels_stylizer_stylizer_style_settings_form',
+    'render region' => 'panels_stylizer_stylizer_style_render_region',
+    'settings form' => 'panels_stylizer_stylizer_style_settings_form',
 
-  // We offer substyles so provide callbacks to do so.
-  'get child' => 'panels_stylizer_get_substyle',
-  'get children' => 'panels_stylizer_get_substyles',
+    // We offer substyles so provide callbacks to do so.
+    'get child' => 'panels_stylizer_get_substyle',
+    'get children' => 'panels_stylizer_get_substyles',
 
-  // Set up an AJAX callback for the style
-  'ajax' => array(
-    'custom' => 'panels_stylizer_pane_add_style',
-  ),
-//  'settings validate' => 'panels_stylizer_stylizer_style_settings_validate',
-);
+    // Set up an AJAX callback for the style
+    'ajax' => array(
+      'custom' => 'panels_stylizer_pane_add_style',
+    ),
+  //  'settings validate' => 'panels_stylizer_stylizer_style_settings_validate',
+  );
+}
 
 /**
  * Merge the main stylizer plugin with a style to create a sub plugin.
