@@ -320,7 +320,7 @@ function panels_ctools_plugin_type() {
     ),
     'cache' => array(),
     'display_renderers' => array(
-      'classes' => 'renderer',
+      'classes' => array('renderer'),
     ),
   );
 }
