@@ -18,7 +18,6 @@ class panels_renderer_editor extends panels_renderer_standard {
   // Display edit rendering.
 
   function edit() {
-    ctools_include('form');
     $form_state = array(
       'display' => &$this->display,
       'renderer' => &$this,
@@ -29,7 +28,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       'cache key' => $this->display->cache_key,
     );
 
-    $output = ctools_build_form('panels_edit_display_form', $form_state);
+    $output = drupal_build_form('panels_edit_display_form', $form_state);
     if ($output) {
       return $output;
     }

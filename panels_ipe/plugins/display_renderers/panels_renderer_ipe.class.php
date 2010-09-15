@@ -116,7 +116,6 @@ class panels_renderer_ipe extends panels_renderer_editor {
    * AJAX entry point to create the controller form for an IPE.
    */
   function ajax_save_form($break = NULL) {
-    ctools_include('form');
     if (!empty($this->cache->locked)) {
       if ($break != 'break') {
         $account  = user_load($this->cache->locked->uid);
@@ -146,7 +145,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
       'layout' => $this->plugins['layout'],
     );
 
-    $output = ctools_build_form('panels_ipe_edit_control_form', $form_state);
+    $output = drupal_build_form('panels_ipe_edit_control_form', $form_state);
     if ($output) {
       // At this point, we want to save the cache to ensure that we have a lock.
       panels_edit_cache_set($this->cache);
