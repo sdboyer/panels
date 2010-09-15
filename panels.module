@@ -254,19 +254,40 @@ function panels_init() {
 }
 
 /**
- * Implementation of hook_perm
+ * Implementation of hook_permission().
+ *
+ * @todo Almost all of these need to be moved into pipelines.
  */
-function panels_perm() {
+function panels_permission() {
   return array(
-    'view all panes',
-    'view pane admin links',
-    'administer pane visibility',
-    'administer pane access',
-    'administer advanced pane settings',
-    'administer panels layouts',
-    'use panels caching features',
-    'use panels dashboard',
-    'use panels in place editing',
+    'use panels dashboard' => array(
+      'title' => t("Use Panels Dashboard"),
+      'description' => t("Allows a user to access the !link.", array('!link' => l('Panels Dashboard', 'admin/structure/panels'))),
+    ),
+    'view pane admin links' => array( // @todo
+      'title' => t("View administrative links on Panel panes"),
+      'description' => t(""),
+    ),
+    'administer pane access' => array( // @todo should we really have a global perm for this, or should it be moved into a pipeline question?
+      'title' => t("Configure access settings on Panel panes"),
+      'description' => t("Access rules (often also called visibility rules) can be configured on a per-pane basis. This permission allows users to configure those settings."),
+    ),
+    'use panels in place editing' => array(
+      'title' => t("Use the Panels In-Place Editor"),
+      'description' => t("Allows a user to utilize Panels' In-Place Editor."),
+    ),
+    'administer advanced pane settings' => array(
+      'title' => t("Configure advanced settings on Panel panes"),
+      'description' => t(""),
+    ),
+    'administer panels layouts' => array(
+      'title' => t("Administer Panels layouts"),
+      'description' => t("Allows a user to administer exported Panels layout plugins & instances."),
+    ),
+    'use panels caching features' => array(
+      'title' => t("Configure caching settings on Panels"),
+      'description' => t("Allows a user to configure caching on Panels displays and panes."),
+    ),
   );
 }
 
