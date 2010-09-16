@@ -9,10 +9,19 @@
  */
 
 /**
- * Implementation of hook_perm().
+ * Implementation of hook_permission().
  */
-function panels_mini_perm() {
-  return array('create mini panels', 'administer mini panels');
+function panels_mini_permission() {
+  return array(
+    'create mini panels' => array(
+      'title' => t('Create mini panels'),
+      'description' => t('Create new mini panels'),
+    ),
+    'administer mini panels' => array(
+      'title' => t('Administer mini panels'),
+      'description' => t('Edit and delete mini panels'),
+    ),
+  );
 }
 
 /**

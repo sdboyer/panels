@@ -14,10 +14,35 @@
 // General Drupal hooks
 
 /**
- * Implementation of hook_perm().
+ * Implementation of hook_permission().
  */
-function panels_node_perm() {
-  return array('create panel-nodes', 'edit any panel-nodes', 'edit own panel-nodes', 'administer panel-nodes', 'delete any panel-nodes', 'delete own panel-nodes');
+function panels_node_permission() {
+  return array(
+    'create panel-nodes' => array(
+      'title' => t('Create panel nodes'),
+      'description' => t('Create new panel nodes.'),
+    ),
+    'edit any panel-nodes' => array(
+      'title' => t('Edit any panel-nodes'),
+      'description' => t('Edit all pre-existing panel nodes regardless of ownership.'),
+    ),
+    'edit own panel-nodes' => array(
+      'title' => t('Edit own panel nodes'),
+      'description' => t('Edit panel nodes owned by this user.'),
+    ),
+    'administer panel-nodes' => array(
+      'title' => t('Administer panel nodes'),
+      'description' => t('Full administrative access to panel nodes including create, update and delete all'),
+    ),
+    'delete any panel-nodes' => array(
+      'title' => t('Delete any panel nodes')
+      'description' => t('Delete any panel node regardless of ownership'),
+    ),
+    'delete own panel-nodes' => array(
+      'title' => t('Delete own panel nodes'),
+      'description' => t('Delete any panel node owned by this user.'),
+    ),
+  );
 }
 
 /**
