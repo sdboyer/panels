@@ -110,24 +110,14 @@ function panels_theme() {
   foreach ($styles as $name => $data) {
     if (!empty($data['render pane'])) {
       $theme[$data['render pane']] = array(
-        'variables' => array('output' => NULL, 'pane' => NULL, 'display' => NULL, 'style' => NULL),
+        'variables' => array('content' => NULL, 'pane' => NULL, 'display' => NULL, 'style' => NULL, 'settings' => NULL),
         'path' => $data['path'],
         'file' => $data['file'],
       );
     }
-    // If we're in legacy mode, include the old callback key for legacy styles.
-    if (variable_get('panels_legacy_rendering_mode', TRUE)) {
-      if (!empty($data['render panel'])) {
-        $theme[$data['render panel']] = array(
-          'variables' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
-          'path' => $data['path'],
-          'file' => $data['file'],
-        );
-      }
-    }
     if (!empty($data['render region'])) {
       $theme[$data['render region']] = array(
-        'variables' => array('display' => NULL, 'region_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
+        'variables' => array('display' => NULL, 'owner_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'region_id' => NULL, 'style' => NULL),
         'path' => $data['path'],
         'file' => $data['file'],
       );
@@ -1055,10 +1045,11 @@ function panels_render_display(&$display, $renderer = NULL) {
  * panes. This sets up the form system to be the main caller and we
  * then operate as a theme function of the form.
  */
-function theme_panels_render_display_form($form) {
-  $form['#children'] = $form['#display']->render();
-  drupal_render($form);
-  return theme('form', $form);
+function theme_panels_render_display_form($vars) {
+  // @todo this is probably broken in D7
+  $vars['form']['#children'] = $vars['form']['#display']->render();
+  render($vars['form']);
+  return theme('form', $vars['form']);
 }
 
 // @layout
@@ -1073,7 +1064,11 @@ function panels_print_layout_icon($id, $layout, $title = NULL) {
  * @layout
  * @todo move to theme.inc
  */
-function theme_panels_layout_icon($id, $image, $title = NULL) {
+function theme_panels_layout_icon($vars) {
+  $id = $vars['id'];
+  $image = $vars['image'];
+  $title = $vars['title'];
+
   $output = '<div class="layout-icon">';
   $output .= $image;
   if ($title) {
@@ -1086,11 +1081,17 @@ function theme_panels_layout_icon($id, $image, $title = NULL) {
 /**
  * Theme the layout link image
  * @layout
+ *
+ * @todo Why isn't this a template at this point?
+ * @todo Why does this take 4 arguments but only makes use of two?
  */
-function theme_panels_layout_link($title, $id, $image, $link) {
+function theme_panels_layout_link($vars) {
+  $title = $vars['title'];
+  $image = $vars['image'];
+
   $output = '<div class="layout-link">';
-  $output .= $image;
-  $output .= '<div>' . $title . '</div>';
+  $output .= $vars['image'];
+  $output .= '<div>' . $vars['title'] . '</div>';
   $output .= '</div>';
   return $output;
 }

@@ -10,7 +10,7 @@
 $plugin = array(
   'title' => t('Rounded corners'),
   'description' => t('Presents the panes or panels with a rounded corner box around them'),
-  'render panel' => 'panels_rounded_corners_style_render_panel',
+  'render region' => 'panels_rounded_corners_style_render_region',
   'render pane' => 'panels_rounded_corners_style_render_pane',
   'settings form' => 'panels_rounded_corners_style_settings_form',
   'hook theme' => array(
@@ -27,7 +27,12 @@ $plugin = array(
  *
  * @ingroup themeable
  */
-function theme_panels_rounded_corners_style_render_panel($display, $panel_id, $panes, $settings) {
+function theme_panels_rounded_corners_style_render_region($vars) {
+  $display = $vars['display'];
+  $region_id = $vars['region_id'];
+  $panes = $vars['panes'];
+  $settings = $vars['settings'];
+
   $output = '';
 
   // Determine where to put the box. If empty or 'pane' around each pane. If
@@ -73,7 +78,11 @@ function panels_add_rounded_corners_css($display, $where) {
 /**
  * Render callback for a single pane.
  */
-function theme_panels_rounded_corners_style_render_pane($content, $pane, $display) {
+function theme_panels_rounded_corners_style_render_pane($vars) {
+  $content = $vars['content'];
+  $pane = $vars['pane'];
+  $display = $vars['display'];
+
   if (empty($content->content)) {
     return;
   }

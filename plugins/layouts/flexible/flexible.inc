@@ -340,7 +340,14 @@ function panels_flexible_create_renderer($admin, $id, $content, $settings, &$dis
 /**
  * Draw the flexible layout.
  */
-function theme_panels_flexible($id, $content, $settings, $display, $layout, $handler) {
+function theme_panels_flexible($vars) {
+  $id = $vars['id'];
+  $content = $vars['content'];
+  $settings = $vars['settings'];
+  $display = $vars['display'];
+  $layout = $vars['layout'];
+  $handler = $vars['handler'];
+
   panels_flexible_convert_settings($settings, $layout);
 
   $renderer = panels_flexible_create_renderer(FALSE, $id, $content, $settings, $display, $layout, $handler);
@@ -391,7 +398,14 @@ function theme_panels_flexible($id, $content, $settings, $display, $layout, $han
 /**
  * Draw the flexible layout.
  */
-function theme_panels_flexible_admin($id, $content, $settings, $display, $layout, $handler) {
+function theme_panels_flexible_admin($vars) {
+  $id = $vars['id'];
+  $content = $vars['content'];
+  $settings = $vars['settings'];
+  $display = $vars['display'];
+  $layout = $vars['layout'];
+  $handler = $vars['handler'];
+
   // We never draw stored flexible layouts in admin mode; they must be edited
   // from the stored layout UI at that point.
   if (!empty($layout['layout'])) {

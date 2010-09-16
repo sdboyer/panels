@@ -19,7 +19,7 @@ $plugin = array(
  *
  * @ingroup themeable
  */
-function theme_panels_naked_style_render_pane($content, $pane, $display) {
-  return $content->content;
+function theme_panels_naked_style_render_pane($vars) {
+  return $vars['content']->content;
 }
 

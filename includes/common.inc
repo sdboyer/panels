@@ -480,7 +480,9 @@ function panels_common_get_allowed_layouts($module_name) {
  * Create a visible list of content in a display.
  * Note that the contexts must be pre-loaded.
  */
-function theme_panels_common_content_list($display) {
+function theme_panels_common_content_list($vars) {
+  $display = $vars['display'];
+
   $layout = panels_get_layout($display->layout);
   $content = '<dl class="content-list">';
   foreach (panels_get_regions($layout, $display) as $panel_id => $title) {

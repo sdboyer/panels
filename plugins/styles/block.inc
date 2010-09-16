@@ -19,7 +19,9 @@ $plugin = array(
  *
  * @ingroup themeable
  */
-function theme_panels_block_style_render_pane($content, $pane, $display) {
+function theme_panels_block_style_render_pane($vars) {
+  $content = $vars['content'];
+
   if (empty($content->content)) {
     return;
   }

@@ -36,7 +36,7 @@ function panels_ipe_ctools_plugin_api($owner, $api) {
 function panels_ipe_theme() {
   return array(
     'panels_ipe_pane_wrapper' => array(
-      'variables' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
+      'variables' => array('output' => NULL, 'pane' => NULL, 'display' => NULL, 'renderer' => NULL),
     ),
     'panels_ipe_region_wrapper' => array(
       'variables' => array('output' => NULL, 'region_id' => NULL, 'display' => NULL, 'renderer' => NULL),
@@ -60,14 +60,22 @@ function panels_ipe_theme() {
  * @param string $region_id
  * @param string $region_title
  */
-function theme_panels_ipe_placeholder_pane($region_id, $region_title) {
+function theme_panels_ipe_placeholder_pane($vars) {
+  $region_id = $vars['region_id'];
+  $region_title = $vars['region_title'];
+
   $output = '<div class="panels-ipe-placeholder-content">';
   $output .= "<h3>$region_title</h3>";
   $output .= '</div>';
   return $output;
 }
 
-function theme_panels_ipe_pane_wrapper($output, $pane, $display, $renderer) {
+function theme_panels_ipe_pane_wrapper($vars) {
+  $output = $vars['output'];
+  $pane = $vars['pane'];
+  $display = $vars['display'];
+  $renderer = $vars['renderer'];
+
   $content_type = ctools_get_content_type($pane->type);
   $subtype = ctools_content_get_subtype($content_type, $pane->subtype);
   $links = array();
@@ -104,11 +112,15 @@ function theme_panels_ipe_pane_wrapper($output, $pane, $display, $renderer) {
   return $handlebar . $output;
 }
 
-function theme_panels_ipe_region_wrapper($output, $region_id, $display) {
-  return $output;
+function theme_panels_ipe_region_wrapper($vars) {
+  return $vars['output'];
 }
 
-function theme_panels_ipe_add_pane_button($region_id, $display, $renderer) {
+function theme_panels_ipe_add_pane_button($vars) {
+  $region_id = $vars['region_id'];
+  $display = $vars['display'];
+  $renderer = $vars['renderer'];
+
   $attr = array('class' => 'ctools-use-modal');
   $link = l(t('Add new pane'), $renderer->get_url('select-content', $region_id), array('attributes' => $attr));
   return '<div class="panels-ipe-newblock panels-ipe-on panels-ipe-portlet-static">' . $link . '</div>';

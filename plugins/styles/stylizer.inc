@@ -107,7 +107,13 @@ function _panels_stylizer_get_style($plugin, $style_settings) {
 /**
  * Region render theme.
  */
-function theme_panels_stylizer_stylizer_style_render_region($display, $owner_id, $panes, $style_settings, $region_id, $plugin) {
+function theme_panels_stylizer_stylizer_style_render_region($vars) {
+  $display = $vars['display'];
+  $panes = $vars['panes'];
+  $style_settings = $vars['settings'];
+  $region_id = $vars['region_id'];
+  $plugin = $vars['style'];
+
   $output = '';
 
   foreach ($panes as $pane_id => $pane_output) {
@@ -132,8 +138,13 @@ function theme_panels_stylizer_stylizer_style_render_region($display, $owner_id,
 /**
  * Pane render theme
  */
-function theme_panels_stylizer_stylizer_style_render_pane($content, $pane, $display, $plugin) {
-  $settings = _panels_stylizer_get_style($plugin, $pane->style['settings']);
+function theme_panels_stylizer_stylizer_style_render_pane($vars) {
+  $content = $vars['content'];
+  $pane = $vars['pane'];
+  $display = $vars['display'];
+  $plugin = $vars['style'];
+
+  $settings = _panels_stylizer_get_style($plugin, $vars['settings']);
 
   if ($settings) {
     ctools_include('stylizer');
