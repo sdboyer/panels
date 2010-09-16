@@ -7,7 +7,7 @@
  * Core functionality for the Panels engine.
  */
 
-define('PANELS_REQUIRED_CTOOLS_API', '1.8');
+define('PANELS_REQUIRED_CTOOLS_API', '2.0-alpha');
 
 define('PANELS_TITLE_FIXED', 0); // Hide title use to be true/false. So false remains old behavior.
 define('PANELS_TITLE_NONE', 1); // And true meant no title.
@@ -15,6 +15,8 @@ define('PANELS_TITLE_PANE', 2); // And this is the new behavior, where the title
 
 /**
  * Returns the API version of Panels. This didn't exist in 1.
+ *
+ * @todo -- this should work more like the CTools API version.
  *
  * @return An array with the major and minor versions
  */
@@ -36,40 +38,40 @@ function panels_theme() {
 
   $theme = array();
   $theme['panels_layout_link'] = array(
-    'arguments' => array('title', 'id', 'image', 'link'),
+    'variables' => array('title' => NULL, 'id' => NULL, 'image' => NULL, 'link' => NULL),
   );
   $theme['panels_layout_icon'] = array(
-    'arguments' => array('id', 'image', 'title' => NULL),
+    'variables' => array('id' => NULL, 'image' => NULL, 'title' => NULL),
   );
   $theme['panels_pane'] = array(
-    'arguments' => array('output' => array(), 'pane' => array(), 'display' => array()),
+    'variables' => array('output' => array(), 'pane' => array(), 'display' => array()),
     'path' => drupal_get_path('module', 'panels') . '/templates',
     'template' => 'panels-pane',
   );
   $theme['panels_common_content_list'] = array(
-    'arguments' => array('display'),
+    'variables' => array('display' => NULL),
     'file' => 'includes/common.inc',
   );
   $theme['panels_render_display_form'] = array(
-    'arguments' => array('form' => NULL),
+    'variables' => array('form' => NULL),
   );
 
   $theme['panels_dashboard'] = array(
-    'arguments' => array(),
+    'variables' => array(),
     'path' => drupal_get_path('module', 'panels') . '/templates',
     'file' => '../includes/callbacks.inc',
     'template' => 'panels-dashboard',
   );
 
   $theme['panels_dashboard_link'] = array(
-    'arguments' => array('link' => array()),
+    'variables' => array('link' => array()),
     'path' => drupal_get_path('module', 'panels') . '/templates',
     'file' => '../includes/callbacks.inc',
     'template' => 'panels-dashboard-link',
   );
 
   $theme['panels_dashboard_block'] = array(
-    'arguments' => array('block' => array()),
+    'variables' => array('block' => array()),
     'path' => drupal_get_path('module', 'panels') . '/templates',
     'file' => '../includes/callbacks.inc',
     'template' => 'panels-dashboard-block',
@@ -90,7 +92,7 @@ function panels_theme() {
     foreach (array('theme', 'admin theme') as $callback) {
       if (!empty($data[$callback])) {
         $theme[$data[$callback]] = array(
-          'arguments' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL, 'display' => NULL, 'layout' => NULL, 'renderer' => NULL),
+          'variables' => array('css_id' => NULL, 'content' => NULL, 'settings' => NULL, 'display' => NULL, 'layout' => NULL, 'renderer' => NULL),
           'path' => $data['path'],
           'file' => $data['file'],
         );
@@ -108,7 +110,7 @@ function panels_theme() {
   foreach ($styles as $name => $data) {
     if (!empty($data['render pane'])) {
       $theme[$data['render pane']] = array(
-        'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL, 'style' => NULL),
+        'variables' => array('output' => NULL, 'pane' => NULL, 'display' => NULL, 'style' => NULL),
         'path' => $data['path'],
         'file' => $data['file'],
       );
@@ -117,7 +119,7 @@ function panels_theme() {
     if (variable_get('panels_legacy_rendering_mode', TRUE)) {
       if (!empty($data['render panel'])) {
         $theme[$data['render panel']] = array(
-          'arguments' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
+          'variables' => array('display' => NULL, 'panel_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
           'path' => $data['path'],
           'file' => $data['file'],
         );
@@ -125,7 +127,7 @@ function panels_theme() {
     }
     if (!empty($data['render region'])) {
       $theme[$data['render region']] = array(
-        'arguments' => array('display' => NULL, 'region_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
+        'variables' => array('display' => NULL, 'region_id' => NULL, 'panes' => NULL, 'settings' => NULL, 'style' => NULL),
         'path' => $data['path'],
         'file' => $data['file'],
       );

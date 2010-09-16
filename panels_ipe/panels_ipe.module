@@ -36,19 +36,19 @@ function panels_ipe_ctools_plugin_api($owner, $api) {
 function panels_ipe_theme() {
   return array(
     'panels_ipe_pane_wrapper' => array(
-      'arguments' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
+      'variables' => array('output' => NULL, 'pane' => NULL, 'display' => NULL),
     ),
     'panels_ipe_region_wrapper' => array(
-      'arguments' => array('output' => NULL, 'region_id' => NULL, 'display' => NULL, 'renderer' => NULL),
+      'variables' => array('output' => NULL, 'region_id' => NULL, 'display' => NULL, 'renderer' => NULL),
     ),
     'panels_ipe_add_pane_button' => array(
-      'arguments' => array('region_id' => NULL, 'display' => NULL, 'renderer' => NULL),
+      'variables' => array('region_id' => NULL, 'display' => NULL, 'renderer' => NULL),
     ),
     'panels_ipe_placeholder_pane' => array(
-      'arguments' => array('region_id' => NULL, 'region_title' => NULL),
+      'variables' => array('region_id' => NULL, 'region_title' => NULL),
     ),
     'panels_ipe_dnd_form_container' => array(
-      'arguments' => array('link' => NULL, 'cache_key' => NULL, 'display' => NULL),
+      'variables' => array('link' => NULL, 'cache_key' => NULL, 'display' => NULL),
     ),
   );
 }

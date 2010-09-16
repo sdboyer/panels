@@ -15,7 +15,7 @@ $plugin = array(
   'settings form' => 'panels_rounded_corners_style_settings_form',
   'hook theme' => array(
     'panels_rounded_corners_box' => array(
-      'arguments' => array('content' => NULL),
+      'variables' => array('content' => NULL),
       'path' => panels_get_path('plugins/styles/corners'),
       'template' => 'panels-rounded-corners-box',
     ),
