@@ -224,7 +224,7 @@ class panels_allowed_layouts {
  * A common settings page for Panels modules, because this code is relevant to
  * any modules that don't already have special requirements.
  */
-function panels_common_settings(&$form_state, $module_name = 'panels_common') {
+function panels_common_settings($form, &$form_state, $module_name = 'panels_common') {
   ctools_include('plugins', 'panels');
   ctools_include('content');
   $content_types = ctools_get_content_types();

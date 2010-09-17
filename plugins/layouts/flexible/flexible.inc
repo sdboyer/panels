@@ -16,7 +16,7 @@ $plugin = array(
   'settings form' => 'panels_flexible_settings_form',
   'settings submit' => 'panels_flexible_settings_submit',
   'settings validate' => 'panels_flexible_settings_validate',
-  'panels function' => 'panels_flexible_panels',
+  'regions function' => 'panels_flexible_panels',
   'hook menu' => 'panels_flexible_menu',
 
   // Reuisable layout Builder specific directives

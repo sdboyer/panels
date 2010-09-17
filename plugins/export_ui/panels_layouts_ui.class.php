@@ -208,24 +208,24 @@ class panels_layouts_ui extends ctools_export_ui {
     $category = $item->category ? check_plain($item->category) : t('Miscellaneous');
     $this->rows[$item->name] = array(
       'data' => array(
-        array('data' => check_plain($type), 'class' => 'ctools-export-ui-type'),
-        array('data' => check_plain($item->name), 'class' => 'ctools-export-ui-name'),
-        array('data' => check_plain($item->admin_title), 'class' => 'ctools-export-ui-title'),
-        array('data' => $category, 'class' => 'ctools-export-ui-category'),
-        array('data' => theme('links', array('links' => $operations)), 'class' => 'ctools-export-ui-operations'),
+        array('data' => check_plain($type), 'class' => array('ctools-export-ui-type')),
+        array('data' => check_plain($item->name), 'class' => array('ctools-export-ui-name')),
+        array('data' => check_plain($item->admin_title), 'class' => array('ctools-export-ui-title')),
+        array('data' => $category, 'class' => array('ctools-export-ui-category')),
+        array('data' => theme('links', array('links' => $operations)), 'class' => array('ctools-export-ui-operations')),
       ),
       'title' => check_plain($item->admin_description),
-      'class' => !empty($item->disabled) ? 'ctools-export-ui-disabled' : 'ctools-export-ui-enabled',
+      'class' => array(!empty($item->disabled) ? 'ctools-export-ui-disabled' : 'ctools-export-ui-enabled'),
     );
   }
 
   function list_table_header() {
     return array(
-      array('data' => t('Type'), 'class' => 'ctools-export-ui-type'),
-      array('data' => t('Name'), 'class' => 'ctools-export-ui-name'),
-      array('data' => t('Title'), 'class' => 'ctools-export-ui-title'),
-      array('data' => t('Category'), 'class' => 'ctools-export-ui-category'),
-      array('data' => t('Operations'), 'class' => 'ctools-export-ui-operations'),
+      array('data' => t('Type'), 'class' => array('ctools-export-ui-type')),
+      array('data' => t('Name'), 'class' => array('ctools-export-ui-name')),
+      array('data' => t('Title'), 'class' => array('ctools-export-ui-title')),
+      array('data' => t('Category'), 'class' => array('ctools-export-ui-category')),
+      array('data' => t('Operations'), 'class' => array('ctools-export-ui-operations')),
     );
   }
 }

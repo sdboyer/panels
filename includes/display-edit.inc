@@ -81,7 +81,7 @@ function _panels_edit($display, $destination, $content_types, $title = FALSE) {
  * @ingroup forms
  * @see panels_edit_display_submit()
  */
-function panels_edit_display_form(&$form_state) {
+function panels_edit_display_form($form, &$form_state) {
   $display = &$form_state['display'];
   $renderer = &$form_state['renderer'];
 
@@ -225,8 +225,7 @@ function panels_edit_display_form_preview(&$form, &$form_state) {
 /**
  * Form for display settings.
  */
-function panels_edit_display_settings_form(&$form_state) {
-  $form = array();
+function panels_edit_display_settings_form($form, &$form_state) {
   $display = &$form_state['display'];
 
   $layout = panels_get_layout($display->layout);

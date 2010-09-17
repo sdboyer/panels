@@ -5,6 +5,13 @@
  * @file
  * Contains helper functions for the Panels page wizards.
  */
+
+/**
+ * Add layout form helper for panels page wizards.
+ *
+ * This is not a proper form, it is meant to be called by a form to add
+ * elements to it.
+ */
 function panels_page_wizard_add_layout(&$form, &$form_state) {
   $form_state['allowed_layouts'] = 'panels_page';
   $form_state['display'] = $form_state['cache']->display;
@@ -30,6 +37,12 @@ function panels_page_wizard_add_layout(&$form, &$form_state) {
   );
 }
 
+/**
+ * Add content editor form helper for panels page wizards.
+ *
+ * This is not a proper form, it is meant to be called by a form to add
+ * elements to it.
+ */
 function panels_page_wizard_add_content(&$form, &$form_state) {
   ctools_include('ajax');
   ctools_include('plugins', 'panels');
@@ -55,6 +68,12 @@ function panels_page_wizard_add_content(&$form, &$form_state) {
   $form['#theme'] = 'panels_edit_display_form';
 }
 
+/**
+ * Add content form submit handler
+ *
+ * This is not a proper submit handler, it is meant to be called by a form's
+ * submit handler to handle submission.
+ */
 function panels_page_wizard_add_content_submit(&$form, &$form_state) {
   // Call the normal panels edit form submit to make sure values are stored
   // on the display

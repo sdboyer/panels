@@ -72,7 +72,7 @@ function panels_landing_page_new_page(&$cache) {
 /**
  * First page of our page creator wizard.
  */
-function panels_landing_page_basic(&$form, &$form_state) {
+function panels_landing_page_basic($form, &$form_state) {
   $cache = &$form_state['cache'];
   ctools_include('dependent');
 
@@ -155,6 +155,8 @@ function panels_landing_page_basic(&$form, &$form_state) {
 
   ctools_include('page-wizard', 'panels');
   panels_page_wizard_add_layout($form, $form_state);
+
+  return $form;
 }
 
 /**
@@ -216,9 +218,11 @@ function panels_landing_page_basic_submit(&$form, &$form_state) {
  * Second page of our wizard. This one provides a layout and lets the
  * user add content.
  */
-function panels_landing_page_content(&$form, &$form_state) {
+function panels_landing_page_content($form, &$form_state) {
   ctools_include('page-wizard', 'panels');
   panels_page_wizard_add_content($form, $form_state);
+
+  return $form;
 }
 
 /**

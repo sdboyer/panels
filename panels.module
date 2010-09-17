@@ -1252,7 +1252,7 @@ function panels_ajax_router() {
 
   $output = call_user_func_array(array($renderer, $method), $args);
   if (empty($output) && !empty($renderer->commands)) {
-    return ctools_ajax_render($renderer->commands);
+    return ajax_render($renderer->commands);
   }
   return $output;
 }

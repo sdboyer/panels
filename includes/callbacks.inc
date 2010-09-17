@@ -9,6 +9,7 @@
  * A central administrative page for Panels.
  */
 function panels_admin_page() {
+  // @todo I think this should return a renderable array somehow?
   return theme('panels_dashboard');
 }
 

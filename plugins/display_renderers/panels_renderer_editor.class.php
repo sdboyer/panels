@@ -245,7 +245,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       );
     }
 
-    return theme('ctools_dropdown', t('Display settings'), $links, FALSE, 'panels-display-links');
+    return theme('ctools_dropdown', array('title' => t('Display settings'), 'link' => $links, 'class' => 'panels-display-links'));
   }
 
   /**
@@ -274,7 +274,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       'attributes' => array('class' => 'panels-sub-menu'),
     );
 
-    return theme('ctools_dropdown', theme('image', ctools_image_path('icon-addcontent.png', 'panels')), $links, TRUE, 'pane-add-link panels-region-links-' . $region_id);
+    return theme('ctools_dropdown', array('title' => theme('image', ctools_image_path('icon-addcontent.png', 'panels')), 'links' => $links, 'image' => TRUE, 'class' => 'pane-add-link panels-region-links-' . $region_id));
   }
 
   /**
@@ -443,7 +443,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       ),
     );
 
-    return theme('ctools_dropdown', theme('image', ctools_image_path('icon-configure.png', 'panels')), $links, TRUE);
+    return theme('ctools_dropdown', array('title' => theme('image', ctools_image_path('icon-configure.png', 'panels')), 'links' => $links, 'image' => TRUE));
   }
 
   // -----------------------------------------------------------------------
@@ -1295,7 +1295,8 @@ class panels_renderer_editor extends panels_renderer_standard {
       return $this->ajax_access_configure_test($pid, 'add');
     }
 
-    ctools_ajax_render($output);
+    print ajax_render($output);
+    ajax_footer();
   }
 
   /**
@@ -1427,8 +1428,8 @@ class panels_renderer_editor extends panels_renderer_standard {
       $pane = $this->display->content[$pid];
     }
 
-    $this->commands[] = ctools_ajax_command_replace("#panel-pane-$pane->pid", $this->render_pane($pane));
-    $this->commands[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+    $this->commands[] = ajax_command_replace("#panel-pane-$pane->pid", $this->render_pane($pane));
+    $this->commands[] = ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
   }
 
   /**
@@ -1442,22 +1443,22 @@ class panels_renderer_editor extends panels_renderer_standard {
       $pane = $this->display->content[$pid];
     }
 
-    $this->commands[] = ctools_ajax_command_append("#panel-pane-$pane->panel", $this->render_pane($pane));
-    $this->commands[] = ctools_ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
+    $this->commands[] = ajax_command_append("#panel-pane-$pane->panel", $this->render_pane($pane));
+    $this->commands[] = ajax_command_changed("#panel-pane-$pane->pid", "div.grabber span.text");
   }
 
   /**
    * Create a command to update the links on a display after a change was made.
    */
   function command_update_display_links() {
-    $this->commands[] = ctools_ajax_command_replace('.panels-display-links', $this->get_display_links());
+    $this->commands[] = ajax_command_replace('.panels-display-links', $this->get_display_links());
   }
 
   /**
    * Create a command to update the links on a region after a change was made.
    */
   function command_update_region_links($id) {
-    $this->commands[] = ctools_ajax_command_replace('.panels-region-links-' . $id, $this->get_region_links($id));
+    $this->commands[] = ajax_command_replace('.panels-region-links-' . $id, $this->get_region_links($id));
   }
 }
 
@@ -1496,7 +1497,7 @@ function panels_ajax_edit_pane_cancel(&$form_state) {
 /**
  * Choose cache method form
  */
-function panels_edit_cache_method_form(&$form_state) {
+function panels_edit_cache_method_form($form, &$form_state) {
   $display = &$form_state['display'];
   $conf = &$form_state['conf'];
 
@@ -1544,7 +1545,7 @@ function panels_edit_cache_method_form_submit($form, &$form_state) {
 /**
  * Cache settings form
  */
-function panels_edit_cache_settings_form(&$form_state) {
+function panels_edit_cache_settings_form($form, &$form_state) {
   $display = &$form_state['display'];
   $conf = &$form_state['conf'];
   $pid = $form_state['pid'];
@@ -1604,7 +1605,7 @@ function panels_edit_cache_settings_form_submit($form, &$form_state) {
 /**
  * Choose style form
  */
-function panels_edit_style_type_form(&$form_state) {
+function panels_edit_style_type_form($form, &$form_state) {
   $display = &$form_state['display'];
   $style = $form_state['style'];
   $type = $form_state['type'];
@@ -1654,7 +1655,7 @@ function panels_edit_style_type_form_submit($form, &$form_state) {
 /**
  * Style settings form
  */
-function panels_edit_style_settings_form(&$form_state) {
+function panels_edit_style_settings_form($form, &$form_state) {
   $display = &$form_state['display'];
   $conf = &$form_state['conf'];
   $pid = $form_state['pid'];
@@ -1708,7 +1709,7 @@ function panels_edit_style_settings_form_submit($form, &$form_state) {
 /**
  * Configure CSS on a pane form.
  */
-function panels_edit_configure_pane_css_form(&$form_state) {
+function panels_edit_configure_pane_css_form($form, &$form_state) {
   $display = &$form_state['display'];
   $pane = &$form_state['pane'];
 
@@ -1787,7 +1788,7 @@ function panels_edit_configure_access_settings_form_submit($form, &$form_state) 
 /**
  * Form to add a visibility rule.
  */
-function panels_edit_add_access_test_form(&$form_state) {
+function panels_edit_add_access_test_form($form, &$form_state) {
   $display = &$form_state['display'];
   $pane = &$form_state['pane'];
 
@@ -1816,7 +1817,7 @@ function panels_edit_add_access_test_form(&$form_state) {
 /**
  * Form to configure a visibility rule.
  */
-function panels_edit_configure_access_test_form(&$form_state) {
+function panels_edit_configure_access_test_form($form, &$form_state) {
   $display = &$form_state['display'];
   $test = &$form_state['test'];
   $plugin = &$form_state['plugin'];

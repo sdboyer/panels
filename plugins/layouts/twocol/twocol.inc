@@ -8,7 +8,7 @@ $plugin = array(
   'icon' => 'twocol.png',
   'theme' => 'panels_twocol',
   'css' => 'twocol.css',
-  'panels' => array(
+  'regions' => array(
     'left' => t('Left side'),
     'right' => t('Right side')
   ),

@@ -71,7 +71,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
  *
  * @ingroup forms
  */
-function panels_choose_layout(&$form_state) {
+function panels_choose_layout($form, &$form_state) {
   $display = &$form_state['display'];
   ctools_include('common', 'panels');
   ctools_include('cleanstring');
@@ -172,17 +172,11 @@ function panels_choose_layout_submit($form, &$form_state) {
  * @ingroup forms
  *
  * @param array $form
- *  A structured FAPI $form array.
- * @param object $display instanceof panels_display \n
- *  The panels_display object that was modified on the preceding display layout
- *  editing form.
- * @param string $new_layout_id
- *  A string containing the name of the layout the display is to be converted to.
- *  These strings correspond exactly to the filenames of the *.inc files in panels/layouts.
- *  So, if the new layout that's been selected is the 'Two Column bricks' layout, then
- *  $new_layout_id will be 'twocol_bricks', corresponding to panels/layouts/twocol_bricks.inc.
+ *   A structured FAPI $form array.
+ * @param &$form_state
+ *   The Drupal $form_state
  */
-function panels_change_layout(&$form_state) {
+function panels_change_layout($form, &$form_state) {
   $display = &$form_state['display'];
 
   $new_layout = panels_get_layout($form_state['layout']);

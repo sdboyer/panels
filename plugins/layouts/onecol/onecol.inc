@@ -11,5 +11,5 @@ $plugin = array(
   'icon' => 'onecol.png',
   'theme' => 'panels_onecol',
   'css' => 'onecol.css',
-  'panels' => array('middle' => t('Middle column')),
+  'regions' => array('middle' => t('Middle column')),
 );

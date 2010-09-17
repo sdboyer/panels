@@ -169,7 +169,7 @@ class panels_renderer_standard {
     $this->display = &$display;
     $this->plugins['layout'] = $layout;
     if (!isset($layout['panels'])) {
-      $this->plugins['layout']['panels'] = panels_get_regions($layout, $display);
+      $this->plugins['layout']['regions'] = panels_get_regions($layout, $display);
     }
 
     if (empty($this->plugins['layout'])) {
@@ -299,7 +299,7 @@ class panels_renderer_standard {
     $regions = array();
     if (empty($settings)) {
       // No display/panel region settings exist, init all with the defaults.
-      foreach ($this->plugins['layout']['panels'] as $region_id => $title) {
+      foreach ($this->plugins['layout']['regions'] as $region_id => $title) {
         // Ensure this region has at least an empty panes array.
         $panes = !empty($region_pane_list[$region_id]) ? $region_pane_list[$region_id] : array();
 
@@ -309,7 +309,7 @@ class panels_renderer_standard {
     }
     else {
       // Some settings exist; iterate through each region and set individually.
-      foreach ($this->plugins['layout']['panels'] as $region_id => $title) {
+      foreach ($this->plugins['layout']['regions'] as $region_id => $title) {
         // Ensure this region has at least an empty panes array.
         $panes = !empty($region_pane_list[$region_id]) ? $region_pane_list[$region_id] : array();
 
@@ -423,15 +423,7 @@ class panels_renderer_standard {
     $path = file_create_path($filename);
     switch ($this->meta_location) {
       case 'standard':
-        if ($path) {
-          // Use CTools CSS add because it can handle temporary CSS in private
-          // filesystem.
-          ctools_include('css');
-          ctools_css_add_css($filename, $type, $media, $preprocess);
-        }
-        else {
-          drupal_add_css($filename, $type, $media, $preprocess);
-        }
+        drupal_add_css($filename, $type, $media, $preprocess);
         break;
       case 'inline':
         if ($path) {

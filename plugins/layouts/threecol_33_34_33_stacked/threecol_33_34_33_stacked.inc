@@ -11,7 +11,7 @@ function panels_threecol_33_34_33_stacked_panels_layouts() {
     'icon' => 'threecol_33_34_33_stacked.png',
     'theme' => 'panels_threecol_33_34_33_stacked',
     'css' => 'threecol_33_34_33_stacked.css',
-    'panels' => array(
+    'regions' => array(
       'top' => t('Top'),
       'left' => t('Left side'),
       'middle' => t('Middle column'),

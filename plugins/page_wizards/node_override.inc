@@ -71,7 +71,7 @@ function panels_node_override_start($form_info, $step, &$form_state) {
 /**
  * First page of our page creator wizard.
  */
-function panels_node_override_basic(&$form, &$form_state) {
+function panels_node_override_basic($form, &$form_state) {
   $types = node_get_types();
   $form_state['types'] = $types;
 
@@ -118,6 +118,8 @@ function panels_node_override_basic(&$form, &$form_state) {
 
   ctools_include('page-wizard', 'panels');
   panels_page_wizard_add_layout($form, $form_state);
+
+  return $form;
 }
 
 /**
@@ -257,9 +259,11 @@ function panels_node_override_basic_submit(&$form, &$form_state) {
  * Second page of our wizard. This one provides a layout and lets the
  * user add content.
  */
-function panels_node_override_content(&$form, &$form_state) {
+function panels_node_override_content($form, &$form_state) {
   ctools_include('page-wizard', 'panels');
   panels_page_wizard_add_content($form, $form_state);
+
+  return $form;
 }
 
 /**

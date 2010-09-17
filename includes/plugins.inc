@@ -24,12 +24,14 @@ function panels_pane_access($pane, $display) {
  * Get a list of panels available in the layout.
  */
 function panels_get_regions($layout, $display) {
-  if (!empty($layout['panels function']) && function_exists($layout['panels function'])) {
-    return $layout['panels function']($display, $display->layout_settings, $layout);
+  if ($function = ctools_plugin_get_function($layout, 'regions function')) {
+    return $function($display, $display->layout_settings, $layout);
   }
-  if (!empty($layout['panels'])) {
-    return $layout['panels'];
+
+  if (!empty($layout['regions'])) {
+    return $layout['regions'];
   }
+
   return array();
 }
 
@@ -244,6 +246,8 @@ class panels_cache_object {
 
 /**
  * Get the title of a pane.
+ *
+ * @deprecated @todo this function should be removed.
  *
  * @param $pane
  *   The $pane object.
@@ -492,6 +496,8 @@ function panels_get_renderer_pipelines($sort = TRUE) {
  * @return
  *   The actual name of the function to call, or NULL if the function
  *   does not exist.
+ *
+ * @deprecated All calls to this function should be removed.
  */
 function panels_plugin_get_function($plugin, $which, $function_name) {
   ctools_include('plugins');
@@ -501,10 +507,4 @@ function panels_plugin_get_function($plugin, $which, $function_name) {
   else {
     return ctools_plugin_load_function('panels', $plugin, $which, $function_name);
   }
-
 }
-
-// @todo these are DEPRECATED and can probably be removed.
-// These are placeholders to prevent crashes from the former plugins
-class panels_required_context { function filter() { } };
-class panels_optional_context extends panels_required_context {};

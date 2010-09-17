@@ -520,7 +520,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
  * previous layout to choose from. a different, only slightly different
  * variant is called to change a pre-existing layout.
  */
-function panels_panel_context_edit_choose(&$form, &$form_state) {
+function panels_panel_context_edit_choose($form, &$form_state) {
   ctools_include('common', 'panels');
   ctools_include('display-layout', 'panels');
   ctools_include('plugins', 'panels');
@@ -536,6 +536,8 @@ function panels_panel_context_edit_choose(&$form, &$form_state) {
   // Change the #id of the form so the CSS applies properly.
   $form['#id'] = 'panels-choose-layout';
   $form = array_merge($form, panels_choose_layout($form_state));
+
+  return $form;
 }
 
 /**
@@ -566,7 +568,7 @@ function panels_panel_context_edit_choose_submit(&$form, &$form_state) {
  * to the move content form, which is 'hidden' so it won't be accessed
  * directly.
  */
-function panels_panel_context_edit_layout(&$form, &$form_state) {
+function panels_panel_context_edit_layout($form, &$form_state) {
   ctools_include('common', 'panels');
   ctools_include('display-layout', 'panels');
   ctools_include('plugins', 'panels');
@@ -582,6 +584,8 @@ function panels_panel_context_edit_layout(&$form, &$form_state) {
   // Change the #id of the form so the CSS applies properly.
   $form['#id'] = 'panels-choose-layout';
   $form = array_merge($form, panels_choose_layout($form_state));
+
+  return $form;
 }
 
 /**
@@ -612,7 +616,7 @@ function panels_panel_context_edit_layout_submit(&$form, &$form_state) {
 /**
  * When a layout is changed, the user is given the opportunity to move content.
  */
-function panels_panel_context_edit_move(&$form, &$form_state) {
+function panels_panel_context_edit_move($form, &$form_state) {
   $form_state['display'] = &panels_panel_context_get_display($form_state['handler']);
   $form_state['layout'] = $form_state['handler']->conf['temp_layout'];
 
@@ -637,13 +641,14 @@ function panels_panel_context_edit_move(&$form, &$form_state) {
   $form['buttons']['next']['#next'] = 'content';
 
   $form_state['form_info']['return path'] = page_manager_edit_url($form_state['page']->task_name, array('handlers', $form_state['handler_id'], 'content'));
+  return $form;
 }
 
 /**
  * Present the panels drag & drop editor to edit the display attached
  * to the task handler.
  */
-function panels_panel_context_edit_content(&$form, &$form_state) {
+function panels_panel_context_edit_content($form, &$form_state) {
   ctools_include('ajax');
   ctools_include('plugins', 'panels');
   ctools_include('common', 'panels');
@@ -671,6 +676,7 @@ function panels_panel_context_edit_content(&$form, &$form_state) {
     $form['buttons']['preview'] = $form['buttons']['return'];
     $form['buttons']['preview']['#value'] = t('Update and preview');
   }
+  return $form;
 }
 
 function panels_panel_context_edit_content_submit(&$form, &$form_state) {
@@ -690,7 +696,7 @@ function panels_panel_context_edit_content_submit(&$form, &$form_state) {
 /**
  * General settings for the panel
  */
-function panels_panel_context_edit_settings(&$form, &$form_state) {
+function panels_panel_context_edit_settings($form, &$form_state) {
   $conf = $form_state['handler']->conf;
   $form['conf']['title'] = array(
     '#type' => 'textfield',
@@ -752,6 +758,8 @@ function panels_panel_context_edit_settings(&$form, &$form_state) {
     '#description' => t('Enter well-formed CSS code here; this code will be embedded into the page, and should only be used for minor adjustments; it is usually better to try to put CSS for the page into the theme if possible. This CSS will be filtered for safety so some CSS may not work.'),
     '#default_value' => $conf['css'],
   );
+
+  return $form;
 }
 
 /**
@@ -773,7 +781,7 @@ function panels_panel_context_edit_settings_submit(&$form, &$form_state) {
 /**
  * Form to show a nice preview.
  */
-function panels_panel_context_edit_preview(&$form, &$form_state) {
+function panels_panel_context_edit_preview($form, &$form_state) {
   ctools_include('context');
   ctools_include('context-task-handler');
 
@@ -803,6 +811,8 @@ function panels_panel_context_edit_preview(&$form, &$form_state) {
   }
 
   $form_state['do not cache'] = TRUE;
+
+  return $form;
 }
 
 /**
