@@ -409,7 +409,7 @@ function theme_panels_flexible_admin($vars) {
   // We never draw stored flexible layouts in admin mode; they must be edited
   // from the stored layout UI at that point.
   if (!empty($layout['layout'])) {
-    return theme_panels_flexible($id, $content, $settings, $display, $layout, $handler);
+    return theme_panels_flexible(array('id' => $id, 'content' => $content, 'settings' => $settings, 'display' => $display, 'layout' => $layout, 'handler' => $handler));
   }
 
   panels_flexible_convert_settings($settings, $layout);
@@ -715,8 +715,7 @@ function panels_flexible_render_item_links($renderer, $id, $item) {
     );
   }
 
-  return theme('ctools_dropdown', $title, $links, FALSE,
-      'flexible-layout-only flexible-links flexible-title flexible-links-' . $id);
+  return theme('ctools_dropdown', array('title' => $title, 'links' => $links, 'class' => 'flexible-layout-only flexible-links flexible-title flexible-links-' . $id));
 }
 /**
  * Provide CSS for a flexible layout.

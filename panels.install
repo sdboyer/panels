@@ -69,10 +69,10 @@ function panels_requirements_runtime() {
         $modules[] = array('data' => check_plain($module) . ' - ' . $type);
       }
 
-      $list[] = array('data' => $values['explanation'] ."\n" . theme('item_list', $modules));
+      $list[] = array('data' => $values['explanation'] ."\n" . theme('item_list', array('items' => $modules)));
     }
 
-    $description .= theme('item_list', $list);
+    $description .= theme('item_list', array('items' => $list));
 
     $requirements['panels_legacy'] = array(
       'title' => $t('Panels operating in Legacy mode'),

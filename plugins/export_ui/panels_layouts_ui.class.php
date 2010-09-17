@@ -212,7 +212,7 @@ class panels_layouts_ui extends ctools_export_ui {
         array('data' => check_plain($item->name), 'class' => 'ctools-export-ui-name'),
         array('data' => check_plain($item->admin_title), 'class' => 'ctools-export-ui-title'),
         array('data' => $category, 'class' => 'ctools-export-ui-category'),
-        array('data' => theme('links', $operations), 'class' => 'ctools-export-ui-operations'),
+        array('data' => theme('links', array('links' => $operations)), 'class' => 'ctools-export-ui-operations'),
       ),
       'title' => check_plain($item->admin_description),
       'class' => !empty($item->disabled) ? 'ctools-export-ui-disabled' : 'ctools-export-ui-enabled',

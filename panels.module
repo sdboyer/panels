@@ -289,10 +289,10 @@ function panels_permission() {
  * We implement this so that we can be sure our legacy rendering state setting
  * in $conf is updated whenever caches are cleared.
  */
-function panels_flush_caches() {
-  $legacy = panels_get_legacy_state();
-  $legacy->determineStatus();
-}
+//function panels_flush_caches() {
+//  $legacy = panels_get_legacy_state();
+//  $legacy->determineStatus();
+//}
 
 // ---------------------------------------------------------------------------
 // CTools hook implementations
@@ -416,12 +416,12 @@ function panels_ctools_style_base_types() {
     'region' => array(
       'title' => t('Panel region'),
       'preview' => 'panels_stylizer_region_preview',
-      'theme arguments' => array('settings' => NULL, 'classes' => NULL, 'content' => NULL),
+      'theme variables' => array('settings' => NULL, 'classes' => NULL, 'content' => NULL),
     ),
     'pane' => array(
       'title' => t('Panel pane'),
       'preview' => 'panels_stylizer_pane_preview',
-      'theme arguments' => array('settings' => NULL, 'content' => NULL, 'pane' => NULL, 'display' => NULL),
+      'theme variables' => array('settings' => NULL, 'content' => NULL, 'pane' => NULL, 'display' => NULL),
     ),
   );
 }
@@ -439,7 +439,7 @@ function panels_stylizer_lipsum() {
  */
 function panels_stylizer_region_preview($plugin, $settings) {
   ctools_stylizer_add_css($plugin, $settings);
-  return theme($plugin['theme'], $settings, ctools_stylizer_get_css_class($plugin, $settings), panels_stylizer_lipsum());
+  return theme($plugin['theme'], array('settings' => $settings, 'classes' => ctools_stylizer_get_css_class($plugin, $settings), 'content' => panels_stylizer_lipsum()));
 }
 
 /**
@@ -460,10 +460,10 @@ function panels_stylizer_pane_preview($plugin, $settings) {
   $display = new panels_display();
 
   if (!empty($plugin['theme'])) {
-    return theme($plugin['theme'], $settings, $content, $pane, $display);
+    return theme($plugin['theme'], array('settings' => $settings, 'content' => $content, 'pane' => $pane, 'display' => $display));
   }
   else {
-    return theme('panels_pane', $content, $pane, $display);
+    return theme('panels_pane', array('output' => $content, 'pane' => $pane, 'display' => $display));
   }
 }
 
@@ -599,13 +599,7 @@ class panels_display {
   var $css_id = NULL;
   var $context = array();
   var $did = 'new';
-  var $renderer;
-
-  function panels_display() {
-    // Set the default renderer to either the legacy or the standard renderer,
-    // depending on the legacy rendering state
-    $this->renderer = variable_get('panels_legacy_rendering_mode', TRUE) ? 'legacy' : 'standard';
-  }
+  var $renderer = 'standard';
 
   function add_pane(&$pane, $location = NULL) {
     // If no location specified, use what's set in the pane.
@@ -1022,7 +1016,6 @@ function panels_export_display($display, $prefix = '') {
  * @ingroup hook_invocations
  */
 function panels_render_display(&$display, $renderer = NULL) {
-  ctools_include('display-render', 'panels');
   ctools_include('plugins', 'panels');
   ctools_include('context');
 
@@ -1049,14 +1042,14 @@ function theme_panels_render_display_form($vars) {
   // @todo this is probably broken in D7
   $vars['form']['#children'] = $vars['form']['#display']->render();
   render($vars['form']);
-  return theme('form', $vars['form']);
+  return theme('form', $vars);
 }
 
 // @layout
 function panels_print_layout_icon($id, $layout, $title = NULL) {
   ctools_add_css('panels_admin', 'panels');
   $file = $layout['path'] . '/' . $layout['icon'];
-  return theme('panels_layout_icon', $id, theme('image', $file, strip_tags($layout['title']), strip_tags($layout['description'])), $title);
+  return theme('panels_layout_icon', array('id' => $id, 'image' => theme('image', $file, strip_tags($layout['title']), strip_tags($layout['description'])), 'title' => $title));
 }
 
 /**
@@ -1107,9 +1100,9 @@ function panels_print_layout_link($id, $layout, $link, $options = array()) {
 
   ctools_add_css('panels_admin', 'panels');
   $file = $layout['path'] . '/' . $layout['icon'];
-  $image = l(theme('image', $file), $link, array('html' => true) + $options);
+  $image = l(theme('image', array('path' => $file)), $link, array('html' => true) + $options);
   $title = l($layout['title'], $link, $options);
-  return theme('panels_layout_link', $title, $id, $image, $link);
+  return theme('panels_layout_link', array('title' => $title, 'image' => $image));
 }
 
 
@@ -1181,7 +1174,7 @@ function template_preprocess_panels_pane($vars) {
   // administrative links, only if there is permission.
   $vars['admin_links'] = '';
   if (user_access('view pane admin links') && !empty($content->admin_links)) {
-    $vars['admin_links'] = theme('links', $content->admin_links);
+    $vars['admin_links'] = theme('links', array('links' => $content->admin_links));
   }
 
   $vars['title'] = !empty($content->title) ? $content->title : '';
@@ -1189,7 +1182,7 @@ function template_preprocess_panels_pane($vars) {
   $vars['feeds'] = !empty($content->feeds) ? implode(' ', $content->feeds) : '';
   $vars['content'] = !empty($content->content) ? $content->content : '';
 
-  $vars['links'] = !empty($content->links) ? theme('links', $content->links) : '';
+  $vars['links'] = !empty($content->links) ? theme('links', array('links' => $content->links)) : '';
   $vars['more'] = '';
   if (!empty($content->more)) {
     if (empty($content->more['title'])) {
@@ -1619,92 +1612,9 @@ function panels_print_layout($layout, $content, $meta = 'standard') {
 // Everything below this line will eventually go away.
 
 /**
- * Load a panels include file.
- *
- * @deprecated This function is deprecated and should no longer be used. It will
- * be removed in the next major version of Panels. Use ctools_include() instead.
- */
-function panels_load_include($include, $path = 'includes/') {
-  static $loaded = array();
-  if (empty($loaded["$path$include.inc"])) {
-    require_once './' . panels_get_path("$path$include.inc");
-    $loaded["$path$include.inc"] = TRUE;
-  }
-}
-
-/**
  * panels path helper function
  */
 function panels_get_path($file, $base_path = FALSE, $module = 'panels') {
   $output = $base_path ? base_path() : '';
   return $output . drupal_get_path('module', $module) . '/' . $file;
 }
-
-/**
- * Given a full layout structure and a content array, render a panel display.
- *
- * @deprecated This function represents an old approach to rendering, and is
- * retained only as a temporary support for other modules still using that
- * approach. It will be removed in the next major version of Panels.
- */
-function panels_render_layout($layout, $content, $css_id = NULL, $settings = array(), $display = NULL) {
-  if (!empty($layout['css'])) {
-    if (file_exists(path_to_theme() . '/' . $layout['css'])) {
-      drupal_add_css(path_to_theme() . '/' . $layout['css']);
-    }
-    else {
-      drupal_add_css($layout['path'] . '/' . $layout['css']);
-    }
-  }
-  // This now comes after the CSS is added, because panels-within-panels must
-  // have their CSS added in the right order; inner content before outer content.
-
-  // If $content is an object, it's a $display and we have to render its panes.
-  if (is_object($content)) {
-    $display = $content;
-    if (empty($display->cache['method'])) {
-      $content = panels_render_panes($display);
-    }
-    else {
-      $cache = panels_get_cached_content($display, $display->args, $display->context);
-      if ($cache === FALSE) {
-        $cache = new panels_cache_object();
-        $cache->set_content(panels_render_panes($display));
-        panels_set_cached_content($cache, $display, $display->args, $display->context);
-      }
-      $content = $cache->content;
-    }
-  }
-
-  $output = theme($layout['theme'], check_plain($css_id), $content, $settings, $display);
-
-  return $output;
-}
-
-/**
- * Get a list of panel regions available in the layout.
- *
- * @deprecated Use panels_get_regions instead.
- */
-function panels_get_panels($layout, $display) {
-  return panels_get_regions($layout, $display);
-}
-
-/**
- * Select a context for a pane.
- *
- * @param $pane
- *   A fully populated pane.
- * @param $contexts
- *   A keyed array of available contexts.
- *
- * @return
- *   The matching contexts or NULL if none or necessary, or FALSE if
- *   requirements can't be met.
- *
- * @deprecated this function will be removed.
- */
-function panels_pane_select_context($pane, $contexts) {
-  return ctools_content_select_context($pane->type, $pane->subtype, $pane->configuration, $contexts);
-}
-

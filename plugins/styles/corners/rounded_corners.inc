@@ -41,25 +41,22 @@ function theme_panels_rounded_corners_style_render_region($vars) {
 
   $print_separator = FALSE;
   foreach ($panes as $pane_id => $pane) {
-    $text = panels_render_pane($pane, $display->content[$pane_id], $display);
-    if ($text) {
-      // Add the separator if we've already displayed a pane.
-      if ($print_separator) {
-        $output .= '<div class="panel-separator">&nbsp;</div>';
-      }
+    // Add the separator if we've already displayed a pane.
+    if ($print_separator) {
+      $output .= '<div class="panel-separator">&nbsp;</div>';
+    }
 
-      if ($where == 'pane') {
-        $output .= theme('panels_rounded_corners_box', $text);
-      }
-      else {
-        $output .= $text;
-        $print_separator = TRUE;
-      }
+    if ($where == 'pane') {
+      $output .= theme('panels_rounded_corners_box', array('content' => $pane));
+    }
+    else {
+      $output .= $pane;
+      $print_separator = TRUE;
     }
   }
 
   if ($where == 'panel') {
-    $output = theme('panels_rounded_corners_box', $output);
+    $output = theme('panels_rounded_corners_box', array('content' => $output));
   }
 
   panels_add_rounded_corners_css($display, $where);
@@ -87,10 +84,10 @@ function theme_panels_rounded_corners_style_render_pane($vars) {
     return;
   }
 
-  $output = theme('panels_pane', $content, $pane, $display);
+  $output = theme('panels_pane', array('content' => $content, 'pane' => $pane, 'display' => $display));
 
   // Just stick a box around the standard theme_panels_pane.
-  $output = theme('panels_rounded_corners_box', $output);
+  $output = theme('panels_rounded_corners_box', array('content' => $output));
   panels_add_rounded_corners_css($display, 'pane');
   return $output;
 }

@@ -37,7 +37,7 @@ function theme_panels_list_style_render_region($vars) {
     $settings['list_type'] = 'ul';
   }
 
-  return theme('item_list', $items, NULL, $settings['list_type']);
+  return theme('item_list', array('items' => $items, 'type' => $settings['list_type']));
 }
 
 /**

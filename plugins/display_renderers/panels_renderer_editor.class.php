@@ -206,7 +206,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     $style_links = $this->get_style_links('display');
 
     $links[] = array(
-      'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links($style_links),
+      'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links(array('links' => $style_links)),
       'html' => TRUE,
       'attributes' => array('class' => 'panels-sub-menu'),
     );
@@ -239,7 +239,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       }
 
       $links[] = array(
-        'title' => '<span class="dropdown-header">' . t('Caching') . '</span>' . theme_links($cache_links),
+        'title' => '<span class="dropdown-header">' . t('Caching') . '</span>' . theme_links(array('links' => $cache_links)),
         'html' => TRUE,
         'attributes' => array('class' => 'panels-sub-menu'),
       );
@@ -269,7 +269,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     $style_links = $this->get_style_links('region', $region_id);
 
     $links[] = array(
-      'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links($style_links),
+      'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links(array('links' => $style_links)),
       'html' => TRUE,
       'attributes' => array('class' => 'panels-sub-menu'),
     );
@@ -338,7 +338,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     $style_links = $this->get_style_links('pane', $pane->pid);
 
     $links[] = array(
-      'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links($style_links),
+      'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links(array('links' => $style_links)),
       'html' => TRUE,
       'attributes' => array('class' => 'panels-sub-menu'),
     );
@@ -390,7 +390,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       );
 
       $links[] = array(
-        'title' => '<span class="dropdown-header">' . t('Visibility rules') . '</span>' . theme_links($visibility_links),
+        'title' => '<span class="dropdown-header">' . t('Visibility rules') . '</span>' . theme_links(array('links' => $visibility_links)),
         'html' => TRUE,
         'attributes' => array('class' => 'panels-sub-menu'),
       );
@@ -423,7 +423,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       }
 
       $links[] = array(
-        'title' => '<span class="dropdown-header">' . t('Caching') . '</span>' . theme_links($cache_links),
+        'title' => '<span class="dropdown-header">' . t('Caching') . '</span>' . theme_links(array('links' => $cache_links)),
         'html' => TRUE,
         'attributes' => array('class' => 'panels-sub-menu'),
       );

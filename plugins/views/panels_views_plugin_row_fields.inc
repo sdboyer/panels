@@ -119,7 +119,7 @@ class panels_views_plugin_row_fields extends views_plugin_row {
     if (!$layout) {
       // Fall back to normal behavior if the layout is somehow invalid. This
       // can happen if the layout was removed, for example.
-      return theme($this->theme_functions(), $this->view, $this->options, $row, $this->field_alias);
+      return theme($this->theme_functions(), array('view' => view, 'options' => $this->options, 'row' => $row, 'field_alias' => $this->field_alias));
     }
 
     // Store a backup copy of the array because we're going to be screwing
@@ -169,7 +169,7 @@ class panels_views_plugin_row_fields extends views_plugin_row {
     // render them into the content array.
     foreach ($this->region_fields as $region_id => $fields) {
       $this->view->field = $fields;
-      $content[$region_id] = theme($this->theme_functions(), $this->view, $this->options, $row, $this->field_alias);
+      $content[$region_id] = theme($this->theme_functions(), array('view' => $this->view, 'options' => $this->options, 'row' => $row, 'field_alias' => $this->field_alias));
     }
 
     // Restore our $fields array.

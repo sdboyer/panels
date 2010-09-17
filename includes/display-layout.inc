@@ -204,7 +204,7 @@ function panels_change_layout(&$form_state) {
   );
 
   $form['container']['right_arrow'] = array(
-    '#value' => theme('image', drupal_get_path('module', 'panels') . '/images/go-right.png'),
+    '#value' => theme('image', array('path' => drupal_get_path('module', 'panels') . '/images/go-right.png')),
   );
   $form['container']['new_layout'] = array(
     '#value' => panels_print_layout_icon($form_state['layout'], $new_layout, check_plain($new_layout['title'])),

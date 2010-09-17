@@ -127,7 +127,7 @@ function theme_panels_stylizer_stylizer_style_render_region($vars) {
     $plugin = ctools_get_style_base($settings['style_base']);
     ctools_stylizer_add_css($plugin, $settings);
 
-    return theme($plugin['theme'], $settings, ctools_stylizer_get_css_class($plugin, $settings), $output);
+    return theme($plugin['theme'], array('settings' => $settings, 'class' => ctools_stylizer_get_css_class($plugin, $settings), 'output' => $output));
   }
   else {
     // if the style is gone, just display the output.
@@ -160,12 +160,12 @@ function theme_panels_stylizer_stylizer_style_render_pane($vars) {
     ctools_stylizer_add_css($plugin, $settings);
 
     if (isset($plugin['theme'])) {
-      return theme($plugin['theme'], $settings, $content, $pane, $display);
+      return theme($plugin['theme'], array('settings' => $settings, 'content' => $content, 'pane' => $pane, 'display' => $display));
     }
   }
 
   // if the style is gone or has no theme of its own, just display the output.
-  return theme('panels_pane', $content, $pane, $display);
+  return theme('panels_pane', array('content' => $content, 'pane' => $pane, 'display' => $display));
 }
 
 /**

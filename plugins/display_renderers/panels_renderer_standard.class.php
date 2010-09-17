@@ -382,7 +382,7 @@ class panels_renderer_standard {
     else {
       $theme = $this->plugins['layout']['theme'];
     }
-    $this->rendered['layout'] = theme($theme, check_plain($this->display->css_id), $this->rendered['regions'], $this->display->layout_settings, $this->display, $this->plugins['layout'], $this);
+    $this->rendered['layout'] = theme($theme, array('css_id' => check_plain($this->display->css_id), 'content' => $this->rendered['regions'], 'settings' => $this->display->layout_settings, 'display' => $this->display, 'layout' => $this->plugins['layout'], 'renderer' => $this));
     return $this->prefix . $this->rendered['layout'] . $this->suffix;
   }
 
@@ -497,7 +497,7 @@ class panels_renderer_standard {
         $style = panels_get_style($pane->style['style']);
 
         if (isset($style) && isset($style['render pane'])) {
-          $output = theme($style['render pane'], $content, $pane, $this->display, $style, $pane->style['settings']);
+          $output = theme($style['render pane'], array('content' => $content, 'pane' => $pane, 'display' => $this->display, 'style' => $style, 'settings' => $pane->style['settings']));
 
           // This could be null if no theme function existed.
           if (isset($output)) {
@@ -507,7 +507,7 @@ class panels_renderer_standard {
       }
 
       // fallback
-      return theme('panels_pane', $content, $pane, $this->display);
+      return theme('panels_pane', array('content' => $content, 'pane' => $pane, 'display' => $this->display));
     }
   }
 
@@ -618,6 +618,6 @@ class panels_renderer_standard {
       $owner_id = $this->display->owner->id;
     }
 
-    return theme($style['render region'], $this->display, $owner_id, $panes, $style_settings, $region_id, $style);
+    return theme($style['render region'], array('display' => $this->display, 'owner_id' => $owner_id, 'panes' => $panes, 'settings' => $style_settings, 'region_id' => $region_id, 'style' => $style));
   }
 }

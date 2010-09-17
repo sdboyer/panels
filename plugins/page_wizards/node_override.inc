@@ -60,7 +60,7 @@ function panels_node_override_start($form_info, $step, &$form_state) {
   $form_state['page'] = page_manager_get_page_cache('node_view');
   if (!empty($form_state['page']->locked)) {
     $account  = user_load($form_state['page']->locked->uid);
-    $name     = theme('username', $account);
+    $name     = theme('username', array('account' => $account));
     $lock_age = format_interval(time() - $form_state['page']->locked->updated);
     $break    = url(page_manager_edit_url($form_state['page']->task_name, array('actions', 'break-lock')));
 
@@ -98,7 +98,7 @@ function panels_node_override_basic(&$form, &$form_state) {
     $form['already_done'] = array(
       '#type' => 'item',
       '#title' => t('Existing node templates'),
-      '#value' => theme('item_list', $items),
+      '#value' => theme('item_list', array('items' => $items)),
     );
   }
 

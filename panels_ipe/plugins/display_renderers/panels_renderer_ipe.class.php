@@ -68,7 +68,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
       $output = "<div class=\"panels-ipe-portlet-content panels-ipe-empty-pane\">$output</div>";
     }
     // Hand it off to the plugin/theme for placing draggers/buttons
-    $output = theme('panels_ipe_pane_wrapper', $output, $pane, $this->display, $this);
+    $output = theme('panels_ipe_pane_wrapper', array('output' => $output, 'pane' => $pane, 'display' => $this->display, 'renderer' => $this));
     return "<div id=\"panels-ipe-paneid-{$pane->pid}\" class=\"panels-ipe-portlet-wrapper panels-ipe-portlet-marker\">" . $output . "</div>";
   }
 
@@ -95,16 +95,16 @@ class panels_renderer_ipe extends panels_renderer_editor {
    */
   function render_region($region_id, $panes) {
     // Generate this region's 'empty' placeholder pane from the IPE plugin.
-    $empty_ph = theme('panels_ipe_placeholder_pane', $region_id, $this->plugins['layout']['panels'][$region_id]);
+    $empty_ph = theme('panels_ipe_placeholder_pane', array('region_id' => $region_id, 'region_title' => $this->plugins['layout']['panels'][$region_id]));
 
     // Wrap the placeholder in some guaranteed markup.
     $panes['empty_placeholder'] = '<div class="panels-ipe-placeholder panels-ipe-on panels-ipe-portlet-marker panels-ipe-portlet-static">' . $empty_ph . "</div>";
 
     // Generate this region's add new pane button. FIXME waaaaay too hardcoded
-    $panes['add_button'] = theme('panels_ipe_add_pane_button', $region_id, $this->display, $this);
+    $panes['add_button'] = theme('panels_ipe_add_pane_button', array('region_id' => $region_id, 'display' => $this->display, 'renderer' => $this));
 
     $output = parent::render_region($region_id, $panes);
-    $output = theme('panels_ipe_region_wrapper', $output, $region_id, $this->display);
+    $output = theme('panels_ipe_region_wrapper', array('output' => $output, 'region_id' => $region_id, 'display' => $this->display, 'renderer' => $this));
     $classes = 'panels-ipe-region';
 
     ctools_include('cleanstring');
@@ -119,7 +119,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
     if (!empty($this->cache->locked)) {
       if ($break != 'break') {
         $account  = user_load($this->cache->locked->uid);
-        $name     = theme('username', $account);
+        $name     = theme('username', array('account' => $account));
         $lock_age = format_interval(time() - $this->cache->locked->updated);
 
         $message = t("This panel is being edited by user !user, and is therefore locked from editing by others. This lock is !age old.\n\nClick OK to break this lock and discard any changes made by !user.", array('!user' => $name, '!age' => $lock_age));

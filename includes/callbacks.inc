@@ -68,7 +68,7 @@ function panels_panels_dashboard_blocks(&$vars) {
   }
 
   if ($rows) {
-    $content = theme('table', array(), $rows, array('class' => 'panels-manage'));
+    $content = theme('table', array('rows' => $rows, 'attributes' => array('class' => 'panels-manage')));
   }
   else {
     $content = '<p>' . t('There are no custom layouts.') . '</p>';
@@ -122,7 +122,7 @@ function template_preprocess_panels_dashboard(&$vars) {
           'description' => $plugin['description'],
         );
 
-        $vars['blocks']['wizards']['content'] .= theme('panels_dashboard_link', $link);
+        $vars['blocks']['wizards']['content'] .= theme('panels_dashboard_link', array('link' => $link));
       }
     }
 
@@ -140,7 +140,7 @@ function template_preprocess_panels_dashboard(&$vars) {
 
   // Turn the links into a block
   foreach ($vars['links'] as $link) {
-    $vars['blocks']['links']['content'] .= theme('panels_dashboard_link', $link);
+    $vars['blocks']['links']['content'] .= theme('panels_dashboard_link', array('link' => $link));
   }
 
   uasort($vars['blocks'], 'ctools_plugin_sort');
@@ -151,7 +151,7 @@ function template_preprocess_panels_dashboard(&$vars) {
   // Render all the blocks
   foreach ($vars['blocks'] as $block) {
     $section = !empty($block['section']) ? $block['section'] : 'left';
-    $vars[$section] .= theme('panels_dashboard_block', $block);
+    $vars[$section] .= theme('panels_dashboard_block', array('block' => $block));
   }
 }
 

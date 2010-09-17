@@ -102,11 +102,11 @@ function theme_panels_ipe_pane_wrapper($vars) {
     ),
   );
 
-  $attr = array(
+  $attributes = array(
     'class' => 'panels-ipe-linkbar',
   );
 
-  $links = theme('links', $links, $attr);
+  $links = theme('links', array('links' => $links, 'attributes' => $attributes));
   $links .= '<div class="panels-ipe-draghandle">&nbsp;</div>';
   $handlebar = '<div class="panels-ipe-handlebar-wrapper panels-ipe-on clear-block">' . $links . '</div>';
   return $handlebar . $output;
@@ -121,8 +121,8 @@ function theme_panels_ipe_add_pane_button($vars) {
   $display = $vars['display'];
   $renderer = $vars['renderer'];
 
-  $attr = array('class' => 'ctools-use-modal');
-  $link = l(t('Add new pane'), $renderer->get_url('select-content', $region_id), array('attributes' => $attr));
+  $attributes = array('class' => 'ctools-use-modal');
+  $link = l(t('Add new pane'), $renderer->get_url('select-content', $region_id), array('attributes' => $attributes));
   return '<div class="panels-ipe-newblock panels-ipe-on panels-ipe-portlet-static">' . $link . '</div>';
 }
 

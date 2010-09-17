@@ -379,17 +379,13 @@ function panels_node_edit_layout($node) {
  * Pass through to the panels content editor.
  */
 function panels_node_edit_content($node) {
-//  ctools_include('plugins', 'panels');
   ctools_include('context');
   $display = panels_load_display($node->panels_node['did']);
   $display->context = panels_node_get_context($node);
   ctools_include('common', 'panels');
   $content_types = panels_common_get_allowed_types('panels_node', $display->context);
 
-  // Print this with theme('page') so that blocks are disabled while editing a display.
-  // This is important because negative margins in common block layouts (i.e, Garland)
-  // messes up the drag & drop.
-  print theme('page', panels_edit($display, "node/$node->nid/panel_content", $content_types), FALSE);
+  return panels_edit($display, "node/$node->nid/panel_content", $content_types);
 }
 
 /**

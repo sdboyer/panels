@@ -464,18 +464,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
   $content_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'content'))) . ']';
   $context_link = ' [' . l(t('Edit'), page_manager_edit_url($task_name, array('handlers', $handler->name, 'context'))) . ']';
 
-  $info = theme('table', array(), $rows, array('class' => 'page-manager-handler-summary'));
-
-/*
-  $content = theme('panels_common_content_list', $display);
-  if (empty($contents)) {
-    $contents = t('This panel has no content.');
-  }
-  $contexts = theme('ctools_context_list_no_table', $object);
-  if (empty($contexts)) {
-    $contexts = t('This panel has no contexts.');
-  }
-*/
+  $info = theme('table', array('rows' => $rows, 'attributes' => array('class' => 'page-manager-handler-summary')));
 
   $title = $handler->conf['title'];
   if ($title != t('Panel')) {

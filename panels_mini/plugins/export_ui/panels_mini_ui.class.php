@@ -95,7 +95,7 @@ class panels_mini_ui extends ctools_export_ui {
         array('data' => $category, 'class' => 'ctools-export-ui-category'),
         array('data' => $layout, 'class' => 'ctools-export-ui-layout'),
         array('data' => $item->type, 'class' => 'ctools-export-ui-storage'),
-        array('data' => theme('links', $operations), 'class' => 'ctools-export-ui-operations'),
+        array('data' => theme('links', array('links' => $operations)), 'class' => 'ctools-export-ui-operations'),
       ),
       'title' => !empty($item->admin_description) ? check_plain($item->admin_description) : '',
       'class' => !empty($item->disabled) ? 'ctools-export-ui-disabled' : 'ctools-export-ui-enabled',

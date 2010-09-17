@@ -286,7 +286,7 @@ function panels_edit_display_settings_form(&$form_state) {
 
       $header = array(t('Keyword'), t('Value'));
       $form['display_title']['contexts'] = array(
-        '#value' => theme('table', $header, $rows),
+        '#value' => theme('table', array('header' => $header, 'rows' => $rows)),
       );
       $form['display_title']['contexts_suffix'] = array(
         '#value' => '</fieldset></div>',
