@@ -12,7 +12,7 @@
   <div class="wrap-corner">
     <div class="t-edge"><div class="l"></div><div class="r"></div></div>
     <div class="l-edge">
-      <div class="r-edge clear-block">
+      <div class="r-edge clearfix">
         <?php print $content; ?>
       </div>
     </div>

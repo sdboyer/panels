@@ -392,7 +392,7 @@ function panels_get_renderer_handler($plugin, &$display) {
     $plugin = panels_get_display_renderer($plugin);
   }
 
-  $class = ctools_plugin_get_class($plugin, 'handler');
+  $class = ctools_plugin_get_class($plugin, 'renderer');
   if ($class) {
     $renderer = new $class();
     $renderer->init($plugin, $display);

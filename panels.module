@@ -767,17 +767,16 @@ function panels_load_displays($dids) {
     return $displays;
   }
 
-  $result = db_query("SELECT * FROM {panels_display} WHERE did IN (" .  db_placeholders($dids) . ")", $dids);
+  $result = db_query("SELECT * FROM {panels_display} WHERE did IN (:dids)", array(':dids' => $dids));
 
   ctools_include('export');
-  while ($obj = db_fetch_object($result)) {
+  foreach ($result as $obj) {
     $displays[$obj->did] = ctools_export_unpack_object('panels_display', $obj);
     // Modify the hide_title field to go from a bool to an int if necessary.
   }
 
-  $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (" . db_placeholders($dids) . ") ORDER BY did, panel, position", $dids);
-
-  while ($obj = db_fetch_object($result)) {
+  $result = db_query("SELECT * FROM {panels_pane} WHERE did IN (:dids) ORDER BY did, panel, position", array(':dids' => $dids));
+  foreach ($result as $obj) {
     $pane = ctools_export_unpack_object('panels_pane', $obj);
 
     $displays[$pane->did]->panels[$pane->panel][] = $pane->pid;
@@ -844,8 +843,8 @@ function panels_save_display(&$display) {
   if ($update) {
     // Get a list of all panes currently in the database for this display so we can know if there
     // are panes that need to be deleted. (i.e, aren't currently in our list of panes).
-    $result = db_query("SELECT pid FROM {panels_pane} WHERE did = %d", $display->did);
-    while ($pane = db_fetch_object($result)) {
+    $result = db_query("SELECT pid FROM {panels_pane} WHERE did = :did", array(':did' => $display->did));
+    foreach ($result as $pane) {
       $pids[$pane->pid] = $pane->pid;
     }
   }
@@ -882,7 +881,12 @@ function panels_save_display(&$display) {
           // Do a simple update query to write it so we don't have to rewrite
           // the whole record. We can't just save writing the whole record here
           // because it was needed to get the did. Chicken, egg, more chicken.
-          db_query("UPDATE {panels_display} SET title_pane = %d WHERE did = %d", $pane->pid, $display->did);
+          db_update('panels_display')
+            ->fields(array(
+              'title_pane' => $pane->pid
+            ))
+            ->condition('did', $display->did)
+            ->execute();
         }
       }
 
@@ -898,7 +902,7 @@ function panels_save_display(&$display) {
     $display->panels[$id] = $new_panes;
   }
   if (!empty($pids)) {
-    db_query("DELETE FROM {panels_pane} WHERE pid IN (" . db_placeholders($pids) . ")", $pids);
+    db_delete('panels_pane')->condition('pid', $pids);
   }
 
   // Clear any cached content for this display.
@@ -931,8 +935,8 @@ function panels_delete_display($display) {
   else {
     $did = $display;
   }
-  db_query("DELETE FROM {panels_display} WHERE did = %d", $did);
-  db_query("DELETE FROM {panels_pane} WHERE did = %d", $did);
+  db_delete('panels_display')->condition('did', $did);
+  db_delete('panels_pane')->condition('did', $did);
 }
 
 /**
@@ -1049,7 +1053,7 @@ function theme_panels_render_display_form($vars) {
 function panels_print_layout_icon($id, $layout, $title = NULL) {
   ctools_add_css('panels_admin', 'panels');
   $file = $layout['path'] . '/' . $layout['icon'];
-  return theme('panels_layout_icon', array('id' => $id, 'image' => theme('image', $file, strip_tags($layout['title']), strip_tags($layout['description'])), 'title' => $title));
+  return theme('panels_layout_icon', array('id' => $id, 'image' => theme('image', array('path' => $file, 'alt' => strip_tags($layout['title']), 'title' => strip_tags($layout['description']))), 'title' => $title));
 }
 
 /**
@@ -1142,8 +1146,11 @@ function panels_get_current_page_display($change = NULL) {
 /**
  * Clean up the panel pane variables for the template.
  */
-function template_preprocess_panels_pane($vars) {
-  $content = $vars['output'];
+function template_preprocess_panels_pane(&$vars) {
+  // Make a copy of the original content as we are overwriting the
+  // named variable.
+  $vars['output'] = $content = $vars['content'];
+
   // basic classes
   $vars['classes'] = 'panel-pane';
   $vars['id'] = '';
@@ -1251,8 +1258,10 @@ function panels_ajax_router() {
   $renderer->clean_key = ctools_cleanstring($cache_key);
 
   $output = call_user_func_array(array($renderer, $method), $args);
+
   if (empty($output) && !empty($renderer->commands)) {
-    return ajax_render($renderer->commands);
+    print ajax_render($renderer->commands);
+    ajax_footer();
   }
   return $output;
 }

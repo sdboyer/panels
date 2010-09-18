@@ -105,7 +105,7 @@ function panels_choose_layout($form, &$form_state) {
   );
 
   $form['layout'] = array(
-    '#prefix' => '<div class="panels-choose-layout panels-layouts-checkboxes clear-block">',
+    '#prefix' => '<div class="panels-choose-layout panels-layouts-checkboxes clearfix">',
     '#suffix' => '</div>',
   );
 
@@ -121,7 +121,7 @@ function panels_choose_layout($form, &$form_state) {
     );
 
     $form['layout'][$category] = array(
-      '#prefix' => '<div id="panels-layout-category-' . $category . '-wrapper"><div id="panels-layout-category-' . $category . '" class="form-checkboxes clear-block"><div class="panels-layouts-category">' . $categories[$category] . '</div>',
+      '#prefix' => '<div id="panels-layout-category-' . $category . '-wrapper"><div id="panels-layout-category-' . $category . '" class="form-checkboxes clearfix"><div class="panels-layouts-category">' . $categories[$category] . '</div>',
       '#suffix' => '</div></div>',
     );
 
@@ -132,7 +132,7 @@ function panels_choose_layout($form, &$form_state) {
         '#type' => 'radio',
         '#title' => $choice,
         '#parents' => array('layout'),
-        '#id' => form_clean_id('edit-layout-' . $key),
+        '#id' => drupal_clean_css_identifier('edit-layout-' . $key),
         '#return_value' => check_plain($key),
         '#default_value' => in_array($display->layout, array_keys($layouts)) ? $display->layout : NULL,
       );
@@ -205,7 +205,7 @@ function panels_change_layout($form, &$form_state) {
   );
 
   $form['container-clearer'] = array(
-    // TODO: FIx this ot use clear-block instead
+    // TODO: FIx this ot use clearfix instead
     '#value' => '<div style="clear: both;"></div>',
   );
 

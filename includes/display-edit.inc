@@ -8,36 +8,6 @@
  * as well as the ajax modal forms associated with them.
  */
 
-
-/**
- * Method to allow modules to provide their own caching mechanism for the
- * display editor.
- */
-function panels_edit_cache_get($cache_key) {
-  if (strpos($cache_key, ':') !== FALSE) {
-    list($module, $argument) = explode(':', $cache_key, 2);
-    return module_invoke($module, 'panels_cache_get', $argument);
-  }
-
-  // Fall back to our normal method:
-  return panels_cache_get('display', $cache_key);
-}
-
-/**
- * Method to allow modules to provide their own caching mechanism for the
- * display editor.
- */
-function panels_edit_cache_set($cache) {
-  $cache_key = $cache->display->cache_key;
-  if (strpos($cache_key, ':') !== FALSE) {
-    list($module, $argument) = explode(':', $cache_key, 2);
-    return module_invoke($module, 'panels_cache_set', $argument, $cache);
-  }
-
-  // Fall back to our normal method:
-  return panels_cache_set('display', $cache_key, $cache);
-}
-
 /**
  * Handle calling and processing of the form for editing display content.
  *
@@ -105,16 +75,16 @@ function panels_edit_display_form($form, &$form_state) {
     '#value' => $links,
   );
 
-  $form += panels_edit_display_settings_form($form_state);
+  $form += panels_edit_display_settings_form($form, $form_state);
 
   $form['panel'] = array('#tree' => TRUE);
   $form['panel']['pane'] = array('#tree' => TRUE);
 
   $form['display'] = array(
-    '#value' => $renderer->render(),
+    '#markup' => $renderer->render(),
   );
 
-  foreach ($renderer->plugins['layout']['panels'] as $region_id => $title) {
+  foreach ($renderer->plugins['layout']['regions'] as $region_id => $title) {
     // Make sure we at least have an empty array for all possible locations.
     if (!isset($display->panels[$region_id])) {
       $display->panels[$region_id] = array();
@@ -153,7 +123,7 @@ function panels_edit_display_form($form, &$form_state) {
     $form['preview']['button'] = array(
       '#type' => 'submit',
       '#value' => t('Preview'),
-      '#attributes' => array('class' => 'ctools-use-ajax'),
+      '#attributes' => array('class' => array('use-ajax-submit')),
       '#id' => 'panels-live-preview-button',
       '#submit' => array('panels_edit_display_form_submit', 'panels_edit_display_form_preview'),
     );

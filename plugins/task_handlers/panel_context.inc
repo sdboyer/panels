@@ -404,7 +404,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
   // Get operations for just this handler.
   $operations = $operations['handlers']['children'][$handler->name]['children']['actions']['children'];
   $args = array('handlers', $handler->name, 'actions');
-  $rendered_operations = page_manager_render_operations($page, $operations, array(), array('class' => 'actions'), 'actions', $args);
+  $rendered_operations = page_manager_render_operations($page, $operations, array(), array('class' => array('actions')), 'actions', $args);
 
   $layout = panels_get_layout($display->layout);
 
@@ -471,9 +471,9 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
     $title = t('Panel: @title', array('@title' => $title));
   }
 
-  $output .= '<div class="clear-block">';
+  $output .= '<div class="clearfix">';
   if ($show_title) {
-  $output .= '<div class="handler-title clear-block">';
+  $output .= '<div class="handler-title clearfix">';
     $output .= '<div class="actions handler-actions">' . $rendered_operations['actions'] . '</div>';
     $output .= '<span class="title-label">' . $title . '</span>';
   }
@@ -535,7 +535,7 @@ function panels_panel_context_edit_choose($form, &$form_state) {
 
   // Change the #id of the form so the CSS applies properly.
   $form['#id'] = 'panels-choose-layout';
-  $form = array_merge($form, panels_choose_layout($form_state));
+  $form = panels_choose_layout($form, $form_state);
 
   return $form;
 }
@@ -583,7 +583,7 @@ function panels_panel_context_edit_layout($form, &$form_state) {
 
   // Change the #id of the form so the CSS applies properly.
   $form['#id'] = 'panels-choose-layout';
-  $form = array_merge($form, panels_choose_layout($form_state));
+  $form = panels_choose_layout($form, $form_state);
 
   return $form;
 }
@@ -628,7 +628,7 @@ function panels_panel_context_edit_move($form, &$form_state) {
   $form_state['no buttons'] = TRUE;
 
   // Change the #id of the form so the CSS applies properly.
-  $form = array_merge($form, panels_change_layout($form_state));
+  $form = panels_change_layout($form, $form_state);
 
   // Change the 'back' button to just go directly to the previous form
 //  $task_id = $form_state['task']['name'];
@@ -668,7 +668,7 @@ function panels_panel_context_edit_content($form, &$form_state) {
   $form_state['no preview'] = TRUE;
   $form_state['page']->display_cache[$form_state['handler_id']] = $cache;
 
-  $form = array_merge($form, panels_edit_display_form($form_state));
+  $form = panels_edit_display_form($form, $form_state);
   // Make sure the theme will work since our form id is different.
   $form['#theme'] = 'panels_edit_display_form';
 
@@ -806,7 +806,7 @@ function panels_panel_context_edit_preview($form, &$form_state) {
 
   if (!empty($output)) {
     $form['output'] = array(
-      '#value' => $output,
+      '#markup' => $output,
     );
   }
 

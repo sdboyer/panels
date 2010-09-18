@@ -36,7 +36,7 @@
   <?php endif; ?>
 
   <div class="pane-content">
-    <?php print $content; ?>
+    <?php print render($content); ?>
   </div>
 
   <?php if ($links): ?>

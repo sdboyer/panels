@@ -66,14 +66,14 @@ function panels_landing_page_new_page(&$cache) {
     ),
   );
   $cache->display = panels_new_display();
-  $cache->display->layout = 'flexible';
+  $cache->display->layout = 'twocol';
 }
 
 /**
  * First page of our page creator wizard.
  */
 function panels_landing_page_basic($form, &$form_state) {
-  $cache = &$form_state['cache'];
+  $cache = &$form_state['wizard cache'];
   ctools_include('dependent');
 
   $form['admin_title'] = array(
@@ -183,15 +183,15 @@ function panels_landing_page_basic_validate(&$form, &$form_state) {
   }
 
   // Check to see if something is already using the path
-  $result = db_query("SELECT * FROM {menu_router} WHERE path = '%s'", $form_state['values']['path']);
-  while ($router = db_fetch_object($result)) {
+  $result = db_query("SELECT * FROM {menu_router} WHERE path = :path", array(':path' => $form_state['values']['path']))->fetch();
+  if ($result) {
     form_error($form['path'], t('That path is already in use. This system cannot override existing paths.'));
     return;
   }
 
   // Ensure the path is not already an alias to something else.
-  $result = db_query("SELECT src, dst FROM {url_alias} WHERE dst = '%s'", $form_state['values']['path']);
-  if ($alias = db_fetch_object($result)) {
+  $alias = db_query('SELECT alias, source FROM {url_alias} WHERE alias = :path', array(':path' => $form_state['values']['path']))->fetchObject();
+  if ($alias) {
     form_error($form['path'], t('That path is currently assigned to be an alias for @alias. This system cannot override existing aliases.', array('@alias' => $alias->src)));
   }
 }
@@ -200,7 +200,8 @@ function panels_landing_page_basic_validate(&$form, &$form_state) {
  * Submit function to store the form data in our cache.
  */
 function panels_landing_page_basic_submit(&$form, &$form_state) {
-  $cache = &$form_state['cache'];
+  $cache = &$form_state['wizard cache'];
+  dsm($form_state);
   $cache->name = $form_state['values']['name'];
   $cache->admin_title = $form_state['values']['admin_title'];
   $cache->admin_description = $form_state['values']['admin_description'];
@@ -239,7 +240,7 @@ function panels_landing_page_submit(&$form, &$form_state) {
  * page, save it, and redirect the user to view the new work.
  */
 function panels_landing_page_finish(&$form_state) {
-  $cache = &$form_state['cache'];
+  $cache = &$form_state['wizard cache'];
 
   // Ensure all 'page' features are loaded.
   $page_task = page_manager_get_task('page');

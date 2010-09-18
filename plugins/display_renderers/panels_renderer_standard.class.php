@@ -382,6 +382,7 @@ class panels_renderer_standard {
     else {
       $theme = $this->plugins['layout']['theme'];
     }
+
     $this->rendered['layout'] = theme($theme, array('css_id' => check_plain($this->display->css_id), 'content' => $this->rendered['regions'], 'settings' => $this->display->layout_settings, 'display' => $this->display, 'layout' => $this->plugins['layout'], 'renderer' => $this));
     return $this->prefix . $this->rendered['layout'] . $this->suffix;
   }
@@ -419,19 +420,19 @@ class panels_renderer_standard {
    *
    * @see drupal_add_css
    */
-  function add_css($filename, $type = 'module', $media = 'all', $preprocess = TRUE) {
-    $path = file_create_path($filename);
+  function add_css($filename) {
+//    $path = file_create_path($filename);
     switch ($this->meta_location) {
       case 'standard':
-        drupal_add_css($filename, $type, $media, $preprocess);
+        drupal_add_css($filename);
         break;
       case 'inline':
-        if ($path) {
-          $url = file_create_url($filename);
-        }
-        else {
+//        if ($path) {
+//          $url = file_create_url($filename);
+//        }
+//        else {
           $url = base_path() . $filename;
-        }
+//        }
 
         $this->prefix .= '<link type="text/css" rel="stylesheet" media="' . $media . '" href="' . $url . '" />'."\n";
         break;
@@ -530,6 +531,7 @@ class panels_renderer_standard {
     }
     else {
       $content = ctools_content_render($pane->type, $pane->subtype, $pane->configuration, array(), $this->display->args, $this->display->context);
+
       foreach (module_implements('panels_pane_content_alter') as $module) {
         $function = $module . '_panels_pane_content_alter';
         $function($content, $pane, $this->display->args, $this->display->context);

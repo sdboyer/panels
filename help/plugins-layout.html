@@ -61,7 +61,7 @@ There are many additional properties that can be added to the include file. For 
 
 <h2>The tpl.php File:</h2>
 <p>The tpl.php file is very similar to any other template file within drupal. The difference here is that we're being passed an array of regions through $content, and we also have a css id available to us for the entire panel in the form of $css_id.  The template is very straight forward and will look similar to the following:
-<pre>&lt;div class="panel-display panel-stacked-twothirds-onethird clear-block" &lt;?php if (!empty($css_id)) { print "id=\"$css_id\""; } ?&gt;&gt;  
+<pre>&lt;div class="panel-display panel-stacked-twothirds-onethird clearfix" &lt;?php if (!empty($css_id)) { print "id=\"$css_id\""; } ?&gt;&gt;  
   &lt;div class="panel-panel panel-col-first panel-region-main"&gt;
     &lt;div class="inside"&gt;&lt;?php print $content['main']; ?&gt;&lt;/div&gt;
   &lt;/div&gt;

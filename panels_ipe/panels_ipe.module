@@ -108,7 +108,7 @@ function theme_panels_ipe_pane_wrapper($vars) {
 
   $links = theme('links', array('links' => $links, 'attributes' => $attributes));
   $links .= '<div class="panels-ipe-draghandle">&nbsp;</div>';
-  $handlebar = '<div class="panels-ipe-handlebar-wrapper panels-ipe-on clear-block">' . $links . '</div>';
+  $handlebar = '<div class="panels-ipe-handlebar-wrapper panels-ipe-on clearfix">' . $links . '</div>';
   return $handlebar . $output;
 }
 
@@ -148,12 +148,12 @@ function panels_ipe_footer($main = 0) {
   }
 
   // TODO should be moved into the IPE plugin - WAAAY too hardcoded right now
-  $output = "<div id='panels-ipe-control-container' class='clear-block'>";
+  $output = "<div id='panels-ipe-control-container' class='clearfix'>";
   $output .= "<div id='panels-ipe-control-$key' class='panels-ipe-control'>";
   $output .= "<div class='panels-ipe-startedit panels-ipe-pseudobutton panels-ipe-off'>";
   $output .= "<span>" . t('Customize this page') . "</span>";
   $output .= "</div>";
-  $output .= "<div class='panels-ipe-form-container panels-ipe-on clear-block'</div>";
+  $output .= "<div class='panels-ipe-form-container panels-ipe-on clearfix'</div>";
   $output .= "</div></div>";
   return $output;
 }

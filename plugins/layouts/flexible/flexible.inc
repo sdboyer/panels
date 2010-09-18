@@ -384,7 +384,7 @@ function theme_panels_flexible($vars) {
   // needs it
   $display->add_css = $css;
 
-  $output = "<div class=\"panel-flexible " . $renderer->base['canvas'] . " clear-block\" $renderer->id_str>\n";
+  $output = "<div class=\"panel-flexible " . $renderer->base['canvas'] . " clearfix\" $renderer->id_str>\n";
   $output .= "<div class=\"panel-flexible-inside " . $renderer->base['canvas'] . "-inside\">\n";
 
   $output .= panels_flexible_render_items($renderer, $settings['items']['canvas']['children'], $renderer->base['canvas']);
@@ -428,10 +428,10 @@ function theme_panels_flexible_admin($vars) {
       $output .= '<input type="submit" id="panels-flexible-reuse-layout" class="ctools-use-modal" value ="' .
         t('Reuse layout') . '">';
     }
-    $output .= "<div class=\"panel-flexible " . $renderer->base['canvas'] . " clear-block panel-flexible-admin panel-flexible-no-edit-layout\" $renderer->id_str>\n";
+    $output .= "<div class=\"panel-flexible " . $renderer->base['canvas'] . " clearfix panel-flexible-admin panel-flexible-no-edit-layout\" $renderer->id_str>\n";
   }
   else {
-    $output = "<div class=\"panel-flexible " . $renderer->base['canvas'] . " clear-block panel-flexible-admin panel-flexible-edit-layout\" $renderer->id_str>\n";
+    $output = "<div class=\"panel-flexible " . $renderer->base['canvas'] . " clearfix panel-flexible-admin panel-flexible-edit-layout\" $renderer->id_str>\n";
   }
   $output .= "<div class=\"panel-flexible-inside " . $renderer->base['canvas'] . "-inside \">\n";
 
@@ -540,7 +540,7 @@ function panels_flexible_render_item($renderer, $item, $content, $id, $position,
     $output .= ' ' . $base . '-last';
   }
   if ($clear) {
-    $output .= ' clear-block';
+    $output .= ' clearfix';
   }
 
   if (isset($item['class'])) {
@@ -561,7 +561,7 @@ function panels_flexible_render_item($renderer, $item, $content, $id, $position,
     $output .= ' ' . $base . '-inside-last';
   }
   if ($clear) {
-    $output .= ' clear-block';
+    $output .= ' clearfix';
   }
 
   $output .= "\">\n";
