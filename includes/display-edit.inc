@@ -234,14 +234,15 @@ function panels_edit_display_settings_form($form, &$form_state) {
       // We have to create a manual fieldset because fieldsets do not support IDs.
       // Use 'hidden' instead of 'markup' so that the process will run.
       // Add js for collapsible fieldsets manually
-      drupal_add_js('misc/collapse.js');
-      $form['display_title']['contexts_prefix'] = array(
-        '#type' => 'hidden',
-        '#id' => 'edit-display-substitutions',
-        '#prefix' => '<div><fieldset id="edit-display-substitutions" class="collapsed collapsible"><legend>' . t('Substitutions') . '</legend>',
-        '#process' => array('ctools_dependent_process'),
-        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
-      );
+//      drupal_add_js('misc/form.js');
+//      drupal_add_js('misc/collapse.js');
+//      $form['display_title']['contexts_prefix'] = array(
+//        '#type' => 'hidden',
+//        '#id' => 'edit-display-substitutions',
+//        '#prefix' => '<div><fieldset id="edit-display-substitutions" class="collapsed collapsible"><legend>' . t('Substitutions') . '</legend><div class="fieldset-wrapper">',
+//        '#process' => array('ctools_dependent_process'),
+//        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
+//      );
 
       $rows = array();
       foreach ($display->context as $context) {
@@ -255,11 +256,18 @@ function panels_edit_display_settings_form($form, &$form_state) {
 
       $header = array(t('Keyword'), t('Value'));
       $form['display_title']['contexts'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Substitutions'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
         '#value' => theme('table', array('header' => $header, 'rows' => $rows)),
+//        '#process' => array('form_process_fieldset', 'ctools_dependent_process'),
+//        '#id' => 'edit-display-title-context',
+//        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
       );
-      $form['display_title']['contexts_suffix'] = array(
-        '#value' => '</fieldset></div>',
-      );
+//      $form['display_title']['contexts_suffix'] = array(
+//        '#value' => '</div></fieldset></div>',
+//      );
     }
   }
 
