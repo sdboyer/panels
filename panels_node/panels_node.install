@@ -47,14 +47,12 @@ function panels_node_schema_1() {
  */
 function panels_node_install() {
   db_query("UPDATE {system} SET weight = 11 WHERE name = 'panels_node'");
-  drupal_install_schema('panels_node');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function panels_node_uninstall() {
-  // TODO: Delete all actual nodes that are panels_nodes.
   db_query("DELETE FROM {node} WHERE type = 'panel'");
   drupal_uninstall_schema('panels_node');
 }
