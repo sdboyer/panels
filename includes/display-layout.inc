@@ -33,7 +33,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
   // Examine $_POST to see which form they're currently using.
   if (empty($_POST) || empty($_POST['form_id']) || $_POST['form_id'] != 'panels_change_layout') {
     $output = drupal_build_form('panels_choose_layout', $form_state);
-    if (empty($output)) {
+    if (!empty($form_state['executed'])) {
       // upon submission go to next form.
       $change_form_state['layout'] = $_SESSION['layout'][$display->did] = $form_state['layout'];
       $change_form = TRUE;
@@ -46,7 +46,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
 
   if ($change_form) {
     $output = drupal_build_form('panels_change_layout', $change_form_state);
-    if (empty($output)) {
+    if (!empty($change_form_state['executed'])) {
       if (isset($change_form_state['back'])) {
         unset($_POST);
         return _panels_edit_layout($display, $finish, $destination, $allowed_layouts);
@@ -189,24 +189,19 @@ function panels_change_layout($form, &$form_state) {
   $old_layout = panels_get_layout($display->layout);
 
   $form['container'] = array(
-    '#prefix' => '<div class="change-layout-display">',
+    '#prefix' => '<div class="change-layout-display clearfix">',
     '#suffix' => '</div>',
   );
 
   $form['container']['old_layout'] = array(
-    '#value' => panels_print_layout_icon($display->layout, $old_layout, check_plain($old_layout['title'])),
+    '#markup' => panels_print_layout_icon($display->layout, $old_layout, check_plain($old_layout['title'])),
   );
 
   $form['container']['right_arrow'] = array(
-    '#value' => theme('image', array('path' => drupal_get_path('module', 'panels') . '/images/go-right.png')),
+    '#markup' => theme('image', array('path' => drupal_get_path('module', 'panels') . '/images/go-right.png')),
   );
   $form['container']['new_layout'] = array(
-    '#value' => panels_print_layout_icon($form_state['layout'], $new_layout, check_plain($new_layout['title'])),
-  );
-
-  $form['container-clearer'] = array(
-    // TODO: FIx this ot use clearfix instead
-    '#value' => '<div style="clear: both;"></div>',
+    '#markup' => panels_print_layout_icon($form_state['layout'], $new_layout, check_plain($new_layout['title'])),
   );
 
   $form['old'] = array(
@@ -219,7 +214,7 @@ function panels_change_layout($form, &$form_state) {
   if (empty($display->panels)) {
     $form['old'] = array(
       '#prefix' => '<div>',
-      '#value' => t('There is no content in the panel display. If there were content, you would be given an opportunity to select where in the new layout the old content would be placed. Select "Save" or "Continue" to proceed. This change will not be processed if you do not continue.'),
+      '#markup' => t('There is no content in the panel display. If there were content, you would be given an opportunity to select where in the new layout the old content would be placed. Select "Save" or "Continue" to proceed. This change will not be processed if you do not continue.'),
       '#suffix' => '</div>',
     );
   }

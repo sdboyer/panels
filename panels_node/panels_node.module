@@ -324,8 +324,6 @@ function panels_node_view($node, $view_mode) {
   $rendering[$node->nid] = TRUE;
   ctools_include('plugins', 'panels');
   if ($view_mode == 'teaser') {
-    // Do the standard view for teaser.
-    $node = node_prepare($node, $teaser);
     // Because our teasier is never the same as our content, *always* provide
     // the read more flag.
     $node->readmore = TRUE;

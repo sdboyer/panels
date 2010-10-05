@@ -66,7 +66,6 @@ function panels_mini_settings() {
  * Implementation of hook_block_list().
  */
 function panels_mini_block_info() {
-  dsm('test');
   // Safety: go away if CTools is not at an appropriate version.
   if (!defined('PANELS_REQUIRED_CTOOLS_API') || !module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return array();
@@ -79,7 +78,7 @@ function panels_mini_block_info() {
     if (empty($mini->disabled) && empty($mini->requiredcontext)) {
       $blocks[$panel_mini->name] = array(
         'info' => t('Mini panel: "@title"', array('@title' => $panel_mini->admin_title)),
-        'cache' => BLOCK_NO_CACHE,
+        'cache' => DRUPAL_NO_CACHE,
       );
     }
   }

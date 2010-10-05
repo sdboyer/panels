@@ -201,7 +201,6 @@ function panels_landing_page_basic_validate(&$form, &$form_state) {
  */
 function panels_landing_page_basic_submit(&$form, &$form_state) {
   $cache = &$form_state['wizard cache'];
-  dsm($form_state);
   $cache->name = $form_state['values']['name'];
   $cache->admin_title = $form_state['values']['admin_title'];
   $cache->admin_description = $form_state['values']['admin_description'];
