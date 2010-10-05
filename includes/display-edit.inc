@@ -126,6 +126,7 @@ function panels_edit_display_form($form, &$form_state) {
       '#attributes' => array('class' => array('use-ajax-submit')),
       '#id' => 'panels-live-preview-button',
       '#submit' => array('panels_edit_display_form_submit', 'panels_edit_display_form_preview'),
+      '#preview' => TRUE,
     );
   }
 

@@ -22,30 +22,26 @@ class panels_renderer_editor extends panels_renderer_standard {
       'display' => &$this->display,
       'renderer' => &$this,
       'content_types' => $this->cache->content_types,
-      're_render' => FALSE,
       'no_redirect' => TRUE,
       'display_title' => !empty($this->cache->display_title),
       'cache key' => $this->display->cache_key,
     );
 
     $output = drupal_build_form('panels_edit_display_form', $form_state);
-    if ($output) {
+    if (empty($form_state['executed']) || !empty($form_state['clicked_button']['preview'])) {
       return $output;
     }
 
-    // no output == submit
-    if (!$output) {
-      if (!empty($form_state['clicked_button']['#save-display'])) {
-        drupal_set_message(t('Panel content has been updated.'));
-        panels_save_display($this->display);
-      }
-      else {
-        drupal_set_message(t('Your changes have been discarded.'));
-      }
-
-      panels_cache_clear('display', $this->display->did);
-      return $this->display;
+    if (!empty($form_state['clicked_button']['#save-display'])) {
+      drupal_set_message(t('Panel content has been updated.'));
+      panels_save_display($this->display);
     }
+    else {
+      drupal_set_message(t('Your changes have been discarded.'));
+    }
+
+    panels_cache_clear('display', $this->display->did);
+    return $this->display;
   }
 
   function add_meta() {
