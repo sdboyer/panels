@@ -96,13 +96,6 @@ function panels_mini_schema_1() {
 }
 
 /**
- * Implementation of hook_install().
- */
-function panels_mini_install() {
-  drupal_install_schema('panels_mini');
-}
-
-/**
  * Implementation of hook_uninstall().
  */
 function panels_mini_uninstall() {
@@ -120,9 +113,6 @@ function panels_mini_uninstall() {
     // Delete all configured blocks.
     db_query("DELETE FROM {blocks} WHERE module = 'panels_mini' AND delta = %d", $panel_mini->pid);
   }
-
-  // Finally, delete all mini panels.
-  drupal_uninstall_schema('panels_mini');
 }
 
 /**

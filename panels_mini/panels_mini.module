@@ -32,79 +32,107 @@ function panels_mini_menu() {
   if (!defined('PANELS_REQUIRED_CTOOLS_API') || !module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return array();
   }
-  require_once drupal_get_path('module', 'panels_mini') . '/panels_mini.admin.inc';
-  return _panels_mini_menu();
+
+  $items['admin/structure/mini-panels/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'panels_mini_settings',
+    'access arguments' => array('create mini panels'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  // Also provide settings on the main panel UI
+  $items['admin/structure/panels/settings/panels-mini'] = array(
+    'title' => 'Mini panels',
+    'page callback' => 'panels_mini_settings',
+    'access arguments' => array('create mini panels'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Settings for mini panels.
+ */
+function panels_mini_settings() {
+  ctools_include('common', 'panels');
+  return drupal_get_form('panels_common_settings', 'panels_mini');
 }
 
 // ---------------------------------------------------------------------------
 // Allow the rest of the system access to mini panels
 
 /**
- * Implementation of hook_block().
- *
- * Expose qualifying mini panels to Drupal's block system.
+ * Implementation of hook_block_list().
  */
-function panels_mini_block($op = 'list', $delta = 0, $edit = array()) {
+function panels_mini_block_info() {
+  dsm('test');
   // Safety: go away if CTools is not at an appropriate version.
   if (!defined('PANELS_REQUIRED_CTOOLS_API') || !module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return array();
   }
 
-  if ($op == 'list') {
-    $blocks = array();
+  $blocks = array();
 
-    $minis = panels_mini_load_all();
-    foreach ($minis as $panel_mini) {
-      if (empty($mini->disabled) && empty($mini->requiredcontext)) {
-        $blocks[$panel_mini->name] = array(
-          'info' => t('Mini panel: "@title"', array('@title' => $panel_mini->admin_title)),
-          'cache' => BLOCK_NO_CACHE,
-        );
-      }
+  $minis = panels_mini_load_all();
+  foreach ($minis as $panel_mini) {
+    if (empty($mini->disabled) && empty($mini->requiredcontext)) {
+      $blocks[$panel_mini->name] = array(
+        'info' => t('Mini panel: "@title"', array('@title' => $panel_mini->admin_title)),
+        'cache' => BLOCK_NO_CACHE,
+      );
     }
-
-    return $blocks;
   }
-  elseif ($op == 'view') {
-    // static recursion protection.
-    static $viewing = array();
-    if (!empty($viewing[$delta])) {
-      return;
-    }
-    $viewing[$delta] = TRUE;
 
-    $panel_mini = panels_mini_load($delta);
-    if (empty($panel_mini)) {
-      // Bail out early if the specified mini panel doesn't exist.
-      return;
-    }
+  return $blocks;
+}
 
-    ctools_include('context');
-    $panel_mini->context = $panel_mini->display->context = ctools_context_load_contexts($panel_mini);
-    $panel_mini->display->css_id = panels_mini_get_id($panel_mini->name);
-
-    $block = array();
-
-    $block['content'] = panels_render_display($panel_mini->display);
-    $block['subject'] = $panel_mini->display->get_title();
-
-    unset($viewing[$delta]);
-    return $block;
+/**
+ * Implementation of hook_block_view().
+ */
+function panels_mini_block_view($delta = 0) {
+  // static recursion protection.
+  static $viewing = array();
+  if (!empty($viewing[$delta])) {
+    return;
   }
-  elseif ($op = 'configure') {
-    return array(
-      'admin-shortcut' => array(
-        '#value' => l(t('Manage this mini-panel'), 'admin/structure/panel-mini/' . $delta . '/edit-general')
-      ),
-    );
+  $viewing[$delta] = TRUE;
+
+  $panel_mini = panels_mini_load($delta);
+  if (empty($panel_mini)) {
+    // Bail out early if the specified mini panel doesn't exist.
+    return;
   }
+
+  ctools_include('context');
+  $panel_mini->context = $panel_mini->display->context = ctools_context_load_contexts($panel_mini);
+  $panel_mini->display->css_id = panels_mini_get_id($panel_mini->name);
+
+  $block = array();
+
+  $block['content'] = panels_render_display($panel_mini->display);
+  $block['subject'] = $panel_mini->display->get_title();
+
+  unset($viewing[$delta]);
+  return $block;
+}
+
+/**
+ * Implementation of hook_block_configure().
+ */
+function panels_mini_block_configure($delta = 0) {
+  return array(
+    'admin-shortcut' => array(
+      '#value' => l(t('Manage this mini-panel'), 'admin/structure/mini-panels/' . $delta . '/edit')
+    ),
+  );
 }
 
 /**
  * Statically store all used IDs to ensure all mini panels get a unique id.
  */
 function panels_mini_get_id($name) {
-  static $id_cache = array();
+  $id_cache = &drupal_static(__FUNCTION__, array());
 
   $id = 'mini-panel-' . $name;
   if (!empty($id_cache[$name])) {
@@ -132,7 +160,7 @@ function panels_mini_new($set_defaults = TRUE) {
  * Load a single mini panel.
  */
 function panels_mini_load($name) {
-  $cache = &ctools_static('panels_mini_load_all', array());
+  $cache = &drupal_static('panels_mini_load_all', array());
 
   // We use array_key_exists because failed loads will be NULL and
   // isset() will try to load it again.
@@ -165,7 +193,7 @@ function panels_mini_load($name) {
  * Load all mini panels.
  */
 function panels_mini_load_all($reset = FALSE) {
-  $cache = &ctools_static('panels_mini_load_all', array());
+  $cache = &drupal_static('panels_mini_load_all', array());
   static $all_loaded = FALSE;
 
   // We check our own private static because individual minis could have
@@ -205,7 +233,6 @@ function panels_mini_load_all($reset = FALSE) {
       }
       $cache[$dids[$did]]->display = $display;
     }
-    return $result[$name];
   }
 
   return $cache;
@@ -230,9 +257,17 @@ function panels_mini_save(&$mini) {
  * Remove a mini panel.
  */
 function panels_mini_delete($mini) {
-  db_query("DELETE FROM {panels_mini} WHERE name = '%s'", $mini->name);
+  db_delete('panels_mini')
+    ->condition('name', $mini->name)
+    ->execute();
+
   if ($mini->type != t('Overridden')) {
+    // Also remove from blocks table as long as there isn't a default that may appear.
     db_query("DELETE FROM {blocks} WHERE module = 'panels_mini' AND delta = '%s'", $mini->name);
+    db_delete('blocks')
+      ->condition('delta', $mini->name)
+      ->condition('module', 'panels_mini')
+      ->execute();
   }
   return panels_delete_display($mini->did);
 }
@@ -347,17 +382,6 @@ function panels_mini_panels_cache_break_lock($key, $cache) {
 }
 
 /**
- * Alter default mini panels to ensure they have new fields and avoid warnings.
- */
-function panels_mini_default_panels_mini_alter(&$minis) {
-  foreach ($minis as $name => $mini) {
-    if (!isset($mini->admin_description)) {
-      $minis[$name]->admin_description = '';
-    }
-  }
-}
-
-/**
  * Implementation of hook_panels_dashboard_blocks().
  *
  * Adds mini panels information to the Panels dashboard.
@@ -405,24 +429,4 @@ function panels_mini_panels_dashboard_blocks(&$vars) {
     'section' => 'left',
   );
 
-}
-
-/**
- * Implementation of hook_ctools_plugin_directory() to let the system know
- * we implement task and task_handler plugins.
- */
-function panels_mini_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'ctools' && $plugin == 'content_types') {
-    return 'plugins/' . $plugin;
-  }
-}
-
-function panels_mini_panels_mini_list() {
-  $all_panels = panels_mini_load_all();
-  $list = array();
-
-  foreach ($all_panels as $name => $panel) {
-    $list[$name] = check_plain($name) . ' (' . check_plain($panel->title) . ')';
-  }
-  return $list;
 }
