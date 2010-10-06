@@ -481,10 +481,16 @@ Drupal.behaviors.PanelsDisplayEditor = {
       .addClass('panels-preview-processed')
       .click(function () {
         if (!$('#panels-preview').size()) {
-          $('#panels-dnd-main').parents('form').after('<div id="panels-preview"></div>');
+          $('#panels-dnd-main').parents('form').after('<div id="panels-preview" class="clearfix"></div>');
         }
+        var html = '';
+        html += '  <div id="modal-throbber">';
+        html += '    <div class="modal-throbber-wrapper">';
+        html +=        Drupal.settings.CToolsModal.throbber;
+        html += '    </div>';
+        html += '  </div>';
 
-        $('#panels-preview').html(Drupal.theme('CToolsModalThrobber'));
+        $('#panels-preview').html(html);
       });
 
     var setTitleClass = function () {
@@ -512,7 +518,7 @@ $(function() {
   /**
    * AJAX responder command to render the preview.
    */
-  Drupal.ajax.prototype.commands.panel_preview = function(command) {
+  Drupal.ajax.prototype.commands.panel_preview = function(ajax, command, status) {
     $('#panels-preview').html(command.output);
   }
 });
