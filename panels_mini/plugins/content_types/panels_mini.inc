@@ -112,8 +112,9 @@ function panels_mini_panels_mini_content_type_render($subtype, $conf, $panel_arg
 /**
  * Edit form for the mini panel content type.
  */
-function panels_mini_panels_mini_content_type_edit_form(&$form, &$form_state) {
+function panels_mini_panels_mini_content_type_edit_form($form, &$form_state) {
   // Empty form to ensure we have the override title + context gadgets.
+  return $form;
 }
 
 /**

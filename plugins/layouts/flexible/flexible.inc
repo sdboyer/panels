@@ -421,11 +421,11 @@ function theme_panels_flexible_admin($vars) {
   drupal_add_css($css, 'inline');
 
   if (empty($display->editing_layout)) {
-    $output = '<input type="submit" id="panels-flexible-toggle-layout" value ="' .
+    $output = '<input type="submit" id="panels-flexible-toggle-layout" class="form-submit" value ="' .
       t('Show layout designer') . '">';
     if (user_access('administer panels layouts')) {
       $output .= '<input type="hidden" class="panels-flexible-reuse-layout-url" value="' . url($handler->get_url('layout', 'reuse'), array('absolute' => TRUE)) . '">';
-      $output .= '<input type="submit" id="panels-flexible-reuse-layout" class="ctools-use-modal" value ="' .
+      $output .= '<input type="submit" id="panels-flexible-reuse-layout" class="form-submit ctools-use-modal" value ="' .
         t('Reuse layout') . '">';
     }
     $output .= "<div class=\"panel-flexible " . $renderer->base['canvas'] . " clearfix panel-flexible-admin panel-flexible-no-edit-layout\" $renderer->id_str>\n";
