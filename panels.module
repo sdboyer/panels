@@ -902,7 +902,7 @@ function panels_save_display(&$display) {
     $display->panels[$id] = $new_panes;
   }
   if (!empty($pids)) {
-    db_delete('panels_pane')->condition('pid', $pids);
+    db_delete('panels_pane')->condition('pid', $pids)->execute();
   }
 
   // Clear any cached content for this display.
@@ -935,8 +935,8 @@ function panels_delete_display($display) {
   else {
     $did = $display;
   }
-  db_delete('panels_display')->condition('did', $did);
-  db_delete('panels_pane')->condition('did', $did);
+  db_delete('panels_display')->condition('did', $did)->execute();
+  db_delete('panels_pane')->condition('did', $did)->execute();
 }
 
 /**
