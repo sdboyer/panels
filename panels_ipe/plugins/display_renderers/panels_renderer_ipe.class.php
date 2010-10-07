@@ -43,7 +43,13 @@ class panels_renderer_ipe extends panels_renderer_editor {
     drupal_add_js(array('PanelsIPECacheKeys' => array($this->clean_key)), 'setting');
     drupal_add_js(array('PanelsIPESettings' => array($this->clean_key => $settings)), 'setting');
 
-    jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
+    drupal_add_library('system', 'ui.draggable');
+    drupal_add_library('system', 'ui.droppable');
+    drupal_add_library('system', 'ui.sortable');
+//    drupal_add_js('misc/ui/jquery.ui.draggable.min.js');
+//    drupal_add_js('misc/ui/jquery.ui.droppable.min.js');
+//    drupal_add_js('misc/ui/jquery.ui.sortable.min.js');
+//    jquery_ui_add(array('ui.draggable', 'ui.droppable', 'ui.sortable'));
     parent::add_meta();
   }
 
@@ -95,7 +101,7 @@ class panels_renderer_ipe extends panels_renderer_editor {
    */
   function render_region($region_id, $panes) {
     // Generate this region's 'empty' placeholder pane from the IPE plugin.
-    $empty_ph = theme('panels_ipe_placeholder_pane', array('region_id' => $region_id, 'region_title' => $this->plugins['layout']['panels'][$region_id]));
+    $empty_ph = theme('panels_ipe_placeholder_pane', array('region_id' => $region_id, 'region_title' => $this->plugins['layout']['regions'][$region_id]));
 
     // Wrap the placeholder in some guaranteed markup.
     $panes['empty_placeholder'] = '<div class="panels-ipe-placeholder panels-ipe-on panels-ipe-portlet-marker panels-ipe-portlet-static">' . $empty_ph . "</div>";
@@ -146,18 +152,18 @@ class panels_renderer_ipe extends panels_renderer_editor {
     );
 
     $output = drupal_build_form('panels_ipe_edit_control_form', $form_state);
-    if ($output) {
+    if (empty($form_state['executed'])) {
       // At this point, we want to save the cache to ensure that we have a lock.
       panels_edit_cache_set($this->cache);
       $this->commands[] = array(
         'command' => 'initIPE',
         'key' => $this->clean_key,
-        'data' => $output,
+        'data' => drupal_render($output),
       );
       return;
     }
 
-    // no output == submit
+    // Otherwise it was submitted.
     if (!empty($form_state['clicked_button']['#save-display'])) {
       // Saved. Save the cache.
       panels_edit_cache_save($this->cache);
@@ -185,8 +191,8 @@ class panels_renderer_ipe extends panels_renderer_editor {
       $pane = $this->display->content[$pid];
     }
 
-    $this->commands[] = ctools_ajax_command_replace("#panels-ipe-paneid-$pane->pid", $this->render_pane($pane));
-    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->clean_key}");
+    $this->commands[] = ajax_command_replace("#panels-ipe-paneid-$pane->pid", $this->render_pane($pane));
+    $this->commands[] = ajax_command_changed("#panels-ipe-display-{$this->clean_key}");
   }
 
   /**
@@ -202,15 +208,15 @@ class panels_renderer_ipe extends panels_renderer_editor {
 
     ctools_include('cleanstring');
     $region_id = ctools_cleanstring($pane->panel);
-    $this->commands[] = ctools_ajax_command_append("#panels-ipe-regionid-$region_id div.panels-ipe-sort-container", $this->render_pane($pane));
-    $this->commands[] = ctools_ajax_command_changed("#panels-ipe-display-{$this->clean_key}");
+    $this->commands[] = ajax_command_append("#panels-ipe-regionid-$region_id div.panels-ipe-sort-container", $this->render_pane($pane));
+    $this->commands[] = ajax_command_changed("#panels-ipe-display-{$this->clean_key}");
   }
 }
 
 /**
  * FAPI callback to create the Save/Cancel form for the IPE.
  */
-function panels_ipe_edit_control_form(&$form_state) {
+function panels_ipe_edit_control_form($form, &$form_state) {
   $display = &$form_state['display'];
   // @todo -- this should be unnecessary as we ensure cache_key is set in add_meta()
 //  $display->cache_key = isset($display->cache_key) ? $display->cache_key : $display->did;
@@ -246,6 +252,7 @@ function panels_ipe_edit_control_form(&$form_state) {
   );
   $form['buttons']['cancel'] = array(
     '#type' => 'submit',
+    '#id' => 'panels-ipe-cancel',
     '#value' => t('Cancel'),
   );
   return $form;

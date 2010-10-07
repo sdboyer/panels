@@ -27,37 +27,9 @@ $(function() {
   });
 });
 
-Drupal.behaviors.PanelsIPE = function(context) {
-  Drupal.PanelsIPE.bindClickDelete(context);
-};
-
-Drupal.CTools.AJAX.commands.initIPE = function(data) {
-  if (Drupal.PanelsIPE.editors[data.key]) {
-    Drupal.PanelsIPE.editors[data.key].initEditing(data.data);
-  }
-};
-
-Drupal.CTools.AJAX.commands.unlockIPE = function(data) {
-  if (confirm(data.message)) {
-    var ajaxOptions = {
-      type: "POST",
-      url: data.break_path,
-      data: { 'js': 1 },
-      global: true,
-      success: Drupal.CTools.AJAX.respond,
-      error: function(xhr) {
-        Drupal.CTools.AJAX.handleErrors(xhr, ipe.cfg.formPath);
-      },
-      dataType: 'json'
-    };
-
-    $.ajax(ajaxOptions);
-  };
-};
-
-Drupal.CTools.AJAX.commands.endIPE = function(data) {
-  if (Drupal.PanelsIPE.editors[data.key]) {
-    Drupal.PanelsIPE.editors[data.key].endEditing(data);
+Drupal.behaviors.PanelsIPE = {
+  attach: function(context) {
+    Drupal.PanelsIPE.bindClickDelete(context);
   }
 };
 
@@ -114,37 +86,28 @@ function DrupalPanelsIPE(cache_key, cfg) {
     });
 
     $('.panels-ipe-form-container', ipe.control).append(formdata);
-    // bind ajax submit to the form
-    $('form', ipe.control).submit(function(event) {
-      url = $(this).attr('action');
-      try {
-        var ajaxOptions = {
-          type: 'POST',
-          url: url,
-          data: { 'js': 1 },
-          global: true,
-          success: Drupal.CTools.AJAX.respond,
-          error: function(xhr) {
-            Drupal.CTools.AJAX.handleErrors(xhr, url);
-          },
-          dataType: 'json'
-        };
-        $(this).ajaxSubmit(ajaxOptions);
-      }
-      catch (err) {
-        alert("An error occurred while attempting to process " + url);
-        return false;
-      }
-      return false;
-    });
 
-    $('input:submit', ipe.control).each(function() {
-      if ($(this).val() == 'Save') {
-        $(this).click(ipe.saveEditing);
-      };
-      if ($(this).val() == 'Cancel') {
-        $(this).click(ipe.cancelEditing);
-      };
+    $('input:submit:not(.ajax-processed)', ipe.control).addClass('ajax-processed').each(function() {
+      var element_settings = {};
+
+      element_settings.url = $(this.form).attr('action');
+      element_settings.setClick = true;
+      element_settings.event = 'click';
+      element_settings.progress = { 'type': 'throbber' };
+
+      var base = $(this).attr('id');
+      Drupal.ajax[base] = new Drupal.ajax(base, this, element_settings);
+      if ($(this).attr('id') == 'panels-ipe-save') {
+        Drupal.ajax[base].options.beforeSerialize = function (element_settings, options) {
+          ipe.saveEditing();
+          return Drupal.ajax[base].beforeSerialize(element_settings, options);
+        };
+      }
+      if ($(this).attr('id') == 'panels-ipe-cancel') {
+        Drupal.ajax[base].options.beforeSend = function () {
+          return ipe.cancelEditing();
+        };
+      }
     });
 
     // Perform visual effects in a particular sequence.
@@ -168,9 +131,6 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.saveEditing = function() {
-    // Put our button in.
-    this.form.clk = this;
-
     $('div.panels-ipe-region', ipe.topParent).each(function() {
       var val = '';
       var region = $(this).attr('id').split('panels-ipe-regionid-')[1];
@@ -183,14 +143,11 @@ function DrupalPanelsIPE(cache_key, cfg) {
           val += id;
         }
       });
-      $('input#edit-panel-pane-' + region, ipe.control).val(val);
+      $('input[name="panel[pane][' +  region + ']"]', ipe.control).val(val);
     });
   }
 
   this.cancelEditing = function() {
-    // Put our button in.
-    this.form.clk = this;
-
     if (ipe.topParent.hasClass('changed')) {
       ipe.changed = true;
     }
@@ -233,9 +190,20 @@ function DrupalPanelsIPE(cache_key, cfg) {
 
   this.createSortContainers();
 
+  var element_settings = {
+    url: ipe.cfg.formPath,
+    event: 'click',
+    keypress: false,
+    // No throbber at all.
+    progress: { 'type': 'none' }
+  };
+
+  Drupal.ajax['ipe-ajax'] = new Drupal.ajax('ipe-ajax', $('div.panels-ipe-startedit', this.control).get(0), element_settings);
+
+/*
   var ajaxOptions = {
     type: "POST",
-    url: ipe.cfg.formPath,
+    url: ,
     data: { 'js': 1 },
     global: true,
     success: Drupal.CTools.AJAX.respond,
@@ -249,6 +217,41 @@ function DrupalPanelsIPE(cache_key, cfg) {
     var $this = $(this);
     $.ajax(ajaxOptions);
   });
+  */
 };
+
+$(function() {
+  Drupal.ajax.prototype.commands.initIPE = function(ajax, data, status) {
+    if (Drupal.PanelsIPE.editors[data.key]) {
+      Drupal.PanelsIPE.editors[data.key].initEditing(data.data);
+    }
+  };
+
+  Drupal.ajax.prototype.commands.unlockIPE = function(ajax, data, status) {
+    if (confirm(data.message)) {
+      var ajaxOptions = {
+        type: "POST",
+        url: data.break_path,
+        data: { 'js': 1 },
+        global: true,
+        success: Drupal.CTools.AJAX.respond,
+        error: function(xhr) {
+          Drupal.CTools.AJAX.handleErrors(xhr, ipe.cfg.formPath);
+        },
+        dataType: 'json'
+      };
+
+      $.ajax(ajaxOptions);
+    };
+  };
+
+  Drupal.ajax.prototype.commands.endIPE = function(ajax, data, status) {
+    if (Drupal.PanelsIPE.editors[data.key]) {
+      Drupal.PanelsIPE.editors[data.key].endEditing(data);
+    }
+  };
+
+
+});
 
 })(jQuery);

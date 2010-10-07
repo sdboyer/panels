@@ -406,11 +406,6 @@ function panels_get_renderer_handler($plugin, &$display) {
  * Choose a renderer for a display based on a render pipeline setting.
  */
 function panels_get_renderer($pipeline_name, &$display) {
-  // If operating in legacy mode, only the legacy renderer is available:
-  if (variable_get('panels_legacy_rendering_mode', TRUE)) {
-    return panels_get_renderer_handler('legacy', $display);
-  }
-
   // Load the pipeline
   ctools_include('export');
   $pipeline = ctools_export_crud_load('panels_renderer_pipeline', $pipeline_name);
@@ -468,11 +463,6 @@ function _panels_renderer_pipeline_sort($a, $b) {
  * sorting. Descriptions are left in.
  */
 function panels_get_renderer_pipelines($sort = TRUE) {
-  // If operating in legacy mode, only the legacy renderer is available:
-  if (variable_get('panels_legacy_rendering_mode', TRUE)) {
-    return array();
-  }
-
   ctools_include('export');
   $pipelines = ctools_export_crud_load_all('panels_renderer_pipeline');
   if ($sort) {

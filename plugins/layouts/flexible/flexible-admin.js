@@ -382,7 +382,7 @@ $(function() {
    * Provide an AJAX response command to fix the first/last bits of a
    * group.
    */
-  Drupal.ajax.prototype.flexible_fix_firstlast = function(ajax, data, status) {
+  Drupal.ajax.prototype.commands.flexible_fix_firstlast = function(ajax, data, status) {
     $(data.selector + ' > div > .' + data.base)
       .removeClass(data.base + '-first')
       .removeClass(data.base + '-last');

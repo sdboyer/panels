@@ -279,11 +279,6 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   // With an argument, this actually sets the display.
   panels_get_current_page_display($display);
 
-  // Handle backward compatibility with the IPE checkbox.
-  if (empty($handler->conf['pipeline'])) {
-    $handler->conf['pipeline'] = !empty($handler->conf['use_ipe']) ? 'ipe' : 'standard';
-  }
-
   $renderer = panels_get_renderer($handler->conf['pipeline'], $display);
 
   $info = array(

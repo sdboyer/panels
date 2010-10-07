@@ -141,7 +141,7 @@ function panels_ipe_get_cache_key($key = NULL) {
  *
  * @param unknown_type $main
  */
-function panels_ipe_footer($main = 0) {
+function panels_ipe_page_alter(&$page) {
   $key = panels_ipe_get_cache_key();
   if (!isset($key)) {
     return;
@@ -155,5 +155,8 @@ function panels_ipe_footer($main = 0) {
   $output .= "</div>";
   $output .= "<div class='panels-ipe-form-container panels-ipe-on clearfix'</div>";
   $output .= "</div></div>";
-  return $output;
+
+  $page['page_bottom']['panels_ipe'] = array(
+    '#markup' => $output,
+  );
 }
