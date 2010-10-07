@@ -1028,7 +1028,7 @@ function panels_ajax_flexible_edit_settings($handler, $id) {
         $css['.' . $renderer->base['canvas']] = array('width' => 'auto');
       }
       foreach ($css as $selector => $data) {
-        $output[] = ctools_ajax_command_css($selector, $data);
+        $output[] = ajax_command_css($selector, $data);
       }
     }
 
@@ -1377,7 +1377,7 @@ function panels_ajax_flexible_edit_add($handler, $id, $location = 'left') {
       $output[] = ajax_command_html($sibling_width, $settings['items'][$form_state['sibling']]['width']);
     }
     foreach ($css as $selector => $data) {
-      $output[] = ctools_ajax_command_css($selector, $data);
+      $output[] = ajax_command_css($selector, $data);
     }
 
     // Rerender our parent item links:
@@ -1613,7 +1613,7 @@ function panels_ajax_flexible_edit_remove($handler, $id) {
     $css = array();
     panels_flexible_get_css_group($css, $renderer, $siblings, $parent_class, $item['type'], $item['parent']);
     foreach ($css as $selector => $data) {
-      $output[] = ctools_ajax_command_css($selector, $data);
+      $output[] = ajax_command_css($selector, $data);
     }
   }
 
