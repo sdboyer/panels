@@ -171,13 +171,13 @@ class panels_renderer_editor extends panels_renderer_standard {
 
     $style_links[] = array(
       'title' => $style_title,
-      'attributes' => array('class' => 'panels-text'),
+      'attributes' => array('class' => array('panels-text')),
     );
 
     $style_links[] = array(
       'title' => t('Change'),
       'href' => $this->get_url('style-type', $type, $id),
-      'attributes' => array('class' => 'ctools-use-modal'),
+      'attributes' => array('class' => array('ctools-use-modal')),
     );
 
     $function = $type != 'pane' ? 'settings form' : 'pane settings form';
@@ -185,7 +185,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       $style_links[] = array(
         'title' => t('Settings'),
         'href' => $this->get_url('style-settings', $type, $id),
-        'attributes' => array('class' => 'ctools-use-modal'),
+        'attributes' => array('class' => array('ctools-use-modal')),
       );
     }
 
@@ -203,7 +203,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     $links[] = array(
       'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links(array('links' => $style_links, 'attributes' => array(), 'heading' => array())),
       'html' => TRUE,
-      'attributes' => array('class' => 'panels-sub-menu'),
+      'attributes' => array('class' => array('panels-sub-menu')),
     );
 
     if (user_access('use panels caching features')) {
@@ -218,25 +218,25 @@ class panels_renderer_editor extends panels_renderer_standard {
 
       $cache_links[] = array(
         'title' => $cache_method,
-        'attributes' => array('class' => 'panels-text'),
+        'attributes' => array('class' => array('panels-text')),
       );
       $cache_links[] = array(
         'title' => t('Change'),
         'href' => $this->get_url('cache-method', 'display'),
-        'attributes' => array('class' => 'ctools-use-modal'),
+        'attributes' => array('class' => array('ctools-use-modal')),
       );
       if (panels_plugin_get_function('cache', $info, 'settings form')) {
         $cache_links[] = array(
           'title' => t('Settings'),
           'href' => $this->get_url('cache-settings', 'display'),
-          'attributes' => array('class' => 'ctools-use-modal'),
+          'attributes' => array('class' => array('ctools-use-modal')),
         );
       }
 
       $links[] = array(
         'title' => '<span class="dropdown-header">' . t('Caching') . '</span>' . theme_links(array('links' => $cache_links, 'attributes' => array(), 'heading' => array())),
         'html' => TRUE,
-        'attributes' => array('class' => 'panels-sub-menu'),
+        'attributes' => array('class' => array('panels-sub-menu')),
       );
     }
 
@@ -252,7 +252,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       'title' => t('Add content'),
       'href' => $this->get_url('select-content', $region_id),
       'attributes' => array(
-        'class' => 'ctools-use-modal',
+        'class' => array('ctools-use-modal'),
       ),
     );
 
@@ -266,7 +266,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     $links[] = array(
       'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links(array('links' => $style_links, 'attributes' => array(), 'heading' => array())),
       'html' => TRUE,
-      'attributes' => array('class' => 'panels-sub-menu'),
+      'attributes' => array('class' => array('panels-sub-menu')),
     );
 
     return theme('ctools_dropdown', array('title' => theme('image', array('path' => ctools_image_path('icon-addcontent.png', 'panels'))), 'links' => $links, 'image' => TRUE, 'class' => 'pane-add-link panels-region-links-' . $region_id));
@@ -282,14 +282,14 @@ class panels_renderer_editor extends panels_renderer_standard {
       $links[] = array(
         'title' => t('Disable this pane'),
         'href' => $this->get_url('hide', $pane->pid),
-        'attributes' => array('class' => 'use-ajax'),
+        'attributes' => array('class' => array('use-ajax')),
       );
     }
     else {
       $links[] = array(
         'title' => t('Enable this pane'),
         'href' => $this->get_url('show', $pane->pid),
-        'attributes' => array('class' => 'use-ajax'),
+        'attributes' => array('class' => array('use-ajax')),
       );
     }
 
@@ -303,7 +303,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       $links['panels-set-title'] = array(
         'title' => t('Panel title'),
         'href' => $this->get_url('panel-title', $pane->pid),
-        'attributes' => array('class' => 'use-ajax'),
+        'attributes' => array('class' => array('use-ajax')),
       );
     }
 
@@ -313,7 +313,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       $links[] = array(
         'title' => isset($content_type['edit text']) ? $content_type['edit text'] : t('Settings'),
         'href' => $this->get_url('edit-pane', $pane->pid),
-        'attributes' => array('class' => 'ctools-use-modal'),
+        'attributes' => array('class' => array('ctools-use-modal')),
       );
     }
 
@@ -321,7 +321,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       $links[] = array(
         'title' => t('CSS properties'),
         'href' => $this->get_url('pane-css', $pane->pid),
-        'attributes' => array('class' => 'ctools-use-modal'),
+        'attributes' => array('class' => array('ctools-use-modal')),
       );
     }
 
@@ -335,7 +335,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     $links[] = array(
       'title' => '<span class="dropdown-header">' . t('Style') . '</span>' . theme_links(array('links' => $style_links, 'attributes' => array(), 'heading' => array())),
       'html' => TRUE,
-      'attributes' => array('class' => 'panels-sub-menu'),
+      'attributes' => array('class' => array('panels-sub-menu')),
     );
 
     if (user_access('administer pane access')) {
@@ -361,33 +361,33 @@ class panels_renderer_editor extends panels_renderer_standard {
           $visibility_links[] = array(
             'title' => $access_description,
             'href' => $this->get_url('access-configure-test', $pane->pid, $id),
-            'attributes' => array('class' => 'ctools-use-modal panels-italic'),
+            'attributes' => array('class' => array('ctools-use-modal', 'panels-italic')),
           );
         }
       }
       if (empty($visibility_links)) {
         $visibility_links[] = array(
           'title' => t('No rules'),
-          'attributes' => array('class' => 'panels-text'),
+          'attributes' => array('class' => array('panels-text')),
         );
       }
 
       $visibility_links[] = array(
         'title' => t('Add new rule'),
         'href' => $this->get_url('access-add-test', $pane->pid),
-        'attributes' => array('class' => 'ctools-use-modal'),
+        'attributes' => array('class' => array('ctools-use-modal')),
       );
 
       $visibility_links[] = array(
         'title' => t('Settings'),
         'href' => $this->get_url('access-settings', $pane->pid),
-        'attributes' => array('class' => 'ctools-use-modal'),
+        'attributes' => array('class' => array('ctools-use-modal')),
       );
 
       $links[] = array(
         'title' => '<span class="dropdown-header">' . t('Visibility rules') . '</span>' . theme_links(array('links' => $visibility_links, 'attributes' => array(), 'heading' => array())),
         'html' => TRUE,
-        'attributes' => array('class' => 'panels-sub-menu'),
+        'attributes' => array('class' => array('panels-sub-menu')),
       );
     }
 
@@ -402,25 +402,25 @@ class panels_renderer_editor extends panels_renderer_standard {
       $cache_method = isset($info['title']) ? $info['title'] : t('No caching');
       $cache_links[] = array(
         'title' => $cache_method,
-        'attributes' => array('class' => 'panels-text'),
+        'attributes' => array('class' => array('panels-text')),
       );
       $cache_links[] = array(
         'title' => t('Change'),
         'href' => $this->get_url('cache-method', $pane->pid),
-        'attributes' => array('class' => 'ctools-use-modal'),
+        'attributes' => array('class' => array('ctools-use-modal')),
       );
       if (panels_plugin_get_function('cache', $info, 'settings form')) {
         $cache_links[] = array(
           'title' => t('Settings'),
           'href' => $this->get_url('cache-settings', $pane->pid),
-          'attributes' => array('class' => 'ctools-use-modal'),
+          'attributes' => array('class' => array('ctools-use-modal')),
         );
       }
 
       $links[] = array(
         'title' => '<span class="dropdown-header">' . t('Caching') . '</span>' . theme_links(array('links' => $cache_links, 'attributes' => array(), 'heading' => array())),
         'html' => TRUE,
-        'attributes' => array('class' => 'panels-sub-menu'),
+        'attributes' => array('class' => array('panels-sub-menu')),
       );
     }
 
@@ -433,7 +433,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       'title' => t('Remove'),
       'href' => '#',
       'attributes' => array(
-        'class' => 'pane-delete',
+        'class' => array('pane-delete'),
         'id' => "pane-delete-panel-pane-$pane->pid",
       ),
     );
@@ -849,7 +849,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_cache_method_form', $form_state);
-    if (!empty($output)) {
+    if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
     }
@@ -923,7 +923,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_cache_settings_form', $form_state);
-    if (!empty($output)) {
+    if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
     }
@@ -992,7 +992,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_style_type_form', $form_state);
-    if (!empty($output)) {
+    if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
     }
@@ -1172,7 +1172,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_style_settings_form', $form_state);
-    if (!empty($output)) {
+    if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
     }
@@ -1219,7 +1219,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_configure_pane_css_form', $form_state);
-    if (!empty($output)) {
+    if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
     }
@@ -1251,7 +1251,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_configure_access_settings_form', $form_state);
-    if (!empty($output)) {
+    if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
     }
@@ -1280,7 +1280,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_add_access_test_form', $form_state);
-    if (empty($output)) {
+    if (empty($form_state['executed'])) {
       // Set up the plugin in cache
       $plugin = ctools_get_access_plugin($form_state['values']['type']);
       $this->cache->new_plugin = ctools_access_new_test($plugin);
@@ -1330,7 +1330,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_configure_access_test_form', $form_state);
-    if (!empty($output)) {
+    if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
     }
