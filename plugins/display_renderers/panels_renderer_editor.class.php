@@ -1280,7 +1280,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_add_access_test_form', $form_state);
-    if (empty($form_state['executed'])) {
+    if (!empty($form_state['executed'])) {
       // Set up the plugin in cache
       $plugin = ctools_get_access_plugin($form_state['values']['type']);
       $this->cache->new_plugin = ctools_access_new_test($plugin);
@@ -1290,8 +1290,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       return $this->ajax_access_configure_test($pid, 'add');
     }
 
-    print ajax_render($output);
-    ajax_footer();
+    $this->commands = $output;
   }
 
   /**
@@ -1830,7 +1829,7 @@ function panels_edit_configure_access_test_form($form, &$form_state) {
 
   $form['settings'] = array('#tree' => TRUE);
   if ($function = ctools_plugin_get_function($plugin, 'settings form')) {
-    $function($form, $form_state, $test['settings']);
+    $form = $function($form, $form_state, $test['settings']);
   }
 
   $form['not'] = array(
