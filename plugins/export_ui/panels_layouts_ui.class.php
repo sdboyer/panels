@@ -12,7 +12,7 @@ class panels_layouts_ui extends ctools_export_ui {
     }
 
     // Change the item to a tab on the Panels page.
-    $this->plugin['menu']['items']['list callback']['type'] = MENU_LOCAL_TASK;
+    $this->plugin['menu']['items']['list callback']['type'] = MENU_LOCAL_ACTION;
 
     // Establish a base for adding plugins
     $base = $this->plugin['menu']['items']['add'];

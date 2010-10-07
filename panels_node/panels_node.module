@@ -314,6 +314,14 @@ function panels_node_update($node) {
  * Implementation of hook_view().
  */
 function panels_node_view($node, $view_mode) {
+  // Because we have the module 'panels' and the module 'panels_node'
+  // and because Drupal has hook_view and hook_node_view, this
+  // erroneously gets run for 'panels' hook 'node_view'. We detect
+  // this because the arguments are slightly different.
+  if (count(func_get_args()) != 4) {
+    return;
+  }
+
   static $rendering = array();
 
   // Prevent loops if someone foolishly puts the node inside itself:
@@ -336,7 +344,7 @@ function panels_node_view($node, $view_mode) {
       $display->context = panels_node_get_context($node);
       $renderer = panels_get_renderer($node->panels_node['pipeline'], $display);
       $node->content['body'] = array(
-        '#value' => panels_render_display($display, $renderer),
+        '#markup' => panels_render_display($display, $renderer),
         '#weight' => 0,
       );
     }

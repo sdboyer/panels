@@ -1147,9 +1147,47 @@ function panels_get_current_page_display($change = NULL) {
  * Clean up the panel pane variables for the template.
  */
 function template_preprocess_panels_pane(&$vars) {
-  // Make a copy of the original content as we are overwriting the
-  // named variable.
-  $vars['output'] = $content = $vars['content'];
+  $content = &$vars['content'];
+
+  $vars['contextual_links'] = array();
+  $vars['classes_array'] = array();
+  $vars['admin_links'] = '';
+
+  if (user_access('access contextual links')) {
+    $links = array();
+    // These are specified by the content.
+    if (!empty($content->admin_links)) {
+      $links += $content->admin_links;
+    }
+
+    // Take any that may have been in the render array we were given and
+    // move them up so they appear outside the pane properly.
+    if (is_array($content->content) && isset($content->content['#contextual_links'])) {
+      $element = array(
+        '#type' => 'contextual_links',
+        '#contextual_links' => $content->content['#contextual_links'],
+      );
+      unset($content->content['#contextual_links']);
+
+      $element = contextual_pre_render_links($element);
+      $links += $element['#links'];
+    }
+
+    if ($links) {
+      $build = array(
+        '#prefix' => '<div class="contextual-links-wrapper">',
+        '#suffix' => '</div>',
+        '#theme' => 'links__contextual',
+        '#links' => $links,
+        '#attributes' => array('class' => array('contextual-links')),
+        '#attached' => array(
+          'library' => array(array('contextual', 'contextual-links')),
+        ),
+      );
+      $vars['classes_array'][] = 'contextual-links-region';
+      $vars['admin_links'] = drupal_render($build);
+    }
+  }
 
   // basic classes
   $vars['classes'] = 'panel-pane';
@@ -1178,16 +1216,9 @@ function template_preprocess_panels_pane(&$vars) {
     }
   }
 
-  // administrative links, only if there is permission.
-  $vars['admin_links'] = '';
-  if (user_access('view pane admin links') && !empty($content->admin_links)) {
-    $vars['admin_links'] = theme('links', array('links' => $content->admin_links));
-  }
-
   $vars['title'] = !empty($content->title) ? $content->title : '';
 
   $vars['feeds'] = !empty($content->feeds) ? implode(' ', $content->feeds) : '';
-  $vars['content'] = !empty($content->content) ? $content->content : '';
 
   $vars['links'] = !empty($content->links) ? theme('links', array('links' => $content->links)) : '';
   $vars['more'] = '';
@@ -1197,6 +1228,9 @@ function template_preprocess_panels_pane(&$vars) {
     }
     $vars['more'] = l($content->more['title'], $content->more['href'], $content->more);
   }
+
+  $vars['content'] = !empty($content->content) ? $content->content : '';
+
 }
 
 /**
