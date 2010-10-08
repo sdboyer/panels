@@ -416,7 +416,7 @@ function panels_ctools_style_base_types() {
     'region' => array(
       'title' => t('Panel region'),
       'preview' => 'panels_stylizer_region_preview',
-      'theme variables' => array('settings' => NULL, 'classes' => NULL, 'content' => NULL),
+      'theme variables' => array('settings' => NULL, 'class' => NULL, 'content' => NULL),
     ),
     'pane' => array(
       'title' => t('Panel pane'),
@@ -439,7 +439,7 @@ function panels_stylizer_lipsum() {
  */
 function panels_stylizer_region_preview($plugin, $settings) {
   ctools_stylizer_add_css($plugin, $settings);
-  return theme($plugin['theme'], array('settings' => $settings, 'classes' => ctools_stylizer_get_css_class($plugin, $settings), 'content' => panels_stylizer_lipsum()));
+  return theme($plugin['theme'], array('settings' => $settings, 'class' => ctools_stylizer_get_css_class($plugin, $settings), 'content' => panels_stylizer_lipsum()));
 }
 
 /**

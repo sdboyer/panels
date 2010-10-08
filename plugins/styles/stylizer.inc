@@ -127,7 +127,7 @@ function theme_panels_stylizer_stylizer_style_render_region($vars) {
     $plugin = ctools_get_style_base($settings['style_base']);
     ctools_stylizer_add_css($plugin, $settings);
 
-    return theme($plugin['theme'], array('settings' => $settings, 'class' => ctools_stylizer_get_css_class($plugin, $settings), 'output' => $output));
+    return theme($plugin['theme'], array('settings' => $settings, 'class' => ctools_stylizer_get_css_class($plugin, $settings), 'content' => $output));
   }
   else {
     // if the style is gone, just display the output.

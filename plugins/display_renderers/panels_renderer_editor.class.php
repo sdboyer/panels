@@ -1606,7 +1606,7 @@ function panels_edit_style_type_form($form, &$form_state) {
 
   $styles = panels_get_styles();
 
-  $function = ($type == 'pane' ? 'render pane' : (variable_get('panels_legacy_rendering_mode', TRUE) ? 'render panel' : 'render region'));
+  $function = ($type == 'pane' ? 'render pane' : 'render region');
   $options = array();
   if ($type == 'region') {
     $options[-1] = t('Use display default style');
