@@ -383,20 +383,6 @@ function panels_schema_1() {
   return $schema;
 }
 
-/**
- * Implementation of hook_install().
- */
-function panels_install() {
-  drupal_install_schema('panels');
-}
-
-/**
- * Implementation of hook_uninstall().
- */
-function panels_uninstall() {
-  drupal_uninstall_schema('panels');
-}
-
 function panels_update_1000() {
   // Panels D6 2 had *no* update functions in it, so the schema version is
   // completely wrong. If we run this update with no schema version, we
