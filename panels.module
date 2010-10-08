@@ -308,7 +308,7 @@ function panels_ctools_plugin_directory($module, $plugin) {
   if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
     return;
   }
-  if ($module == 'page_manager' || $module == 'panels' || $module == 'ctools') {
+  if ($module == 'page_manager' || $module == 'panels' || $module == 'ctools' || $module == 'stylizer') {
     return 'plugins/' . $plugin;
   }
 }
